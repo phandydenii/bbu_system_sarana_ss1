@@ -1,0 +1,160 @@
+﻿@using BBU_SYSTEM.DTOs
+@{
+    var invoice = new InvoiceDto();
+}
+<div class="modal fade" id="PaymentModal" data-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Payment Detail</h4>
+                <div class="float-right">
+                    <strong id="txtRateIn" class="badge badge-info"></strong>
+                    <strong id="txtRateOut" class="badge badge-warning"></strong>
+                    <button id="btnSelectItem" type="button" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-sitemap"></i> Select Item
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="PaymentForm" asp-action="CreatePayment" asp-controller="Invoice">
+                    <input type="hidden" asp-for="@invoice.InvoiceId"/>
+                    <input type="hidden" asp-for="@invoice.StudentId"/>
+                    <input type="hidden" asp-for="@invoice.SchoolId"/>
+                    <input type="hidden" asp-for="@invoice.FieldId"/>
+                    <input type="hidden" asp-for="@invoice.DegreeId"/>
+                    <input type="hidden" asp-for="@invoice.PromotionId"/>
+                    <input type="hidden" asp-for="@invoice.StageId"/>
+                    <input type="hidden" asp-for="@invoice.TermNo"/>
+                    <input type="hidden" asp-for="@invoice.GroupId"/>
+                    <input type="hidden" asp-for="@invoice.ExchangeRateId"/>
+                    <div class="row">
+                        <div class="col-12">
+                            <table id="tblInvoiceDetail" class="table table-sm table-bordered table-striped"
+                                   style="width: 100%;">
+                                <thead>
+                                <tr>
+                                    <th class="hide-col">invoice_detail_id</th>
+                                    <th class="hide-col">invoice_id</th>
+                                    <th class="hide-col">product_id</th>
+                                    <th>product_name</th>
+                                    <th class="hide-col">product_name_khmer</th>
+                                    <th>quantity</th>
+                                    <th>product_price</th>
+                                    @* <th>price_usd</th> *@
+                                    <th class="hide-col">total_khr</th>
+                                    <th class="hide-col">total_usd</th>
+                                    <th class="hide-col">type</th>
+                                    <th class="hide-col">vat</th>
+                                    <th>discount</th>
+                                    <th class="hide-col">discount_khr</th>
+                                    <th class="hide-col">discount_usd</th>
+                                    <th>owe_price</th>
+                                    @* <th>owe_as_usd</th> *@
+                                    <th>other_price</th>
+                                    @* <th>other_as_usd</th> *@
+                                    <th class="hide-col">grand_total_khr</th>
+                                    <th class="hide-col">grand_total_usd</th>
+                                    <th class="hide-col">pay_as_khr</th>
+                                    <th class="hide-col">pay_as_usd</th>
+                                    <th class="hide-col">pay_bath</th>
+                                    <th class="hide-col">tuition_fees</th>
+                                    <th class="hide-col">card_certificate</th>
+                                    <th class="hide-col">category_id</th>
+                                    <th class="hide-col">category_id</th>
+                                    <th>action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-2">
+                                    <label>@nameof(invoice.GrandTotalKhr)</label>
+                                    <input type="number" class="form-control edit-mode" asp-for="@invoice.GrandTotalKhr"
+                                           readonly value="0"/>
+                                </div>
+
+                                <div class="col-2">
+                                    <label>total_dis_khr</label>
+                                    <input type="number" class="form-control edit-mode"
+                                           asp-for="@invoice.TotalDiscountKhr"
+                                           readonly value="0"/>
+                                </div>
+                                <div class="col-2">
+                                    <label>total_owe_khr</label>
+                                    <input type="number" class="form-control edit-mode" asp-for="@invoice.OweKhr"
+                                           readonly
+                                           value="0">
+                                </div>
+                                <div class="col-2">
+                                    <label>total_other_khr</label>
+                                    <input type="number" class="form-control edit-mode" asp-for="@invoice.TotalOtherKhr"
+                                           readonly value="0">
+                                </div>
+                                <div class="col-2">
+                                    <label>total_khr</label>
+                                    <input type="number" class="form-control edit-mode" asp-for="@invoice.TotalRiel"
+                                           readonly
+                                           value="0">
+                                </div>
+                                <div class="col-2">
+                                    <label>pay_khr</label>
+                                    <input type="number" class="form-control edit-mode is-warning" asp-for="@invoice.TotalPayKhr" value="0">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-2">
+                                    <label>grand_total_usd</label>
+                                    <input type="number" class="form-control edit-mode" asp-for="@invoice.GrandTotalUsd"
+                                           readonly value="0"/>
+                                </div>
+
+                                <div class="col-2">
+                                    <label>total_dis_usd</label>
+                                    <input type="number" class="form-control edit-mode"
+                                           asp-for="@invoice.TotalDiscountUsd"
+                                           readonly value="0"/>
+                                </div>
+                                <div class="col-2">
+                                    <label>total_owe_usd</label>
+                                    <input type="number" class="form-control edit-mode" asp-for="@invoice.OweUsd"
+                                           readonly
+                                           value="0">
+                                </div>
+                                <div class="col-2">
+                                    <label>total_other_usd</label>
+                                    <input type="number" class="form-control edit-mode" asp-for="@invoice.TotalOtherUsd"
+                                           readonly value="0">
+                                </div>
+                                <div class="col-2">
+                                    <label>total_usd</label>
+                                    <input type="number" class="form-control edit-mode" asp-for="@invoice.TotalDollar"
+                                           readonly
+                                           value="0">
+                                </div>
+                                <div class="col-2">
+                                    <label>pay_usd</label>
+                                    <input type="number" class="form-control edit-mode is-warning" asp-for="@invoice.TotalPayUsd" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success float-right" id="btnSavePayment"><i
+                        class="fas fa-save"></i> Save Payment
+                </button>
+                <button type="button" id="btnClosePayment" class="btn btn-danger float-right"><i
+                        class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="_ProductModal"/>

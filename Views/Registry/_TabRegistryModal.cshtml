@@ -1,0 +1,559 @@
+﻿@model BBU_SYSTEM.ViewModel.ListData
+@*@model dynamic*@
+<div class="modal fade" id="RegistryModal" tabindex="-1" role="dialog" aria-labelledby="RegistryModalLabel"
+     aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Registration</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-action="DoRegistry">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="card card-primary card-outline card-outline-tabs">
+                                <div class="card-header p-0 border-bottom-0">
+                                    <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="custom-tabs-four-personal-tab"
+                                               data-toggle="pill"
+                                               href="#custom-tabs-four-personal" role="tab"
+                                               aria-controls="custom-tabs-four-personal"
+                                               aria-selected="true">Personal</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-personalcontact-tab"
+                                               data-toggle="pill"
+                                               href="#custom-tabs-four-personalcontact" role="tab"
+                                               aria-controls="custom-tabs-four-personalcontact" aria-selected="false">
+                                                Contact
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-parent-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-parent" role="tab"
+                                               aria-controls="custom-tabs-four-parent" aria-selected="false">Parent</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-relative-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-relative" role="tab"
+                                               aria-controls="custom-tabs-four-relative"
+                                               aria-selected="false">Relative</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-schoolarship-tab"
+                                               data-toggle="pill"
+                                               href="#custom-tabs-four-schoolarship" role="tab"
+                                               aria-controls="custom-tabs-four-schoolarship" aria-selected="false">Schoolarship</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-certificate-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-certificate" role="tab"
+                                               aria-controls="custom-tabs-four-certificate" aria-selected="false">Certificate</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-extend-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-extend" role="tab"
+                                               aria-controls="custom-tabs-four-extend" aria-selected="false">Extend</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-note-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-note" role="tab"
+                                               aria-controls="custom-tabs-four-note" aria-selected="false">Note</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-continue-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-continue" role="tab"
+                                               aria-controls="custom-tabs-four-continue"
+                                               aria-selected="false">Continue</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="card-body">
+                                    <div class="tab-content" id="custom-tabs-four-tabContent">
+                                        <div class="tab-pane fade show active" id="custom-tabs-four-personal"
+                                             role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-personal-tab">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <label>Student Id</label>
+                                                    <input type="text" name="student.student_id" class="form-control"
+                                                           id="txtStudentId" placeholder="" value="">
+                                                </div>
+                                                <div class="col-5">
+                                                    <label>Student Name</label>
+                                                    <input type="text" class="form-control" id="txtStudentName"
+                                                           placeholder="" value="">
+                                                </div>
+                                                <div class="col-4">
+                                                    <label>Student Name Khmer</label>
+                                                    <input type="text" class="form-control" id="txtStudentNameKhmer"
+                                                           placeholder="" value="">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <label>Sex</label>
+                                                    <input type="text" class="form-control" id="txtSex" placeholder="">
+                                                </div>
+                                                <div class="col-4">
+                                                    <label>Date Of Birth</label>
+                                                    <input type="text" class="form-control" id="txtDOB" placeholder=""/>
+                                                </div>
+                                                <div class="col-4">
+                                                    <label>Place Of Birth</label>
+                                                    <select id="cboPOB" class="form-control select2"
+                                                            style="width: 100%;">
+                                                        <option selected="selected" value="" disabled>Select Place of
+                                                            Birth
+                                                        </option>
+                                                        @foreach (var data in Model.Provinces!)
+                                                        {
+                                                            <option value=@data.ProvinceId>@data.ProvinceName</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="col-2">
+                                                    <label>Table No</label>
+                                                    <input type="text" class="form-control" id="txtTableNo"
+                                                           placeholder="">
+
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <label>Material</label>
+                                                    <input type="text" class="form-control" id="txtMaterialStatus"
+                                                           placeholder="">
+
+                                                </div>
+                                                <div class="col-4">
+                                                    <label>Nationality</label>
+                                                    <select id="cboNationality" class="form-control select2"
+                                                            style="width: 100%;">
+                                                        <option selected="selected" value="" disabled>Select
+                                                            Nationality
+                                                        </option>
+                                                        @foreach (var data in Model.Nationalities!)
+                                                        {
+                                                            <option
+                                                                value=@data.NationalityId>@data.NationalityName</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <label>Province</label>
+                                                    <select id="cboProvince" class="form-control select2"
+                                                            style="width: 100%;">
+                                                        <option selected="selected" value="" disabled>Select Province
+                                                        </option>
+                                                        @foreach (var data in Model.Provinces!)
+                                                        {
+                                                            <option value=@data.ProvinceId>@data.ProvinceName</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="col-2">
+                                                    <label>Year</label>
+                                                    <input type="text" class="form-control" id="txtYear" placeholder="">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label>Hight School</label>
+                                                    @*<input type="text" class="form-control" id="txtHighSchool" placeholder="">*@
+                                                    <select id="cboHighSchool" class="form-control select2"
+                                                            style="width: 100%;">
+                                                        <option selected="selected" value="" disabled>Select Hight
+                                                            School
+                                                        </option>
+                                                        @foreach (var data in Model.HightSchools!)
+                                                        {
+                                                            <option
+                                                                value=@data.HighSchoolId>@data.HighSchoolName</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="col-4">
+                                                    <label>Race</label>
+                                                    <select id="cboRace" class="form-control select2"
+                                                            style="width: 100%;">
+                                                        <option selected="selected" value="" disabled>Select Race
+                                                        </option>
+                                                        @foreach (var data in Model.Races!)
+                                                        {
+                                                            <option value=@data.RaceId>@data.RaceName</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="col-2">
+                                                    <label>Result</label>
+                                                    <input type="text" class="form-control" id="txtResult"
+                                                           placeholder="" value="">
+                                                </div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label>Job</label>
+                                                    <select id="cboJob" class="form-control select2"
+                                                            style="width: 100%;">
+                                                        <option selected="selected" value="" disabled>Select Job
+                                                        </option>
+                                                        @foreach (var data in Model.StudentJobs!)
+                                                        {
+                                                            <option value=@data.JobId>@data.JobName</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label>Disability</label>
+                                                    <select id="cboDisability" class="form-control select2"
+                                                            style="width: 100%;">
+                                                        <option selected="selected" value="" disabled>Select
+                                                            Disability
+                                                        </option>
+                                                        @foreach (var data in Model.Disabilities!)
+                                                        {
+                                                            <option value=@data.Id>@data.DisabilityName</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-personalcontact" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-personalcontact-tab">
+                                            @*<label>Phone</label>
+                                                <input type="text" class="form-control" id="" asp-for="student!.phone" placeholder="" value="">
+                                                <label>Email</label>
+                                                <input type="text" class="form-control" id="" asp-for="student!.email" placeholder="" value="">
+                                                <label>Address</label>
+                                                <textarea type="text" rows="4" class="form-control" id="" asp-for="student!.address" placeholder=""></textarea>
+                                                <label>Address Khmer</label>
+                                                <textarea type="text" rows="4" class="form-control" id="" asp-for="address_in_khmer" placeholder=""></textarea>*@
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-parent" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-parent-tab">
+                                            @*<label>Father Name</label>
+                                                <input type="text" class="form-control" id="" asp-for="student.student!.father_name_in_khmer" placeholder="" value="">
+                                                <label>Father Occupation</label>
+                                                <input type="text" class="form-control" id="" asp-for="student!.father_occupation_in_khmer" placeholder="" value="">
+                                                <label>Mother Name</label>
+                                                <input type="text" class="form-control" id="" asp-for="student!.mother_name_in_khmer" placeholder="" value="">
+                                                <label>Mother Occupation</label>
+                                                <input type="text" class="form-control" id="" asp-for="student!.mother_occupation_in_khmer" placeholder="" value="">*@
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-relative" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-relative-tab">
+                                            @*<label>Contact Name</label>
+                                                <input type="text" class="form-control" id="" asp-for="contactPerson!.contact_person_name" placeholder="" value="">
+                                                <label>Job</label>
+                                                <input type="text" class="form-control" id="" asp-for="contactPerson!.job" placeholder="" value="">
+                                                <label>Phone</label>
+                                                <input type="text" class="form-control" id="" asp-for="contactPerson!.phone" placeholder="" value="">
+                                                <label>Address</label>
+                                                <input type="text" class="form-control" id="" asp-for="contactPerson!.address" placeholder="" value="">*@
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-schoolarship" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-schoolarship-tab">
+                                            <div class="row">
+                                                <div class="col-md-10">
+                                                    <label>Sponsor</label>
+                                                    <select id="cboSponsor" class="form-control form-control-sm select2"
+                                                            style="width: 100%;">
+                                                        <option selected="selected" value="" disabled>Select Sponsor
+                                                        </option>
+                                                        @*@foreach (var data in Model.sponsors!)
+                                                            {
+                                                                <option value=@data.sponsor_id>@data.sponsor_name</option>
+                                                            }*@
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label>#</label>
+                                                    <button type="button" id="addRowSchoolarship"
+                                                            class="form-control form-control-sm btn btn-primary btn-sm">
+                                                        Add Row
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <table id="tblSchoolarship"
+                                                           class="table table-bordered table-striped"
+                                                           style="width: 100%;">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Term</th>
+                                                            <th>Is Full</th>
+                                                            <th>Amount</th>
+                                                            <th>Sponsor</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        @*<tr>
+                                                                    <td>
+                                                                        <input class="form-control form-control-sm" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <input class="form-control form-control-sm" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <input class="form-control form-control-sm" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <input class="form-control form-control-sm" />
+                                                                    </td>
+                                                                    <td>
+                                                                        <a class="btn btn-sm btn-danger removeRowSchoolarship">Remove</a>
+                                                                    </td>
+                                                                </tr>*@
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-certificate" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-certificate-tab">
+                                            <div class="row">
+                                                <div class="col-md-10">
+                                                    <label>Sponsor</label>
+                                                    <select id="cboCertificate"
+                                                            class="form-control form-control-sm select2"
+                                                            style="width: 100%;">
+                                                        <option selected="selected" value="" disabled>Select Sponsor
+                                                        </option>
+                                                        @*@foreach (var data in Model.certificates!)
+                                                            {
+                                                                <option value=@data.certificate_id>@data.certificate_name</option>
+                                                            }*@
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label>#</label>
+                                                    <button type="button" id="addRowCertificate"
+                                                            class="btn btn-primary btn-sm">Add Row
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <table id="tblCertificate"
+                                                           class="table table-bordered table-striped"
+                                                           style="width: 100%;">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Cert. Id</th>
+                                                            <th>Grade</th>
+                                                            <th>Recieve</th>
+                                                            <th>Issue No</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-extend" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-extend-tab">
+                                            <label>Term</label>
+                                            @*<input type="text" class="form-control" id="" asp-for="extend!.term_no" placeholder="" value="">*@
+                                            @*<label>Father Occupation</label>
+                                                <input type="text" class="form-control" id="txtDegreeEng" placeholder="" value="">
+                                                <label>Mother Name</label>
+                                                <input type="text" class="form-control" id="txtDegreeEng" placeholder="" value="">
+                                                <label>Mother Occupation</label>
+                                                <input type="text" class="form-control" id="txtDegreeEng" placeholder="" value="">*@
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-note" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-note-tab">
+                                            <div class="custom-control custom-checkbox">
+                                                @*<input class="custom-control-input" type="checkbox" id="" value="@Model.student.is_photo_received">*@
+                                                <label for="customCheckbox2" class="custom-control-label">Photo
+                                                    Recieve</label>
+                                            </div>
+                                            <label>Note</label>
+                                            @*<textarea type="text" rows="4" class="form-control" id="" asp-for="student!.note" placeholder=""></textarea>*@
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-continue" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-continue-tab">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox" id="" value="">
+                                                <label for="customCheckbox2" class="custom-control-label">Photo
+                                                    Recieve</label>
+                                            </div>
+                                            <select id="cboContinueTerm" class="form-control form-control-sm select2"
+                                                    style="width: 100%;">
+                                                <option selected="selected" value="0" disable>Select Term</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                            </select>
+                                            @*<textarea type="text" rows="4" class="form-control" id="" asp-for="student!.note" placeholder=""></textarea>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="card card-outline card-primary">
+                                <div class="card-body" style="display: block;">
+                                    <label>Degree</label>
+                                    <select id="cboDegree" name="registry.degree_id" onchange="DegreeChange()"
+                                            class="form-control select2" style="width: 100%;">
+                                        <option selected="selected" disabled value="">Degree</option>
+                                        @foreach (var data in Model.Degrees!)
+                                        {
+                                            <option value=@data.DegreeId>@data.DegreeName</option>
+                                        }
+                                    </select>
+                                    <label>School</label>
+                                    <select id="cboSchool" name="registry.school_id" onchange="SchoolChange()"
+                                            class="form-control select2" style="width: 100%;">
+                                        <option selected="selected" disabled value="-1">School</option>
+                                        @foreach (var data in Model.Schools!)
+                                        {
+                                            <option value=@data.SchoolId>@data.SchoolName</option>
+                                        }
+                                    </select>
+                                    <label>Program</label>
+                                    <select id="cboProgram" class="form-control select2" style="width: 100%;">
+                                        <option selected="selected">Program</option>
+                                        @*@foreach (var data in Model.fields!)
+                                            {
+                                                <option value=@data.field_id>@data.field_name</option>
+                                            }*@
+                                    </select>
+                                    <label>Field</label>
+                                    <select id="cboField" class="form-control select2" style="width: 100%;">
+                                        <option selected="selected">Field</option>
+                                        @*@foreach (var data in Model.fields!)
+                                            {
+                                                <option value=@data.field_id>@data.field_name</option>
+                                            }*@
+                                    </select>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>Promotion</label>
+                                            <select onchange="PromotionChange()" name="registry.promotion_no"
+                                                    id="cboPromotion" class="form-control select2" style="width: 100%;">
+                                                <option selected="selected">Promotion</option>
+                                                @foreach (var data in Model.Promotions!)
+                                                {
+                                                    <option value=@data.PromotionId>@data.PromotionNo</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Stage</label>
+                                            <select onchange="StageChange()" name="registry.stage_no" id="cboStage"
+                                                    class="form-control select2" style="width: 100%;">
+                                                <option selected="selected">Stage</option>
+                                                @foreach (var data in Model.Stages!)
+                                                {
+                                                    <option value=@data.StageId>@data.StageNo</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Term</label>
+                                            <select id="cboTerm" name="registry.term_no" onchange="TermChange()"
+                                                    class="form-control select2" style="width: 100%;">
+                                                <option selected="selected" disabled>Term</option>
+                                                @*@foreach (var data in Model.stages!)
+                                                    {
+                                                        <option value=@data.stage_id>@data.stage_no</option>
+                                                    }*@
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>Group</label>
+                                            <select id="cboGroup" class="form-control select2" style="width: 100%;">
+                                                <option selected="selected">Group</option>
+                                                @*@foreach (var data in Model.groups!)
+                                                    {
+                                                        <option value=@data.group_id>@data.group_name</option>
+                                                    }*@
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Study Time</label>
+                                            <select id="cboStudyTime" class="form-control select2" style="width: 100%;">
+                                                <option selected="selected">Study Time</option>
+                                                @*@foreach (var data in Model.studyTimes!)
+                                                    {
+                                                        <option value=@data.study_time>@data.study_time</option>
+                                                    }*@
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Room</label>
+                                            <select id="cboRoom" class="form-control select2" style="width: 100%;">
+                                                <option selected="selected">Room</option>
+                                                @*@foreach (var data in Model.rooms!)
+                                                    {
+                                                        <option value=@data.room_id>@data.room_name</option>
+                                                    }*@
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="custom-control custom-checkbox">
+                                            <input class="custom-control-input" type="checkbox" id="customCheckbox2">
+                                            <label for="customCheckbox2" class="custom-control-label">Continued
+                                                Student</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="custom-control custom-checkbox">
+                                            <input class="custom-control-input" type="checkbox" id="customCheckbox2">
+                                            <label for="customCheckbox2" class="custom-control-label">Associate to
+                                                Bachelor</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="custom-control custom-checkbox">
+                                            <input class="custom-control-input" type="checkbox" id="customCheckbox2">
+                                            <label for="customCheckbox2" class="custom-control-label">Bachelor to
+                                                Master</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" onclick="OnClose()" class="btn btn-danger float-right">Close</button>
+                            <button type="submit" class="btn btn-success float-right">Registry</button>
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

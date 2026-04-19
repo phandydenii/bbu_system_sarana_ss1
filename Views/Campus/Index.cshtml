@@ -1,0 +1,54 @@
+@{
+    ViewData["Controller"] = "Campus";
+    ViewData["Action"] = "Index";
+    var campuses = new Dictionary<string, string>
+    {
+        { "pp", "Phnom Penh" },
+        { "tk", "Takeo" },
+        { "sr", "Siem Reap" },
+        { "bb", "Battambang" },
+        { "bmc", "Banteay Meanchey" },
+        { "sh", "Sihanouk" },
+        { "rk", "Ratanakiri" },
+        { "st", "Stoeng Treng" },
+        { "tb", "Thboung Khmum" }
+    }; 
+}
+<div class="row">
+    <div class="col-12">
+        <div class="margin" id="rangeButtons">
+            @foreach (var st in campuses)
+            {
+                <button type="button" class="btn btn-outline-primary"
+                        value="@st.Key">@st.Value</button>
+            }
+        </div>
+    </div>
+</div>
+<hr>
+<div class="card card-primary card-outline card-outline-tabs">
+    <div class="card-header p-0 border-bottom-0">
+        <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="custom-tabs-four-user-tab" data-toggle="pill"
+                   href="#custom-tabs-four-user" role="tab" aria-controls="custom-tabs-four-ASS"
+                   aria-selected="true">គណនីអ្នកប្រើប្រាស់</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="custom-tabs-four-report-tab" data-toggle="pill"
+                   href="#custom-tabs-four-report" role="tab" aria-controls="custom-tabs-four-report"
+                   aria-selected="true">របាយការណ៍</a>
+            </li>
+        </ul>
+    </div>
+    <div class="tab-content" id="custom-tabs-four-tabContent">
+        <div class="tab-pane fade show active" id="custom-tabs-four-user" role="tabpanel"
+             aria-labelledby="custom-tabs-four-ASS-tab">
+            user
+        </div>
+        <div class="tab-pane fade" id="custom-tabs-four-report" role="tabpanel"
+             aria-labelledby="custom-tabs-four-ASS-tab">
+            report
+        </div>
+    </div>
+</div>

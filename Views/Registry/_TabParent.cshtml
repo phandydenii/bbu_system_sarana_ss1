@@ -1,0 +1,14 @@
+﻿@using BBU_SYSTEM.Models.Req
+@using BBU_SYSTEM.DTOs
+@model BBU_SYSTEM.ViewModel.RegisryDetailViewModel
+@{
+    var registryReq = new RegistryReq();
+}
+<label>Father Name</label>
+<input type="text" class="form-control" asp-for="@registryReq.Student!.FatherNameInKhmer">
+<label>Father Occupation</label>
+<input type="text" class="form-control" asp-for="@registryReq.Student!.FatherOccupationInKhmer">
+<label>Mother Name</label>
+<input type="text" class="form-control" asp-for="@registryReq.Student!.MotherNameInKhmer">
+<label>Mother Occupation</label>
+<input type="text" class="form-control" asp-for="@registryReq.Student!.MotherOccupationInKhmer">

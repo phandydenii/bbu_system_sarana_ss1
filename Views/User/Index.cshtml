@@ -1,0 +1,318 @@
+@{
+    ViewData["Controller"] = "User";
+    ViewData["Action"] = "Index";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-success">Admin</button>
+                    <button type="button" class="btn btn-outline-primary">Academic</button>
+                    <button type="button" class="btn btn-outline-warning">Dean</button>
+                    <button type="button" class="btn btn-outline-info">HR</button>
+                    <button type="button" class="btn btn-outline-default">Library</button>
+                </div>
+                <button id="btnAddNewUser" type="button" class="btn btn-success btn-sm float-right">
+                    <i class="fas fa-plus"></i>
+                    Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblAdminUser" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>User Id</th>
+                        <th>Username</th>
+                        <th>Password</th>
+                        <th>Group</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_UserPrivilege"/>
+<partial name="_User"/>
+<partial name="_ResetPassword"/>
+
+@section scripts{
+    <script>
+        const tblAdminUser = $("#tblAdminUser");
+        const modelUser = $("#modelUser");
+        const modelUserPrivilege = $("#modelUserPrivilege");
+        const btnAddNewUser = $("#btnAddNewUser");
+        const tblUserPrivilege = $("#tblUserPrivilege");
+        const modalResetPassword = $("#modalResetPassword");
+        const userId = $("#userId");
+        const username = $("#username"); 
+        const frmResetPassword  = $("#frmResetPassword");
+        const listPrivilege = $("#listPrivilege");
+        
+        $(document).ready(function () { 
+            LoadData();
+            GetPrivileges();
+        });
+
+        function LoadData() {
+            tblAdminUser.DataTable().clear().destroy();
+            tblAdminUser.DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: `/user/get-users`,
+                    type: "POST",
+                },
+                columns: [
+                    {data: "userId"},
+                    {data: "userName"},
+                    {
+                        data: "password",
+                        render: (data, type, row) => {
+                            return `<i class="fas fa-eye-slash"></i>`
+                        }
+                    },
+                    {
+                        data: "userGroup", 
+                        render: (data, type, row) => {
+                            if(data === "ADMIN"){
+                                return `<badge class="badge badge-success">${data}</badge>`
+                                // return `<badge type="button" class="btn btn-success btn-sm">${data}</badge>`
+                            }else if(data === "ACADEMIC"){
+                                return `<badge class="badge badge-primary">${data}</badge>`
+                                // return `<badge type="button" class="btn btn-primary btn-sm">${data}</badge>`
+                            }else if(data === "DEAN"){
+                                return `<badge class="badge badge-warning">${data}</badge>`
+                                // return `<badge type="button" class="btn btn-warning btn-sm">${data}</badge>`
+                            }else if(data === "HR"){
+                                return `<badge class="badge badge-info">${data}</badge>`
+                                // return `<badge type="button" class="btn btn-secondary btn-sm">${data}</badge>`
+                            }
+                            return `<badge class="badge badge-default">${data}</badge>`
+                            // return `<badge type="button" class="btn btn-default btn-sm">${data}</badge>`
+                        }
+                    },
+                    {data: "status"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+                                   <i class="fas fa-gears"></i> Action
+                                </button>
+                                <div class="dropdown-menu" style="min-width: 8rem;">
+                                    <div class="col-md-12">
+                                        <a id="btnEdit" class="btn btn-warning btn-sm" style="display: block;margin:.2rem 0"><i class='fas fa-gear'></i> Edit</a>
+                                        <a id="btnPermission" class="btn btn-primary btn-sm" style="display: block;margin:.2rem 0"><i class='fas fa-gear'></i> Permission</a>
+                                        <a id="btnResetPassword" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0"><i class='fas fa-gear'></i> Reset Password</a>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+                        }
+                    }
+                ]
+            })
+        }
+
+        function LoadUserPrivileges(user_id) { 
+            tblUserPrivilege.DataTable().clear().destroy();
+            tblUserPrivilege.DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: `/user/get-user-privileges`,
+                    type: "POST",
+                    data: {
+                        userId: user_id,
+                    }
+                },
+                columns: [
+                    {data: "privilegeId"},
+                    {data: "privilegeName"},
+                    {data: "privilegeGroupName"}
+                ]
+            })
+        }
+
+        
+        async function GetPrivileges() {
+            try {
+                const response = await $.ajax({
+                    url: "/user/get-privileges",
+                    method: 'POST',
+                    data: {isAll: true}
+                });
+                if (response.code === "200" && response.data && response.data.length > 0) {
+                    // console.log(response.data);
+                    const privileges = response.data;
+                    // Group privileges by group name
+                    const grouped = {};
+                    privileges.forEach(p => {
+                        if (!grouped[p.privilegeGroupName]) grouped[p.privilegeGroupName] = [];
+                        grouped[p.privilegeGroupName].push(p);
+                    });
+
+                    // Generate dynamic tabs and tab content
+                    let tabLinks = '';
+                    let tabContents = '';
+                    let first = true;
+
+                    for (const group in grouped) {
+                        const safeId = group.replace(/\s+/g, '-').toLowerCase(); // For IDs (no spaces)
+
+                        // Create tab link
+                        tabLinks += `
+                            <a class="nav-link ${first ? 'active' : ''}" 
+                               id="tab-${safeId}-link" 
+                               data-toggle="pill" 
+                               href="#tab-${safeId}" 
+                               role="tab" 
+                               aria-controls="tab-${safeId}" 
+                               aria-selected="${first}">
+                               ${group}
+                            </a>
+                          `;
+                        
+                        // Create tab content
+                        let bodyHtml = `<div class="row row-cols-1 row-cols-md-4 g-2">`;
+                        grouped[group].forEach(p => {
+                            const checkboxId = `checkbox_${p.privilegeId}`;
+                            bodyHtml += `
+                              <div class="col">
+                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                  <input type="checkbox" class="custom-control-input" id="${checkboxId}">
+                                  <label class="custom-control-label" for="${checkboxId}">${p.privilegeName}</label>
+                                </div>
+                              </div>
+                            `;
+                        });
+                        bodyHtml += `</div>`;
+
+                        tabContents += `
+                        <div class="tab-pane fade ${first ? 'active show' : ''}" 
+                             id="tab-${safeId}" 
+                             role="tabpanel" 
+                             aria-labelledby="tab-${safeId}-link">
+                          ${bodyHtml}
+                        </div>
+                      `;
+
+                        first = false;
+                    }
+
+                    // Insert into HTML
+                    document.getElementById('privilegeTabs').innerHTML = tabLinks;
+                    document.getElementById('privilegeTabContent').innerHTML = tabContents;
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        // Attach a change event to all checkboxes inside privilegeTabContent
+        document.getElementById('privilegeTabContent').addEventListener('change',async function(e) {
+            showLoading();
+            if (e.target && e.target.matches('input[type="checkbox"]')) {
+                const checkbox = e.target;
+                const isChecked = checkbox.checked;
+                const privilegeId = checkbox.id.replace('checkbox_', ''); // Extract ID from checkbox id
+                try {
+                    const response = await $.ajax({
+                        url: "/user/set-user-privileges",
+                        method: 'POST',
+                        data: {
+                            privilegeId: privilegeId,
+                            userId: userId.val(),
+                            assign: isChecked
+                        },
+                    });
+                    if (response.status.code === "200") {
+                        ShowToastSuccess(response.status.message);
+                    }
+                }catch(err) {
+                    ShowToastError(err);
+                }
+            }
+            hideLoading();
+        });
+        btnAddNewUser.on("click", function (event) {
+            event.preventDefault();
+            listPrivilege.css("display", "none");
+            modelUser.modal("show"); 
+        });
+        tblAdminUser.on("click", "#btnEdit",async function () {
+            const $row = $(this).closest("tr");
+            const data = tblAdminUser.DataTable().row($row).data();
+            LoadUserPrivileges(data.userId);
+            listPrivilege.css("display", "block");
+            modelUser.modal("show");
+        });
+
+        tblAdminUser.on("click", "#btnPermission",async function () {
+            showLoading();
+            const $row = $(this).closest("tr");
+            const data = tblAdminUser.DataTable().row($row).data();
+            console.log(data);
+            userId.val(data.userId);
+            username.text(data.userName);
+            const response = await $.ajax({
+                url: "/user/get-user-privileges",
+                method: 'POST',
+                data: {isAll: true,userId: data.userId},
+            });
+            
+            // Suppose this is the array of privilege IDs assigned to the user 
+            const userPrivileges = [];
+            response.data.forEach(p => {
+                userPrivileges.push(p.privilegeId);
+            })
+            // Loop through all checkboxes
+            document.querySelectorAll('#privilegeTabContent input[type="checkbox"]').forEach(checkbox => {
+                const privilegeId = parseInt(checkbox.id.replace('checkbox_', ''));
+                checkbox.checked=userPrivileges.includes(privilegeId);
+            });
+            hideLoading(1);
+            modelUserPrivilege.modal("show");
+        });
+        tblAdminUser.on("click", "#btnResetPassword",async function () {
+            const $row = $(this).closest("tr");
+            const data = tblAdminUser.DataTable().row($row).data();
+            // console.log(data);
+            $("#Username").val(data.userName);
+            $("#CurrentPassword").val(data.password);
+            
+            
+            modalResetPassword.modal("show");
+        });
+
+        frmResetPassword.on("submit", function (e) {
+            e.preventDefault();
+            const form = $(this);
+            const formData = form.serialize();
+            $.ajax({
+                url: '/Account/ResetPassword/',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    ShowToastSuccess(response.status.message);
+                    frmResetPassword[0].reset();
+                    modalResetPassword.modal("hide");
+                    tblAdminUser.DataTable().ajax.reload();
+                },
+                error: function (error) { 
+                    const json = JSON.parse(error.responseText);  
+                    ShowToastError(json.status.message);
+                }
+            });
+        });
+    </script>
+}

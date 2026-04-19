@@ -1,0 +1,85 @@
+﻿@using BBU_SYSTEM.DTOs 
+@{ 
+    var group = new GroupDto();
+    var groupRoom = new GroupRoomDto();
+}
+<div class="modal fade" id="modalGroup" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Group</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formGroup">
+                    <input hidden asp-for="@group.GroupId" readonly class="form-control" value="0"/>
+                    <input hidden asp-for="@group.StageId" readonly class="form-control" value="0"/>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label asp-for="@group.GroupName"></label>
+                                <input type="text" asp-for="@group.GroupName" class="form-control">
+                                <span asp-validation-for="@group.GroupName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label asp-for="@group.StudyTime"></label>
+                                <select asp-for="@group.StudyTime" class="form-control select2">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label asp-for="@group.CreatedInTermNo"></label>
+                                <input type="text" asp-for="@group.CreatedInTermNo" class="form-control">
+                                <span asp-validation-for="@group.CreatedInTermNo" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <label>Field</label>
+                            <select asp-for="@group.FieldId" class="form-control select2">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>note</label>
+                        <input type="text" asp-for="@group.Note" class="form-control"> 
+                    </div>
+                    <p>Group Room</p>
+                    <hr/>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>term_no</label>
+                                <input type="hidden" asp-for="@groupRoom.GroupRoomId" class="form-control">
+                                <input type="number" asp-for="@groupRoom.TermNo" class="form-control"> 
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>room_name</label>
+                                <select asp-for="@groupRoom.RoomName" class="form-control select2">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>start_payment</label>
+                                <input type="date" asp-for="@groupRoom.StartPayment" class="form-control"> 
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success float-right" form="groupForm"><i
+                        class="fa-solid fa-download"></i> Save
+                </button>
+                <button type="button" id="CloseGroup" class="btn btn-danger float-right"><i class="fas fa-close"></i> Close</button>
+            </div>
+        </div>
+    </div>
+</div>

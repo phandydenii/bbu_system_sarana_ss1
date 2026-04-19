@@ -1,0 +1,312 @@
+@{
+    ViewData["OpenMenu"] = "Administration";
+    ViewData["Action"] = "Index";
+}
+<div class="card card-primary card-outline card-outline-tabs">
+    <div class="card-header p-0 border-bottom-0">
+        <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="custom-tabs-four-1-tab" data-toggle="pill"
+                   href="#custom-tabs-four-1" role="tab" aria-controls="custom-tabs-four-1"
+                   aria-selected="true">ផលិតផលបង់ថ្លៃសិក្សា</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="custom-tabs-four-2-tab" data-toggle="pill"
+                   href="#custom-tabs-four-2" role="tab" aria-controls="custom-tabs-four-2"
+                   aria-selected="false">
+                    ផលិតផលបង់ថ្លៃសិក្សាលើ WeBill
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="tab-content" id="custom-tabs-four-tabContent">
+        <div class="tab-pane fade show active" id="custom-tabs-four-1" role="tabpanel"
+             aria-labelledby="custom-tabs-four-1-tab">
+            <div class="card-header">
+                <button class="btn btn-primary" id="btnAddNewProduct"><i class="fas fa-plus"></i> Add New</button>
+            </div>
+            <div class="card-body">
+                <table id="tblProduct" class="table table-bordered table-striped table-sm" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>item_name</th>
+                        <th>name khmer</th>
+                        <th>price_khr</th>
+                        <th>price_usd</th>
+                        <th>degree</th>
+                        <th>vat</th>
+                        <th>default_pay</th>
+                        @* <th>category_id</th> *@
+                        @* <th>card</th> *@
+                        @* <th>fee</th> *@
+                        @* <th>status</th> *@
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade show" id="custom-tabs-four-2" role="tabpanel"
+             aria-labelledby="custom-tabs-four-2-tab">
+            <div class="card-body">
+                <table id="tblProductPayOnline" class="table table-bordered table-striped table-sm" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>product_id</th>
+                        <th>degree</th>
+                        <th>school</th>
+                        <th>price</th>
+                        <th>price_khr</th>
+                        <th>from_promotion</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_ValidationScriptsPartial"/>
+<partial name="_ProductModal"/>
+<partial name="_ProductPayOnline"/>
+
+@section Scripts{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/js/Components.js"></script>
+    <script>
+        const tblProduct = $("#tblProduct");
+        const modalProduct = $("#ProductModal");
+        const btnAddNewProduct = $("#btnAddNewProduct");
+        const btnEditProduct = $("#btnEdit");
+        const btnCloseProduct = $("#btnCloseProduct");
+        const btnCloseProductWeBill = $("#btnCloseProductWeBill");
+        const btnSaveProduct = $("#btnSaveProduct");
+        const tblProductPayOnline = $("#tblProductPayOnline");
+        const ProductPayOnlineModal = $("#ProductPayOnlineModal");
+
+        const cboDegree = $("#productDetail_DegreeId");
+        const cboSchool = $("#productDetail_SchoolId");
+        const cboProduct = $("#productDetail_ProductId");
+        const frmProduct = $("#frmProduct");
+        const frmProductWeBill = $("#frmProductWeBill");
+        $(document).ready(function () {
+            fetchProduct();
+            Components.BindSelectOptions("/product/get-product-category-list","product_CategoryId","categoryId","categoryName")
+            fetchProductPayOnline();
+        });
+
+        function fetchProduct() {
+            tblProduct.DataTable().clear().destroy();
+            tblProduct.DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/product/get-product-list",
+                    type: "POST",
+                },
+                columns: [
+                    {data: "productId"},
+                    {data: "productName"},
+                    {data: "productNameInKhmer"},
+                    {data: "priceKhr"},
+                    {data: "price"},
+                    {data: "degreeId"},
+                    {data: "vat"},
+                    {
+                        data: "paymentType",
+                        render: function (data, type, row) {
+                            return data ? '<span class="badge bg-info">KHR</span>' : '<span class="badge bg-success">USD</span>';
+                        }
+                    },
+                    // {data: "categoryId"},
+                    // {data: "cardCertificate"},
+                    // {data: "tuitionFees"},
+                    // {data: "status"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `<a class="btn btn-warning btn-sm" id="btnEdit"><i class="fas fa-edit"></i> Edit</a>
+                                    <a class="btn btn-danger btn-sm" id="btnDelete"><i class="fas fa-trash"></i> Delete</a>
+                                    `;
+                        }
+                    }
+                ]
+            });
+        }
+
+        function fetchProductPayOnline() {
+            tblProductPayOnline.DataTable().clear().destroy();
+            tblProductPayOnline.DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/product/get-product-detail-list",
+                    type: "POST",
+                    // success: function (data, status, headers) {
+                    //     console.log(data.data);
+                    //     return data.data;
+                    // },
+                    // error: function (data, status, error) {
+                    //     console.log(data.responseText);
+                    // }
+                },
+                columns: [
+                    {data: "productDetailId"},
+                    {data: "productName"},
+                    {data: "degreeName"},
+                    {data: "schoolName"},
+                    {data: "price"},
+                    {data: "priceKhr"},
+                    {data: "fromPromotionNo"},
+                    {
+                        data: null,
+                        render: function (data, type, row) { 
+                            return `<a class="btn btn-warning btn-sm" ><i class="fas fa-edit"></i> Edit</a>`;
+                        }
+                    }
+                ]
+            });
+        }
+
+        btnAddNewProduct.click(function () {
+            frmProduct[0].reset();
+            modalProduct.modal("show");
+            modalProduct.find(".modal-title").text("Add New Product");
+        });
+
+        tblProduct.on("click", "#btnEdit", function (e) {
+            const $row = $(this).closest("tr");
+            const data = tblProduct.DataTable().row($row).data();
+            console.log(data);
+            $("#product_ProductId").val(data.productId);
+            $("#product_ProductName").val(data.productName);
+            $("#product_PriceKhr").val(data.priceKhr);
+            $("#product_ProductNameInKhmer").val(data.productNameInKhmer);
+            $("#product_Price").val(data.price);
+            $("#product_CategoryId").val(data.categoryId).trigger("change");
+            $("#product_DegreeId").val(data.degreeId);
+            $("#product_FromPromotion").val(data.fromPromotion);
+            $("#product_Vat").val(data.vat);
+            $("#product_CardCertificate").val(data.cardCertificate);
+            $("#product_Type").val(data.type);
+            $("#isFee").prop("checked", data.tuitionFees);
+            $("#isHidden").prop("checked", data.hidden);
+
+            $("#product_PaymentType").prop("checked", data.paymentType);
+
+            $("#radioPrimary1").prop("checked", data.paymentType);
+            $("#radioPrimary2").prop("checked", !data.paymentType || false);
+            modalProduct.find(".modal-title").text("Edit Product");
+            modalProduct.modal("show");
+        });
+
+        tblProduct.on("click", "#btnDelete", function (e) {
+            const $row = $(this).closest("tr");
+            const data = tblProduct.DataTable().row($row).data();
+            console.log(data);
+        });
+
+        $("#radioPrimary1").on("change", function (e) { 
+            $("#product_PaymentType").prop("checked", e.target.checked);
+        });
+
+        $("#radioPrimary2").on("change", function (e) { 
+            $("#product_PaymentType").prop("checked", !e.target.checked);
+        });
+
+        btnCloseProduct.click(function () {
+            frmProduct[0].reset();
+            modalProduct.modal("hide");
+        });
+
+        frmProduct.on("submit",function (e) {
+            e.preventDefault();
+            const form = $(this);
+            const formData = form.serialize();
+            $.ajax({
+                url: '/product/save-change-product',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.status.code === "200") {
+                        ShowToastSuccess(response.status.message);
+                        frmProduct[0].reset();
+                        modalProduct.modal("hide");
+                        tblProduct.DataTable().ajax.reload();
+                    } else {
+                        ShowToastError(response);
+                    }
+                },
+                error: function (error, status, xhr) {
+                    ShowToastError(error.responseText); 
+                }
+            });
+        });
+
+        const OnEditProductWeBill = (row) => {
+            console.log(row);
+            GetDegree();
+            GetSchool();
+            GetProduct();
+            ProductPayOnlineModal.modal("show");
+        }
+
+        async function GetDegree() {
+            cboDegree.empty();
+            cboDegree.append("<option value='' disabled>Select Degree</option>");
+            const degrees = await Degree.GetAllDegree();
+            degrees.forEach(item => {
+                cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
+            });
+            cboDegree.val('').trigger("change");
+        }
+
+        async function GetSchool() {
+            cboSchool.empty();
+            cboSchool.append("<option value='' disabled>Select School</option>");
+            const schools = await School.GetSchool()
+            schools.forEach(function (item) {
+                cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
+            });
+            cboSchool.val('').trigger("change");
+        }
+
+        async function GetProduct() {
+            cboProduct.empty();
+            cboProduct.append("<option value='' disabled>Select Product</option>");
+            try {
+                const response = await $.ajax({
+                    url: "/product/get-product-list",
+                    method: 'POST',
+                    data: {isAll: true}
+                });
+                if (response.code === "200" && response.data !== "") {
+                    response.data.forEach(function (item) {
+                        cboProduct.append(`<option value='${item.productId}'>${item.productId}-${item.productName}-(Price Usd: ${item.price}, Price Khr: ${item.priceKhr})</option>`);
+                    });
+                    cboProduct.val('').trigger("change");
+                } else {
+                    ShowToastError(response.message);
+                    return [];
+                }
+            } catch (err) {
+                console.log(err);
+                ShowToastError(err);
+            }
+        }
+
+        btnCloseProductWeBill.click(function () {
+            frmProductWeBill[0].reset();
+            ProductPayOnlineModal.modal("hide");
+        })
+    </script>
+}

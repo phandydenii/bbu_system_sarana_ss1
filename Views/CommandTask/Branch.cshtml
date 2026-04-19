@@ -1,0 +1,81 @@
+@{
+    ViewData["OpenMenu"] = "CommandTask";
+    ViewData["Action"] = "Branch";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Branch</h3>
+                <button type="submit" class="btn btn-success btn-sm float-right" data-toggle="modal"
+                        data-target="#BranchModal">
+                    <i class="fas fa-plus"></i>
+                    Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblBranch" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Name Khmer</th>
+                        <th>Short</th>
+                        <th>Address</th>
+                        <th>action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_BranchModal"/>
+
+@section Scripts{
+    <script>
+        const tblBranch = $("#tblBranch");
+        $(document).ready(function () {
+            fetchBranch();
+        });
+
+        function fetchBranch() {
+            tblBranch.DataTable().clear().destroy();
+            tblBranch.DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/branch/get-branch",
+                    type: "POST"
+                },
+                columns: [
+                    {data: "branchId"},
+                    {data: "branchName"},
+                    {data: "branchNameInKhmer"},
+                    {data: "shortName"},
+                    {data: "address"},
+                    // { data: "phone" },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                        <a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i> Edit</a>
+                        <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
+                    `;
+                        }
+                    }
+                ]
+            });
+        }
+
+    </script>
+}

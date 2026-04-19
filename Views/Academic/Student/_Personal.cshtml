@@ -1,0 +1,156 @@
+﻿@model BBU_SYSTEM.ViewModel.StudentViewModel
+<div class="tab-pane fade show active" id="custom-tabs-four-personal" role="tabpanel"
+     aria-labelledby="custom-tabs-four-personal-tab">
+    <div class="row">
+        <div class="col-3">
+            <label>Student Id</label>
+            <input type="text" class="form-control" id="txtStudentId" placeholder="" readonly
+                   value="@Html.DisplayFor(m => m.Student!.StudentId)">
+        </div>
+        <div class="col-5">
+            <label>Student Name</label>
+            <input type="text" class="form-control" id="txtStudentName" placeholder="" readonly
+                   value="@Html.DisplayFor(m => m.Student!.StudentName)">
+        </div>
+        <div class="col-4">
+            <label>Student Name Khmer</label>
+            <input type="text" class="form-control" id="txtStudentNameKhmer" placeholder="" readonly
+                   value="@Html.DisplayFor(m => m.Student!.StudentNameInKhmer)">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-2">
+            <label>Sex</label>
+            <input type="text" class="form-control" id="txtSex" placeholder="" readonly
+                   value="@Html.DisplayFor(m => m.Student!.Sex)">
+        </div>
+        <div class="col-4">
+            <label>Date Of Birth</label>
+            <input type="text" class="form-control" id="txtDOB" placeholder="" readonly
+                   value="@Html.DisplayFor(m => m.Student!.DateOfBirth)"/>
+        </div>
+        <div class="col-4">
+            <label>Place Of Birth</label>
+            <select id="cboPOB" class="form-control select2" style="width: 100%;" disabled>
+                <option selected="selected" disabled>Select Place of Birth</option>
+                @*@foreach (var data in Model.provinces!)
+                    {
+                        <option value=@data.province_id>@data.province</option>
+                    }*@
+            </select>
+        </div>
+        <div class="col-2">
+            <label>Race</label>
+            <select id="cboRace" class="form-control select2" style="width: 100%;" disabled>
+                <option selected="selected" disabled>Select Race</option>
+                @*@foreach (var data in Model.races!)
+                    {
+                        <option value=@data.race_id>@data.race</option>
+                    }*@
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-2">
+            <label>Nationality</label>
+            <select id="cboNationality" class="form-control select2" style="width: 100%;" disabled>
+                <option selected="selected" disabled>Select Nationality</option>
+                @*@foreach (var data in Model.nationalities!)
+                    {
+                        <option value=@data.nationality_id>@data.nationality_in_eng</option>
+                    }*@
+            </select>
+        </div>
+        <div class="col-4">
+            <label>Material Status</label>
+            <input type="text" class="form-control" id="txtMaterialStatus" placeholder=""
+                   value="@Html.DisplayFor(m => m.Student!.MaritalStatus)" disabled>
+        </div>
+        <div class="col-4">
+            <label>Province</label>
+            <select id="cboProvince" class="form-control select2" style="width: 100%;" disabled>
+                <option selected="selected">Select Province</option>
+                @*@foreach (var data in Model.provinces!)
+                    {
+                        <option value=@data.province_id>@data.province</option>
+                    }*@
+            </select>
+        </div>
+        <div class="col-2">
+            <label>Year</label>
+            <input type="text" class="form-control" id="txtYear" placeholder=""
+                   value="@Html.DisplayFor(m => m.Student!.HighSchoolGraduatedYear)" disabled>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <label>Hight School</label>
+            <input type="text" class="form-control" id="txtHighSchool" placeholder=""
+                   value="@Html.DisplayFor(m => m.Student!.FromHighSchoolNameInKhmer)" disabled>
+            @*<select id="cboHighSchool" class="form-control select2" style="width: 100%;" disabled>
+                    <option selected="selected">Select Hight School</option>
+                    @foreach (var data in Model.hightSchools!)
+                    {
+                        <option value=@data.high_school_id>@data.high_school_name_in_khmer</option>
+                    }
+                </select>*@
+        </div>
+        <div class="col-4">
+            <label>Table No</label>
+            <input type="text" class="form-control" id="txtTableNo" placeholder="" disabled
+                   value="@Html.DisplayFor(m => m.Registry!.HighSchoolTableNo)">
+        </div>
+        <div class="col-2">
+            <label>Result</label>
+            <input type="text" class="form-control" id="txtResult" placeholder="" disabled
+                   value="@Html.DisplayFor(m => m.Registry!.HighSchoolResult)">
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <label>Job</label>
+            <select id="cboJob" class="form-control select2" style="width: 100%;" disabled>
+                <option selected="selected">Select Job</option>
+                @*@foreach (var data in Model.studentJobs!)
+                    {
+                        <option value=@data.job_id>@data.job</option>
+                    }*@
+            </select>
+        </div>
+        <div class="col-6">
+            <label>Disability</label>
+            <select id="cboDisability" class="form-control select2" style="width: 100%;" disabled>
+                <option selected="selected" disabled value="">Select Disability</option>
+                @*@foreach (var data in Model.disabilities!)
+                    {
+                        <option value=@data.id>@data.disability</option>
+                    }*@
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <label>Status</label>
+            <input type="text" class="form-control" id="txtStatus" placeholder=""
+                   value="@Html.DisplayFor(m => m.Student!.Status)"
+                   style="text-align: center;background-color:green;color:white;font-weight:bold" readonly>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#cboPOB").val(@Html.DisplayFor(m => m.Student!.FromProvinceId));
+        $("#cboRace").val(@Html.DisplayFor(m => m.Student!.RaceId));
+        $("#cboNationality").val(@Html.DisplayFor(m => m.Student!.NationalityId));
+        $("#cboProvince").val(@Html.DisplayFor(m => m.Student!.FromProvinceId));
+        if (@Html.DisplayFor(m => m.Student!.DisabilityId) != 0) {
+            $("#cboDisability").val(@Html.DisplayFor(m => m.Student!.FromProvinceId).ToString());
+        }
+        $("#cboJob").val(@Html.DisplayFor(m => m.Student!.JobId));
+        @*$("#cboHighSchool").inn(@Html.DisplayFor(m=>m.Student!.from_high_school_name_in_khmer));*@
+
+
+    });
+</script>

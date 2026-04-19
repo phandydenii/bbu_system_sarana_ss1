@@ -1,0 +1,51 @@
+@using BBU_SYSTEM.DTOs
+@{
+    var productDetail = new ProductDetailDto();
+}
+<div class="modal fade" id="ProductPayOnlineModal" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Product WeBill Payment</h4>
+            </div>
+            <div class="modal-body">
+                <form id="frmProductWeBill">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>Product</label>
+                            <select asp-for="@productDetail.ProductId" class="form-control select2">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Degree</label>
+                            <select asp-for="@productDetail.DegreeId" class="form-control select2">
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label>School</label>
+                            <select asp-for="@productDetail.SchoolId" class="form-control select2">
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>From Promotion</label>
+                                <input type="number" class="form-control"
+                                       placeholder="Enter Name" min="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success" form="frmProductWeBill"><i
+                        class="fas fa-check"></i> Save changes
+                </button>
+                <button type="button" id="btnCloseProductWeBill" class="btn btn-danger float-right"><i
+                        class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

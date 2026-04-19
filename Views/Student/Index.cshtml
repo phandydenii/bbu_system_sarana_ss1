@@ -1,0 +1,130 @@
+﻿@{
+    ViewData["OpenMenu"] = "AcademicTask";
+    ViewData["Action"] = "ManageStudent"; 
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Student List</h3>
+            </div>
+            <div class="card-body">
+                <table id="tblStudent" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Student Id</th>
+                        <th>Name English</th>
+                        <th>Name Khmer</th>
+                        <th>Gender</th>
+                        <th>DOB</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        fetchStudent();
+    });
+
+    function fetchStudent() {
+        let tblStudent = $("#tblStudent");
+        tblStudent.DataTable().clear().destroy();
+        tblStudent.DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            ajax: {
+                url: `/student/academic/student-list/all`,
+                type: "POST",
+                // data: {
+                //     status: "all"
+                // },
+                // success: function (data) {
+                //     // console.log(data.data);
+                //     return data.data;
+                // },
+                error: function (xhr, status, error) {
+                    ShowToastError(xhr.responseText);
+                }
+            },
+            columns: [
+                {data: "studentId"},
+                {data: "studentName"},
+                {data: "studentNameInKhmer"},
+                {data: "sex"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const dt = formatDate(row.date_of_birth);
+                        return `${dt}`
+                    }
+                },
+                {data: "phone"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        if (row.status === "REGISTER") {
+                            return ` <span class="badge badge-warning">${row.status}</span>`;
+                        } else if (row.status === "ACTIVE") {
+                            return ` <span class="badge badge-primary">${row.status}</span>`;
+                        } else if (row.status === "QUIT") {
+                            return ` <span class="badge badge-danger">${row.status}</span>`;
+                        }else {
+                            return `<span class="badge badge-default">${row.status}</span>`;
+                        }
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return `<a href="/student/details/${row.studentId}" class="btn btn-warning btn-sm"><i class="fas fa-gear"></i> View</a> `;
+                    }
+                }
+            ]
+        });
+    }
+
+    // Function to handle Edit
+    function OnEdit(id) {
+        $("#editModal").modal("show");
+        $.get(`/api/mis/${campus()}/students/academics/${id}`, function (result) {
+            const data = result["data"];
+            const student = data["student"];
+            const nationality = data["nationality"];
+            const province = data["province"];
+            const race = data["race"];
+            const degree = data["degree"];
+            const school = data["school"];
+            const field = data["field"];
+            const promotion = data["promotion"];
+            const stage = data["stage"];
+            const term = data["term"];
+            const group = data["group"];
+            const group_room = data["group_room"];
+            $("#txtStudentId").val(student["student_id"]);
+            $("#txtStudentName").val(student["student_name"]);
+            $("#txtStudentNameKhmer").val(student["student_name_in_khmer"]);
+
+            $("#txtSex").val(student["sex"]);
+            const dob = moment(student["date_of_birth"]).format("YYYY-MM-DD");
+            $("#txtDOB").val(dob);
+            $("#txtPOB").val(province["province"]);
+            //$("#txtStatus").val(data["status"]);
+        });
+
+        //window.location.href = `/student/details/${data}`;
+    }
+
+    function OnView(id) {
+        window.location.href = `student/details/${id}`;
+    }
+</script>

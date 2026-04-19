@@ -1,0 +1,124 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["TitleContent"] = "Dashboard";
+    ViewData["Controller"] = "ReportChart";
+    ViewData["Action"] = "ReportChart";
+}
+
+<div id="queryContainer">
+    <!-- Query blocks will be appended here -->
+</div>
+
+<button id="btnAddQuery" class="btn btn-success mt-3">Add New Query</button>
+
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Chart.js Data Labels plugin -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script>
+    $(function () {
+
+        Chart.register(ChartDataLabels); // Register plugin globally
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) color += letters[Math.floor(Math.random() * 16)];
+            return color;
+        }
+
+        // Add first query block
+        addQueryBlock();
+
+        $("#btnAddQuery").click(function () {
+            addQueryBlock();
+        });
+
+        function addQueryBlock() {
+            const block = $(`
+            <div class="card mt-3 query-block">
+                <div class="card-header">
+                    <h3 class="card-title">SQL Query</h3>
+                    <button type="button" class="btn btn-tool btnRemoveBlock"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="card-body">
+                    <textarea class="form-control txtQuery" rows="3" placeholder="SELECT label, value FROM Table"></textarea>
+                    <button class="btn btn-primary btnRunQuery mt-2">Run Query</button>
+                    <div class="mt-3 chart-container">
+                        <canvas class="chartCanvas" style="min-height:250px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        `);
+
+            $("#queryContainer").append(block);
+        }
+
+        // Remove block
+        $(document).on("click", ".btnRemoveBlock", function () {
+            $(this).closest(".query-block").remove();
+        });
+
+        // Run query for each block
+        $(document).on("click", ".btnRunQuery", function () {
+            const $block = $(this).closest(".query-block");
+            const query = $block.find(".txtQuery").val();
+            const ctx = $block.find(".chartCanvas").get(0).getContext("2d");
+
+            $.ajax({
+                url: "/Report/RunQuery",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({query}),
+                success: function (data) {
+                    const labels = data.map(x => x.label);
+                    const values = data.map(x => x.value);
+
+                    const chartData = {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Result',
+                            data: values,
+                            backgroundColor: labels.map(() => getRandomColor())
+                        }]
+                    };
+
+                    const chartOptions = {
+                        plugins: {
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'top',
+                                color: '#000',
+                                font: {weight: 'bold'},
+                                formatter: function (value) {
+                                    return value;
+                                }
+                            }
+                        },
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        scales: {y: {beginAtZero: true}}
+                    };
+
+                    // Destroy previous chart if exists
+                    if ($block.data("chart")) $block.data("chart").destroy();
+
+                    const chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: chartData,
+                        options: chartOptions
+                    });
+
+                    $block.data("chart", chart);
+                },
+                error: function (err) {
+                    alert("Error: " + err.responseText);
+                    // console.log(err.responseText);
+                }
+            });
+        });
+
+    });
+
+</script>

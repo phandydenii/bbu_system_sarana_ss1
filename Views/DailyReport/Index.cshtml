@@ -1,0 +1,49 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer;
+@{
+    ViewData["Controller"] = "DailyReport";
+    ViewData["Action"] = "DailyReport"; 
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Daily Report</h3>
+                <button type="button" id="btnAddNew" class="btn btn-success btn-sm float-right">
+                    <i class="fas fa-plus"></i>
+                    Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblDailyReport" class="table table-bordered table-striped table-sm" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>@Localizer["Id"]</th>
+                        <th>@Localizer["Title"]</th>
+                        <th>@Localizer["Description"]</th> 
+                        <th>@Localizer["CreateDate"]</th>
+                        <th>@Localizer["Action"]</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script> 
+<partial name="_ValidationScriptsPartial"/> 
+<partial name="_DailyReportModal"/>
+@section Scripts
+{
+    <script>
+        const i18n = {
+            edit: '@Localizer["Edit"]',
+            delete: '@Localizer["Delete"]',
+            view: '@Localizer["View"]'
+        };
+    </script>
+    <script src="~/function/DailyReport.js"></script>
+}

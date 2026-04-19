@@ -1,0 +1,94 @@
+﻿@{
+    var student = new Student();
+}
+<div class="row">
+    <div class="col-5">
+        <div class="row">
+            <div class="col-3">
+                <label class="required">@nameof(student.StudentId)</label>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" readonly/>
+                    <div class="input-group-append" style="cursor: pointer;" id="btnSearchStudent">
+                        <span class="input-group-text" style="background-color: green;">
+                            <i class="fa-solid fa-magnifying-glass" style="color: white;"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-5">
+                <label>@nameof(student.StudentName)</label>
+                <input type="text" class="form-control" asp-for="@student.StudentName" readonly/>
+            </div>
+            <div class="col-4">
+                <label>@nameof(student.StudentNameInKhmer)</label>
+                <input type="text" class="form-control" asp-for="@student.StudentNameInKhmer" readonly/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <label>DoB</label>
+                <input type="text" class="form-control" asp-for="@student.DateOfBirth" readonly>
+            </div>
+            <div class="col-2">
+                <label>Gender</label>
+                <input type="text" class="form-control" asp-for="@student.Sex" readonly/>
+            </div>
+            <div class="col-3">
+                <label>phone</label>
+                <input type="text" class="form-control" asp-for="@student.Phone" readonly/>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="row">
+            <div class="col-4">
+                <label>Degree</label>
+                <input type="text" class="form-control" readonly>
+            </div>
+            <div class="col-8">
+                <label>School</label>
+                <input type="text" class="form-control" readonly>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <label>Promotion</label>
+                <input type="text" class="form-control" readonly>
+            </div>
+            <div class="col-2">
+                <label>Stage</label>
+                <input type="number" class="form-control" readonly>
+            </div>
+            <div class="col-8">
+                <label>Field</label>
+                <input type="text" class="form-control" readonly>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <label>Term</label>
+                <input type="number" class="form-control" readonly>
+            </div>
+            <div class="col-2">
+                <label>Group</label>
+                <input type="text" class="form-control" readonly>
+            </div>
+            <div class="col-2">
+                <label>Room</label>
+                <input type="text" class="form-control" readonly>
+            </div>
+            <div class="col-2">
+                <label>Study Time</label>
+                <input type="text" class="form-control" readonly>
+            </div>
+            <div class="col-2">
+                <label>StartDate</label>
+                <input type="text" class="form-control" readonly>
+            </div>
+            <div class="col-2">
+                <label>EndDate</label>
+                <input type="text" class="form-control" readonly>
+            </div>
+        </div>
+    </div>
+</div>

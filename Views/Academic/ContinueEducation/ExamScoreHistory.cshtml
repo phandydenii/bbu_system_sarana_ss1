@@ -1,0 +1,177 @@
+﻿@using BBU_SYSTEM.DTOs
+@model BBU_SYSTEM.ViewModel.ListData
+@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "AcademicTask";
+    ViewData["Action"] = "OtherBranchScore";
+}
+<div class="card-body">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Student List</h3>
+                </div>
+                <div class="card-body">
+                    <table id="tblExamScoreHistory" class="table table-sm table-bordered table-striped"
+                           style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>DOB</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Student Mark</h3>
+                </div>
+                <div class="card-body">
+                    <table id="tblStudentMark" class="table table-sm table-bordered table-striped"
+                           style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th>term</th>
+                            <th>name</th>
+                            <th>midterm_score</th>
+                            <th>final_score</th>
+                            <th>total</th>
+                            <th>grade</th>
+                            <th>action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Score History</h3>
+                </div>
+                <div class="card-body">
+                    <table id="tblShoreHistory" class="table table-sm table-bordered table-striped"
+                           style="width: 100%;">
+                        <thead>
+                        <tr> 
+                            <th>term</th>
+                            <th>name</th>
+                            <th>midterm_score</th>
+                            <th>final_score</th>
+                            <th>total</th>
+                            <th>grade</th>
+                            <th>time</th>
+                            <th>action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // fetchStudentExamScoreHistory();
+        // $("#tblOtherBranchScore").DataTable();
+    });
+
+    function fetchStudentExamScoreHistory() {
+        const tblStudent = $("#tblExamScoreHistory");
+        tblStudent.DataTable().clear().destroy();
+        tblStudent.DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            ajax: {
+                url: `/scores/GetAllFailedStudents`,
+                type: "POST",
+            },
+            columns: [
+                {data: "studentId"},
+                {data: "studentName"},
+                {data: "sex"},
+                {
+                    data: "dateOfBirth",
+                    render: function (data, type, row) {
+                        return `${formatDate(data)}`
+                    }
+                }
+            ]
+        })
+    }
+
+    $('#tblStudent tbody').on('click', 'tr', function () {
+        $('#tblStudent tbody tr').removeClass('highlight');
+        $(this).addClass('highlight');
+        const table = $('#tblStudent').DataTable();
+        const data = table.row(this).data();
+        GetOtherBanchScore(data.studentId);
+        getStudent(data.studentId)
+    });
+
+    function GetOtherBanchScore(studentId) {
+        if (!studentId) return;
+        const tblOtherBranchScore = $("#tblOtherBranchScore");
+        tblOtherBranchScore.DataTable().clear().destroy();
+        tblOtherBranchScore.DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            ajax: {
+                url: `/scores/get-other-brand-score/${studentId}`,
+                type: "POST",
+                dataSrc: function (json) {
+                    return json.data;
+                }
+            },
+            columns: [
+                {data: "otherBranchScoreId", visible: false},
+                {data: "courseId", visible: false},
+                {data: "termNo"},
+                {data: "courseName"},
+                {
+                    data: "midTermScore",
+                    render: function (data, type, row) {
+                        return data ? `<input type="number" class="form-control form-control-sm is-warning" name="otherBranchScore_MidTermScore" value="${data.toFixed(2)}" readonly/>` : 'N/A';
+                    }
+                },
+                {
+                    data: "finalScore",
+                    render: function (data, type, row) {
+                        return data ? `<input type="number" class="form-control form-control-sm is-warning" name="otherBranchScore_FinalScore" value="${data.toFixed(2)}" readonly/>` : 'N/A';
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const totalScore = (row.midTermScore || 0) + (row.finalScore || 0);
+                        if (totalScore >= 60) {
+                            return `<button class="btn btn-success btn-sm">Pass</button>`;
+                        } else {
+                            return `<button class="btn btn-danger btn-sm">Fail</button>`;
+                        }
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const rows = JSON.stringify(row).replace(/"/g, '&quot;');
+                        return `<button class="btn btn-warning btn-sm" onclick="OnEdit(${rows})"><i class="fa-solid fa-pen-to-square"></i></button>`;
+                    }
+                }
+            ]
+        });
+    }
+</script>

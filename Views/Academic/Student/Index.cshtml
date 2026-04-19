@@ -1,0 +1,202 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Branch</h3>
+            </div>
+            <div class="card-body">
+                <table id="tblStudent" class="table table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Student Id</th>
+                        <th>Name English</th>
+                        <th>Name Khmer</th>
+                        <th>Gender</th>
+                        <th>DOB</th>
+                        <th>Phone</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<div class="modal fade" id="editModal">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">-->
+@* <div class="modal-header">
+                    <h4 class="modal-title">Default Modal</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div> *@
+<!--<div class="modal-body">-->
+@* ======Body===== *@
+<!--<div class="row"> 
+    <div class="col-12 col-sm-7">
+        <div class="card card-primary card-outline card-outline-tabs">
+            <div class="card-header p-0 border-bottom-0">
+                <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="custom-tabs-four-personal-tab" data-toggle="pill"
+                           href="#custom-tabs-four-personal" role="tab"
+                           aria-controls="custom-tabs-four-personal" aria-selected="true">Personal</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="custom-tabs-four-personalcontact-tab" data-toggle="pill"
+                           href="#custom-tabs-four-personalcontact" role="tab"
+                           aria-controls="custom-tabs-four-personalcontact" aria-selected="false">
+                            Persional Contact
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="custom-tabs-four-relativecontact-tab" data-toggle="pill"
+                           href="#custom-tabs-four-relativecontact" role="tab"
+                           aria-controls="custom-tabs-four-relativecontact" aria-selected="false">
+                            Relative Contact
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="custom-tabs-four-parent-tab" data-toggle="pill"
+                           href="#custom-tabs-four-parent" role="tab"
+                           aria-controls="custom-tabs-four-parent" aria-selected="false">Parent</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="custom-tabs-four-tabContent">
+                    <partial name="_Personal" />
+                    <partial name="_PersonalContact" />
+                    <partial name="_RelativeContact" />
+                    <partial name="_Parent" /> 
+                </div>
+            </div> 
+        </div>
+    </div> 
+</div>
+</div>-->
+@* ======Body===== *@
+<!--<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Fileter</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Suppress</button>
+    <button type="button" class="btn btn-dark" data-dismiss="modal">Change Branch</button>
+    <button type="button" class="btn btn-warning" data-dismiss="modal">Quit</button>
+    <button type="button" class="btn btn-primary" data-dismiss="modal">Suspend</button>
+    <button type="button" class="btn btn-info" data-dismiss="modal">Adjust</button>
+    <button type="button" class="btn btn-success" data-dismiss="modal">Update</button>
+    <button type="button"  class="btn btn-danger" data-dismiss="modal">Close</button> 
+</div>
+</div>
+</div>
+</div>-->
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script>
+    //const campus = localStorage.getItem("campus")
+    $(document).ready(function () {
+        //$.get(`/api/mis/${campus}/high-schools`, function (data) {
+        //    const dropdown = $('#cboHighSchool');
+        //    $.each(data, function (index, item) {
+        //        console.log(item.high_school_id);
+        //        dropdown.append(`<option value="${item.high_school_id}">${item.high_school_name_in_khmer}</option>`);
+        //    });
+        //});
+
+        $.ajax({
+            url: `/api/mis/${campus()}/high-schools`,
+            type: 'GET',
+            success: function (data) {
+                const dropdown = $('#cboHighSchool');
+                $.each(data["data"], function (index, item) {
+                    dropdown.append(`<option value="${item.high_school_id}">${item.high_school_id}</option>`);
+                });
+            },
+            error: function (error) {
+                console.error('Error fetching nationalities:', error);
+            }
+        });
+
+        $("#tblStudent")
+            .DataTable({
+                responsive: true,
+                lengthChange: true,
+                autoWidth: true,
+                ajax: {
+                    url: `/api/mis/${campus()}/students/name/phan dy`,
+                    type: "GET",
+                    dataSrc: "data",
+                },
+                columns: [
+                    {data: "student_id"},
+                    {data: "student_name"},
+                    {data: "student_name_in_khmer"},
+                    {data: "sex"},
+                    {data: "date_of_birth"},
+                    {data: "phone"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+                                    Action
+                                </button>
+                                <div class="dropdown-menu" style="min-width: 8rem;">
+                                    <div class="col-md-12">
+                                        <a href"/student/details?student_id=PP47981" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0rem">Edit</a>
+                                         <a href="student/details/${row.student_id}" class="btn btn-warning btn-sm" style="display: block;margin:.2rem 0rem">View</a>
+                                        <a class="btn btn-danger btn-sm" style="display: block;margin:.2rem 0rem">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+                        }
+
+                    }
+                ]
+            })
+            .buttons()
+            .container()
+            .appendTo("#example1_wrapper .col-md-6:eq(0)");
+    });
+
+    // Function to handle Edit
+    function OnEdit(id) {
+        $("#editModal").modal("show");
+        $.get(`/api/mis/${campus()}/students/academics/${id}`, function (result) {
+            var data = result["data"];
+            var student = data["student"];
+            var nationality = data["nationality"];
+            var province = data["province"];
+            var race = data["race"];
+            var degree = data["degree"];
+            var school = data["school"];
+            var field = data["field"];
+            var promotion = data["promotion"];
+            var stage = data["stage"];
+            var term = data["term"];
+            var group = data["group"];
+            var group_room = data["group_room"];
+            $("#txtStudentId").val(student["student_id"]);
+            $("#txtStudentName").val(student["student_name"]);
+            $("#txtStudentNameKhmer").val(student["student_name_in_khmer"]);
+
+            $("#txtSex").val(student["sex"]);
+            var dob = moment(student["date_of_birth"]).format("YYYY-MM-DD");
+            $("#txtDOB").val(dob);
+            $("#txtPOB").val(province["province"]);
+            //$("#txtStatus").val(data["status"]);
+        });
+
+        //window.location.href = `/student/details/${data}`;
+    }
+
+    function OnView(id) {
+        window.location.href = `student/details/${id}`;
+    }
+</script>

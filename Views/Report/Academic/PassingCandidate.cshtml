@@ -1,0 +1,61 @@
+@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AcademicReport";
+    ViewData["Action"] = "PassingCandidateReport";
+    
+    var menus = new Dictionary<string, string>
+    {
+        {"report2", "Report 2"},
+        {"report3", "Report 3"},
+        {"report4", "Report 4"},
+        {"report5", "Report 5"},
+        {"pass_to_dhe", "Passing to DHE"},
+        {"entrance_pass", "Entrance Pass"},
+    };
+}
+<h1>Passing Candidate</h1>
+<div class="card">
+    <div class="card-header">
+        <div class="margin" id="rangeButtons">
+            <button type="button" class="btn btn-primary btn-sm" value="report1"><i class="fas fa-check mr-1"></i> Report 1</button>
+            @foreach (var st in menus)
+            {
+                <button type="button" class="btn btn-outline-primary btn-sm" value="@st.Key">@st.Value</button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="formContainer"></div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+@section Scripts
+{
+    <script>
+        const formContainer = $("#formContainer");
+        const rangeButtons = $("#rangeButtons");
+        $(document).ready(async function () {
+            renterForm("report1");
+        });
+
+        function renterForm(form) {
+            formContainer.html("");
+            if (!form) return;
+            $(".select2").select2();
+            formContainer.load("/report-partial/academic/student-passing-candidate/" + form, function () {
+                $("#renderContainer select").select2({
+                    width: "100%",
+                    placeholder: "Select an option"
+                });
+            });
+        }
+        rangeButtons.on("click", "button", function (e) {
+            $("#rangeButtons").find("button").removeClass("btn-primary").addClass("btn-outline-primary").find("i").remove();
+            $(this).removeClass("btn-outline-primary").addClass("btn-primary");
+            $(this).prepend('<i class="fas fa-check mr-1"></i>');
+            renterForm(e.target.value);
+        });
+        
+    </script>
+}

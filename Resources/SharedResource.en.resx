@@ -1,0 +1,125 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="Home" xml:space="preserve"><value>Home</value></data>
+    <data name="TotalStudent" xml:space="preserve"><value>Total Student</value></data>
+    <data name="ActiveStudent" xml:space="preserve"><value>Active Student</value></data>
+    <data name="RegisterStudent" xml:space="preserve"><value>Register Student</value></data>
+    <data name="Quit" xml:space="preserve"><value>Quit</value></data>
+    <data name="Student" xml:space="preserve"><value>Student</value></data>
+    <data name="DailyReport" xml:space="preserve"><value>Daily Report</value></data>
+    <data name="Register" xml:space="preserve"><value>Register</value></data>
+    <data name="Payment" xml:space="preserve"><value>Payment</value></data>
+    <data name="Item" xml:space="preserve"><value>Item Payment</value></data>
+    <data name="Discount" xml:space="preserve"><value>Discount</value></data>
+    <data name="BookingClothes" xml:space="preserve"><value>Booking Clothes</value></data>
+    <data name="Certificate" xml:space="preserve"><value>Certificate</value></data>
+    <data name="GraduateLetter" xml:space="preserve"><value>Graduate Letter</value></data>
+    <data name="AdminLetter" xml:space="preserve"><value>Admin Letter</value></data>
+    <data name="LetterType" xml:space="preserve"><value>Letter Type</value></data>
+    <data name="AdminTask" xml:space="preserve"><value>Administration Task</value></data>
+    <data name="AcademicTask" xml:space="preserve"><value>Academic Task</value></data>
+    <data name="AssignStudentGroup" xml:space="preserve"><value>Assign Student Group</value></data>
+    <data name="RequestQRCode" xml:space="preserve"><value>QR Code Request</value></data>
+    <data name="Course" xml:space="preserve"><value>Course</value></data>
+    <data name="Score" xml:space="preserve"><value>Score</value></data>
+    <data name="OtherBranchScore" xml:space="preserve"><value>Other Branch Score</value></data>
+    <data name="ContinueEducation" xml:space="preserve"><value>Continue Education</value></data>
+    <data name="DoctoralContract" xml:space="preserve"><value>Doctoral Contract</value></data>
+    <data name="Room" xml:space="preserve"><value>Manage Room</value></data>
+    <data name="Dean" xml:space="preserve"><value>Dean</value></data>
+    <data name="ManageCourse" xml:space="preserve"><value>Manage Course</value></data>
+    <data name="Learner" xml:space="preserve"><value>Manage Learner</value></data>
+    <data name="Mark" xml:space="preserve"><value>Record Score</value></data>
+    <data name="RestudyMark" xml:space="preserve"><value>Restudy Score</value></data>
+    <data name="StateExamMark" xml:space="preserve"><value>Final Exam Score</value></data>
+    <data name="ThesisMark" xml:space="preserve"><value>Thesis Score</value></data>
+    <data name="PracticumMark" xml:space="preserve"><value>Practicum Score</value></data>
+    <data name="CommandTask" xml:space="preserve"><value>Command Task</value></data>
+    <data name="Degree" xml:space="preserve"><value>Degree</value></data>
+    <data name="PromotionGroup" xml:space="preserve"><value>Promotion, Group</value></data>
+    <data name="Branch" xml:space="preserve"><value>Branch</value></data>
+    <data name="University" xml:space="preserve"><value>University</value></data>
+    <data name="Faculty" xml:space="preserve"><value>Faculty</value></data>
+    <data name="School" xml:space="preserve"><value>School</value></data>
+    <data name="Field" xml:space="preserve"><value>Field</value></data>
+    <data name="FieldCertificate" xml:space="preserve"><value>Field Certificate</value></data>
+    <data name="Province" xml:space="preserve"><value>Province</value></data>
+    <data name="Race" xml:space="preserve"><value>Race</value></data>
+    <data name="Nationality" xml:space="preserve"><value>Nationality</value></data>
+    <data name="Disability" xml:space="preserve"><value>Disability</value></data>
+    <data name="Report" xml:space="preserve"><value>Report</value></data>
+    <data name="Admin" xml:space="preserve"><value>Admin</value></data>
+    <data name="Registration" xml:space="preserve"><value>Registration</value></data>
+    <data name="BookClothes" xml:space="preserve"><value>Book Clothes</value></data>
+    <data name="Other" xml:space="preserve"><value>Other</value></data>
+    <data name="Academic" xml:space="preserve"><value>Academic Task</value></data>
+    <data name="PassingCandidate" xml:space="preserve"><value>Passing Candidate</value></data> 
+    <data name="StudentResult" xml:space="preserve"><value>Student Result</value></data>
+    <data name="ReExamination" xml:space="preserve"><value>Re-Examination</value></data>
+    <data name="CreditCompletion" xml:space="preserve"><value>Credit Completion</value></data>
+    <data name="SPO" xml:space="preserve"><value>SPO</value></data>
+    <data name="StateExamResult" xml:space="preserve"><value>State Exam Result</value></data>
+    <data name="Graduate" xml:space="preserve"><value>Graduate</value></data>
+    <data name="GraduateMasterDoctor" xml:space="preserve"><value>Graduate Master, Doctor</value></data>
+    <data name="StudentStatistic" xml:space="preserve"><value>Student Statistic</value></data>
+    <data name="StudentCardList" xml:space="preserve"><value>Student Card List</value></data>
+    <data name="FoundationYear" xml:space="preserve"><value>Foundation Year</value></data>
+    <data name="StudentList" xml:space="preserve"><value>Student List</value></data>
+    <data name="ScoreSheet" xml:space="preserve"><value>Score Sheet</value></data>
+    <data name="ExaminationList" xml:space="preserve"><value>Examination List</value></data>
+    <data name="ExaminationList2" xml:space="preserve"><value>Examination List 2</value></data>
+    <data name="FailStudentList" xml:space="preserve"><value>Fail Student List</value></data>
+    <data name="FYReExamResult" xml:space="preserve"><value>FY ReExam Result</value></data>
+    <data name="FYExamResult" xml:space="preserve"><value>FY Exam Result</value></data>
+    <data name="FYExamResult2" xml:space="preserve"><value>FY Exam Result 2</value></data>
+    <data name="CertificateOfFYCourse" xml:space="preserve"><value>Certificate of FY Course</value></data>
+    <data name="StudentQuitSuspendSuppress" xml:space="preserve"><value>Student Quit, Suspend and Suppress</value></data>
+    <data name="StudentStatisticByProvince" xml:space="preserve"><value>Student Statistic By Province</value></data>
+    <data name="Student_Status" xml:space="preserve"><value>Student Status</value></data> 
+    <data name="SkillStudent" xml:space="preserve"><value>Skill Student</value></data>
+    <data name="ListOfSubject" xml:space="preserve"><value>List Of Subject</value></data>
+    <data name="ExamResult" xml:space="preserve"><value>Exam Result</value></data>
+    <data name="DeanStateExamResult" xml:space="preserve"><value>State Exam Result</value></data>
+    <data name="ProjectPaperResult" xml:space="preserve"><value>Project Paper Result</value></data>
+    <data name="PracticumResult" xml:space="preserve"><value>Practicum Result</value></data>
+    <data name="SummaryFailList" xml:space="preserve"><value>Summary Fail List</value></data>
+    <data name="InformationRevision" xml:space="preserve"><value>Information Revision</value></data>
+    <data name="Library" xml:space="preserve"><value>Library</value></data>
+    <data name="HR" xml:space="preserve"><value>HR</value></data>
+    <data name="Setting" xml:space="preserve"><value>Setting</value></data>
+    <data name="User" xml:space="preserve"><value>User</value></data>
+    <data name="Roles" xml:space="preserve"><value>Roles</value></data>
+    <data name="UserRoles" xml:space="preserve"><value>User Roles</value></data>
+    <data name="QuitStudent" xml:space="preserve">
+        <value>Quit Student</value>
+    </data>
+    <data name="CompletedStudent" xml:space="preserve">
+        <value>Completed Student</value>
+    </data>
+    <data name="GraduatedStudent" xml:space="preserve">
+        <value>Graduated Student</value>
+    </data>
+    <data name="Id" xml:space="preserve"><value>Id</value></data>
+    <data name="Title" xml:space="preserve"><value>Title</value></data>
+    <data name="CreateDate" xml:space="preserve"><value>Create Date</value></data>
+    <data name="Description" xml:space="preserve"><value>Description</value></data>
+    <data name="Add" xml:space="preserve"><value>Add</value></data>
+    <data name="Edit" xml:space="preserve"><value>Edit</value></data>
+    <data name="Delete" xml:space="preserve"><value>Delete</value></data>
+    <data name="View" xml:space="preserve"><value>View</value></data>
+</root>

@@ -1,0 +1,243 @@
+﻿@using BBU_SYSTEM.ViewModel.Report.Academic
+@{
+    var student = new Student();
+    var req = new TranscriptViewModel();
+}
+<div class="row">
+    <div class="col-3">
+        <div class="row">
+            <div class="col-12">
+                <label class="required">Student Id</label>
+                <div class="input-group">
+                    <input type="text" asp-for="@student.StudentId" class="form-control form-control-sm" readonly="readonly"/>
+                    <div class="input-group-append" style="cursor: pointer;" id="btnSearchStudent">
+                        <span class="input-group-text" style="background-color: green;">
+                            <i class="fa-solid fa-magnifying-glass" style="color: white;"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <label>student_name</label>
+                <input type="text" class="form-control form-control-sm" asp-for="@student.StudentName" readonly="readonly"/>
+            </div> 
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <label>student_name_khmer</label>
+                <input type="text" class="form-control form-control-sm" asp-for="@student.StudentNameInKhmer" readonly="readonly"/>
+            </div> 
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <label>term</label>
+                <select asp-for="@req.Term" class="custom-select custom-select-sm" style="width: 100%;">
+                </select>
+            </div> 
+            <div class="col-8">
+                <label>report_type</label>
+                <select asp-for="@req.ReportType" class="custom-select custom-select-sm" style="width: 100%;">
+                    <option value="0" selected="selected">Up to select term</option>
+                    <option value="1">Select term only</option>
+                    <option value="2">Select year only</option>
+                    <option value="3">Foundation</option>
+                </select>
+            </div> 
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-4">
+                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                    <input type="checkbox" class="custom-control-input" id="chbKhmer" data-gtm-form-interact-field-id="0">
+                    <label class="custom-control-label" for="chbKhmer">Khmer</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                    <input type="checkbox" class="custom-control-input" id="chbSuccess" data-gtm-form-interact-field-id="0">
+                    <label class="custom-control-label" for="chbSuccess">Successfully</label>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group"> 
+                    <button type="button" class="btn btn-sm btn-success float-right">Preview</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                    <input type="checkbox" class="custom-control-input" id="chbReportSetting" data-gtm-form-interact-field-id="0">
+                    <label class="custom-control-label" for="chbReportSetting">Report setting</label>
+                </div>
+            </div>
+            <div class="col-6">
+                <hr class="line link-black">
+            </div>
+        </div>
+        <form id="frmReportSetting" hidden="hidden">
+            <div class="row">
+                <div class="col-12">
+                    <label>title</label>
+                    <input type="text" class="form-control form-control-sm report-setting" asp-for="@req.Title" required="required"/>
+                </div> 
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    <label>campus</label>
+                    <input type="text" class="form-control form-control-sm report-setting" asp-for="@req.Campus" required="required"/>
+                </div> 
+                <div class="col-4">
+                    <label>branch</label>
+                    <input type="text" class="form-control form-control-sm report-setting" asp-for="@req.BranchName" required="required"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    <label>signature</label>
+                    <input type="text" class="form-control form-control-sm report-setting" asp-for="@req.Signature" required="required"/>
+                </div> 
+                <div class="col-4">
+                    <label>short_name</label>
+                    <input type="text" class="form-control form-control-sm report-setting" asp-for="@req.ShortName" required="required"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    <label>description</label>
+                    <input type="text" class="form-control form-control-sm report-setting" asp-for="@req.Description" required="required"/>
+                </div>
+                <div class="col-4">
+                    <label>total</label>
+                    <input type="text" class="form-control form-control-sm report-setting" asp-for="@req.Total" required="required"/>
+                </div>
+            </div>
+        </form> 
+    </div>
+    <div class="col-md-9">
+        <iframe src="" width="100%" height="800px" id="reportContainer"></iframe>
+    </div>
+</div>
+<script>
+    document.getElementById("btnSearchStudent").addEventListener("click", function (e) {
+        $("#StudentModal").modal("show");
+        const tblSearchStudent = $("#tblSearchStudent");
+        tblSearchStudent.DataTable().clear().destroy();
+        tblSearchStudent.DataTable({
+            processing: true,
+            serverSide: true,
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: true,
+            autoWidth: true,
+            scrollCollapse: true,
+            ajax: {
+                url: "/student/academic/student-list/all",
+                type: "POST",
+            },
+            columns: [
+                {data: "studentId"},
+                {data: "studentName"},
+                {data: "studentNameInKhmer"},
+                {data: "sex"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        if (row.status === "REGISTER") {
+                            return ` <span class="badge badge-warning">${row.status}</span>`;
+                        } else if (row.status === "ACTIVE") {
+                            return ` <span class="badge badge-primary">${row.status}</span>`;
+                        } else if (row.status === "QUIT") {
+                            return ` <span class="badge badge-danger">${row.status}</span>`;
+                        } else {
+                            return `<span class="badge badge-secondary">${row.status}</span>`;
+                        }
+                    },
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return `<a onclick="OnSelectStudent(this)"  class="btn btn-success btn-xs">Select</a>`;
+                    },
+                },
+            ],
+        });
+    });
+
+    function OnSelectStudent(e) {
+        const $input = $(e);
+        const $row = $input.closest('tr');
+        const selectedRow = $("#tblSearchStudent").DataTable().row($row).data();
+        if (selectedRow) {
+            getStudent(selectedRow.studentId);
+            $("#StudentModal").modal("hide");
+        }
+    }
+
+    function getStudent(studentId) {
+        $.ajax({
+            url: "/student/academic/student-id/" + studentId,
+            type: "GET",
+            data: {student_id: studentId},
+            success: function (data) {
+                if (data) {
+                    data = data.data;
+                    const student = data.student;
+                    $("#student_StudentId").val(student.studentId);
+                    $("#student_StudentName").val(`${student.studentName}`);
+                    $("#student_StudentNameInKhmer").val(`${student.studentNameInKhmer}`);
+                } else {
+                    alert("Student not found.");
+                }
+            },
+            error: function () {
+                alert("Error fetching student data.");
+            }
+        });
+    }
+    
+    
+    $("#chbReportSetting").on("change", function (e) {
+        const isChecked = $(this).is(":checked");
+        $("#frmReportSetting").prop("hidden", !isChecked);
+    });
+    function Print() {
+        showLoading();
+        $.ajax({
+            url: '/report/transcripts/PP47981/true',
+            type: 'POST',
+            data: {
+                // degreeId: 2,
+                // schoolId: 2,
+                // fieldId: 18,
+                // promotionId: 368,
+                // filter: "document_in"
+            },
+            xhrFields: {
+                responseType: 'blob' // important for PDF
+            },
+            success: function (blob) {
+
+                const url = URL.createObjectURL(blob);
+                const iframe = document.getElementById("reportContainer");
+
+                iframe.src = url;
+                
+                // iframe.onload = function () {
+                //     iframe.contentWindow.focus();
+                //     iframe.contentWindow.print(); 
+                //     setTimeout(() => URL.revokeObjectURL(url), 1000);
+                // };
+            },
+            error: function (err) {
+                console.error(err);
+            }
+        });
+        hideLoading(1);
+    }
+</script>

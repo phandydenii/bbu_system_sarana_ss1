@@ -1,0 +1,54 @@
+@using BBU_SYSTEM.DTOs
+@{
+    var courseDto = new CourseDto(); 
+}
+<div class="modal fade" id="modalCourse" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Course</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formCourse">
+                    <input asp-for="@courseDto.CourseId" hidden readonly class="form-control" value="0"/>
+                    <div class="row">
+                        <div class="col-8">
+                            <label >Course Full Name</label>
+                            <input type="text" asp-for="@courseDto.CourseFullName" class="form-control" placeholder="Full name" required/>
+                        </div>
+                        <div class="col-4">
+                            <label >Short Name</label>
+                            <input type="text" asp-for="@courseDto.CourseShortName" class="form-control" placeholder="Short name" required/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-8">
+                            <label >Course Full Name Khmer</label>
+                            <input type="text" asp-for="@courseDto.CourseFullNameInKhmer" class="form-control" placeholder="Full name khmer" required/>
+                        </div>
+                        <div class="col-4">
+                            <label >Short Name Khmer</label>
+                            <input type="text" asp-for="@courseDto.CourseShortNameInKhmer" class="form-control" placeholder="Short name khmer" required/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-8">
+                            <label >Credit</label>
+                            <input type="number" asp-for="@courseDto.Credit" class="form-control" min="0" value="0"/>
+                        </div>
+                        <div class="col-4">
+                            <label >Number of Hours</label>
+                            <input type="number" asp-for="@courseDto.NumberOfHours" class="form-control" min="0" value="0"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="formCourse" class="btn btn-primary float-right"><i class="fas fa-save"></i> Save changes
+                </button>
+                <button type="button" id="btnClose" class="btn btn-danger float-right"><i class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

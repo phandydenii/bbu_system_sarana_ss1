@@ -1,0 +1,75 @@
+@{
+    ViewData["OpenMenu"] = "CommandTask";
+    ViewData["Action"] = "Race";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Race</h3>
+                <button type="button" id="btnNewRace" class="btn btn-primary float-right">
+                    <i class="fas fa-plus"></i>
+                    Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblSchool" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name English</th>
+                        <th>Name Khmer</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_RaceModal"/>
+<script>
+    $(document).ready(function () {
+        fetchSchool();
+    });
+
+    function fetchSchool() {
+        $("#tblSchool").DataTable({
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "/Race/get-races",
+                type: "POST"
+            },
+            columns: [
+                {data: "raceId"},
+                {data: "raceName"},
+                {data: "raceInKhmer"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const jsonData = JSON.stringify(row).replace(/"/g, '&quot;');
+                        return `<a onclick="OnEdit('${jsonData}')" class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</a>`;
+                    }
+                }
+            ]
+        });
+    }
+
+
+    document.getElementById("btnNewRace").addEventListener("click", function (e) {
+        e.preventDefault();
+        $("#formRace")[0].reset();
+        $("#raceModal").modal("show");
+    });
+
+</script>

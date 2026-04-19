@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AdminReport";
+    ViewData["Action"] = "BookClothesReport";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="margin" id="rangeButtons">
+            <button type="button" class="btn btn-primary btn-sm" value="booking"><i class="fas fa-check mr-1"></i> Booking</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" value="return_booking"> Return Booking</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="formContainer"></div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+@section Scripts
+{
+    <script>
+        const formContainer = $("#formContainer");
+        const rangeButtons = $("#rangeButtons");
+        $(document).ready(async function () {
+            renterForm("booking");
+        });
+
+        function renterForm(form) {
+            formContainer.html("");
+            if (!form) return;
+            $(".select2").select2();
+            formContainer.load("/report-partial/admin/book-clothes/" + form, function () {
+                $(".select2").select2({
+                    width: "100%",
+                    placeholder: "Select an option"
+                });
+            });
+        }
+        rangeButtons.on("click", "button", function (e) {
+            $("#rangeButtons").find("button").removeClass("btn-primary").addClass("btn-outline-primary").find("i").remove();
+            $(this).removeClass("btn-outline-primary").addClass("btn-primary");
+            $(this).prepend('<i class="fas fa-check mr-1"></i>');
+            renterForm(e.target.value);
+        });
+    </script>
+}

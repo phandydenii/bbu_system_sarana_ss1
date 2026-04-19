@@ -1,0 +1,125 @@
+﻿@using BBU_SYSTEM.DTOs
+ @{
+     var student = new StudentDto();
+     var registry = new RegistryDto();
+}
+<div class="row">
+    <div class="col-3">
+        <label>Student Id</label>
+        <input type="text" class="form-control" asp-for="@student.StudentId" readonly/>
+        <input type="hidden" class="form-control" asp-for="@registry.RegistrationId" readonly/>
+    </div>
+    <div class="col-4">
+        <label>Student Name</label>
+        <input type="text" class="form-control" asp-for="@student.StudentName" readonly/>
+    </div>
+    <div class="col-3">
+        <label>Student Name Khmer</label>
+        <input type="text" class="form-control" asp-for="@student.StudentNameInKhmer"
+               readonly/>
+    </div>
+    <div class="col-2">
+        <label>Sex</label>
+         <select asp-for="@student.Sex" class="custom-select" style="width: 100%;">
+            <option selected="selected" value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+    </div>
+</div>
+<div class="row">
+    <div class="col-3">
+        <label>Date Of Birth</label>
+        <input type="date" class="form-control" asp-for="@student.DateOfBirth"/>
+    </div>
+    <div class="col-4">
+        <label>Place Of Birth</label>
+        <select asp-for="@student.PlaceOfBirthId" class="form-control select2" >  
+        </select>
+    </div>
+    <div class="col-3">
+        <label>Nationality</label>
+        <select asp-for="@student.NationalityId" class="form-control select2" > 
+        </select>
+    </div>
+    <div class="col-2">
+        <label>Table No</label>
+        <input type="text" class="form-control" asp-for="@registry.HighSchoolTableNo" >
+    </div>
+</div>
+<div class="row">
+    <div class="col-3">
+        <label>Material Status</label>
+        <select  asp-for="@student.MaritalStatus" class="custom-select" style="width: 100%;"
+                 required>
+            <option selected="selected" value="Single">Single</option>
+            <option value="Marred">Marred</option>
+        </select>
+    </div>
+    <div class="col-4">
+        <label>High School</label> 
+        <input type="text" class="form-control" asp-for="@student.FromHighSchoolNameInKhmer" readonly/>
+    </div>
+    @* <div class="col-4">  *@
+    @*     <div class="form-group"> *@
+    @*         <div class="row"> *@
+    @*             <div class="col-6"> *@
+    @*                 <div class="custom-control custom-radio"> *@
+    @*                     <input class="custom-control-input" checked type="radio" id="rdoHighSchool" *@
+    @*                            name="customRadio"> *@
+    @*                     <label for="rdoHighSchool" class="custom-control-label">High School</label> *@
+    @*                 </div> *@
+    @*             </div> *@
+    @*             <div class="col-6"> *@
+    @*                 <div class="custom-control custom-radio"> *@
+    @*                     <input class="custom-control-input" type="radio" id="rdoMasPhD" name="customRadio"> *@
+    @*                     <label for="rdoMasPhD" class="custom-control-label">Mass & PhD</label> *@
+    @*                 </div> *@
+    @*             </div> *@
+    @*         </div> *@
+    @*     </div> *@
+    @*     <select asp-for="@student.FromHighSchoolNameInKhmer" class="form-control select2" required style="width: 100%;"> *@
+    @*         <option selected="selected">Select High School</option> *@
+    @*     </select> *@
+    @* </div> *@
+    <div class="col-3">
+        <label>Province</label>
+        <select asp-for="@student.FromProvinceId" class="form-control select2" >
+        </select>
+    </div>
+    
+    <div class="col-2">
+        <label>Year</label>
+        <input type="text" class="form-control" asp-for="@student.HighSchoolGraduatedYear" >
+    </div>
+</div>
+<div class="row">
+    <div class="col-3">
+        <label>Race</label>
+        <select asp-for="@student.RaceId" class="form-control select2"  >
+        </select>
+    </div>
+    <div class="col-4">
+        <label>Job</label>
+        <select class="form-control select2" asp-for="@student.JobId" > 
+        </select>
+    </div>
+    <div class="col-3">
+        <label>Disability</label>
+        <select  asp-for="@student.DisabilityId"  class="form-control select2"  > 
+        </select>
+    </div>
+    <div class="col-2">
+        <label>Result</label>
+         <select class="custom-select" asp-for="@registry.HighSchoolResult" >
+            <option selected="selected" value="P">Pass</option>
+            <option value="F">Fail</option>
+        </select>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <label>Status</label>
+        <input type="text" class="form-control" asp-for="@student.Status"
+               style="text-align: center;font-weight:bold" readonly>
+    </div>
+</div>

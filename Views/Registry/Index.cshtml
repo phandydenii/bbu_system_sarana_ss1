@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["OpenMenu"] = "Administration";
+    ViewData["Action"] = "Register";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"> 
+                <a asp-action="Create" asp-controller="Registry" class="btn btn-primary"><i class="fas fa-plus"></i> New Register</a>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistry" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Student Id</th>
+                        <th>Name English</th>
+                        <th>Name Khmer</th>
+                        <th>Gender</th>
+                        <th>Date of Birth</th>
+                        <th>Registry Date</th>
+                        <th>Degree</th>
+                        <th>School</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_ValidationScriptsPartial"/>
+@section Scripts
+{
+    <script>
+        const tblRegistry = $("#tblRegistry");
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchStudent();
+        });
+        
+        function fetchStudent() {
+            tblRegistry.DataTable().clear().destroy();
+            tblRegistry.DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                ajax: {
+                    url: "/Registry/GetStudentRegistryList",
+                    type: "POST",
+                    dataSrc: function (json) {
+                        return json.data;
+                    }
+                },
+                columns: [
+                    {data: "studentId"},
+                    {data: "studentName"},
+                    {data: "studentNameInKhmer"},
+                    {data: "sex"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            const dt = formatDate(row.dateOfBirth);
+                            return `${dt}`
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            const dt = formatDate(row.registrationDate);
+                            return `${dt}`
+                        }
+                    },
+                    {data: "degreeName"},
+                    {data: "schoolName"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            if (row.status === "REGISTER") {
+                                return ` <span class="badge badge-warning">${row.status}</span>`;
+                            } else if (row.status === "ACTIVE") {
+                                return ` <span class="badge badge-primary">${row.status}</span>`;
+                            } else if (row.status === "QUIT") {
+                                return ` <span class="badge badge-danger">${row.status}</span>`;
+                            }else if (row.status === "GRADUATED") {
+                                return ` <span class="badge badge-fuchsia">${row.status}</span>`;
+                            }else if (row.status === "COMPLETED") {
+                                return ` <span class="badge badge-pink">${row.status}</span>`;
+                            }else {
+                                return `<span class="badge badge-default">${row.status}</span>`;
+                            }
+
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) { 
+                            return `<a href="/registry/details/${row.studentId}" class="btn btn-success btn-sm"><i class="fas fa-gear"></i> Manage</a>`;
+                        }
+                    }
+                ], 
+            });
+        }
+    </script>
+}

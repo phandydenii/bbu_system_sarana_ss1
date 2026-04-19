@@ -1,0 +1,37 @@
+@using BBU_SYSTEM.DTOs
+@{
+    var university = new UniversityDto();
+}
+<div class="modal fade" id="UniversityModal" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">University</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="degreeForm">
+                    <input asp-for="@university.UniversityId" hidden readonly class="form-control" value="0"/>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" asp-for="@university.UniversityName" class="form-control"
+                               placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label>Name Khmer</label>
+                        <input type="text" asp-for="@university.UniversityNameInKhmer" class="form-control"
+                               placeholder="Enter name khmer">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="submit" form="degreeForm" class="btn btn-primary"><i class="fas fa-save"></i> Save changes
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

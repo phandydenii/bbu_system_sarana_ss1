@@ -1,0 +1,306 @@
+﻿@model BBU_SYSTEM.ViewModel.LearnerViewModel
+@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "Dean";
+    ViewData["Action"] = "Learner";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 class="card-title">Learner</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Degree</label>
+                        <select id="cboDegree" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>School</label>
+                        <select id="cboSchool" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Field</label>
+                        <select id="cboField" class="form-control select2"> </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Promotion</label>
+                        <select id="cboPromotion" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-1">
+                        <label>Stage</label>
+                        <select id="cboStage" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-1">
+                        <label>Term</label>
+                        <select id="cboTerm" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-1">
+                        <label>#</label>
+                        <button type="button" class="form-control btn btn-primary" id="btnFilter"><i class="fas fa-filter"></i>
+                            Filter
+                        </button>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="button" class="btn btn-success" id="btnAddCourse"><i class="fas fa-plus"></i>
+                            Add Course
+                        </button>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-12">
+                        <table id="tblCourse" class="table table-bordered table-sm table-striped">
+                            <thead>
+                            <tr>
+                                <th>course_term_id</th>
+                                <th>name</th>
+                                <th>type</th>
+                                <th>credit</th>
+                                <th>hour</th>
+                                <th>action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_ValidationScriptsPartial"/>
+<partial name="_CourseTerm"/>
+
+@section Scripts
+{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Term.js"></script>
+    <script src="~/function/Group.js"></script>
+    <script>
+        const cboDegree = $("#cboDegree");
+        const cboSchool = $("#cboSchool");
+        const cboField = $("#cboField");
+        const cboPromotion = $("#cboPromotion");
+        const cboStage = $("#cboStage");
+        const cboTerm = $("#cboTerm");
+        const cboGroup = $("#cboGroup");
+        const tblCourse = $("#tblCourse");
+        
+        const btnAddCourse = $("#btnAddCourse");
+        $(document).ready(function () {
+            tblCourse.DataTable({responsive: true,});
+            btnAddCourse.prop("disabled", true);
+            GetDegree();
+            GetSchool();
+            GetField();
+            GetPromotion();
+            GetStage();
+            GetTerm(); 
+        });
+
+        cboDegree.change(function () {
+            GetField();
+            GetPromotion();
+            GetStage();
+            GetTerm(); 
+        });
+
+        cboSchool.change(function () {
+            GetField();
+            GetPromotion();
+        });
+
+        cboPromotion.change(function () {
+            GetStage();
+            GetTerm(); 
+        });
+        cboStage.change(function () {
+            GetTerm(); 
+        });
+
+        $("#btnFilter").on("click", function () {
+            OnFilter();
+            btnAddCourse.prop("disabled", false);
+        })
+        async function GetDegree() {
+            cboDegree.empty();
+            cboDegree.append(`<option value='0' disabled>Select Degree</option>`);
+            const degrees = await Degree.GetAllDegree();
+            degrees.forEach(item => {
+                cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
+            });
+            cboDegree.val('0').trigger("change");
+        }
+
+        async function GetSchool() {
+            cboSchool.empty();
+            cboSchool.append("<option value='0' disabled>Select School</option>");
+            const schools = await School.GetSchool()
+            schools.forEach(function (item) {
+                cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
+            });
+            cboSchool.val('0').trigger("change");
+        }
+
+
+        async function GetField() {
+            const degreeId = parseInt(cboDegree.val());
+            const schoolId = parseInt(cboSchool.val());
+            cboField.empty();
+            cboField.append("<option value='0' disabled>Select Field</option>");
+            if (!degreeId || !schoolId) {
+                cboField.val('0');
+                return;
+            }
+
+            const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
+            fields.forEach(item => {
+                cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
+            });
+            cboField.val('0').trigger("change");
+        }
+
+        async function GetPromotion() {
+            const degreeId = cboDegree.val();
+            const schoolId = cboSchool.val();
+            cboPromotion.empty();
+            cboPromotion.append("<option value='0' disabled>Promotion</option>");
+            if (!degreeId || !schoolId) {
+                cboPromotion.val('0');
+                return;
+            }
+            const promotions = await Promotion.GetPromotions();
+            let hasPromotion = false;
+            promotions.forEach(item => {
+                if (item.degree === parseInt(degreeId) && item.school === parseInt(schoolId)) {
+                    cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`);
+                    hasPromotion = true;
+                }
+            });
+            if (!hasPromotion) {
+                cboPromotion.empty();
+                cboPromotion.append("<option value='0' disabled>No promotion available</option>");
+            }
+            cboPromotion.val('0').trigger("change");
+        }
+
+        async function GetStage() {
+            const promotionId = cboPromotion.val();
+            cboStage.empty();
+            cboStage.append("<option value='0' disabled>Stage</option>");
+            if (!promotionId) {
+                cboPromotion.val('0');
+                return;
+            }
+            const stages = await Stage.GetStages();
+            stages.forEach(item => {
+                if (item.promotionId === parseInt(promotionId)) {
+                    cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
+                }
+            });
+            cboStage.val('0').trigger("change");
+        }
+        async function GetTerm() {
+            const stageId = cboStage.val();
+            cboTerm.empty();
+            cboTerm.append("<option value='0' disabled>Select Term</option>");
+            if (!stageId) {
+                cboTerm.val('0');
+                return;
+            }
+            const terms = await Term.GetTerms();
+            terms.forEach(item => {
+                if (item.stageId === parseInt(stageId)) {
+                    cboTerm.append(`<option value='${item.termId}'>${item.termNo}</option>`);
+                }
+            });
+            cboTerm.val('0').trigger("change");
+        }
+        function OnFilter() {
+            const termId = cboTerm.find(":selected").val();
+            const stageId = cboStage.find(":selected").val();
+            const fieldId = cboField.find(":selected").val();
+            const promotionId = cboPromotion.find(":selected").val();
+
+            tblCourse.DataTable().clear().destroy();
+            tblCourse.DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                orderings: true,
+                ajax: {
+                    url: `/course/get-course-terms/${termId}/${stageId}/${promotionId}/${fieldId}`,
+                    type: "POST",
+                },
+                columns: [
+                    {data: "courseTermId"},
+                    {data: "courseFullName"},
+                    {data: "type"},
+                    {data: "credit"},
+                    {data: "hours"},
+                    {
+                        data: null,
+                        render: (data, type, row) => { 
+                            return `<a class="btn btn-warning btn-sm" id="btnEdit"><i class="fas fa-edit"></i> Edit</a>
+                                    <a class="btn btn-danger btn-sm" id="btnRemove"><i class="fas fa-remove"></i> Remove</a>                                
+                                `;
+                        }
+                    },
+                ]
+            })
+        }
+
+        tblCourse.on("click","#btnEdit", async e => {
+            const $row = $(this).closest("tr");
+            const data = tblCourse.DataTable().row($row).data();
+            console.log(data);
+            $("#CourseTermModal").modal("show");
+        });
+        
+        tblCourse.on("click","#btnRemove", async e => {
+            const $row = $(this).closest("tr");
+            const data = tblCourse.DataTable().row($row).data();
+            console.log(data);
+            $("#CourseTermModal").modal("show");
+        });
+
+        btnAddCourse.click(function () {
+            $.ajax(
+                {
+                    url: "/course/get-course-list",
+                    type: "GET",
+                    success: function (response) {
+                        const cboGroup = document.getElementById("cboAddCourse");
+                        cboGroup.innerText = "";
+                        const option = document.createElement("option");
+                        option.value = -1;
+                        option.text = "Select Course";
+                        cboGroup.appendChild(option);
+                        response.data.forEach(item => {
+                            const option = document.createElement("option");
+                            option.value = item.courseId;
+                            option.text = item.courseFullName;
+                            cboGroup.appendChild(option);
+                        });
+                    }
+                }
+            )
+            $("#CourseTermModal").modal("show");
+        })
+    </script>
+}

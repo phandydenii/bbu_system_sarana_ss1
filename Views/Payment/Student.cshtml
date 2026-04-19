@@ -1,0 +1,1036 @@
+﻿@model BBU_SYSTEM.ViewModel.StudentViewModel;
+@using BBU_SYSTEM.DTOs
+@using BBU_SYSTEM.Models.Req
+@{
+    ViewData["Title"] = "Index";
+    ViewData["TitleContent"] = "Payment";
+    ViewData["Controller"] = "Payment";
+    ViewData["Action"] = "Create";
+
+    var invoiceDetails = new List<InvoiceDetailReq>();
+    var student = Model.Student!;
+    var degree = new Degree();
+    var school = new School();
+    var field = new Field();
+    var promotion = new Promotion();
+    var stage = new Stage();
+    var term = new Term();
+    var product = new Product();
+    var group = new GroupDto();
+    var groupRoom = new GroupRoomDto();
+    var invoice = new InvoiceDto();
+    var invoiceDetail = new InvoiceDetailDto();
+    var invoiceDetailRes = new InvoiceDetailRes();
+}
+<div class="card">
+    <div class="card-header">
+        <label>Create Payment</label>
+    </div>
+    <div class="card-body">
+        <form asp-action="CreatePayment" asp-controller="Invoice">
+            <div class="row">
+                <div class="col-7">
+                    <div class="row">
+                        <div class="col-2">
+                            <label>@nameof(student.StudentId)</label>
+                            <input type="text" class="form-control" asp-for="@invoice.StudentId" readonly/>
+                        </div>
+                        <div class="col-2">
+                            <label>@nameof(student.StudentName)</label>
+                            <input type="text" class="form-control" asp-for="@student.StudentName" readonly/>
+                        </div>
+                        <div class="col-4">
+                            <label>@nameof(student.StudentNameInKhmer)</label>
+                            <input type="text" class="form-control" asp-for="@student.StudentNameInKhmer" readonly/>
+                        </div>
+                        <div class="col-2">
+                            <label>Gender</label>
+                            <input type="text" class="form-control" asp-for="@student.Sex" readonly/>
+                        </div>
+                        <div class="col-2">
+                            <label>DoB</label>
+                            <input type="text" class="form-control" asp-for="@student.DateOfBirth" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <label>Degree</label>
+                            <input type="text" class="form-control" asp-for="@invoice.DegreeId" readonly>
+                        </div>
+                        <div class="col-8">
+                            <label>School</label>
+                            <input type="text" class="form-control" asp-for="@invoice.SchoolId" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label>Promotion</label>
+                            <input type="text" class="form-control" asp-for="@invoice.PromotionId" readonly>
+                        </div>
+                        <div class="col-2">
+                            <label>Stage</label>
+                            <input type="number" class="form-control" asp-for="@invoice.StageId" readonly>
+                        </div>
+                        <div class="col-8">
+                            <label>Field</label>
+                            <input type="text" class="form-control" asp-for="@invoice.FieldId" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-2">
+                            <label>Term</label>
+                            <input type="number" class="form-control" asp-for="@invoice.TermNo" readonly>
+                        </div>
+                        <div class="col-2">
+                            <label>Group</label>
+                            <input type="text" class="form-control" asp-for="@invoice.GroupId" readonly>
+                        </div>
+                        <div class="col-2">
+                            <label>Room</label>
+                            <input type="text" class="form-control" asp-for="@groupRoom.RoomName" readonly>
+                        </div>
+                        <div class="col-2">
+                            <label>Study Time</label>
+                            <input type="text" class="form-control" asp-for="@group.StudyTime" readonly>
+                        </div>
+                        <div class="col-2">
+                            <label>@nameof(term.StartDate)</label>
+                            <input type="text" class="form-control" asp-for="@invoice.StartDate" readonly>
+                        </div>
+                        <div class="col-2">
+                            <label>@nameof(term.EndDate)</label>
+                            <input type="text" class="form-control" asp-for="@invoice.EndDate" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="row">
+                        <div class="col-3">
+                            <label>invoice no</label>
+                            <input type="number" class="form-control" asp-for="@invoice.InvoiceNo" readonly>
+                        </div>
+                        <div class="col-3">
+                            <label>Invoie Date</label>
+                            <input type="date" class="form-control" asp-for="@invoice.InvoiceDate" readonly>
+                        </div>
+                        <div class="col-3">
+                            <label>Grand Total KHR</label>
+                            <input type="number" class="form-control" asp-for="@invoice.GrandTotalKhr" readonly
+                                   value="0"/>
+                        </div>
+                        <div class="col-3">
+                            <label>Grand Total Usd</label>
+                            <input type="number" class="form-control" asp-for="@invoice.GrandTotalUsd" readonly
+                                   value="0"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label>total_dis_khr</label>
+                            <input type="number" class="form-control" asp-for="@invoice.TotalDiscountKhr" readonly
+                                   value="0"/>
+                        </div>
+                        <div class="col-3">
+                            <label>total_dis_usd</label>
+                            <input type="number" class="form-control" asp-for="@invoice.TotalDiscountUsd" readonly
+                                   value="0"/>
+                        </div>
+                        <div class="col-3">
+                            <label>total_owe_khr</label>
+                            <input type="number" class="form-control" asp-for="@invoice.OweKhr" readonly value="0">
+                        </div>
+                        <div class="col-3">
+                            <label>total_owe_usd</label>
+                            <input type="number" class="form-control" asp-for="@invoice.OweUsd" readonly value="0">
+                        </div>
+                        @* <div class="col-3">
+                            <label>Total Other</label>
+                            <input type="number" class="form-control" asp-for="@invoice.totalother" readonly value="0">
+                        </div>
+                        <div class="col-3">
+                            <label>Total Keep</label>
+                            <input type="number" class="form-control" asp-for="@invoice.owe_khr" readonly value="0">
+                        </div> *@
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label>Total KHR</label>
+                            <input type="number" class="form-control" id="total_khr" readonly value="0">
+                        </div>
+                        <div class="col-3">
+                            <label>Total USD</label>
+                            <input type="number" class="form-control" id="total_usd" readonly value="0">
+                        </div>
+                        <div class="col-3">
+                            <label>Total Bat</label>
+                            <input type="number" class="form-control" id="total_bath" readonly value="0">
+                        </div>
+                        <div class="col-3">
+                            <label>Total Other</label>
+                            <input type="number" class="form-control" asp-for="@invoice.TotalOtherUsd" readonly value="0">
+                        </div>
+                        <div class="col-3" hidden>
+                            <label>Rate In</label>
+                            <input type="number" class="form-control" id="rateIn" readonly value="4000">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label>Total Pay KHR</label>
+                            <input type="number" class="form-control" asp-for="@invoice.TotalRiel" readonly value="0">
+                        </div>
+                        <div class="col-3">
+                            <label>Total Pay USD</label>
+                            <input type="number" class="form-control" asp-for="@invoice.TotalDollar" readonly value="0">
+                        </div>
+                        <div class="col-3">
+                            <label>Total Pa Bat</label>
+                            <input type="number" class="form-control" asp-for="@invoice.TotalBath" readonly value="0">
+                        </div>
+                        <div class="col-3">
+                            <label>Total Keep</label>
+                            <input type="number" class="form-control" asp-for="@invoice.OweKhr" readonly value="0">
+                        </div>
+                        <div class="col-3" hidden>
+                            <label>Rate Out</label>
+                            <input type="number" class="form-control" id="rateOut" readonly value="4000">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <div class="row">
+                <div class="col-12">
+                    <div class="margin">
+                        <button id="btnAddItem" type="button" class="btn btn-success btn-sm float-right"
+                                value="new_item" style="margin-top: 5px;margin-bottom:5px"><i
+                                class="fa-solid fa-dollar-sign"></i> New Item
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card card-primary card-outline card-outline-tabs">
+                        <div class="card-header p-0 border-bottom-0">
+                            <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="custom-tabs-four-invoice-tab" data-toggle="pill"
+                                       href="#custom-tabs-four-invoice" role="tab"
+                                       aria-controls="custom-tabs-four-invoice" aria-selected="true">invoice</a>
+                                </li>
+                                @* <li class="nav-item"> *@
+                                @*     <a class="nav-link" id="custom-tabs-four-invoicedetail-tab" data-toggle="pill" *@
+                                @*        href="#custom-tabs-four-invoicedetail" role="tab" *@
+                                @*        aria-controls="custom-tabs-four-invoicedetail" aria-selected="false"> *@
+                                @*         invoicedetail *@
+                                @*     </a> *@
+                                @* </li> *@
+                            </ul>
+                        </div>
+                        <div class="tab-content" id="custom-tabs-four-tabContent">
+                            <div class="tab-pane fade show active" id="custom-tabs-four-invoice" role="tabpanel"
+                                 aria-labelledby="custom-tabs-four-invoice-tab">
+                                <table id="tblInvoice" class="table table-bordered table-striped" style="width: 100%;">
+                                    <thead>
+                                    <tr>
+                                        <th class="hide-col">ID</th>
+                                        <th>No</th>
+                                        <th>Invoice Date</th>
+                                        <th>Student Id</th>
+                                        <th>G.T KHR</th>
+                                        <th>Discount</th>
+                                        <th>Vat</th>
+                                        <th>Owe</th>
+                                        <th>Total R</th>
+                                        <th>Total $</th>
+                                        <th>Total B</th>
+                                        <th>Total Pay R</th>
+                                        <th>Total Pay $</th>
+                                        <th>Total Pay B</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            @* <div class="tab-pane fade show" id="custom-tabs-four-invoicedetail" role="tabpanel" *@
+                            @*      aria-labelledby="custom-tabs-four-invoicedetail-tab"> *@
+                            @*     <table id="tblInvoiceDetail" class="table table-bordered table-striped" *@
+                            @*            style="width: 100%;"> *@
+                            @*         <thead> *@
+                            @*         <tr> *@
+                            @*             <th class="hide-col">#</th> *@
+                            @*             <th class="hide-col">#</th> *@
+                            @*             <th>id</th> *@
+                            @*             <th>name</th> *@
+                            @*             <th class="hide-col">name_khmer</th> *@
+                            @*             <th>item_qty</th> *@
+                            @*             <th>@nameof(invoiceDetailRes.PriceKhr)</th> *@
+                            @*             <th class="hide-col">@nameof(invoiceDetailRes.PriceUsd)</th> *@
+                            @*             <th>@nameof(invoiceDetailRes.TotalKhr)</th> *@
+                            @*             <th class="hide-col">@nameof(invoiceDetailRes.TotalUsd)</th> *@
+                            @*             <th class="hide-col">@nameof(invoiceDetailRes.Type)</th> *@
+                            @*             <th>item_vat</th> *@
+                            @*             <th>discount%</th> *@
+                            @*             <th>@nameof(invoiceDetailRes.DiscountKhr)</th> *@
+                            @*             <th class="hide-col">discount$</th> *@
+                            @*             <th>@nameof(invoiceDetailRes.OweKhr)</th> *@
+                            @*             <th class="hide-col">@nameof(invoiceDetailRes.OweUsd)</th> *@
+                            @*             <th>@nameof(invoiceDetailRes.GrandTotalKhr)</th> *@
+                            @*             <th class="hide-col">@nameof(invoiceDetailRes.GrandTotalUsd)</th> *@
+                            @*             <th>@nameof(invoiceDetailRes.PayKhr)</th> *@
+                            @*             <th>@nameof(invoiceDetailRes.PayUsd)</th> *@
+                            @*             <th>@nameof(invoiceDetailRes.PayBath)</th> *@
+                            @*             <th class="hide-col">@nameof(invoiceDetailRes.Tuitionfees)</th> *@
+                            @*             <th class="hide-col">@nameof(invoiceDetailRes.CardCertificate)</th> *@
+                            @*             <th class="hide-col">@nameof(invoiceDetailRes.CategoryId)</th> *@
+                            @*             <th class="hide-col">@nameof(invoiceDetailRes.oth)</th> *@
+                            @*             <th>Action</th> *@
+                            @*         </tr> *@
+                            @*         </thead> *@
+                            @*         <tbody> *@
+                            @*         </tbody> *@
+                            @*     </table> *@
+                            @*     <div class="margin"> *@
+                            @*         <button type="submit" id="btnSave" class="btn btn-primary btn-sm float-right" *@
+                            @*                 value="save_payment" *@
+                            @*                 style="margin-top: 5px;margin-bottom:5px"><i *@
+                            @*                 class="fa-solid fa-dollar-sign"></i> Save Payment *@
+                            @*         </button> *@
+                            @*     </div> *@
+                            @* </div> *@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<partial name="_ProductModal"/>
+@* <partial name="_PaymentModal" /> *@
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script src="/AdminLTE/plugins/select2/js/select2.full.min.js"></script>
+<script>
+    var student_id =@Html.Raw(Json.Serialize(@Model.Student!.StudentId));
+
+    function OnPrint() {
+        window.print();
+    }
+
+    $(document).ready(function () {
+        getInvoice(student_id);
+        fetchStudent(student_id);
+    });
+
+    document.getElementById("btnAddItem").addEventListener("click", function (e) {
+        $("#tblProduct").DataTable().clear().destroy();
+        $("#tblProduct").DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "/product/getproductlist",
+                type: "POST",
+            },
+            columns: [
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return `<input type="checkbox">`
+                    }
+                },
+                {data: "@nameof(product.ProductId)"},
+                {data: "@nameof(product.ProductName)"},
+                {data: "@nameof(product.ProductNameInKhmer)"},
+                {data: "@nameof(product.PriceKhr)"},
+                {data: "@nameof(product.Price)"},
+                {data: "@nameof(product.DegreeId)"},
+                {data: "@nameof(product.Vat)", className: "hide-col"},
+                {data: "@nameof(product.Type)"},
+                {data: "@nameof(product.CategoryId)"},
+                {data: "@nameof(product.CardCertificate)"},
+                {data: "@nameof(product.TuitionFees)"},
+                {data: "@nameof(product.Status)"}
+            ]
+        });
+        $("#ProductModal").modal("show");
+    });
+
+    function getInvoice(student_id) {
+        $("#tblInvoice").DataTable().clear().destroy();
+        $("#tblInvoice").DataTable({
+            processing: true,
+            serverSide: true,
+            paging: true,
+            lengthChange: false,
+            searching: false,
+            ordering: false,
+            info: false,
+            responsive: true,
+            autoWidth: true,
+            ajax: {
+                url: "/invoice/getinvoicebystudentid",
+                type: "POST",
+                data: function (d) {
+                    d.student_id = student_id;
+                }
+            },
+            columns: [
+                {data: "@nameof(invoice.InvoiceId)", className: "hide-col"},
+                {data: "@nameof(invoice.InvoiceNo)"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const dt = formatDate(row.invoice_date, "DD-MMM-YYYY");
+                        return `${dt}`
+                    }
+                },
+                {data: "@nameof(student.StudentId)"},
+                {data: "@nameof(invoice.GrandTotalKhr)"},
+                {data: "@nameof(invoice.TotalDiscountUsd)"},
+                {data: "@nameof(invoice.Vat)"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return row.owe > 0 ? `<button type="button" class="btn btn-danger btn-sm">${row.owe}</button>` : 0;
+                    }
+                },
+                {data: "@nameof(invoice.TotalRiel)"},
+                {data: "@nameof(invoice.TotalDollar)"},
+                {data: "@nameof(invoice.TotalBath)"},
+                {data: "@nameof(invoice.TotalRiel)"},
+                {data: "@nameof(invoice.TotalDollar)"},
+                {data: "@nameof(invoice.TotalBath)"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        if (row.owe > 0) {
+                            return `
+                                <div class="input-group-prepend">
+                                    <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+                                        Action
+                                    </button>
+                                        <div class="dropdown-menu dropdown-menu-right" style="min-width: 8rem;">
+                                        <div class="col-md-12">
+                                            <a onclick="OnEdit('${row.invoice_id}')" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0rem"><i class='fas fa-edit'></i> Edit</a>
+                                            <a onclick="OnDelete('${row.invoice_id}')" class="btn btn-primary btn-sm" style="display: block;margin:.2rem 0rem">Return</a>
+                                            <a onclick="OnDelete('${row.invoice_id}')" class="btn btn-danger btn-sm" style="display: block;margin:.2rem 0rem"><i class="fa-solid fa-trash"></i> Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            return `
+                                <div class="input-group-prepend">
+                                    <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+                                        Action
+                                    </button>
+                                        <div class="dropdown-menu dropdown-menu-right" style="min-width: 8rem;">
+                                        <div class="col-md-12">
+                                            <a onclick="OnEdit('${row.invoice_id}')" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0rem"><i class='fas fa-edit'></i> Edit</a>
+                                            <a onclick="OnDelete('${row.invoice_id}')" class="btn btn-warning btn-sm" style="display: block;margin:.2rem 0rem">Change Student</a>
+                                            <a onclick="OnDelete('${row.invoice_id}')" class="btn btn-danger btn-sm" style="display: block;margin:.2rem 0rem"><i class="fa-solid fa-trash"></i> Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                    }
+                }
+            ]
+        });
+    }
+
+    function GetInvoiceDetail(invoice_id) {
+        $("#tblInvoiceDetail").DataTable().clear().destroy();
+        $.ajax({
+            url: "/invoice/getinvoicedetail/" + invoice_id,
+            type: 'GET', // or 'POST'
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                data.forEach(item => {
+                    let listdata = [
+                        item.invoicedetail_id,
+                        item.invoice_id,
+                        item.product_id,
+                        item.product_name,
+                        item.product_name_khmer,
+                        item.qty,
+                        item.price_khr,
+                        item.price_usd,
+                        item.total_khr,
+                        item.total_usd,
+                        item.type,
+                        item.vat,
+                        item.discount_percent,
+                        item.discount_khr,
+                        item.discount_usd,
+                        item.owe_khr,
+                        item.owe_usd,
+                        item.grand_total_khr,
+                        item.grand_total_usd,
+                        item.pay_khr,
+                        item.pay_usd,
+                        item.pay_bath,
+                        item.tuitionfees,
+                        item.card_certificate,
+                        item.category_id,
+                        item.other
+                    ];
+                    AddRow(listdata);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX Error:', error);
+            }
+        });
+    }
+
+    function OnAssign() {
+        const tableRows = document.querySelectorAll('#tblProduct tbody tr');
+        const checkboxes = document.querySelectorAll('#tblProduct input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                const row = checkbox.closest('tr');
+                if (row) {
+                    var is_pay_khr = true;
+                    var is_pay_usd = !is_pay_khr;
+                    let listdata = [
+                        0,
+                        0,
+                        getCellValueByHeaderName(row, "@nameof(product.ProductId)"),
+                        getCellValueByHeaderName(row, "@nameof(product.ProductName)"),
+                        getCellValueByHeaderName(row, "@nameof(product.ProductNameInKhmer)"),
+                        1,
+                        is_pay_khr ? getCellValueByHeaderName(row, "@nameof(product.PriceKhr)") : 0,
+                        is_pay_usd ? getCellValueByHeaderName(row, "@nameof(product.Price)") : 0,
+                        is_pay_khr ? getCellValueByHeaderName(row, "@nameof(product.PriceKhr)") : 0,
+                        is_pay_usd ? getCellValueByHeaderName(row, "@nameof(product.Price)") : 0,
+                        getCellValueByHeaderName(row, "@nameof(product.Type)"),
+                        getCellValueByHeaderName(row, "@nameof(product.Vat)"),
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        is_pay_khr ? getCellValueByHeaderName(row, "@nameof(product.PriceKhr)") : 0,
+                        is_pay_usd ? getCellValueByHeaderName(row, "@nameof(product.Price)") : 0,
+                        is_pay_khr ? getCellValueByHeaderName(row, "@nameof(product.PriceKhr)") : 0,
+                        0,
+                        0,
+                        getCellValueByHeaderName(row, "@nameof(product.TuitionFees)"),
+                        getCellValueByHeaderName(row, "@nameof(product.CardCertificate)"),
+                        getCellValueByHeaderName(row, "@nameof(product.CategoryId)"),
+                        0
+                    ];
+                    AddRow(listdata);
+                }
+            }
+        });
+        $("#ProductModal").modal("hide");
+    };
+
+    function getCellValueByHeaderName(row, headerName) {
+        const table = row.closest('table');
+        const headers = Array.from(table.querySelectorAll('thead th'));
+
+        const index = headers.findIndex(th => th.dataset.name === headerName);
+        if (index === -1) return null;
+
+        return row.cells[index]?.textContent.trim() ?? null;
+    }
+
+    function AddRow(params) {
+        const tableBody = document.querySelector('#tblInvoiceDetail tbody');
+        var i = document.querySelectorAll('#tblInvoiceDetail tbody tr').length;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+                <td data-name="invoice_detail_id" class="hide-col"><input type="hidden" name="invoiceDetails[${i}].invoice_detail_id" value="${params[0]}" />${params[0]}</td>
+                <td data-name="invoice_id" class="hide-col"><input type="hidden" name="invoiceDetails[${i}].invoice_id" value="${params[1]}" />${params[1]}</td>
+                <td data-name="product_id" ><input type="hidden" name="invoiceDetails[${i}].product_id" value="${params[2]}" />${params[2]}</td>
+                <td data-name="product_name">${params[3]}</td>
+                <td data-name="product_name_kher" class="hide-col">${params[4]}</td>
+                <td data-name="qty">
+                    <span class="view-mode">${params[5]}</span>
+                    <input type="number" oninput="OnChangeQty(this)" name="invoiceDetails[${i}].qty" value="${params[5]}" class="form-control edit-mode" style="display:none;" min="1"/>
+                </td>
+                <td data-name="price_khr">
+                    <span class="view-mode">${params[6]}</span>
+                    <input type="number" name="invoiceDetails[${i}].price_khr" value="${params[6]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="price_usd"  class="hide-col">
+                    <span class="view-mode">${params[7]}</span>
+                    <input type="number" name="invoiceDetails[${i}].price_usd" value="${params[7]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="total_khr">
+                    <span class="view-mode">${params[8]}</span>
+                    <input type="number" name="invoiceDetails[${i}].total_khr" value="${params[8]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="total_usd" class="hide-col">
+                    <span class="view-mode">${params[9]}</span>
+                    <input type="number" name="invoiceDetails[${i}].total_usd" value="${params[9]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="type" class="hide-col">
+                    <span class="view-mode">${params[10]}</span>
+                    <input type="number" name="invoiceDetails[${i}].type" value="${params[10]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="vat">
+                    <span class="view-mode">${params[11]}</span>
+                    <input type="number" name="invoiceDetails[${i}].vat" value="${params[11]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="discount_percent">
+                    <span class="view-mode">${params[12]}</span>
+                    <input type="number" oninput="OnChangeDisPer(this)" name="invoiceDetails[${i}].discount_percent" value="${params[12]}" class="form-control edit-mode" style="display:none;" min="0"/>
+                </td>
+                <td data-name="discount_khr">
+                    <span class="view-mode">${params[13]}</span>
+                    <input type="number" name="invoiceDetails[${i}].discount_khr" value="${params[13]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="discount_usd" class="hide-col">
+                    <span class="view-mode">${params[14]}</span>
+                    <input type="number" name="invoiceDetails[${i}].discount_usd" value="${params[14]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="owe_khr">
+                    <span class="view-mode">${params[15]}</span>
+                    <input type="number" oninput="OnChangeOweKhr(this)" name="invoiceDetails[${i}].owe_khr" value="${params[15]}" class="form-control edit-mode" style="display:none;" min="0"/>
+                </td>
+                <td data-name="owe_usd" class="hide-col">
+                    <span class="view-mode">${params[16]}</span>
+                    <input type="number" oninput="OnChangeOweUsd(this)" name="invoiceDetails[${i}].owe_usd" value="${params[16]}" class="form-control edit-mode" style="display:none;" min="0"/>
+                </td>
+                <td data-name="grand_total_khr">
+                    <span class="view-mode">${params[17]}</span>
+                    <input type="number" name="invoiceDetails[${i}].grand_total_khr" value="${params[17]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="grand_total_usd" class="hide-col">
+                    <span class="view-mode">${params[18]}</span>
+                    <input type="number" name="invoiceDetails[${i}].grand_total_usd" value="${params[18]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="pay_khr">
+                    <span class="view-mode">${params[19]}</span>
+                    <input type="number" oninput="OnChangePayR(this)" name="invoiceDetails[${i}].pay_khr" value="${params[19]}" class="form-control edit-mode" style="display:none;" min="0"/>
+                </td>
+                <td data-name="pay_usd">
+                    <span class="view-mode">${params[20]}</span>
+                    <input type="text" name="invoiceDetails[${i}].pay_usd" value="${params[20]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="pay_bath">
+                    <span class="view-mode">${params[21]}</span>
+                    <input type="text" name="invoiceDetails[${i}].pay_bath" value="${params[21]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="tuitionfees" class="hide-col">
+                    <span class="view-mode">${params[22]}</span>
+                    <input type="text" name="invoiceDetails[${i}].tuitionfees" value="${params[22]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="card_certificate" class="hide-col">
+                    <span class="view-mode">${params[23]}</span>
+                    <input type="text" name="invoiceDetails[${i}].card_certificate" value="${params[23]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="category_id" class="hide-col">
+                    <span class="view-mode">${params[24]}</span>
+                    <input type="text" name="invoiceDetails[${i}].category_id" value="${params[24]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td data-name="other" class="hide-col">
+                    <span class="view-mode">${params[25]}</span>
+                    <input type="text" name="invoiceDetails[${i}].other" value="${params[25]}" class="form-control edit-mode" style="display:none;" readonly/>
+                </td>
+                <td>
+                    <a onclick="ToggleEditMode(this)" class="btn btn-warning btn-xs" style="margin:.2rem 0rem" data-editing="false"><i class="fa-solid fa-pen-to-square" ></i></a>
+                    <a onclick="DeleteItem(this)" class="btn btn-danger btn-xs" style="margin:.2rem 0rem"><i class="fa-solid fa-trash"></i></a>
+                </td>
+            `;
+        tableBody.appendChild(row);
+        i += 1;
+        CalculateGrandTotal();
+    }
+
+    function ToggleEditMode(button) {
+        const row = button.closest('tr');
+        const viewElems = row.querySelectorAll('.view-mode');
+        const editElems = row.querySelectorAll('.edit-mode');
+
+        const isEditing = button.getAttribute("data-editing") === "true";
+
+        // Toggle visibility
+        viewElems.forEach(el => el.style.display = isEditing ? "" : "none");
+        editElems.forEach(el => el.style.display = isEditing ? "none" : "");
+
+        // Toggle button content
+        button.innerHTML = isEditing
+            ? '<i class="fa-solid fa-pen-to-square"></i>'
+            : '<i class="fa-solid fa-check"></i>';
+        button.classList.add(isEditing ? 'btn-warning' : 'btn-success');
+        button.classList.remove(isEditing ? 'btn-success' : 'btn-warning');
+        // Toggle state
+        button.setAttribute("data-editing", (!isEditing).toString());
+    }
+
+    function DeleteItem(btn) {
+        const row = btn.closest('tr');
+        // if (row) {
+        //     if (!confirm('Are you sure you want to delete this record?')) return;
+        //     // const itemName = row.cells[3].textContent.trim();
+        //     // console.log('Deleting row with item:', itemName);
+        //     row.remove();
+        // }
+        if (row && confirm("Are you sure you want to delete this row?")) {
+            row.remove();
+        }
+    }
+
+    function OnChangeQty(input) {
+        const row = input.closest('tr');
+
+        if (input.value === "") {
+            input = 1
+        }
+        const qty = parseFloat(input.value);
+
+        const pricekhr = row.querySelector('td[data-name="price_khr"]');
+        const priceusd = row.querySelector('td[data-name="price_usd"]');
+
+        const priceInputKhr = parseFloat(pricekhr.querySelector('input.edit-mode').value);
+        const priceInputUsd = parseFloat(priceusd.querySelector('input.edit-mode').value);
+
+        const totalkhr = qty * priceInputKhr;
+        const totalusd = qty * priceInputUsd;
+
+        const td_qty = row.querySelector('td[data-name="qty"]');
+        td_qty.querySelector('span.view-mode').textContent = qty;
+
+        const td_total_khr = row.querySelector('td[data-name="total_khr"]');
+        td_total_khr.querySelector('span.view-mode').textContent = totalkhr.toFixed(2);
+        td_total_khr.querySelector('input.edit-mode').value = totalkhr.toFixed(2);
+
+        const total_usd = row.querySelector('td[data-name="total_usd"]');
+        total_usd.querySelector('span.view-mode').textContent = totalusd.toFixed(2);
+        total_usd.querySelector('input.edit-mode').value = totalusd.toFixed(2);
+
+        @* const type = row.querySelector('td[data-name="type"]');
+        type.querySelector('span.view-mode').textContent = "";
+        type.querySelector('input.edit-mode').value = "";
+
+        const vat = row.querySelector('td[data-name="vat"]');
+        vat.querySelector('span.view-mode').textContent = "";
+        vat.querySelector('input.edit-mode').value = ""; *@
+
+        const discount_percent = row.querySelector('td[data-name="discount_percent"]');
+        discount_percent.querySelector('span.view-mode').textContent = 0;
+        discount_percent.querySelector('input.edit-mode').value = 0;
+
+        const discount_khr = row.querySelector('td[data-name="discount_khr"]');
+        discount_khr.querySelector('span.view-mode').textContent = 0;
+        discount_khr.querySelector('input.edit-mode').value = 0;
+
+        const discount_usd = row.querySelector('td[data-name="discount_usd"]');
+        discount_usd.querySelector('span.view-mode').textContent = 0;
+        discount_usd.querySelector('input.edit-mode').value = 0;
+
+        const owe_khr = row.querySelector('td[data-name="owe_khr"]');
+        owe_khr.querySelector('span.view-mode').textContent = 0;
+        owe_khr.querySelector('input.edit-mode').value = 0;
+
+        const owe_usd = row.querySelector('td[data-name="owe_usd"]');
+        owe_usd.querySelector('span.view-mode').textContent = 0;
+        owe_usd.querySelector('input.edit-mode').value = 0;
+
+        const grand_total_khr = row.querySelector('td[data-name="grand_total_khr"]');
+        grand_total_khr.querySelector('span.view-mode').textContent = totalkhr.toFixed(2);
+        grand_total_khr.querySelector('input.edit-mode').value = totalkhr.toFixed(2);
+
+        const grand_total_usd = row.querySelector('td[data-name="grand_total_usd"]');
+        grand_total_usd.querySelector('span.view-mode').textContent = totalusd.toFixed(2);
+        grand_total_usd.querySelector('input.edit-mode').value = totalusd.toFixed(2);
+
+        const pay_khr = row.querySelector('td[data-name="pay_khr"]');
+        pay_khr.querySelector('span.view-mode').textContent = totalkhr.toFixed(2);
+        pay_khr.querySelector('input.edit-mode').value = totalkhr.toFixed(2);
+
+        const pay_usd = row.querySelector('td[data-name="pay_usd"]');
+        pay_usd.querySelector('span.view-mode').textContent = totalusd.toFixed(2);
+        pay_usd.querySelector('input.edit-mode').value = totalusd.toFixed(2);
+
+        const pay_bath = row.querySelector('td[data-name="pay_bath"]');
+        pay_bath.querySelector('span.view-mode').textContent = 0;
+        pay_bath.querySelector('input.edit-mode').value = 0;
+
+        @* const tuitionfees = row.querySelector('td[data-name="tuitionfees"]');
+        tuitionfees.querySelector('span.view-mode').textContent = null;
+        tuitionfees.querySelector('input.edit-mode').value = null;
+
+        const card_certificate = row.querySelector('td[data-name="card_certificate"]');
+        card_certificate.querySelector('span.view-mode').textContent = undefined;
+        card_certificate.querySelector('input.edit-mode').value = undefined;
+
+        const category_id = row.querySelector('td[data-name="category_id"]');
+        category_id.querySelector('span.view-mode').textContent = "";
+        category_id.querySelector('input.edit-mode').value = "";
+
+        const other = row.querySelector('td[data-name="other"]');
+        other.querySelector('span.view-mode').textContent = "";
+        other.querySelector('input.edit-mode').value = ""; *@
+        CalculateGrandTotal();
+    }
+
+    function OnChangeDisPer(input) {
+        const row = input.closest('tr');
+
+        if (input.value === "") {
+            input = 0
+        }
+        const discountPercent = parseFloat(input.value) || 0;
+        const qty = row.querySelector('td[data-name="qty"] input.edit-mode').value;
+
+        const pricekhr = row.querySelector('td[data-name="price_khr"]');
+        const priceusd = row.querySelector('td[data-name="price_usd"]');
+
+        const priceInputKhr = parseFloat(pricekhr.querySelector('input.edit-mode').value);
+        const priceInputUsd = parseFloat(priceusd.querySelector('input.edit-mode').value);
+
+        const totalkhr = qty * priceInputKhr;
+        const totalusd = qty * priceInputUsd;
+
+        const td_total_khr = row.querySelector('td[data-name="total_khr"]');
+        td_total_khr.querySelector('span.view-mode').textContent = totalkhr.toFixed(2);
+        td_total_khr.querySelector('input.edit-mode').value = totalkhr.toFixed(2);
+
+        const total_usd = row.querySelector('td[data-name="total_usd"]');
+        total_usd.querySelector('span.view-mode').textContent = totalusd.toFixed(2);
+        total_usd.querySelector('input.edit-mode').value = totalusd.toFixed(2);
+
+        const discount_percent = row.querySelector('td[data-name="discount_percent"]');
+        discount_percent.querySelector('span.view-mode').textContent = discountPercent;
+        discount_percent.querySelector('input.edit-mode').value = discountPercent;
+
+        const discount_khr = row.querySelector('td[data-name="discount_khr"]');
+        discount_khr.querySelector('span.view-mode').textContent = (totalkhr * discountPercent / 100).toFixed(2);
+        discount_khr.querySelector('input.edit-mode').value = (totalkhr * discountPercent / 100).toFixed(2);
+
+        const discount_usd = row.querySelector('td[data-name="discount_usd"]');
+        discount_usd.querySelector('span.view-mode').textContent = (totalusd * discountPercent / 100).toFixed(2);
+        discount_usd.querySelector('input.edit-mode').value = (totalusd * discountPercent / 100).toFixed(2);
+
+        const owe_khr = row.querySelector('td[data-name="owe_khr"]');
+        owe_khr.querySelector('span.view-mode').textContent = 0;
+        owe_khr.querySelector('input.edit-mode').value = 0;
+
+        const owe_usd = row.querySelector('td[data-name="owe_usd"]');
+        owe_usd.querySelector('span.view-mode').textContent = 0;
+        owe_usd.querySelector('input.edit-mode').value = 0;
+
+        const grand_total_khr = row.querySelector('td[data-name="grand_total_khr"]');
+        grand_total_khr.querySelector('span.view-mode').textContent = (totalkhr - (totalkhr * discountPercent / 100)).toFixed(2);
+        grand_total_khr.querySelector('input.edit-mode').value = (totalkhr - (totalkhr * discountPercent / 100)).toFixed(2);
+
+        const grand_total_usd = row.querySelector('td[data-name="grand_total_usd"]');
+        grand_total_usd.querySelector('span.view-mode').textContent = (totalusd - (totalusd * discountPercent / 100)).toFixed(2);
+        grand_total_usd.querySelector('input.edit-mode').value = (totalusd - (totalusd * discountPercent / 100)).toFixed(2);
+
+        const pay_khr = row.querySelector('td[data-name="pay_khr"]');
+        pay_khr.querySelector('span.view-mode').textContent = (totalkhr - (totalkhr * discountPercent / 100)).toFixed(2);
+        pay_khr.querySelector('input.edit-mode').value = (totalkhr - (totalkhr * discountPercent / 100)).toFixed(2);
+
+        const pay_usd = row.querySelector('td[data-name="pay_usd"]');
+        pay_usd.querySelector('span.view-mode').textContent = (totalusd - (totalusd * discountPercent / 100)).toFixed(2);
+        pay_usd.querySelector('input.edit-mode').value = (totalusd - (totalusd * discountPercent / 100)).toFixed(2);
+
+        const pay_bath = row.querySelector('td[data-name="pay_bath"]');
+        pay_bath.querySelector('span.view-mode').textContent = 0;
+        pay_bath.querySelector('input.edit-mode').value = 0;
+
+        CalculateGrandTotal();
+    }
+
+    function OnChangeOweKhr(input) {
+        const row = input.closest('tr');
+
+        if (input.value === "") {
+            input = 0
+        }
+        const discountPercent = row.querySelector('td[data-name="discount_percent"] input.edit-mode').value;
+        const owekhr = parseFloat(input.value) || 0;
+        const oweusd = parseFloat(row.querySelector('td[data-name="owe_usd"] input.edit-mode').value) || 0;
+        const qty = row.querySelector('td[data-name="qty"] input.edit-mode').value;
+
+        const pricekhr = row.querySelector('td[data-name="price_khr"]');
+        const priceusd = row.querySelector('td[data-name="price_usd"]');
+
+        const priceInputKhr = parseFloat(pricekhr.querySelector('input.edit-mode').value);
+        const priceInputUsd = parseFloat(priceusd.querySelector('input.edit-mode').value);
+
+        const totalkhr = qty * priceInputKhr;
+        const totalusd = qty * priceInputUsd;
+
+        const owe_khr = row.querySelector('td[data-name="owe_khr"]');
+        owe_khr.querySelector('span.view-mode').textContent = owekhr.toFixed(2);
+        owe_khr.querySelector('input.edit-mode').value = owekhr.toFixed(2);
+
+        const owe_usd = row.querySelector('td[data-name="owe_usd"]');
+        owe_usd.querySelector('span.view-mode').textContent = oweusd.toFixed(2);
+        owe_usd.querySelector('input.edit-mode').value = oweusd.toFixed(2);
+
+        const grand_total_khr = row.querySelector('td[data-name="grand_total_khr"]');
+        grand_total_khr.querySelector('span.view-mode').textContent = (totalkhr - (totalkhr * discountPercent / 100) - owekhr).toFixed(2);
+        grand_total_khr.querySelector('input.edit-mode').value = (totalkhr - (totalkhr * discountPercent / 100) - owekhr).toFixed(2);
+
+        const grand_total_usd = row.querySelector('td[data-name="grand_total_usd"]');
+        grand_total_usd.querySelector('span.view-mode').textContent = (totalusd - (totalusd * discountPercent / 100) - oweusd).toFixed(2);
+        grand_total_usd.querySelector('input.edit-mode').value = (totalusd - (totalusd * discountPercent / 100) - oweusd).toFixed(2);
+
+        const pay_khr = row.querySelector('td[data-name="pay_khr"]');
+        pay_khr.querySelector('span.view-mode').textContent = (totalkhr - (totalkhr * discountPercent / 100) - owekhr).toFixed(2);
+        pay_khr.querySelector('input.edit-mode').value = (totalkhr - (totalkhr * discountPercent / 100) - owekhr).toFixed(2);
+
+        const pay_usd = row.querySelector('td[data-name="pay_usd"]');
+        pay_usd.querySelector('span.view-mode').textContent = (totalusd - (totalusd * discountPercent / 100) - oweusd).toFixed(2);
+        pay_usd.querySelector('input.edit-mode').value = (totalusd - (totalusd * discountPercent / 100) - oweusd).toFixed(2);
+
+        const pay_bath = row.querySelector('td[data-name="pay_bath"]');
+        pay_bath.querySelector('span.view-mode').textContent = 0;
+        pay_bath.querySelector('input.edit-mode').value = 0;
+
+        CalculateGrandTotal();
+    }
+
+    function OnChangePayR(input) {
+        const row = input.closest('tr');
+        if (input.value === "") {
+            row.querySelector('input[name$=".pay_khr"]').value = 0;
+        }
+
+        const pay_r = parseFloat(input.value);
+
+        const qty = parseInt(row.querySelector('input[name$=".qty"]').value);
+        const price_khr = parseFloat(row.querySelector('input[name$=".price_khr"]').value);
+        const discount_r = parseFloat(row.querySelector('input[name$=".discount_khr"]').value);
+        const owe_khr = parseFloat(row.querySelector('input[name$=".owe_khr"]').value);
+        const total = qty * price_khr;
+        const total_pay_r = total - owe_khr - discount_r;
+        const rate_out = document.getElementById("rateOut").value;
+
+        row.querySelector('input[name$=".pay_usd"]').value = (total_pay_r - pay_r) / parseFloat(rate_out);
+        row.querySelector('input[name$=".pay_bath"]').value = 0;
+        CalculateGrandTotal();
+    }
+
+    function CalculateGrandTotal() {
+        let grand_total_khr = 0;
+        let total_khr = 0;
+        let total_pay_khr = 0;
+        let total_pay_usd = 0;
+        let total_dis_khr = 0;
+        let total_owe_khr = 0;
+
+        document.querySelectorAll('#tblInvoiceDetail tbody tr').forEach(row => {
+            const grandtotalkhr = row.querySelector('input[name*=".total_khr"]');
+            const totalkhr = row.querySelector('input[name*=".grand_total_khr"]');
+            const totalpaykhr = row.querySelector('input[name*=".pay_khr"]');
+            const totalpayusd = row.querySelector('input[name*=".pay_usd"]');
+
+            const diskhr = row.querySelector('input[name*=".discount_khr"]');
+            const owekhr = row.querySelector('input[name*=".owe_khr"]');
+
+            if (grandtotalkhr && !isNaN(parseFloat(grandtotalkhr.value))) {
+                grand_total_khr += parseFloat(grandtotalkhr.value);
+            }
+            if (totalkhr && !isNaN(parseFloat(totalkhr.value))) {
+                total_khr += parseFloat(totalkhr.value);
+            }
+            if (totalpaykhr && !isNaN(parseFloat(totalpaykhr.value))) {
+                total_pay_khr += parseFloat(totalpaykhr.value);
+            }
+            if (totalpayusd && !isNaN(parseFloat(totalpayusd.value))) {
+                total_pay_usd += parseFloat(totalpayusd.value);
+            }
+            if (diskhr && !isNaN(parseFloat(diskhr.value))) {
+                total_dis_khr += parseFloat(diskhr.value);
+            }
+            if (owekhr && !isNaN(parseFloat(owekhr.value))) {
+                total_owe_khr += parseFloat(owekhr.value);
+            }
+        });
+
+        document.getElementById("@nameof(invoice)_@nameof(invoice.GrandTotalKhr)").value = grand_total_khr.toFixed(2);
+        document.getElementById("total_khr").value = total_khr;
+        document.getElementById("total_usd").value = 0;
+        document.getElementById("total_bath").value = 0;
+        document.getElementById("@nameof(invoice)_@nameof(invoice.TotalRiel)").value = total_pay_khr;
+        document.getElementById("@nameof(invoice)_@nameof(invoice.TotalDollar)").value = total_pay_usd;
+        document.getElementById("@nameof(invoice)_@nameof(invoice.TotalBath)").value = 0;
+
+        document.getElementById("@nameof(invoice)_@nameof(invoice.TotalDiscountKhr)").value = total_dis_khr;
+        document.getElementById("@nameof(invoice)_@nameof(invoice.OweKhr)").value = total_owe_khr;
+    }
+
+    function fetchStudent() {
+        $.ajax({
+            url: '/student/getsearchstudent', // API URL
+            type: 'GET', // or 'POST'
+            dataType: 'json',
+            success: function (data) {
+                // console.log(data);
+                const cboRoom = document.getElementById("@nameof(invoice)_@nameof(invoice.StudentId)");
+                cboRoom.innerText = "";
+                const optionRoom = document.createElement("option");
+                optionRoom.value = 0;
+                optionRoom.text = "Select Student";
+                optionRoom.disabled = true;
+                cboRoom.appendChild(optionRoom);
+                data.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.student_id;
+                    option.text = item.student_name;
+                    cboRoom.appendChild(option);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX Error:', error);
+            }
+        });
+    }
+
+    function fetchStudent(studentid) {
+        $.ajax({
+            url: `/student/student_id/${studentid}`, // API URL
+            type: 'GET', // or 'POST'
+            dataType: 'json',
+            success: function (data) {
+                document.getElementById("@nameof(invoice)_@nameof(invoice.StudentId)").value = data["@nameof(student)"]["@nameof(student.StudentId)"];
+                document.getElementById("@nameof(student)_@nameof(student.DateOfBirth)").value = formatDate(data["@nameof(student)"]["@nameof(student.DateOfBirth)"], "DD-MMM-YYYY");
+
+                @* document.getElementById("@nameof(invoice)_@nameof(invoice.invoice_date)").value =formatDate(Date.now.toString(),"DD-MMM-YYYY"); *@
+                document.getElementById("@nameof(invoice)_@nameof(invoice.DegreeId)").value = data["@nameof(degree)"]["@nameof(degree.DegreeName)"];
+                document.getElementById("@nameof(invoice)_@nameof(invoice.SchoolId)").value = data["@nameof(school)"]["@nameof(school.SchoolName)"];
+                document.getElementById("@nameof(invoice)_@nameof(invoice.FieldId)").value = data["@nameof(field)"]["@nameof(field.FieldName)"];
+                document.getElementById("@nameof(invoice)_@nameof(invoice.PromotionId)").value = data["@nameof(promotion)"]["@nameof(promotion.PromotionNo)"];
+                document.getElementById("@nameof(invoice)_@nameof(invoice.StageId)").value = data["@nameof(stage)"]["@nameof(stage.StageNo)"];
+                document.getElementById("@nameof(invoice)_@nameof(invoice.TermNo)").value = data["@nameof(term)"]["@nameof(term.TermNo)"];
+                document.getElementById("@nameof(invoice)_@nameof(invoice.GroupId)").value = data["@nameof(group)"]["@nameof(group.GroupName)"];
+                document.getElementById("@nameof(groupRoom)_@nameof(groupRoom.RoomName)").value = data["@nameof(groupRoom)"]["@nameof(groupRoom.RoomName)"];
+                document.getElementById("@nameof(group)_@nameof(group.StudyTime)").value = data["@nameof(group)"]["@nameof(group.StudyTime)"];
+                document.getElementById("@nameof(invoice)_@nameof(invoice.StartDate)").value = formatDate(data["@nameof(term)"]["@nameof(term.StartDate)"], "DD-MMM-YYYY");
+                document.getElementById("@nameof(invoice)_@nameof(invoice.EndDate)").value = formatDate(data["@nameof(term)"]["@nameof(term.EndDate)"], "DD-MMM-YYYY");
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX Error:', error);
+            }
+        });
+    }
+
+    $('#tblInvoice tbody').on('click', 'tr', function () {
+        $('#tblInvoice tbody tr').removeClass('highlight');
+        $(this).addClass('highlight');
+        GetInvoiceDetail($(this).find('td:nth-child(1)').text().trim());
+        document.getElementById("btnAddItem").classList.add("btn-warning");
+        document.getElementById("btnAddItem").value = "add_item";
+        document.getElementById("btnAddItem").innerText = "Add Item";
+
+        document.getElementById("btnSave").classList.add("btn-success");
+        document.getElementById("btnSave").value = "update_payment";
+        document.getElementById("btnSave").innerText = "Update Payment";
+    });
+</script>

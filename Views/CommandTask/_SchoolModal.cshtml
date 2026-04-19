@@ -1,0 +1,65 @@
+@using BBU_SYSTEM.DTOs
+@{
+    var school = new SchoolDto();
+}
+<div class="modal fade" id="SchoolModal" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">School</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="degreeForm">
+                    <input asp-for="@school.SchoolId" hidden readonly class="form-control" value="0"/>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" asp-for="@school.SchoolName" class="form-control"
+                               placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label>Name Khmer</label>
+                        <input type="text" asp-for="@school.SchoolNameInKhmer" class="form-control"
+                               placeholder="Enter name khmer">
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label>Code</label>
+                                <input type="text" asp-for="@school.SchoolCode" class="form-control"
+                                       placeholder="Enter short name">
+                            </div>
+                        </div>
+                        <div class="col-9">
+                            <div class="form-group">
+                                <label>Faculty</label>
+                                <select id="cboSchool" class="form-control select2"
+                                        style="width: 100%;">
+                                    <option selected="selected" disabled value="0">Select Faculty</option>
+                                    @* @foreach (var data in Model.Schools!) *@
+                                    @* { *@
+                                    @*     <option value=@data.SchoolId>@data.SchoolName</option> *@
+                                    @* } *@
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <div class="icheck-primary d-inline">
+                            <input type="checkbox" id="isShort">
+                            <label for="isShort">is foundation</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="submit" form="degreeForm" class="btn btn-primary"><i class="fas fa-save"></i> Save changes
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

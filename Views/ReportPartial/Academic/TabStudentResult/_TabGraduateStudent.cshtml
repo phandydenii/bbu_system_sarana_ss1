@@ -1,0 +1,73 @@
+﻿<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                @*< h3 class="card-title">Student Ministry Document</h3> *@
+                <div class="row">
+                    <div class="col-md-2">
+                        <label aria-required="true" class="required">Degree</label>
+                        <select id="cboDegree" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="required">School</label>
+                        <select id="cboSchool" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Promotion</label>
+                        <select id="cboPromotion" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Field</label>
+                        <select id="cboField" class="form-control select2"></select>
+                    </div>
+
+                    <div class="col-md-1">
+                        <label>Stage</label>
+                        <select id="cboStage" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-1">
+                        <label>Term</label>
+                        <select id="cboTerm" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Group</label>
+                        <select id="cboGroup" class="form-control select2"></select>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="margin" id="rangeButtons">
+                            <button id="btnFilterStudentList" class="btn btn-success">
+                                Filter <i class="fas fa-filter"></i>
+                            </button>
+                            <button id="btnPrit" class="btn btn-primary">
+                                Print <i class="fas fa-print"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="tblStudent" class="table table-bordered table-striped" >
+                    <thead>
+                    <tr>
+                        <th>Student Id</th>
+                        <th>Name English</th>
+                        <th>Name Khmer</th>
+                        <th>Gender</th>
+                        @* <th>DOB</th> *@
+                        <th>Document In</th>
+                        <th>Document Out</th>
+                        <th>Hight School</th>
+                        <th>Status</th>
+                        @* <th>Action</th> *@
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

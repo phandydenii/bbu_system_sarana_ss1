@@ -1,0 +1,13 @@
+﻿@using BBU_SYSTEM.DTOs
+@{
+    var student = new StudentDto();
+}
+
+<label>Phone</label>
+<input type="text" class="form-control" asp-for="@student.Phone">
+<label>Email</label>
+<input type="text" class="form-control" asp-for="@student.Email">
+<label>Address</label>
+<textarea type="text" rows="4" class="form-control" asp-for="@student.Address"></textarea>
+<label>Address Khmer</label>
+<textarea type="text" rows="4" class="form-control" asp-for="@student.AddressInKhmer"></textarea>

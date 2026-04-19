@@ -1,0 +1,126 @@
+﻿@using BBU_SYSTEM.DTOs
+@using BBU_SYSTEM.Models.Req
+@model BBU_SYSTEM.ViewModel.RegisryDetailViewModel
+@{
+    var registryReq = new RegistryReq();
+}
+<div class="tab-pane fade show active" id="custom-tabs-four-personal" role="tabpanel"
+     aria-labelledby="custom-tabs-four-personal-tab">
+    <div class="row">
+        <div class="col-3">
+            <label>Student Id</label>
+            <input type="text" class="form-control" asp-for="@registryReq!.Student!.StudentId" placeholder="Auto generate" readonly>
+        </div>
+        <div class="col-4">
+            <label class="required">Student Name</label>
+            <input type="text" class="form-control" asp-for="@registryReq!.Student!.StudentName" required
+                   placeholder="Enter student name">
+        </div>
+        <div class="col-3">
+            <label class="required">Student Name Khmer</label>
+            <input type="text" class="form-control" asp-for="@registryReq!.Student!.StudentNameInKhmer" required
+                   placeholder="Enter student name khmer">
+        </div>
+        <div class="col-2">
+            <label>Sex</label>
+            <select asp-for="@registryReq!.Student!.Sex" class="custom-select" style="width: 100%;">
+                <option selected="selected" value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            <label class="required">Date Of Birth</label>
+            <input type="date" class="form-control"
+                   asp-for="@registryReq!.Student!.DateOfBirth"/>
+        </div>
+        <div class="col-4">
+            <label class="required">Place Of Birth</label>
+            <select asp-for="@registryReq.PlaceOfBirthId" class="form-control select2" required style="width: 100%;">
+                <option selected="selected" disabled>Select Place of Birth</option>
+            </select>
+        </div>
+        <div class="col-3">
+            <label class="required">Nationality</label>
+            <select asp-for="@registryReq.Student!.NationalityId" class="form-control select2" style="width: 100%;">
+                <option selected="selected">Select Nationality</option>
+            </select>
+        </div>
+        <div class="col-2">
+            <label>Table No</label>
+            <input type="number" asp-for="@registryReq.Registry!.HighSchoolTableNo" class="form-control">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            <label class="required">Material Status</label>
+            <select asp-for="@registryReq.Student!.MaritalStatus" class="custom-select" style="width: 100%;"
+                    required>
+                <option selected="selected" value="Single">Single</option>
+                <option value="Marred">Marred</option>
+            </select>
+        </div>
+        <div class="col-4"> 
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="custom-control custom-radio">
+                            <input class="custom-control-input" checked type="radio" id="rdoHighSchool"
+                                   name="customRadio">
+                            <label for="rdoHighSchool" class="custom-control-label">High School</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="custom-control custom-radio">
+                            <input class="custom-control-input" type="radio" id="rdoMasPhD" name="customRadio">
+                            <label for="rdoMasPhD" class="custom-control-label">Mass & PhD</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <select asp-for="@registryReq.Student!.FromHighSchoolNameInKhmer" class="form-control select2" required style="width: 100%;">
+                <option selected="selected">Select High School</option>
+            </select>
+        </div>
+        <div class="col-3">
+            <label class="required">Province</label>
+            <select asp-for="@registryReq.ProvinceId" class="form-control select2" style="width: 100%;">
+                <option selected="selected">Select Province</option>
+            </select>
+        </div>
+        <div class="col-2">
+            <label>HS-Year</label>
+            <input type="number" class="form-control" asp-for="@registryReq.Student!.HighSchoolGraduatedYear">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            <label>Race</label>
+            <select asp-for="@registryReq.Student!.RaceId" class="form-control select2" style="width: 100%;">
+                <option selected="selected" disabled>Select Race</option>
+            </select>
+        </div>
+        <div class="col-4">
+            <label>Job</label>
+            <select asp-for="@registryReq.Student!.JobId" class="form-control select2" style="width: 100%;">
+                <option selected="selected">Select Job</option>
+            </select>
+        </div>
+        <div class="col-3">
+            <label>Disability</label>
+            <select asp-for="@registryReq!.Student!.DisabilityId" class="form-control select2" style="width: 100%;">
+                <option selected="selected" value="">Select Disability</option>
+            </select>
+        </div>
+        <div class="col-2">
+            <div class="form-group">
+                <label>Result</label> 
+                <select class="custom-select" asp-for="@registryReq!.Registry!.HighSchoolResult" >
+                    <option selected="selected" value="Pass">Pass</option>
+                    <option value="Fail">Fail</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>

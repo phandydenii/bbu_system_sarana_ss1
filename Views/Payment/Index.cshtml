@@ -1,0 +1,159 @@
+﻿@using BBU_SYSTEM.DTOs
+@{
+    ViewData["Title"] = "Index";
+    ViewData["TitleContent"] = "Student Payment";
+    ViewData["Controller"] = "Payment";
+    ViewData["Action"] = "Payment";
+
+    InvoiceDto invoice;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Payment</h3>
+                <button type="submit" class="btn btn-success btn-sm float-right" data-toggle="modal"
+                        data-target="#PaymentModal">
+                    <i class="fas fa-plus"></i>
+                    New Payment
+                </button>
+                <a asp-action="Create" asp-controller="Payment" class="btn btn-primary btn-sm float-right">
+                    <i class="fas fa-plus"></i>
+                    New Payment
+                </a>
+            </div>
+            <div class="card-body">
+                <table id="tblStudent" class="table table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Student Id</th>
+                        <th>Name English</th>
+                        <th>Name Khmer</th>
+                        <th>Gender</th>
+                        <th>DOB</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_PaymentModal"/>
+<partial name="_ValidationScriptsPartial"/>
+
+<script>
+    $(document).ready(function () {
+        fetchStudent();
+    });
+
+    function fetchStudent() {
+        $("#tblStudent").DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "/student/academic/studentlist", // Endpoint to fetch paginated data
+                type: "POST"
+            },
+            columns: [
+                {data: "student_id"},
+                {data: "student_name"},
+                {data: "student_name_in_khmer"},
+                {data: "sex"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const dt = formatDate(row.date_of_birth);
+                        return `${dt}`
+                    }
+                },
+                {data: "phone"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        if (row.status === "REGISTER") {
+                            return ` <span class="badge badge-warning">${row.status}</span>`;
+                        } else if (row.status === "ACTIVE") {
+                            return ` <span class="badge badge-primary">${row.status}</span>`;
+                        } else if (row.status === "QUIT") {
+                            return ` <span class="badge badge-danger">${row.status}</span>`;
+                        }
+
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return `<a href="/payment/student/${row.student_id}" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0">Edit</a>`;
+                    }
+
+                }
+            ]
+        });
+    }
+
+    function fetchStudent1() {
+        $("#tblPayment").DataTable().clear().destroy();
+        $("#tblPayment").DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "/payment/getinvoicelist",
+                type: "POST",
+            },
+            columns: [
+                {data: "@nameof(invoice.InvoiceId)"},
+                {data: "@nameof(invoice.InvoiceNo)"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const dt = formatDate(row.invoice_date);
+                        return `${dt}`
+                    }
+                },
+                {data: "student_id"},
+                {data: "student_name"},
+                {data: "degree_id"},
+                {data: "school_id"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        if (row.status === "REGISTER") {
+                            return `<span class="badge badge-warning">${row.status}</span>`;
+                        } else if (row.status === "ACTIVE") {
+                            return `<span class="badge badge-primary">${row.status}</span>`;
+                        } else if (row.status === "QUIT") {
+                            return `<span class="badge badge-danger">${row.status}</span>`;
+                        } else {
+                            return `<span class="badge badge-secondary">${row.status}</span>`; // fallback for unknown statuses
+                        }
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return `
+                                    <div class="input-group-prepend">
+                                        <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+                                            Action
+                                        </button>
+                                        <div class="dropdown-menu" style="min-width: 8rem;">
+                                            <div class="col-md-12">
+                                                <a href="/registry/details/${row.student_id}" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0rem">Edit</a>
+                                                <a href="/academic/details?student_id=${row.student_id}" class="btn btn-warning btn-sm" style="display: block;margin:.2rem 0rem">View</a>
+                                                <a class="btn btn-danger btn-sm" style="display: block;margin:.2rem 0rem">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    `;
+                    }
+                }
+            ]
+        });
+    }</script>

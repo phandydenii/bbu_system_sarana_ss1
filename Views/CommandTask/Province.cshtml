@@ -1,0 +1,76 @@
+@{
+    ViewData["OpenMenu"] = "CommandTask";
+    ViewData["Action"] = "Province";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Province</h3>
+                <button type="button" id="btnNewProvince" class="btn btn-primary float-right">
+                    Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblProvince" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Name Khmer</th>
+                        <th>City</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_ProvinceModal"/>
+<script>
+    $(document).ready(function () {
+        fetchProvince();
+    });
+
+    function fetchProvince() {
+        $("#tblProvince").DataTable({
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "/Province/get-provinces",
+                type: "POST"
+            },
+            columns: [
+                {data: "provinceId"},
+                {data: "provinceName"},
+                {data: "provinceInKhmer"},
+                {data: "isCity"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const jsonData = JSON.stringify(row).replace(/"/g, '&quot;');
+                        return `<a onclick="OnEdit('${jsonData}')" class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</a>`;
+                    }
+
+                }
+            ]
+        });
+    }
+
+    document.getElementById("btnNewProvince").addEventListener("click", function (e) {
+        e.preventDefault();
+
+        $("#formProvince")[0].reset();
+        $("#provinceModal").modal("show");
+    })
+</script>

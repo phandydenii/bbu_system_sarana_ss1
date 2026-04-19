@@ -1,0 +1,151 @@
+@using BBU_SYSTEM.DTOs
+@using Product = BBU_SYSTEM.Modelsss.Product
+@{
+    var product = new ProductDto();
+}
+<div class="modal fade" id="ProductModal" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Product</h4>
+            </div>
+            <div class="modal-body">
+                <form id="frmProduct">
+                    <input type="hidden" class="form-control" asp-for="@product.ProductId" readonly >
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="form-group">
+                                <label class="required">Name</label>
+                                <input type="text" asp-for="@product.ProductName" class="form-control"
+                                       placeholder="Enter Name" required>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="required">Price Khr</label>
+                                <input type="number" asp-for="@product.PriceKhr" class="form-control" required min="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="form-group">
+                                <label>Name Khmer</label>
+                                <input type="text" asp-for="@product.ProductNameInKhmer" class="form-control"
+                                       placeholder="Enter Name" >
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="required">price usd</label>
+                                <input type="number" asp-for="@product.Price" class="form-control"
+                                       placeholder="Enter Name" required min="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="form-group">
+                                <label class="required">Category</label> 
+                                <select class="form-control select2"
+                                        asp-for="@product.CategoryId"> 
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="required">Degree</label>
+                                <input type="text" asp-for="@product.DegreeId" class="form-control" required>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="required">From Promotion</label>
+                                <input type="number" asp-for="@product.FromPromotion" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>vat</label>
+                                <input type="number" asp-for="@product.Vat" class="form-control"
+                                       placeholder="Enter Name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Card / Certificate</label>
+                                <input type="number" asp-for="@product.CardCertificate" class="form-control"
+                                       placeholder="Enter Name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>ReExam</label>
+                                <input type="number" asp-for="@product.Type" class="form-control"
+                                       placeholder="Enter Name" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div class="form-group clearfix">
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="isFee" asp-for="@product.TuitionFees" required>
+                                        <label for="isFee">Tuition Fee</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div class="form-group clearfix">
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="isHidden" asp-for="@product.Hidden" required>
+                                        <label for="isHidden">Hidden</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="checkbox" asp-for="@product.PaymentType" checked="checked">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" name="r1" id="radioPrimary1" checked="checked">
+                                    <label for="radioPrimary1">KHR</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" name="r1" id="radioPrimary2">
+                                    <label for="radioPrimary2">USD</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Product Description</label>
+                        <textarea id="txtProductDescription" class="form-control" rows="1"
+                                  placeholder="Product Description"></textarea>
+                    </div>
+                    <p class="text-warning"><i class="icon fas fa-exclamation-triangle"></i> Card =1 is print card, Category =2 is print foundation certificate</p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" id="btnSaveProduct" class="btn btn-success" form="frmProduct"><i
+                        class="fas fa-check"></i> Save changes
+                </button>
+                <button type="button" id="btnCloseProduct" class="btn btn-danger float-right"><i
+                        class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

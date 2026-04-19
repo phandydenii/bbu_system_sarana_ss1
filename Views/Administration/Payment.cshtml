@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                @*<h3 class="card-title">Branch</h3>*@
+                <div class="row">
+                    <div class="form-group">
+                        <label>From Date:</label>
+                        <input type="date" id="dtpFrom" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>To Date:</label>
+                        <input type="date" id="dtpTo" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>#</label>
+                        <button onclick="OnSearch()" class="btn form-control btn-success">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="tblStudent" class="table table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Student ID</th>
+                        <th>Date</th>
+                        <th>Degree</th>
+                        <th>School</th>
+                        <th>Field</th>
+                        <th>Promotion</th>
+                        <th>Term</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script>$(document).ready(function () {
+
+    });
+
+    function OnSearch() {
+        const fromdate = $("#dtpFrom").val();
+        const todate = $("#dtpTo").val();
+        if (!fromdate || !todate) return;
+        $("#tblStudent").DataTable().clear().destroy();
+        $("#tblStudent")
+            .DataTable({
+                responsive: true,
+                lengthChange: true,
+                autoWidth: true,
+                ajax: {
+                    url: `/api/mis/${campus()}/invoices/${fromdate}/${todate}`,
+                    type: "GET",
+                    dataSrc: "data",
+                },
+                columns: [
+                    {data: "invoice_id"},
+                    {data: "student_id"},
+                    {data: "invoice_date"},
+                    {data: "degree_id"},
+                    {data: "school_id"},
+                    {data: "field_id"},
+                    {data: "promotion_id"},
+                    {data: "term_no"},
+                    {data: "grand_total"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+                                    Action
+                                </button>
+                                <div class="dropdown-menu" style="min-width: 8rem;">
+                                    <div class="col-md-12">
+                                        <a onclick="OnEdit('${row.student_id}')" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0rem">Edit</a>
+                                         <a class="btn btn-warning btn-sm" style="display: block;margin:.2rem 0rem">View</a>
+                                        <a class="btn btn-danger btn-sm" style="display: block;margin:.2rem 0rem">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+                        }
+
+                    }
+                ]
+            })
+            .buttons()
+            .container()
+            .appendTo("#example1_wrapper .col-md-6:eq(0)");
+    }</script>

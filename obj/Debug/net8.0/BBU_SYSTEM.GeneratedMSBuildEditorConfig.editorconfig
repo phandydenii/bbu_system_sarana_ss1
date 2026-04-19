@@ -1,0 +1,1163 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = BBU_SYSTEM
+build_property.RootNamespace = BBU_SYSTEM
+build_property.ProjectDir = /Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = true
+build_property.MSBuildProjectDirectory = /Users/phandy/Documents/GIT HUB/BBU_SYSTEM1
+build_property._RazorSourceGeneratorDebug = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/TabAssignGroup/_AssociateGroupForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvVGFiQXNzaWduR3JvdXAvX0Fzc29jaWF0ZUdyb3VwRm9ybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/TabAssignGroup/_DiplomaGroupForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvVGFiQXNzaWduR3JvdXAvX0RpcGxvbWFHcm91cEZvcm0uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/TabAssignGroup/_DoctorGroupForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvVGFiQXNzaWduR3JvdXAvX0RvY3Rvckdyb3VwRm9ybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/TabAssignGroup/_FoundationGroupForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvVGFiQXNzaWduR3JvdXAvX0ZvdW5kYXRpb25Hcm91cEZvcm0uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/TabAssignGroup/_MasterGroupForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvVGFiQXNzaWduR3JvdXAvX01hc3Rlckdyb3VwRm9ybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/TabAssignGroup/_OtherGroupForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvVGFiQXNzaWduR3JvdXAvX090aGVyR3JvdXBGb3JtLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/TabAssignGroup/_SpecializeGroupForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvVGFiQXNzaWduR3JvdXAvX1NwZWNpYWxpemVHcm91cEZvcm0uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/TabAssignGroup/_UnPromoteGroupForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvVGFiQXNzaWduR3JvdXAvX1VuUHJvbW90ZUdyb3VwRm9ybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudent/_TabMinistryDoc.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50L19UYWJNaW5pc3RyeURvYy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabBooking/_BookingClothes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJCb29raW5nL19Cb29raW5nQ2xvdGhlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabBooking/_ReturnClothes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJCb29raW5nL19SZXR1cm5DbG90aGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabOthers/_GraduateStudent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJPdGhlcnMvX0dyYWR1YXRlU3R1ZGVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabOthers/_StatisticStudent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJPdGhlcnMvX1N0YXRpc3RpY1N0dWRlbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabOthers/_StudentAcceptCertificate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJPdGhlcnMvX1N0dWRlbnRBY2NlcHRDZXJ0aWZpY2F0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabOthers/_StudentFeeCollection.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJPdGhlcnMvX1N0dWRlbnRGZWVDb2xsZWN0aW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabOthers/_StudentLetterList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = 
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJPdGhlcnMvX1N0dWRlbnRMZXR0ZXJMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/AssignStudentGroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvQXNzaWduU3R1ZGVudEdyb3VwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/ContinueEducation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvQ29udGludWVFZHVjYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/ContinueEducation/ComplementationSemester.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvQ29udGludWVFZHVjYXRpb24vQ29tcGxlbWVudGF0aW9uU2VtZXN0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/ContinueEducation/ExamScoreHistory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvQ29udGludWVFZHVjYXRpb24vRXhhbVNjb3JlSGlzdG9yeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/ContinueEducation/StudentOtherUniversity.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvQ29udGludWVFZHVjYXRpb24vU3R1ZGVudE90aGVyVW5pdmVyc2l0eS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/ContinueEducation/StudentReExam.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvQ29udGludWVFZHVjYXRpb24vU3R1ZGVudFJlRXhhbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Course.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvQ291cnNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/DoctoralContract.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvRG9jdG9yYWxDb250cmFjdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Gpa.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvR3BhLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/OtherBranchScore.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvT3RoZXJCcmFuY2hTY29yZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/QRCodeCertificate/_PrintQRCode.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvUVJDb2RlQ2VydGlmaWNhdGUvX1ByaW50UVJDb2RlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/QRCodeCertificate/_RequestQRCode.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvUVJDb2RlQ2VydGlmaWNhdGUvX1JlcXVlc3RRUkNvZGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/RequestQrCode.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvUmVxdWVzdFFyQ29kZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/ResetQrCode.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvUmVzZXRRckNvZGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Room.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvUm9vbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Score.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU2NvcmUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_Parent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fUGFyZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_Personal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fUGVyc29uYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_PersonalContact.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fUGVyc29uYWxDb250YWN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_RelativeContact.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fUmVsYXRpdmVDb250YWN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabAbsenceRecord.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiQWJzZW5jZVJlY29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabBranchHistory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiQnJhbmNoSGlzdG9yeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabCertificate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiQ2VydGlmaWNhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabComplemential.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiQ29tcGxlbWVudGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabContinueEducation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiQ29udGludWVFZHVjYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabExtendFrom.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiRXh0ZW5kRnJvbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabGroupHistory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiR3JvdXBIaXN0b3J5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabIssueLetter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiSXNzdWVMZXR0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabNote.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiTm90ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabPayment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiUGF5bWVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabQuit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiUXVpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabSchoolarship.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiU2Nob29sYXJzaGlwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabSuppresHistory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiU3VwcHJlc0hpc3RvcnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Student/_TabSuspend.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvU3R1ZGVudC9fVGFiU3VzcGVuZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/Users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvVXNlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/_Course.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvX0NvdXJzZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Academic/_UserPriviledge.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNhZGVtaWMvX1VzZXJQcml2aWxlZGdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Mb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/AdminLetter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vQWRtaW5MZXR0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/BookingClothes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vQm9va2luZ0Nsb3RoZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/CategoryLetter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vQ2F0ZWdvcnlMZXR0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/Discount.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vRGlzY291bnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/GraduateCertificate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vR3JhZHVhdGVDZXJ0aWZpY2F0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/Payment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vUGF5bWVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/Registration.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vUmVnaXN0cmF0aW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/Users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vVXNlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/_AdminLetter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vX0FkbWluTGV0dGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/_DiscountModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vX0Rpc2NvdW50TW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/_GraduateLetter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vX0dyYWR1YXRlTGV0dGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/_LetterCategoryModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vX0xldHRlckNhdGVnb3J5TW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Administration/_RegistryModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5pc3RyYXRpb24vX1JlZ2lzdHJ5TW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/BookingClothes/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va2luZ0Nsb3RoZXMvQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/BookingClothes/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va2luZ0Nsb3RoZXMvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/BookingClothes/_BookingClothesModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va2luZ0Nsb3RoZXMvX0Jvb2tpbmdDbG90aGVzTW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/BookingClothes/_ItemModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va2luZ0Nsb3RoZXMvX0l0ZW1Nb2RhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/BookingClothes/_StudentModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va2luZ0Nsb3RoZXMvX1N0dWRlbnRNb2RhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Branch/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQnJhbmNoL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Campus/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2FtcHVzL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/Branch.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svQnJhbmNoLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/Degree.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svRGVncmVlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/Disability.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svRGlzYWJpbGl0eS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/Faculty.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svRmFjdWx0eS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/Field.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svRmllbGQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/FieldCertificate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svRmllbGRDZXJ0aWZpY2F0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/Nationality.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svTmF0aW9uYWxpdHkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/PromotionGroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svUHJvbW90aW9uR3JvdXAuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/Province.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svUHJvdmluY2UuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/Race.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svUmFjZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/School.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svU2Nob29sLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/University.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svVW5pdmVyc2l0eS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_BranchModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX0JyYW5jaE1vZGFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_DegreeModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX0RlZ3JlZU1vZGFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_DisabilityModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX0Rpc2FiaWxpdHlNb2RhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_FacaltyModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX0ZhY2FsdHlNb2RhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_FieldCertificateModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX0ZpZWxkQ2VydGlmaWNhdGVNb2RhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_FieldModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX0ZpZWxkTW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_GroupModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX0dyb3VwTW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_NationalityModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX05hdGlvbmFsaXR5TW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_PromotionModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX1Byb21vdGlvbk1vZGFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_ProvinceModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX1Byb3ZpbmNlTW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_RaceModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX1JhY2VNb2RhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_SchoolModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX1NjaG9vbE1vZGFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_SettingModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX1NldHRpbmdNb2RhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_StageModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX1N0YWdlTW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_TermModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX1Rlcm1Nb2RhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_TransferModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX1RyYW5zZmVyTW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/CommandTask/_UniversityModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ29tbWFuZFRhc2svX1VuaXZlcnNpdHlNb2RhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/DailyReport/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGFpbHlSZXBvcnQvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/DailyReport/_DailyReportModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGFpbHlSZXBvcnQvX0RhaWx5UmVwb3J0TW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Dean/Course.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVhbi9Db3Vyc2UuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Dean/Learner.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVhbi9MZWFybmVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Dean/Mark.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVhbi9NYXJrLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Dean/PracticumMark.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVhbi9QcmFjdGljdW1NYXJrLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Dean/ReStudyMark.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVhbi9SZVN0dWR5TWFyay5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Dean/StateExamMark.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVhbi9TdGF0ZUV4YW1NYXJrLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Dean/ThesisMark.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVhbi9UaGVzaXNNYXJrLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Dean/Users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVhbi9Vc2Vycy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Dean/_AssignCourse.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVhbi9fQXNzaWduQ291cnNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Dean/_CourseTerm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVhbi9fQ291cnNlVGVybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Dean/_StudentPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGVhbi9fU3R1ZGVudFBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/FieldCertificate/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRmllbGRDZXJ0aWZpY2F0ZS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Home/ReportChart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9SZXBvcnRDaGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/HR/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSFIvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Payment/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUGF5bWVudC9DcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Payment/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUGF5bWVudC9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Payment/Student.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUGF5bWVudC9TdHVkZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Payment/_PaymentModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUGF5bWVudC9fUGF5bWVudE1vZGFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Payment/_ProductModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUGF5bWVudC9fUHJvZHVjdE1vZGFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Payment/_StudentModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUGF5bWVudC9fU3R1ZGVudE1vZGFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Product/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJvZHVjdC9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Product/_ProductModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJvZHVjdC9fUHJvZHVjdE1vZGFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Product/_ProductPayOnline.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUHJvZHVjdC9fUHJvZHVjdFBheU9ubGluZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabAbsenceRecord.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYkFic2VuY2VSZWNvcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabBranchHistory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYkJyYW5jaEhpc3RvcnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabCertificate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYkNlcnRpZmljYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabComplemential.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYkNvbXBsZW1lbnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabContactPerson.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYkNvbnRhY3RQZXJzb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabContinueEducation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYkNvbnRpbnVlRWR1Y2F0aW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabExtendFrom.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYkV4dGVuZEZyb20uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabGroupHistory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYkdyb3VwSGlzdG9yeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabIssueLetter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYklzc3VlTGV0dGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabNote.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYk5vdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabParent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYlBhcmVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabPayment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYlBheW1lbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabPersonal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYlBlcnNvbmFsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabPersonalContact.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYlBlcnNvbmFsQ29udGFjdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabQuit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYlF1aXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabRegistryModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYlJlZ2lzdHJ5TW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabRelativeContact.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYlJlbGF0aXZlQ29udGFjdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabScholarship.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYlNjaG9sYXJzaGlwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabSuppresHistory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYlN1cHByZXNIaXN0b3J5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Registry/_TabSuspend.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVnaXN0cnkvX1RhYlN1c3BlbmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Academic/Certificate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0FjYWRlbWljL0NlcnRpZmljYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Academic/PassingCandidate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0FjYWRlbWljL1Bhc3NpbmdDYW5kaWRhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Academic/Student.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0FjYWRlbWljL1N0dWRlbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Academic/StudentResult.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0FjYWRlbWljL1N0dWRlbnRSZXN1bHQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Academic/_StudentModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0FjYWRlbWljL19TdHVkZW50TW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Admin/BookClothes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0FkbWluL0Jvb2tDbG90aGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Admin/Other.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0FkbWluL090aGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Admin/Payment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0FkbWluL1BheW1lbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Admin/Registration.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0FkbWluL1JlZ2lzdHJhdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/ContinueEducation/ContinueStudent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0NvbnRpbnVlRWR1Y2F0aW9uL0NvbnRpbnVlU3R1ZGVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/ContinueEducation/CreditCompletion.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0NvbnRpbnVlRWR1Y2F0aW9uL0NyZWRpdENvbXBsZXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/ContinueEducation/ReExamination.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0NvbnRpbnVlRWR1Y2F0aW9uL1JlRXhhbWluYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Dean/ExamResult.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0RlYW4vRXhhbVJlc3VsdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Dean/InformationRevision.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0RlYW4vSW5mb3JtYXRpb25SZXZpc2lvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Dean/PracticumResult.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0RlYW4vUHJhY3RpY3VtUmVzdWx0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Dean/ProjectPaperResult.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0RlYW4vUHJvamVjdFBhcGVyUmVzdWx0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Dean/ScoreSheet.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0RlYW4vU2NvcmVTaGVldC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Dean/SkillStudent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0RlYW4vU2tpbGxTdHVkZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Dean/StateExamResult.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0RlYW4vU3RhdGVFeGFtUmVzdWx0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Dean/StudentList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0RlYW4vU3R1ZGVudExpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Dean/StudentStatus.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0RlYW4vU3R1ZGVudFN0YXR1cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/Dean/SummaryFailList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0RlYW4vU3VtbWFyeUZhaWxMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/FoundationYear/CertificateOfFYCourse.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0ZvdW5kYXRpb25ZZWFyL0NlcnRpZmljYXRlT2ZGWUNvdXJzZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/FoundationYear/ExaminationList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0ZvdW5kYXRpb25ZZWFyL0V4YW1pbmF0aW9uTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/FoundationYear/ExaminationList2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0ZvdW5kYXRpb25ZZWFyL0V4YW1pbmF0aW9uTGlzdDIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/FoundationYear/FailStudentList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0ZvdW5kYXRpb25ZZWFyL0ZhaWxTdHVkZW50TGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/FoundationYear/FoundationYearStudent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0ZvdW5kYXRpb25ZZWFyL0ZvdW5kYXRpb25ZZWFyU3R1ZGVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/FoundationYear/FYExamResult.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0ZvdW5kYXRpb25ZZWFyL0ZZRXhhbVJlc3VsdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/FoundationYear/FYExamResult2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0ZvdW5kYXRpb25ZZWFyL0ZZRXhhbVJlc3VsdDIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/FoundationYear/FYReExamResult.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0ZvdW5kYXRpb25ZZWFyL0ZZUmVFeGFtUmVzdWx0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/FoundationYear/ScoreSheet.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0ZvdW5kYXRpb25ZZWFyL1Njb3JlU2hlZXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/FoundationYear/StudentQuitSuspendSuppress.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0ZvdW5kYXRpb25ZZWFyL1N0dWRlbnRRdWl0U3VzcGVuZFN1cHByZXNzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/FoundationYear/StudentStatisticByProvince.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L0ZvdW5kYXRpb25ZZWFyL1N0dWRlbnRTdGF0aXN0aWNCeVByb3ZpbmNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/SPO/Graduate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L1NQTy9HcmFkdWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/SPO/GraduateMasterDoctor.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L1NQTy9HcmFkdWF0ZU1hc3RlckRvY3Rvci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/SPO/StateExamResult.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L1NQTy9TdGF0ZUV4YW1SZXN1bHQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/SPO/StudentCardList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L1NQTy9TdHVkZW50Q2FyZExpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/SPO/StudentStatistic.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L1NQTy9TdHVkZW50U3RhdGlzdGljLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Report/_ModalReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0L19Nb2RhbFJlcG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabPassingCandidate/_TabReport1.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJQYXNzaW5nQ2FuZGlkYXRlL19UYWJSZXBvcnQxLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabPassingCandidate/_TabReport2.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJQYXNzaW5nQ2FuZGlkYXRlL19UYWJSZXBvcnQyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabPassingCandidate/_TabReport3.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJQYXNzaW5nQ2FuZGlkYXRlL19UYWJSZXBvcnQzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabPassingCandidate/_TabReport4.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJQYXNzaW5nQ2FuZGlkYXRlL19UYWJSZXBvcnQ0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabPassingCandidate/_TabReport5.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJQYXNzaW5nQ2FuZGlkYXRlL19UYWJSZXBvcnQ1LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabPassingCandidate/_TabReportEntrancePass.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJQYXNzaW5nQ2FuZGlkYXRlL19UYWJSZXBvcnRFbnRyYW5jZVBhc3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabPassingCandidate/_TabReportPassToDHE.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJQYXNzaW5nQ2FuZGlkYXRlL19UYWJSZXBvcnRQYXNzVG9ESEUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudent/_TabAllStatus.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50L19UYWJBbGxTdGF0dXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudent/_TabScoreList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50L19UYWJTY29yZUxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudent/_TabStudentList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50L19UYWJTdHVkZW50TGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudent/_TabStudentSkillList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50L19UYWJTdHVkZW50U2tpbGxMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentCertificate/_TabCertificateOfEducation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50Q2VydGlmaWNhdGUvX1RhYkNlcnRpZmljYXRlT2ZFZHVjYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentCertificate/_TabCertificateQRCode.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50Q2VydGlmaWNhdGUvX1RhYkNlcnRpZmljYXRlUVJDb2RlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentCertificate/_TabChangeBranchLetter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50Q2VydGlmaWNhdGUvX1RhYkNoYW5nZUJyYW5jaExldHRlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentCertificate/_TabProvissionalCertificate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50Q2VydGlmaWNhdGUvX1RhYlByb3Zpc3Npb25hbENlcnRpZmljYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentCertificate/_TabRankByPromotion.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50Q2VydGlmaWNhdGUvX1RhYlJhbmtCeVByb21vdGlvbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentCertificate/_TabRankStudent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50Q2VydGlmaWNhdGUvX1RhYlJhbmtTdHVkZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentCertificate/_TabStudyRecord.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50Q2VydGlmaWNhdGUvX1RhYlN0dWR5UmVjb3JkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentCertificate/_TabSuspendLetter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50Q2VydGlmaWNhdGUvX1RhYlN1c3BlbmRMZXR0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentCertificate/_TabTranscript.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50Q2VydGlmaWNhdGUvX1RhYlRyYW5zY3JpcHQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentResult/_TabGraduateStudent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50UmVzdWx0L19UYWJHcmFkdWF0ZVN0dWRlbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentResult/_TabStudentFeeConllection.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50UmVzdWx0L19UYWJTdHVkZW50RmVlQ29ubGxlY3Rpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentResult/_TabStudentLetterList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50UmVzdWx0L19UYWJTdHVkZW50TGV0dGVyTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentResult/_TabStudentStatic.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50UmVzdWx0L19UYWJTdHVkZW50U3RhdGljLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Academic/TabStudentResult/_TabStuentAcceptCertificate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BY2FkZW1pYy9UYWJTdHVkZW50UmVzdWx0L19UYWJTdHVlbnRBY2NlcHRDZXJ0aWZpY2F0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabPayments/_Income.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJQYXltZW50cy9fSW5jb21lLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabPayments/_ReExaminationPayment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJQYXltZW50cy9fUmVFeGFtaW5hdGlvblBheW1lbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabPayments/_StudentIncomplete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJQYXltZW50cy9fU3R1ZGVudEluY29tcGxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabPayments/_StudentInsurance.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJQYXltZW50cy9fU3R1ZGVudEluc3VyYW5jZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabPayments/_StudentNotPaymentNew.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJQYXltZW50cy9fU3R1ZGVudE5vdFBheW1lbnROZXcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabPayments/_StudentPaymentByDate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJQYXltZW50cy9fU3R1ZGVudFBheW1lbnRCeURhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabPayments/_StudentPaymentByGroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJQYXltZW50cy9fU3R1ZGVudFBheW1lbnRCeUdyb3VwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabPayments/_StudentPaymentSummary.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJQYXltZW50cy9fU3R1ZGVudFBheW1lbnRTdW1tYXJ5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabRegistrations/_RegisteredStudent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJSZWdpc3RyYXRpb25zL19SZWdpc3RlcmVkU3R1ZGVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabRegistrations/_RegistrationStatic.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJSZWdpc3RyYXRpb25zL19SZWdpc3RyYXRpb25TdGF0aWMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabRegistrations/_RegistrationStaticProvince.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJSZWdpc3RyYXRpb25zL19SZWdpc3RyYXRpb25TdGF0aWNQcm92aW5jZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/ReportPartial/Admin/TabRegistrations/_ScholarshipStudent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvUmVwb3J0UGFydGlhbC9BZG1pbi9UYWJSZWdpc3RyYXRpb25zL19TY2hvbGFyc2hpcFN0dWRlbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Setting/ChartReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2V0dGluZy9DaGFydFJlcG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Setting/_ChartReportModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2V0dGluZy9fQ2hhcnRSZXBvcnRNb2RhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0Vycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Shared/_Footer.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19Gb290ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Shared/_Navbar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19OYXZiYXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Shared/_Sidebar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19TaWRlYmFyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/GetStudents.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9HZXRTdHVkZW50cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/Status.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9TdGF0dXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/StudentForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9TdHVkZW50Rm9ybS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_Parent.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fUGFyZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_Personal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fUGVyc29uYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_PersonalContact.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fUGVyc29uYWxDb250YWN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_RelativeContact.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fUmVsYXRpdmVDb250YWN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabAbsenceRecord.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiQWJzZW5jZVJlY29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabBranchHistory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiQnJhbmNoSGlzdG9yeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabCertificate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiQ2VydGlmaWNhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabComplement.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiQ29tcGxlbWVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabContinueEducation.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiQ29udGludWVFZHVjYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabExtendFrom.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiRXh0ZW5kRnJvbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabGroupHistory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiR3JvdXBIaXN0b3J5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabIssueLetter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiSXNzdWVMZXR0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabNote.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiTm90ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabPayment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiUGF5bWVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabQuit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiUXVpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabScholarship.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiU2Nob2xhcnNoaXAuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabSuppressHistory.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiU3VwcHJlc3NIaXN0b3J5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Student/_TabSuspend.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU3R1ZGVudC9fVGFiU3VzcGVuZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/User/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/User/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9Mb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/User/Privilege.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9Qcml2aWxlZ2UuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/User/PrivilegeGroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9Qcml2aWxlZ2VHcm91cC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/User/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9SZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/User/_Privilege.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9fUHJpdmlsZWdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/User/_PrivilegeGroup.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9fUHJpdmlsZWdlR3JvdXAuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/User/_ResetPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9fUmVzZXRQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/User/_User.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9fVXNlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/User/_UserPrivilege.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVXNlci9fVXNlclByaXZpbGVnZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/phandy/Documents/GIT HUB/BBU_SYSTEM1/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-u647r7m02g

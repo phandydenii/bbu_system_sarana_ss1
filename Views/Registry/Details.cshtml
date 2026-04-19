@@ -1,0 +1,520 @@
+﻿@model BBU_SYSTEM.ViewModel.RegisryDetailViewModel
+@using BBU_SYSTEM.DTOs
+@using BBU_SYSTEM.Models.Req
+@{
+    ViewData["OpenMenu"] = "Administration";
+    ViewData["Action"] = "Register";
+
+
+    var registryReq = new RegistryReq();
+
+    var student = Model.StudentView!.Student;
+    var relative = Model.StudentView.ContactPerson;
+    var registry = Model.StudentView.Registry;
+    var degree = Model.StudentView.Degree;
+    var school = Model.StudentView.School;
+    var field = Model.StudentView.Field;
+    var promotion = Model.StudentView.Promotion;
+    var stage = Model.StudentView.Stage;
+    var term = Model.StudentView.Term;
+    var group = Model.StudentView.Group;
+    var groupRoom = Model.StudentView.GroupRoom;
+
+    var studentCertificates = Model.StudentView.StudentCertificates;
+    var schoolarships = Model.StudentView.Schoolarships;
+    var degrees = Model.ListData!.Degrees;
+    var schools = Model.ListData!.Schools;
+    var fields = Model.ListData.Fields!.Where(x => x.DegreeId == degree!.DegreeId && x.SchoolId ==
+        school!.SchoolId).ToList();
+    var promotions = Model.ListData!.Promotions!.Where(x => x.DegreeId == degree!.DegreeId && x.SchoolId ==
+        school!.SchoolId).ToList();
+    var stages = Model.ListData!.Stages!.GroupBy(x => x.StageNo).Select(x => new
+    {
+        stage_no = x.First().StageNo
+    }).ToList();
+    var fields1 = Model.ListData!.Fields;
+    var terms = Model.ListData!.Terms!.GroupBy(x => x.TermNo).Select(x => new { term_no = x.First().TermNo }).ToList();
+    var groups = Model.ListData!.Groups;
+    var studyTimes = Model.ListData!.StudyTimes;
+
+
+    registryReq.Registry = new RegistryDto
+    {
+        DegreeId = degree!.DegreeId,
+        SchoolId = school!.SchoolId,
+        PromotionNo = registry?.PromotionNo ?? 0,
+        StageNo = registry?.StageNo ?? 0,
+        TermNo = registry?.TermNo ?? 0,
+        StudyTime = registry?.StudyTime ?? ""
+    };
+
+    registryReq.Student = new StudentDto
+    {
+        FieldId = student?.FieldId ?? 0
+    };
+    registryReq.ProgramId = field?.DegreeId ?? 0;
+
+    var schoolarship = false;
+    var extend = false;
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Registry Detail</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" id="frmRegistry" asp-action="PutRegistry">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="card card-primary card-outline card-outline-tabs">
+                                <div class="card-header p-0 border-bottom-0">
+                                    <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="custom-tabs-four-1-tab"
+                                               data-toggle="pill" href="#custom-tabs-four-1" role="tab"
+                                               aria-controls="custom-tabs-four-1"
+                                               aria-selected="true">Personal</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-2-tab"
+                                               data-toggle="pill" href="#custom-tabs-four-2" role="tab"
+                                               aria-controls="custom-tabs-four-2" aria-selected="false">
+                                                Contact
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-3-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-3" role="tab"
+                                               aria-controls="custom-tabs-four-3" aria-selected="false">Parent</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-4-tab"
+                                               data-toggle="pill" href="#custom-tabs-four-4" role="tab"
+                                               aria-controls="custom-tabs-four-4"
+                                               aria-selected="false">Relative</a>
+                                        </li>
+                                        @if (schoolarship)
+                                        {
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="custom-tabs-four-5-tab"
+                                                   data-toggle="pill" href="#custom-tabs-four-5" role="tab"
+                                                   aria-controls="custom-tabs-four-5"
+                                                   aria-selected="false">Schoolarship</a>
+                                            </li>
+                                        }
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-6-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-6" role="tab"
+                                               aria-controls="custom-tabs-four-6"
+                                               aria-selected="false">Certificate</a>
+                                        </li>
+                                        @if (extend)
+                                        {
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="custom-tabs-four-7-tab" data-toggle="pill"
+                                                   href="#custom-tabs-four-7" role="tab"
+                                                   aria-controls="custom-tabs-four-7" aria-selected="false">Extend</a>
+                                            </li>
+                                        }
+
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-8-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-8" role="tab"
+                                               aria-controls="custom-tabs-four-8" aria-selected="false">Note</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-9-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-9" role="tab"
+                                               aria-controls="custom-tabs-four-9"
+                                               aria-selected="false">Continue</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-10-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-10" role="tab"
+                                               aria-controls="custom-tabs-four-10"
+                                               aria-selected="false">Image</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="card-body">
+                                    <div class="tab-content" id="custom-tabs-four-tabContent">
+                                        <div class="tab-pane fade show active" id="custom-tabs-four-1"
+                                             role="tabpanel" aria-labelledby="custom-tabs-four-1-tab">
+                                            <partial name="_TabPersonal"/>
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-2" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-2-tab">
+                                            <partial name="_TabContactPerson"/>
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-3" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-3-tab">
+                                            <partial name="_TabParent"/>
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-4" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-4-tab">
+                                            <partial name="_TabRelativeContact"/>
+                                        </div>
+                                        @if (schoolarship)
+                                        {
+                                            <div class="tab-pane fade" id="custom-tabs-four-5" role="tabpanel"
+                                                 aria-labelledby="custom-tabs-four-5-tab">
+                                                <partial name="_TabSchoolarship"/>
+                                            </div>
+                                        }
+
+                                        <div class="tab-pane fade" id="custom-tabs-four-6" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-6-tab">
+                                            <partial name="_TabCertificate"/>
+                                        </div>
+                                        @if (extend)
+                                        {
+                                            <div class="tab-pane fade" id="custom-tabs-four-7" role="tabpanel"
+                                                 aria-labelledby="custom-tabs-four-7-tab">
+                                                <partial name="_TabExtendFrom"/>
+                                            </div>
+                                        }
+
+                                        <div class="tab-pane fade" id="custom-tabs-four-8" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-8-tab">
+                                            <partial name="_TabNote"/>
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-9" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-9-tab">
+                                            <partial name="_TabContinueEducation"/>
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-10" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-10-tab">
+                                            <img src="/Images/add_user.png" alt="user" width="50%" height="50%"
+                                                 id="imgPreview" style="border: 1px solid #ccc;">
+                                            <div class="form-group">
+                                                <label for="exampleInputFile">File input</label>
+                                                <div class="input-group">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input"
+                                                               id="exampleInputFile">
+                                                        <label class="custom-file-label" for="exampleInputFile">Choose
+                                                            file</label>
+                                                    </div>
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">Upload</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="card card-outline card-primary">
+                                <div class="card-body" style="display: block;">
+                                    <label>Degree</label>
+                                    <select asp-for="@registryReq.Registry!.DegreeId"
+                                            class="form-control select2" s>
+                                        <option selected="selected" disabled value="">Degree</option>
+                                        @foreach (var data in degrees!)
+                                        {
+                                            <option value=@data.DegreeId>@data.DegreeName</option>
+                                        }
+                                    </select>
+                                    <label>School</label>
+                                    <select asp-for="@registryReq.Registry!.SchoolId"
+                                            class="form-control select2">
+                                        <option selected="selected" disabled value="-1">School</option>
+                                        @foreach (var data in Model.ListData!.Schools!)
+                                        {
+                                            <option value=@data.SchoolId>@data.SchoolName</option>
+                                        }
+                                    </select>
+                                    <label>Program</label>
+                                    <select id="cboProgram" asp-for="@registryReq.ProgramId"
+                                            class="form-control select2"
+                                    >
+                                        <option selected="selected">Program</option>
+                                        @foreach (var data in fields)
+                                        {
+                                            <option value=@data.DegreeId>@data.DegreeName</option>
+                                        }
+                                    </select>
+                                    <label>Field</label>
+                                    <select asp-for="@registryReq.Student!.FieldId"
+                                            class="form-control select2"
+                                    >
+                                        <option selected="selected">Field</option>
+                                        @foreach (var data in fields)
+                                        {
+                                            <option value=@data.FieldId>@data.FieldName</option>
+                                        }
+                                    </select>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label>Promotion</label>
+                                            <select asp-for="@registryReq.Registry!.PromotionNo"
+                                                    class="form-control select2">
+                                                <option selected="selected" value="-1">Promotion</option>
+                                                @foreach (var data in promotions)
+                                                {
+                                                    <option value=@data.PromotionNo>@data.PromotionNo</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Stage</label>
+                                            <select asp-for="@registryReq.Registry!.StageNo"
+                                                    class="form-control select2">
+                                                <option selected="selected">Stage</option>
+                                                @foreach (var data in stages)
+                                                {
+                                                    <option value=@data.stage_no>@data.stage_no</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Term</label>
+                                            <select asp-for="@registryReq.Registry!.TermNo"
+                                                    class="form-control select2" s>
+                                                <option selected="selected" disabled>Term</option>
+                                                @foreach (var data in terms)
+                                                {
+                                                    <option value=@data.term_no>@data.term_no</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Study Time</label>
+                                            <select asp-for="@registryReq.Registry!.StudyTime"
+                                                    class="form-control select2">
+                                                <option selected="selected">Study Time</option>
+                                                @foreach (var data in Model.ListData!.StudyTimes!)
+                                                {
+                                                    <option value=@data.StudyTimeValue>@data.StudyTimeValue</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox"
+                                                       id="chbContinuedStudent"
+                                                       asp-for="@registryReq.IsContinue">
+                                                <label for="chbContinuedStudent" class="custom-control-label">Continued
+                                                    Student</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox"
+                                                       id="chbAssToBac"
+                                                       asp-for="@registryReq.AssToBach">
+                                                <label for="chbAssToBac" class="custom-control-label">Associate to
+                                                    Bachelor</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox"
+                                                       id="chbBacToMas" asp-for="@registryReq.BachToMas">
+                                                <label for="chbBacToMas" class="custom-control-label">Bachelor to
+                                                    Master</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="Resume" hidden>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <label>Payment Date</label>
+                                                <input type="date" class="form-control"
+                                                       asp-for="@registryReq!.Resume!.DatePayment">
+                                            </div>
+                                            <div class="col-4">
+                                                <label class="required">Promotion</label>
+                                                <input type="number" class="form-control" min="0" value="0"
+                                                       asp-for="@registryReq!.Resume!.CPromotion">
+                                            </div>
+                                            <div class="col-2">
+                                                <label class="required">Year</label>
+                                                <input type="number" class="form-control" min="0" max="5" value="0"
+                                                       asp-for="@registryReq!.Resume!.CYear">
+                                            </div>
+                                            <div class="col-2">
+                                                <label class="required">Semester</label>
+                                                <input type="number" class="form-control" min="1" max="2" value="0"
+                                                       asp-for="@registryReq!.Resume!.CSemester">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer">
+                <div class="margin">
+
+                    <button type="submit" class="btn btn-success" form="frmRegistry"><i class="fas fa-refresh"></i>
+                        Update
+                    </button>
+                    <a asp-action="Index" asp-controller="Registry" type="button" class="btn btn-danger"><i
+                            class="fas fa-backward"></i> Back to list</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+
+@section Scripts{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Term.js"></script>
+    <script src="~/function/Group.js"></script>
+    <script src="~/function/HighSchool.js"></script>
+    <script src="~/function/University.js"></script>
+    <script>
+        const frmRegistry = $("#frmRegistry");
+        const tblSchoolarship = $("#tblSchoolarship");
+        const tblCertificate = $("#tblCertificate");
+        const btnAddSchoolarship = $("#addRowSchoolarship");
+        const addRowCertificate = $("#addRowCertificate");
+        const cboCertificate = $("#cboCertificate");
+        const rdoHighSchool = $("#rdoHighSchool");
+        const rdoMasPhD = $("#rdoMasPhD");
+
+        const chbAssToBac = $("#chbAssToBac");
+        const chbBacToMas = $("#chbBacToMas");
+        const resume = $("#Resume");
+
+
+        const registerInput = "#registryReq_Registry"
+        const studentInput = "#registryReq_Student"
+
+        const cboHighSchool = $(`${studentInput}_FromHighSchoolNameInKhmer`);
+
+        $(document).ready(function () {
+            tblSchoolarship.DataTable({
+                "paging": false,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": false,
+                "info": false,
+                "autoWidth": false,
+                "responsive": true,
+            });
+            tblCertificate.DataTable({
+                "paging": false,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": false,
+                "info": false,
+                "autoWidth": false,
+                "responsive": true,
+                columnDefs: [
+                    {targets: [0, 1, 2], visible: false}
+                ]
+            });
+        });
+
+        btnAddSchoolarship.on("click", function (e) {
+            const cboSponsor = $("#cboSponsor");
+            const i = tblSchoolarship.DataTable().rows().count();
+            const rowData = [
+                `<input type="number" name="registryReq_Schoolarships[${i}].TermNo" value="1" min="1" class="form-control input-sm"/>`,
+                `${cboSponsor.find("option:selected").text()}<input type="text" name="registryReq_Schoolarships[${i}].SponsorId" class="form-control" value="${cboSponsor.val()}" hidden/>`,
+                `<input type="checkbox" name="registryReq_Schoolarships[${i}].IsFull" class="form-control input-sm"/>`,
+                `<input type="number" name="registryReq_Schoolarships[${i}].Amount" value="0" min="0" class="form-control input-sm"/>`,
+                `<a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i></a>
+                 <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></a>`,
+            ];
+            tblSchoolarship.DataTable().row.add(rowData).draw();
+        });
+
+        addRowCertificate.on("click", function (e) {
+            const exists = tblCertificate.DataTable()
+                .column(2)
+                .nodes()
+                .to$()
+                .find('input')
+                .filter(function () {
+                    return $(this).val() === cboCertificate.val();
+                }).length > 0;
+
+            if (exists) {
+                ShowToastError("This certificate already exists!");
+                return;
+            }
+            const i = tblCertificate.DataTable().rows().count();
+            const rowData = [
+                `<input type="number" name="registryReq_StudentCertificates[${i}].StudentCertificateId" value="1" min="1" class="form-control input-sm"/>`,
+                `<input type="text" name="registryReq_StudentCertificates[${i}].StudentId" class="form-control" value="${cboCertificate.val()}"/>`,
+                `<input type="number" name="registryReq_StudentCertificates[${i}].CertificateId" value="${cboCertificate.val()}" class="form-control input-sm"/>`,
+                `${cboCertificate.find("option:selected").text()}`,
+                `<select name="registryReq_StudentCertificates[${i}].Grade" class="form-control select2">
+                    <option value="Pass">Pass</option>
+                    <option value="Fail">Fail</option>
+                </select>
+            `,
+                `<input type="checkbox" name="registryReq_StudentCertificates[${i}].IsReceived" class="form-control input-sm"/>`,
+                `<input type="number" name="registryReq_StudentCertificates[${i}].CertificateIssueNo" class="form-control input-sm"/>`,
+
+                `<a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i></a>
+             <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></a>`,
+            ];
+            // tblCertificate.DataTable().rows().data().each(function(value, index) {
+            //     console.log('Row ' + value);
+            // });
+
+            const newRow = tblCertificate.DataTable().row.add(rowData).draw().node();
+            $(newRow).find('.select2').select2({
+                width: '100%'
+            });
+        });
+
+        rdoHighSchool.on("change", function (e) {
+            cboHighSchool.empty();
+            cboHighSchool.append($('<option>', {value: '', text: 'Select High School'}));
+            // hightSchools.forEach(function (highSchool) {
+            //     cboHighSchool.append($('<option>', {
+            //         value: highSchool.highSchoolId,
+            //         text: highSchool.highSchoolNameInKhmer
+            //     }))
+            // })
+        })
+        rdoMasPhD.on("change", function (e) {
+            cboHighSchool.empty();
+            cboHighSchool.append($('<option>', {value: '', text: 'Select High School'}));
+            // universities.forEach(function (university) {
+            //     cboHighSchool.append($('<option>', {
+            //         value: university.universityId,
+            //         text: university.universityName
+            //     }))
+            // })
+        })
+
+        chbAssToBac.on("change", function (e) {
+            chbBacToMas.prop("checked", false);
+            if (e.target.checked === true) {
+                resume.removeAttr("hidden");
+            } else {
+                resume.attr("hidden", "hidden");
+            }
+        });
+        chbBacToMas.on("change", function (e) {
+            chbAssToBac.prop("checked", false);
+            if (e.target.checked === true) {
+                resume.removeAttr("hidden");
+            } else {
+                resume.attr("hidden", "hidden");
+            }
+        });
+    </script>
+}
+     

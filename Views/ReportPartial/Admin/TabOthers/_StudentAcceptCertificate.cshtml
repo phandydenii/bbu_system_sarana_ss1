@@ -1,0 +1,89 @@
+@using BBU_SYSTEM.ViewModel.Report
+@{
+    var registeredStudent = new RegisteredViewModel();
+}
+<div class="col-12">
+    <div class="row">
+        <div class="col-3">
+            <form id="frmReportRegistered">
+                <div class="row">
+                    <div class="col-12">
+                        <label aria-required="true" class="required">Degree</label>
+                        <select asp-for="@registeredStudent.DegreeId" class="form-control select2"></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <label aria-required="true" class="required">School</label>
+                        <select  class="form-control select2"></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label>From Promotion</label>
+                        <input type="number" asp-for="@registeredStudent.PromotionNo" class="form-control" min="1"
+                               value="1">
+                    </div>
+                    <div class="col-6">
+                        <label>To Promotion</label>
+                        <input type="number" asp-for="@registeredStudent.PromotionNo" class="form-control" min="1"
+                               value="1">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="icheck-primary d-inline col-6">
+                        <input type="radio" id="radioPrimary1" name="r1" checked="">
+                        <label for="radioPrimary1">Not Accept
+                        </label>
+                    </div>
+                    <div class="icheck-primary d-inline col-6">
+                        <input type="radio" id="radioPrimary2" name="r1" checked="">
+                        <label for="radioPrimary2">Not Accept
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="icheck-primary d-inline col-4">
+                        <input type="radio" id="radioPrimary3" name="r2" checked="">
+                        <label for="radioPrimary3">All
+                        </label>
+                    </div>
+                    <div class="icheck-primary d-inline col-4">
+                        <input type="radio" id="radioPrimary4" name="r2" checked="">
+                        <label for="radioPrimary4">Completed
+                        </label>
+                    </div>
+                    <div class="icheck-primary d-inline col-4">
+                        <input type="radio" id="radioPrimary5" name="r2" checked="">
+                        <label for="radioPrimary5">Graduated
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <label>From Date</label>
+                        <input type="date" asp-for="@registeredStudent.FromDate" class="form-control">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <label>To Date</label>
+                        <input type="date" asp-for="@registeredStudent.ToDate" class="form-control">
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="form-control btn btn-primary">Preview</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-9">
+            <div class="row">
+                <iframe src="" width="95%" height="700px" id="printFrame"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+

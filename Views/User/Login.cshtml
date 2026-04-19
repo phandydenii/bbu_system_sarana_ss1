@@ -1,0 +1,150 @@
+﻿@{
+    Layout = null;
+}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AdminLTE 3 | Log in</title>
+
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="/AdminLTE/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="/AdminLTE/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <link rel="stylesheet" href="/AdminLTE/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="/AdminLTE/plugins/ekko-lightbox/ekko-lightbox.css">
+    <link rel="stylesheet" href="/AdminLTE/plugins/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="/AdminLTE/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <link rel="stylesheet" href="/AdminLTE/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+    <link rel="stylesheet" href="/AdminLTE/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <link rel="stylesheet" href="/AdminLTE/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/AdminLTE/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <link rel="stylesheet" href="/AdminLTE/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+    <link rel="stylesheet" href="/AdminLTE/plugins/bs-stepper/css/bs-stepper.min.css">
+    <link rel="stylesheet" href="/AdminLTE/plugins/dropzone/min/dropzone.min.css">
+    <link rel="stylesheet" href="/AdminLTE/dist/css/adminlte.min.css?v=3.2.0">
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+    <div class="login-logo">
+        <b>Login User</b>
+    </div>
+    <div class="card">
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">Sign in to start your session</p>
+
+            <form>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Username" id="txtUsername">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-envelope"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="password" class="form-control" placeholder="Password" id="txtPassword">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <select class="form-control select2" style="width: 100%;" id="cboCampus">
+                        <option disabled value="" selected>Select Campus</option>
+                        <option value="pp">Phnom Penh</option>
+                        <option value="tk">Takeo</option>
+                    </select>
+                </div>
+
+                <div class="row">
+                    <div class="col-8">
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">
+                                Remember Me
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <a onclick="OnLogin()" class="btn btn-primary btn-block">Sign In</a>
+                    </div>
+                </div>
+            </form>
+
+            @*<div class="social-auth-links text-center mb-3">
+                    <p>- OR -</p>
+                    <a href="#" class="btn btn-block btn-primary">
+                        <i class="fab fa-facebook mr-2"></i> Sign in using Facebook
+                    </a>
+                    <a href="#" class="btn btn-block btn-danger">
+                        <i class="fab fa-google-plus mr-2"></i> Sign in using Google+
+                    </a>
+                </div>*@
+
+            <p class="mb-1">
+                <a href="forgot-password.html">I forgot my password</a>
+            </p>
+            <p class="mb-0">
+                <a asp-action="Register" asp-controller="User" class="text-center">Register a new membership</a>
+            </p>
+        </div>
+    </div>
+</div>
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script src="/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/AdminLTE/dist/js/adminlte.min.js"></script>
+<script src="/AdminLTE/plugins/select2/js/select2.full.min.js"></script>
+
+<script>
+    $(function () {
+        $('.select2').select2()
+        $('.select2bs4').select2({
+            theme: 'bootstrap4'
+        })
+    });
+
+    function OnLogin() {
+        const campus = document.getElementById("cboCampus").value;
+        const data =
+            {
+                "username": document.getElementById("txtUsername").value,
+                "password": document.getElementById("txtPassword").value,
+            }
+        fetch(`/api/mis/${campus}/user/login`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to save student");
+                return res.json();
+            })
+            .then(response => {
+                localStorage.setItem('campus', campus);
+                localStorage.setItem('token', response["data"]["token"]);
+                window.location.href = "/";
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+                })
+            })
+            .catch(error => {
+                alert("Error saving student.");
+                console.error(error);
+            });
+        console.log(data);
+    }
+</script>
+</body>
+</html>

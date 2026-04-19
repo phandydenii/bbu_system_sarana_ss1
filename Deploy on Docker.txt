@@ -1,0 +1,154 @@
+ខាងក្រោមនេះជា វិធី Deploy ASP.NET Core Application ទៅលើ Ubuntu Server (Production-ready) ដែលគេប្រើជាញឹកញាប់បំផុត 👉 Kestrel + Nginx (Reverse Proxy)
+វិធីនេះសុវត្ថិភាព និងស្ថេរភាពល្អ 👍
+
+🧩 Architecture (សង្ខេប)
+Client (Browser)
+   ↓
+Nginx (Port 80/443)
+   ↓
+Kestrel (ASP.NET Core App, Port 5000)
+
+✅ STEP 1: Prepare Ubuntu Server
+sudo apt update && sudo apt upgrade -y
+
+
+Install basic tools:
+
+sudo apt install -y curl wget git unzip
+
+✅ STEP 2: Install .NET SDK / Runtime
+
+ជ្រើស Runtime សម្រាប់ Production (ល្អជាង SDK)
+
+🔹 Example: .NET 8
+sudo apt install -y dotnet-runtime-8.0
+
+
+Verify:
+
+dotnet --list-runtimes
+
+✅ STEP 3: Publish ASP.NET Core App (From Your PC)
+
+នៅលើ Windows / Mac:
+
+dotnet publish -c Release -o publish
+
+
+Upload ទៅ Ubuntu:
+
+scp -r publish user@server-ip:/var/www/myapp
+
+✅ STEP 4: Run App Using Kestrel
+
+Test run first:
+
+cd /var/www/myapp
+dotnet MyApp.dll
+
+
+Open:
+
+http://server-ip:5000
+
+
+👉 បើ run OK → បន្ត
+
+✅ STEP 5: Create systemd Service (Auto start)
+
+Create service file:
+
+sudo nano /etc/systemd/system/myapp.service
+
+
+Paste:
+
+[Unit]
+Description=ASP.NET Core App
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/myapp
+ExecStart=/usr/bin/dotnet /var/www/myapp/MyApp.dll
+Restart=always
+RestartSec=10
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://localhost:5000
+
+[Install]
+WantedBy=multi-user.target
+
+
+Enable service:
+
+sudo systemctl daemon-reload
+sudo systemctl enable myapp
+sudo systemctl start myapp
+sudo systemctl status myapp
+
+✅ STEP 6: Install & Configure Nginx
+sudo apt install -y nginx
+
+
+Create config:
+
+sudo nano /etc/nginx/sites-available/myapp
+
+
+Paste:
+
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection keep-alive;
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+
+Enable site:
+
+sudo ln -s /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+
+✅ STEP 7: Open Firewall
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw reload
+
+✅ STEP 8: HTTPS (Recommended)
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d your-domain.com
+
+🎯 DONE!
+
+Now open:
+
+http://your-domain.com
+https://your-domain.com
+
+🔥 Common Commands
+sudo systemctl restart myapp
+sudo journalctl -u myapp -f
+
+🧠 Best Practice (Important)
+
+❌ Don’t expose Kestrel directly
+
+✅ Use Nginx as reverse proxy
+
+✅ Use systemd
+
+✅ Enable HTTPS
+
+✅ Use www-data user

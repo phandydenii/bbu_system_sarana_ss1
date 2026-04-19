@@ -1,0 +1,81 @@
+@using BBU_SYSTEM.DTOs
+@{
+    var letterCategory = new LetterCategoryDto();
+}
+<div class="modal fade" id="modalLetterCategory">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="frmLetterCategory" method="post" class="form-horizontal">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-8">
+                            <label class="required">name</label>
+                            <input type="text" class="form-control" asp-for="@letterCategory.CategoryId"
+                                   style="display: none;"/>
+                            <input type="text" class="form-control" asp-for="@letterCategory.CategoryName"/>
+                        </div>
+                        <div class="col-4">
+                            <label>price</label>
+                            <input type="number" class="form-control" asp-for="@letterCategory.UnitPrice"/>
+                        </div>
+                    </div>
+                    <br>
+                    <label>type</label>
+                    <div class="card card-outline card-primary">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group clearfix">
+                                        <div class="icheck-primary d-inline">
+                                            <input type="checkbox" id="isAdmin" asp-for="@letterCategory.IsAdmin"/>
+                                            <label for="isAdmin">is admin</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group clearfix">
+                                        <div class="icheck-primary d-inline">
+                                            <input type="checkbox" id="isFoundation" asp-for="@letterCategory.IsFoundation">
+                                            <label for="isFoundation">is foundation</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group clearfix">
+                                        <div class="icheck-primary d-inline">
+                                            <input type="checkbox" id="isShort" asp-for="@letterCategory.IsShortCourse">
+                                            <label for="isShort">is foundation</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="checkbox" id="isStartNewNumber" asp-for="@letterCategory.IsStartNewNumber">
+                                    <label for="isStartNewNumber">Start new number every year</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save changes</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

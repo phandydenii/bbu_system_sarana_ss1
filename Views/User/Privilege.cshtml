@@ -1,0 +1,118 @@
+@{ 
+    ViewData["Controller"] = "User";
+    ViewData["Action"] = "Privilege";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Privilege</h3>
+            </div>
+            <div class="card-body">
+                <table id="tblPrivileges" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Group</th> 
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_Privilege"/>
+@section Scripts
+{ 
+    <script>
+        const tblPrivileges = $("#tblPrivileges");
+        const btnAddNewPrivilege = $("#btnAddNewPrivilege");
+        const modelPrivilege = $("#modelPrivilege");
+        const formPrivilege = $("#formPrivilege");
+        const btnSubmit = $("#btnSubmit");
+        const btnClose = $("#btnClose");
+        
+        let privilege = "";
+        $(document).ready(function () {
+            LoadData();
+            BindSelectOptions("/user/get-privileges-group","privilege_PrivilegeGroupId","id","groupName");
+        });
+
+        function LoadData() {
+            tblPrivileges.DataTable().clear().destroy();
+            tblPrivileges.DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: `/user/get-privileges`,
+                    type: "POST",
+                },
+                columns: [
+                    {data: "privilegeId"},
+                    {data: "privilegeName"}, 
+                    {data: "privilegeGroupName"}, 
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                                <a id="btnEdit" class="btn btn-warning btn-sm"><i class='fas fa-edit'></i> Edit</a>
+                            `;
+                        }
+                    }
+                ]
+            })
+        }
+        tblPrivileges.on("click","#btnEdit", function (e) {
+            const $row = $(this).closest("tr");
+            const data = tblPrivileges.DataTable().row($row).data(); 
+            $("#privilege_PrivilegeId").val(data.privilegeId);
+            $("#privilege_PrivilegeName").val(data.privilegeName);
+            privilege = data.privilegeName;
+            $("#privilege_PrivilegeGroupId").val(data.privilegeGroupId).trigger("change");
+            btnSubmit.prop("disabled", true);
+            modelPrivilege.modal("show");
+        });
+        $("#privilege_PrivilegeName").on("input", function (e) {
+            e.preventDefault();
+            if(privilege !== e.target.value.trim()){
+                btnSubmit.prop("disabled", false);
+            }else {
+                btnSubmit.prop("disabled", true);
+            }
+        });
+        btnClose.on("click", function (e) {
+            e.preventDefault();
+            formPrivilege[0].reset();
+            modelPrivilege.modal("hide");
+        })
+        formPrivilege.on("submit", function (e) {
+            e.preventDefault();
+            if(privilege === e.target.value.trim()){
+                return;
+            }
+            const form = $(this);
+            const formData = form.serialize();
+            $.ajax({
+                url: '/user/save-privileges',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    ShowToastSuccess(response.status.message);
+                    formPrivilege[0].reset();
+                    modelPrivilege.modal("hide");
+                    tblPrivileges.DataTable().ajax.reload();
+                },
+                error: function (error) {
+                    if (error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    }
+                }
+            });
+        });
+    </script>
+}

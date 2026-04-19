@@ -1,0 +1,38 @@
+@using BBU_SYSTEM.ViewModel.Report
+@{
+    var registeredStudent = new RegisteredViewModel();
+}
+<div class="col-12">
+    <div class="row">
+        <div class="col-3">
+            <form id="frmReportRegistered"> 
+                <div class="row">
+                    <div class="col-12">
+                        <label>From Date</label>
+                        <input type="datetime-local" asp-for="@registeredStudent.FromDate" class="form-control">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <label>To Date</label>
+                        <input type="datetime-local" asp-for="@registeredStudent.ToDate" class="form-control">
+                    </div>
+                </div> 
+                <br>
+                <div class="row">
+                    <div class="col-6">
+                        <button type="submit" class="form-control btn btn-primary">Preview</button>
+                    </div>
+                    <div class="col-6">
+                        <button type="submit" class="form-control btn btn-primary">Total</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-9">
+            <div class="row">
+                <iframe src="" width="95%" height="700px" id="printFrame"></iframe>
+            </div>
+        </div>
+    </div>
+</div>

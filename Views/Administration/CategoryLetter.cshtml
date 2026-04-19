@@ -1,0 +1,166 @@
+﻿@{
+    ViewData["OpenMenu"] = "Administration";
+    ViewData["Action"] = "LetterType";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <button class="btn btn-primary" id="btnAddNew"><i class="fas fa-add"></i> Add New</button>
+            </div>
+            <div class="card-body">
+                <table id="tblLetterCategory" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>price</th>
+                        <th>type</th>
+                        <th>status</th>
+                        <th>action</th>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+
+<partial name="_LetterCategoryModal"/>
+
+@section Scripts
+{
+    <script>
+        const tblLetterCategory = $("#tblLetterCategory");
+        const modalLetterCategory = $("#modalLetterCategory");
+        const frmLetterCategory = $("#frmLetterCategory");
+
+        $(document).ready(function () {
+            fetchLetterCategory();
+        });
+
+        function fetchLetterCategory() {
+            tblLetterCategory.DataTable().clear().destroy();
+            tblLetterCategory.DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                ajax: {
+                    url: "/letter-category/get-letter-category",
+                    type: "POST",
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                },
+                columns: [
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `${row.categoryId}`;
+                        }
+                    },
+                    {data: "categoryName"},
+                    {data: "unitPrice"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            let badges = [];
+                            badges.push(row.isAdmin ? '<span class="badge bg-success">Admin</span>' : '');
+                            badges.push(row.isFoundation ? '<span class="badge bg-info">Foundation</span>' : '');
+                            badges.push(row.isShortCourse ? '<span class="badge bg-primary">Short Course</span>' : '');
+                            return badges.filter(b => b).join(' ');
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `${row.isStartNewNumber ? '<span class="badge bg-indigo">New Number</span>' : '<span class="badge bg-secondary">Continue Number</span>'}`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `<a id="btnEdit" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
+                                    <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>`;
+                        }
+                    }
+                ]
+            });
+        }
+
+        document.getElementById("btnAddNew").addEventListener("click", function () {
+            modalLetterCategory.modal("show");
+            modalLetterCategory.find(".modal-title").text("Add New Letter Category");
+        });
+
+        tblLetterCategory.on("click", "#btnEdit", function (e) {
+            e.preventDefault();
+            const $row = $(this).closest("tr");
+            const row = tblLetterCategory.DataTable().row($row).data();
+
+            frmLetterCategory[0].reset();
+            modalLetterCategory.modal("show");
+            modalLetterCategory.find(".modal-title").text("Edit Letter Category");
+
+            document.getElementById("letterCategory_CategoryId").value = row.categoryId;
+            document.getElementById("letterCategory_CategoryName").value = row.categoryName;
+            document.getElementById("letterCategory_UnitPrice").value = row.unitPrice;
+
+            document.getElementById("isAdmin").checked = row.isAdmin;
+            document.getElementById("isFoundation").checked = row.isFoundation;
+            document.getElementById("isShort").checked = row.isShortCourse;
+            document.getElementById("isStartNewNumber").checked = row.isStartNewNumber;
+        });
+
+        tblLetterCategory.on("click", "#btnDelete", function (e) {
+            e.preventDefault();
+            const $row = $(this).closest("tr");
+            const row = tblLetterCategory.DataTable().row($row).data();
+            if (confirm("Are you sure you want to delete this category?")) {
+                $.ajax({
+                    url: `/LetterCategory/delete/${row.categoryId}`,
+                    type: "POST",
+                    success: function (response) {
+                        if (response.status.code === "200") {
+                            ShowToastSuccess(response.status.message);
+                            frmLetterCategory[0].reset();
+                            modalLetterCategory.modal("hide");
+                            tblLetterCategory.DataTable().ajax.reload();
+                        } else {
+                            ShowToastError(response.status.message);
+                        }
+                    },
+                    error: function (error, status, xhr) {
+                        ShowToastError(error.responseText);
+                    }
+                });
+            }
+        });
+
+        document.getElementById("frmLetterCategory").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const form = $(this);
+            const formData = form.serialize();
+            $.ajax({
+                url: '/LetterCategory/post-letter-category',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.status.code === "200") {
+                        ShowToastSuccess(response.status.message);
+                        frmLetterCategory[0].reset();
+                        modalLetterCategory.modal("hide");
+                        tblLetterCategory.DataTable().ajax.reload();
+                    } else {
+                        ShowToastError(response.status.message);
+                    }
+                },
+                error: function (error, status, xhr) {
+                    ShowToastError(error.responseText);
+                }
+            });
+        });
+    </script>
+}

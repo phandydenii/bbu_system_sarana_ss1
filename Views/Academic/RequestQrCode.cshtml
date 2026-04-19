@@ -1,0 +1,257 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "AcademicTask";
+    ViewData["Action"] = "RequestQRCode";
+    var campuses = new Dictionary<string, string>
+    {
+        { "request_qrcode", "ស្នើរសុំឃ្យូអរកូដសញ្ញាបត្រ" }, //degree, school,field, promotion, stage, study-time
+        { "reset-qrcode", "បោះពុម្ពឃ្យូអរកូដសញ្ញាបត្រ" }, //degree, school,field, promotion, stage, study-time
+    };
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="margin" id="rangeButtons">
+                            <button type="button" class="btn btn-primary btn-sm"
+                                    value="request_qrcode">ស្នើរសុំឃ្យូអរកូដសញ្ញាបត្រ
+                            </button>
+                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                    value="request_qrcode">បោះពុម្ពឃ្យូអរកូដសញ្ញាបត្រ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <label aria-required="true" class="required">Degree</label>
+                        <select id="cboDegree" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="required">School</label>
+                        <select id="cboSchool" class="form-control select2">
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Field</label>
+                        <select id="cboField" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-1">
+                        <label>Promotion</label>
+                        <select id="cboPromotion" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-1">
+                        <label>Stage</label>
+                        <select id="cboStage" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Group</label>
+                        <select id="cboGroup" class="form-control select2"></select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>&nbsp;</label>
+                        <button id="btnFilterStudentList" class="form-control btn btn-success">
+                            Filter <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+                <hr>
+                <table id="tblStudent" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>Student Id</th>
+                        <th>Name English</th>
+                        <th>Name Khmer</th>
+                        <th>Gender</th>
+                        <th>Document In</th>
+                        <th>Document Out</th>
+                        <th>High School</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+
+@section Scripts
+{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Term.js"></script>
+    <script src="~/function/Group.js"></script>
+    <script>
+        const cboDegree = $("#cboDegree");
+        const cboSchool = $("#cboSchool");
+        const cboField = $("#cboField");
+        const cboPromotion = $("#cboPromotion");
+        const cboStage = $("#cboStage");
+        const cboTerm = $("#cboTerm");
+        const cboGroup = $("#cboGroup");
+        $(document).ready(function () {
+            showLoading();
+            $("#tblStudent").DataTable();
+            GetDegree();
+            GetSchool();
+            hideLoading(1)
+        });
+
+        $("#rangeButtons").on("click", "button", function (e) {
+            // remove active style from all buttons
+            $("#rangeButtons").find("button").removeClass("btn-primary").addClass("btn-outline-primary");
+            // add active style to clicked button
+            $(this).removeClass("btn-outline-primary").addClass("btn-primary");
+        });
+
+        cboDegree.change(function () {
+            GetField();
+            GetPromotion();
+            GetStage();
+            GetTerm();
+            GetGroup();
+        });
+
+        cboSchool.change(function () {
+            GetField();
+            GetPromotion();
+        });
+
+        cboPromotion.change(function () {
+            GetStage();
+            GetTerm();
+            GetGroup();
+        });
+        cboStage.change(function () {
+            GetTerm();
+            GetGroup();
+        });
+        cboTerm.change(function () {
+            GetGroup();
+        });
+
+        async function GetDegree() {
+            cboDegree.empty();
+            cboDegree.append(`<option value='0' disabled>Select Degree</option>`);
+            const degrees = await Degree.GetAllDegree();
+            degrees.forEach(item => {
+                cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
+            });
+            cboDegree.val('0').trigger("change");
+        }
+
+        async function GetSchool() {
+            cboSchool.empty();
+            cboSchool.append("<option value='0' disabled>Select School</option>");
+            const schools = await School.GetSchool()
+            schools.forEach(function (item) {
+                cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
+            });
+            cboSchool.val('0').trigger("change");
+        }
+
+
+        async function GetField() {
+            const degreeId = parseInt(cboDegree.val());
+            const schoolId = parseInt(cboSchool.val());
+            cboField.empty();
+            cboField.append("<option value='0' disabled>Select Field</option>");
+            if (!degreeId || !schoolId) {
+                cboField.val('0');
+                return;
+            }
+
+            const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
+            fields.forEach(item => {
+                cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
+            });
+            cboField.val('0').trigger("change");
+        }
+
+        async function GetPromotion() {
+            const degreeId = cboDegree.val();
+            const schoolId = cboSchool.val();
+            cboPromotion.empty();
+            cboPromotion.append("<option value='0' disabled>Promotion</option>");
+            if (!degreeId || !schoolId) {
+                cboPromotion.val('0');
+                return;
+            }
+            const promotions = await Promotion.GetPromotions();
+            let hasPromotion = false;
+            promotions.forEach(item => {
+                if (item.degree === parseInt(degreeId) && item.school === parseInt(schoolId)) {
+                    cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`);
+                    hasPromotion = true;
+                }
+            });
+            if (!hasPromotion) {
+                cboPromotion.empty();
+                cboPromotion.append("<option value='0' disabled>No promotion available</option>");
+            }
+            cboPromotion.val('0').trigger("change");
+        }
+
+        async function GetStage() {
+            const promotionId = cboPromotion.val();
+            cboStage.empty();
+            cboStage.append("<option value='0' disabled>All Stage</option>");
+            if (!promotionId) {
+                cboStage.val('0');
+                return;
+            }
+            const stages = await Stage.GetStages();
+            stages.forEach(item => {
+                if (item.promotionId === parseInt(promotionId)) {
+                    cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
+                }
+            });
+            cboStage.val('0').trigger("change");
+        }
+        async function GetTerm() {
+            const stageId = cboStage.val();
+            cboTerm.empty();
+            cboTerm.append("<option value='0' disabled>Select Term</option>");
+            if (!stageId) {
+                cboTerm.val('0');
+                return;
+            }
+            const terms = await Term.GetTerms();
+            terms.forEach(item => {
+                if (item.stageId === parseInt(stageId)) {
+                    cboTerm.append(`<option value='${item.termNo}'>${item.termNo}</option>`);
+                }
+            });
+            cboTerm.val('0').trigger("change");
+        }
+        async function GetGroup() {
+            const stageId = cboStage.val();
+            const fieldId = cboField.val();
+
+            cboGroup.empty();
+            cboGroup.append("<option value='0' disabled>All Group</option>");
+            if (!stageId || !fieldId) {
+                cboGroup.val('0');
+                return;
+            }
+            const groups = await Group.GetGroups();
+            groups.forEach(item => {
+                if (item.stageId === parseInt(stageId) && item.fieldId === parseInt(fieldId)) {
+                    cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
+                }
+            });
+            cboGroup.val('0').trigger("change");
+        }
+    </script>
+}
+

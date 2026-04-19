@@ -1,0 +1,105 @@
+@{ 
+    ViewData["Controller"] = "User";
+    ViewData["Action"] = "PrivilegeGroup";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Privilege Group</h3>
+                <button id="btnAddNewPrivilegeGroup" type="button" class="btn btn-success btn-sm float-right">
+                    <i class="fas fa-plus"></i>
+                    Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblPrivilegesGroup" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Group Name</th> 
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_PrivilegeGroup"/>
+@section Scripts
+{
+    <script>
+        const tblPrivilegesGroup = $("#tblPrivilegesGroup");
+        const modelPrivilegeGroup = $("#modelPrivilegeGroup");
+        const btnAddNewPrivilegeGroup = $("#btnAddNewPrivilegeGroup");
+        const formPrivilegeGroup = $("#formPrivilegeGroup");
+        
+        $(document).ready(function () {
+            LoadData();
+        });
+
+        function LoadData() {
+            tblPrivilegesGroup.DataTable().clear().destroy();
+            tblPrivilegesGroup.DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: `/user/get-privileges-group`,
+                    type: "POST",
+                },
+                columns: [
+                    {data: "id"},
+                    {data: "groupName"}, 
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                                <a id="btnEdit" class="btn btn-warning btn-sm"><i class='fas fa-edit'></i> Edit</a>
+                            `;
+                        }
+                    }
+                ]
+            })
+        }
+        
+        btnAddNewPrivilegeGroup.on("click", function (event) {
+            event.preventDefault();
+            modelPrivilegeGroup.modal("show");
+        });
+        
+        tblPrivilegesGroup.on("click","#btnEdit", function (event) {
+            const $row = $(this).closest("tr");
+            const data = tblPrivilegesGroup.DataTable().row($row).data();
+            event.preventDefault();
+            $("#privilegeGroup_Id").val(data.id);
+            $("#privilegeGroup_GroupName").val(data.groupName); 
+            modelPrivilegeGroup.modal("show");
+        });
+
+        formPrivilegeGroup.on("submit", function (event) {
+            event.preventDefault();
+            const form = $(this);
+            const formData = form.serialize(); 
+            $.ajax({
+                url: '/user/save-privileges-group',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    ShowToastSuccess(response.status.message);
+                    formPrivilegeGroup[0].reset();
+                    modelPrivilegeGroup.modal("hide");
+                    tblPrivilegesGroup.DataTable().ajax.reload();
+                },
+                error: function (error) {
+                    if (error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    }
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,57 @@
+﻿@using BBU_SYSTEM.DTOs
+@model BBU_SYSTEM.ViewModel.ListData
+@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "AcademicTask";
+    ViewData["Action"] = "OtherBranchScore";
+}
+<div class="card-body">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Other University Students</h3>
+                </div>
+                <div class="card-body">
+                    <table id="tblStudentOtherUniversity" class="table table-sm table-bordered table-striped"
+                           style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>DOB</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="card card-outline card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Scores</h3>
+                </div>
+                <div class="card-body">
+                    <table id="tblOtherUniversityScore" class="table table-sm table-bordered table-striped"
+                           style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th class="hide-col">id</th>
+                            <th>term</th>
+                            <th>name</th>
+                            <th>total</th>
+                            <th>grade</th>
+                            <th>action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,498 @@
+﻿@model BBU_SYSTEM.ViewModel.ListData
+<h1>Detail</h1>
+@*<div class="row">
+        <div class="col-12 col-sm-7">
+            <div class="card card-primary shadow-none">
+                <div class="card-header">
+                    <h3 class="card-title">Student Information</h3>
+
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body" style="display: block;">
+                    <div class="card card-primary card-outline card-outline-tabs">
+                        <div class="card-header p-0 border-bottom-0">
+                            <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="custom-tabs-four-personal-tab" data-toggle="pill"
+                                       href="#custom-tabs-four-personal" role="tab"
+                                       aria-controls="custom-tabs-four-personal" aria-selected="true">Personal</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="custom-tabs-four-personalcontact-tab" data-toggle="pill"
+                                       href="#custom-tabs-four-personalcontact" role="tab"
+                                       aria-controls="custom-tabs-four-personalcontact" aria-selected="false">
+                                        Persional Contact
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="custom-tabs-four-relativecontact-tab" data-toggle="pill"
+                                       href="#custom-tabs-four-relativecontact" role="tab"
+                                       aria-controls="custom-tabs-four-relativecontact" aria-selected="false">
+                                        Relative Contact
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="custom-tabs-four-parent-tab" data-toggle="pill"
+                                       href="#custom-tabs-four-parent" role="tab"
+                                       aria-controls="custom-tabs-four-parent" aria-selected="false">Parent</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content" id="custom-tabs-four-tabContent">
+                                <partial name="_Personal" />
+                                <partial name="_PersonalContact" />
+                                <partial name="_RelativeContact" />
+                                <partial name="_Parent" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-5">
+            <div class="card card-primary shadow-none">
+                <div class="card-header">
+                    <h3 class="card-title">Academic Information</h3>
+
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body" style="display: block;">
+                    <label>Degree</label>
+                    <select id="cboDegree" class="form-control select2" style="width: 100%;" disabled>
+                        <option selected="selected" disabled>Select Degree</option>
+                        @foreach (var data in Model.degrees!)
+                        {
+                            <option value=@data.degree_id>@data.degree</option>
+                        }
+                    </select>
+                    <label>School</label>
+                    <select id="cboSchool" class="form-control select2" style="width: 100%;" disabled>
+                        <option selected="selected" disabled>Select School</option>
+                        @foreach (var data in Model.schools!)
+                        {
+                            <option value=@data.school_id>@data.school_name</option>
+                        }
+                    </select>
+                    <label>Field Group</label>
+                    <select id="cboFieldGroup" class="form-control select2" style="width: 100%;" disabled>
+                        <option selected="selected" disabled>Select Field</option>
+                        @foreach (var data in Model.fields!)
+                        {
+                            <option value=@data.field_id>@data.field_name</option>
+                        }
+                    </select>
+                    <label>Field Student</label>
+                    <select id="cboField" class="form-control select2" style="width: 100%;">
+                        <option selected="selected" disabled>Select Field</option>
+                        @foreach (var data in Model.fields!)
+                        {
+                            <option value=@data.field_id>@data.field_name</option>
+                        }
+                    </select>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Promotion</label>
+                            <select id="cboPromotion" class="form-control select2" style="width: 100%;" disabled>
+                                <option selected="selected" disabled>Select Promotion</option>
+                                @foreach (var data in Model.promotions!)
+                                {
+                                    <option value=@data.promotion_id>@data.promotion_no</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Stage</label>
+                            <select id="cboStage" class="form-control select2" style="width: 100%;" disabled>
+                                <option selected="selected" disabled>Select Stage</option>
+                                @foreach (var data in Model.stages!)
+                                {
+                                    <option value=@data.stage_id>@data.stage_no</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Term</label>
+                            <input type="text" class="form-control" id="txtTerm" placeholder="" value="@Html.DisplayFor(m=>m.StudentAcademic.term.term_no)" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Group</label>
+                            <select id="cboGroup" class="form-control select2" style="width: 100%;" disabled>
+                                <option selected="selected" disabled>Select Group</option>
+                                @foreach (var data in Model.groups!)
+                                {
+                                    <option value=@data.group_id>@data.group_name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Study Time</label>
+                            <input type="text" class="form-control" id="txtStudyTime" placeholder="" value="@Html.DisplayFor(m=>m.StudentAcademic.group.study_time)" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Room</label>
+                            <input type="text" class="form-control" id="txtRoom" placeholder="" value="@Html.DisplayFor(m=>m.StudentAcademic.groupRoom.room_name)" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" type="checkbox" id="customCheckbox2" checked>
+                                <label for="customCheckbox2" class="custom-control-label">Continued Student</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" type="checkbox" id="customCheckbox2" checked>
+                                <label for="customCheckbox2" class="custom-control-label">Continued Student</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" type="checkbox" id="customCheckbox2" checked>
+                                <label for="customCheckbox2" class="custom-control-label">Continued Student</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>*@
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card card-primary shadow-none">
+            <div class="card-header">
+                <h3 class="card-title">Student Information</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body" style="display: block;">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="card card-primary card-outline card-outline-tabs">
+                            <div class="card-header p-0 border-bottom-0">
+                                <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="custom-tabs-four-personal-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-personal" role="tab"
+                                           aria-controls="custom-tabs-four-personal" aria-selected="true">Personal</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="custom-tabs-four-personalcontact-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-personalcontact" role="tab"
+                                           aria-controls="custom-tabs-four-personalcontact" aria-selected="false">
+                                            Persional Contact
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="custom-tabs-four-relativecontact-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-relativecontact" role="tab"
+                                           aria-controls="custom-tabs-four-relativecontact" aria-selected="false">
+                                            Relative Contact
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="custom-tabs-four-parent-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-parent" role="tab"
+                                           aria-controls="custom-tabs-four-parent" aria-selected="false">Parent</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <div class="tab-content" id="custom-tabs-four-tabContent">
+                                    <partial name="_Personal"/>
+                                    <partial name="_PersonalContact"/>
+                                    <partial name="_RelativeContact"/>
+                                    <partial name="_Parent"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="card card-outline card-primary">
+                            <div class="card-body" style="display: block;">
+                                <label>Degree</label>
+                                <select id="cboDegree" class="form-control select2" style="width: 100%;" disabled>
+                                    <option selected="selected" disabled>Select Degree</option>
+                                    @foreach (var data in Model.Degrees!)
+                                    {
+                                        <option value=@data.DegreeId>@data.DegreeName</option>
+                                    }
+                                </select>
+                                <label>School</label>
+                                <select id="cboSchool" class="form-control select2" style="width: 100%;" disabled>
+                                    <option selected="selected" disabled>Select School</option>
+                                    @foreach (var data in Model.Schools!)
+                                    {
+                                        <option value=@data.SchoolId>@data.SchoolName</option>
+                                    }
+                                </select>
+                                <label>Field Group</label>
+                                <select id="cboFieldGroup" class="form-control select2" style="width: 100%;" disabled>
+                                    <option selected="selected" disabled>Select Field</option>
+                                    @foreach (var data in Model.Fields!)
+                                    {
+                                        <option value=@data.FieldId>@data.FieldName</option>
+                                    }
+                                </select>
+                                <label>Field Student</label>
+                                <select id="cboField" class="form-control select2" style="width: 100%;">
+                                    <option selected="selected" disabled>Select Field</option>
+                                    @foreach (var data in Model.Fields!)
+                                    {
+                                        <option value=@data.FieldId>@data.FieldName</option>
+                                    }
+                                </select>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Promotion</label>
+                                        <select id="cboPromotion" class="form-control select2" style="width: 100%;"
+                                                disabled>
+                                            <option selected="selected" disabled>Select Promotion</option>
+                                            @foreach (var data in Model.Promotions!)
+                                            {
+                                                <option value=@data.PromotionId>@data.PromotionNo</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Stage</label>
+                                        <select id="cboStage" class="form-control select2" style="width: 100%;"
+                                                disabled>
+                                            <option selected="selected" disabled>Select Stage</option>
+                                            @foreach (var data in Model.Stages!)
+                                            {
+                                                <option value=@data.StageId>@data.StageNo</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Term</label>
+                                        @*<input type="text" class="form-control" id="txtTerm" placeholder="" value="@Html.DisplayFor(m=>m.term!.term_no)" readonly>*@
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Group</label>
+                                        <select id="cboGroup" class="form-control select2" style="width: 100%;"
+                                                disabled>
+                                            <option selected="selected" disabled>Select Group</option>
+                                            @foreach (var data in Model.Groups!)
+                                            {
+                                                <option value=@data.GroupId>@data.GroupName</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Study Time</label>
+                                        @*<input type="text" class="form-control" id="txtStudyTime" placeholder="" value="@Html.DisplayFor(m=>m.StudentAcademic!.group!.study_time)" readonly>*@
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Room</label>
+                                        @*<input type="text" class="form-control" id="txtRoom" placeholder="" value="@Html.DisplayFor(m=>m.StudentAcademic!.groupRoom!.room_name)" readonly>*@
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="custom-control custom-checkbox">
+                                            <input class="custom-control-input" type="checkbox" id="customCheckbox2"
+                                                   checked>
+                                            <label for="customCheckbox2" class="custom-control-label">Continued
+                                                Student</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="custom-control custom-checkbox">
+                                            <input class="custom-control-input" type="checkbox" id="customCheckbox2"
+                                                   checked>
+                                            <label for="customCheckbox2" class="custom-control-label">Continued
+                                                Student</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="custom-control custom-checkbox">
+                                            <input class="custom-control-input" type="checkbox" id="customCheckbox2"
+                                                   checked>
+                                            <label for="customCheckbox2" class="custom-control-label">Continued
+                                                Student</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card card-primary shadow-none">
+            <div class="card-header">
+                <h3 class="card-title">History</h3>
+
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body" style="display: block;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card card-primary card-outline card-outline-tabs">
+                            <div class="card-header p-0 border-bottom-0">
+                                <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="custom-tabs-four-Schoolarship-tab"
+                                           data-toggle="pill"
+                                           href="#custom-tabs-four-Schoolarship" role="tab"
+                                           aria-controls="custom-tabs-four-Schoolarship" aria-selected="false">
+                                            Schoolarship
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="custom-tabs-four-Continue-Education-tab"
+                                           data-toggle="pill"
+                                           href="#custom-tabs-four-Continue-Education" role="tab"
+                                           aria-controls="custom-tabs-four-Continue-Education" aria-selected="false">
+                                            Continue Education
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="custom-tabs-four-Issue-Letter-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-Issue-Letter" role="tab"
+                                           aria-controls="custom-tabs-four-Issue-Letter" aria-selected="false">Issue
+                                            Letter</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="custom-tabs-four-Certificate-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-Certificate" role="tab"
+                                           aria-controls="custom-tabs-four-Certificate"
+                                           aria-selected="true">Certificate</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="custom-tabs-four-Branch-History-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-Branch-History" role="tab"
+                                           aria-controls="custom-tabs-four-Branch-History" aria-selected="true">Branch
+                                            History</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="custom-tabs-four-Note-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-Note" role="tab"
+                                           aria-controls="custom-tabs-four-Note" aria-selected="true">Note</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="custom-tabs-four-Suppres-History-tab"
+                                           data-toggle="pill"
+                                           href="#custom-tabs-four-Suppres-History" role="tab"
+                                           aria-controls="custom-tabs-four-Suppres-History" aria-selected="true">Suppres
+                                            History</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="custom-tabs-four-Absence-Record-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-Absence-Record" role="tab"
+                                           aria-controls="custom-tabs-four-Absence-Record" aria-selected="true">Absence
+                                            Record</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="custom-tabs-four-Payment-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-Payment" role="tab"
+                                           aria-controls="custom-tabs-four-Payment" aria-selected="true">Payment</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="custom-tabs-four-Suspend-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-Suspend" role="tab"
+                                           aria-controls="custom-tabs-four-Suspend" aria-selected="true">Suspend</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="custom-tabs-four-Group-History-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-Group-History" role="tab"
+                                           aria-controls="custom-tabs-four-Group-History" aria-selected="true">Group
+                                            History</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="custom-tabs-four-Extend-From-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-Extend-From" role="tab"
+                                           aria-controls="custom-tabs-four-Extend-From" aria-selected="true">Extend
+                                            From</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="custom-tabs-four-Complemential-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-Complemential" role="tab"
+                                           aria-controls="custom-tabs-four-Complemential" aria-selected="true">Complemential</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="custom-tabs-four-Quit-tab" data-toggle="pill"
+                                           href="#custom-tabs-four-Quit" role="tab"
+                                           aria-controls="custom-tabs-four-Quit" aria-selected="true">Quit</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <div class="tab-content" id="custom-tabs-four-tabContent">
+                                    <partial name="_TabSchoolarship"/>
+                                    <partial name="_TabContinueEducation"/>
+                                    <partial name="_TabIssueLetter"/>
+                                    <partial name="_TabCertificate"/>
+                                    <partial name="_TabBranchHistory"/>
+                                    <partial name="_TabNote"/>
+                                    <partial name="_TabSuppresHistory"/>
+                                    <partial name="_TabAbsenceRecord"/>
+                                    <partial name="_TabPayment"/>
+                                    <partial name="_TabSuspend"/>
+                                    <partial name="_TabGroupHistory"/>
+                                    <partial name="_TabExtendFrom"/>
+                                    <partial name="_TabQuit"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        @*$("#cboDegree").val(@Html.DisplayFor(m=>m.StudentAcademic!.degree!.degree_id));
+        $("#cboSchool").val(@Html.DisplayFor(m=>m.StudentAcademic!.school!.school_id));
+        $("#cboField").val(@Html.DisplayFor(m=>m.StudentAcademic!.field!.field_id));
+        $("#cboFieldGroup").val(@Html.DisplayFor(m=>m.StudentAcademic!.group!.field_id));
+        $("#cboPromotion").val(@Html.DisplayFor(m=>m.StudentAcademic!.promotion!.promotion_id));
+        $("#cboStage").val(@Html.DisplayFor(m=>m.StudentAcademic!.stage!.stage_id));
+        $("#cboGroup").val(@Html.DisplayFor(m=>m.StudentAcademic!.group!.group_id));*@
+    });
+</script>

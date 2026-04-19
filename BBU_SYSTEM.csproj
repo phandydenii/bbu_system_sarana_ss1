@@ -1,0 +1,203 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
+    <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
+    <ItemGroup>
+        <PackageReference Include="AspNetCore.Reporting" Version="2.1.0" />
+        <PackageReference Include="AutoMapper" Version="13.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.3.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.15">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.16" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.15" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration" Version="8.0.7" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Core" Version="9.0.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.EntityFrameworkCore" Version="8.0.7" />
+        <PackageReference Include="ReportViewerCore.NETCore" Version="15.1.26" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="8.1.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.1.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.1.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.15" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.11" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
+        <PackageReference Include="System.Security.Permissions" Version="8.0.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="Views\User\" />
+        <None Remove="ViewModel\" />
+        <None Remove="Views\Academic\" />
+        <None Remove="Views\Administration\" />
+        <None Remove="Views\Dean\" />
+        <None Remove="Views\CommandTask\" />
+        <None Remove="Views\Library\" />
+        <None Remove="Views\HR\" />
+        <None Remove="Views\Academic\Student\" />
+        <None Remove="Views\Account\" />
+        <None Remove="Views\Registry\" />
+        <None Remove="Views\Payment\" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Views\Account\" />
+        <Folder Include="Views\ReportPartial\Admin\" />
+        <Folder Include="Views\ReportPartial\ContinueEducation\" />
+        <Folder Include="Views\ReportPartial\Dean\" />
+        <Folder Include="Views\ReportPartial\FoundationYear\" />
+        <Folder Include="Views\ReportPartial\SPO\" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Remove="Views\Payment\Index1.cshtml" />
+        <Content Remove="Views\Report\_TabStudentSkillList.cshtml" />
+        <Content Remove="wwwroot\ts\" />
+    </ItemGroup>
+    <ItemGroup>
+        <UpToDateCheckInput Remove="Views\Payment\Index1.cshtml" />
+    </ItemGroup>
+    <ItemGroup>
+        <_ContentIncludedByDefault Remove="Views\Payment\Index1.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\_TabStudentSkillList.cshtml" />
+        <_ContentIncludedByDefault Remove="publish\web.config" />
+        <_ContentIncludedByDefault Remove="publish\appsettings.Development.json" />
+        <_ContentIncludedByDefault Remove="publish\appsettings.json" />
+        <_ContentIncludedByDefault Remove="publish\BBU_SYSTEM.deps.json" />
+        <_ContentIncludedByDefault Remove="publish\BBU_SYSTEM.runtimeconfig.json" />
+        <_ContentIncludedByDefault Remove="publish\package-lock.json" />
+        <_ContentIncludedByDefault Remove="publish\package.json" />
+        <_ContentIncludedByDefault Remove="publish\tsconfig.json" />
+        <_ContentIncludedByDefault Remove="publish\wwwroot\AdminLTE\.bundlewatch.config.json" />
+        <_ContentIncludedByDefault Remove="publish\wwwroot\AdminLTE\.eslintrc.json" />
+        <_ContentIncludedByDefault Remove="publish\wwwroot\AdminLTE\build\config\.eslintrc.json" />
+        <_ContentIncludedByDefault Remove="publish\wwwroot\AdminLTE\build\npm\.eslintrc.json" />
+        <_ContentIncludedByDefault Remove="publish\wwwroot\AdminLTE\composer.json" />
+        <_ContentIncludedByDefault Remove="publish\wwwroot\AdminLTE\dist\js\.eslintrc.json" />
+        <_ContentIncludedByDefault Remove="publish\wwwroot\AdminLTE\package-lock.json" />
+        <_ContentIncludedByDefault Remove="publish\wwwroot\AdminLTE\package.json" />
+        <_ContentIncludedByDefault Remove="Views\Report\Others\_GraduateStudent.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Others\_StatisticStudent.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Others\_StudentAcceptCertificate.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Others\_StudentFeeCollection.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Others\_StudentLetterList.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Payment\_Income.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Payment\_ReExaminationPayment.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Payment\_StudentIncomplete.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Payment\_StudentInsurance.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Payment\_StudentNotPaymentNew.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Payment\_StudentPaymentNew.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Registration\_RegisteredStudent.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Registration\_RegistrationStatic.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Registration\_RegistrationStaticProvince.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Registration\_ScholarshipStudent.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentCertificate\_TabCertificateOfEducation.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentCertificate\_TabCertificateQRCode.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentCertificate\_TabChangeBranchLetter.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentCertificate\_TabProvissionalCertificate.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentCertificate\_TabRankByPromotion.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentCertificate\_TabRankStudent.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentCertificate\_TabStudyRecord.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentCertificate\_TabSuspendLetter.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentCertificate\_TabTranscript.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentResult\_TabGraduateStudent.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentResult\_TabStudentFeeConllection.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentResult\_TabStudentLetterList.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentResult\_TabStudentStatic.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\TabStudentResult\_TabStuentAcceptCertificate.cshtml" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\024d38d3-bb83-4f6e-b80e-4173f07c34c5.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\0251d72c-04ac-4d79-9756-468156f78d07.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\0318a1dd-c004-4055-8208-1e2f8304db9f.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\1362c9e2-419f-4c5f-ae08-e96b57511590.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\2d17df1e-d25c-4de3-9052-f5ebf54dfc52.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\40026919-17e4-4cbb-b8d9-3a1fb7fc3afe.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\50c2997a-71fa-4931-8126-2291f36e615e.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\50efb33f-8a84-4c2f-8105-23da0cba807d.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\5ecd5184-0db7-40e7-96f1-218968a94db8.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\6b207c44-25ce-4565-a9c2-0431e002ae4c.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\6b7c3362-83c6-44f2-acc3-0dd2bcc4e18c.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\8bdc5cbd-e705-4b8c-a325-62d0c4f2e7e4.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\8e96acde-530e-4c12-83ea-a0cc25aa9244.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\903d86c9-59b7-4aa0-b20c-c3a22797c97e.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\9706c404-9e9d-4b1d-88f0-4a16d4213cb7.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\9b313e16-1794-459a-879d-679e078cd93f.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\9e23fe20-d9a3-48de-8efe-23169d6bd838.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\a149649c-aa6c-483c-96ed-9f610f4c9d83.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\a9ba471a-9f8c-436b-932b-c9153f8ed76a.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\beb06c78-5101-4c02-a78a-1c65a5a6f5d3.png" />
+        <_ContentIncludedByDefault Remove="wwwroot\uploads\beeed006-ba88-4ca7-9ebb-6ada52185227.png" />
+        <_ContentIncludedByDefault Remove="Views\Report\Academic\TabStudentResult\_TabGraduateStudent.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Academic\TabStudentResult\_TabStudentFeeConllection.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Academic\TabStudentResult\_TabStudentLetterList.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Academic\TabStudentResult\_TabStudentStatic.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Academic\TabStudentResult\_TabStuentAcceptCertificate.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabBooking\_BookingClothes.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabBooking\_ReturnClothes.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabOthers\_GraduateStudent.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabOthers\_StatisticStudent.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabOthers\_StudentAcceptCertificate.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabOthers\_StudentFeeCollection.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabOthers\_StudentLetterList.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabPayments\_Income.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabPayments\_ReExaminationPayment.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabPayments\_StudentIncomplete.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabPayments\_StudentInsurance.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabPayments\_StudentNotPaymentNew.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Report\Admin\TabPayments\_StudentPaymentNew.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\AssignStudentGroup\_AssociateGroupForm.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\AssignStudentGroup\_DiplomaGroupForm.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\AssignStudentGroup\_DoctorGroupForm.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\AssignStudentGroup\_FoundationGroupForm.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\AssignStudentGroup\_MasterGroupForm.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\AssignStudentGroup\_OtherGroupForm.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\AssignStudentGroup\_SpecializeGroupForm.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\AssignStudentGroup\_UnPromoteGroupForm.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\AssociateGroup.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\DiplomaGroup.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\DoctorGroup.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\FoundationGroup.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\MasterGroup.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\OtherGroup.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\SpecializeGroup.cshtml" />
+    </ItemGroup>
+    <ItemGroup>
+        <UpToDateCheckInput Remove="Views\Report\_TabStudentSkillList.cshtml" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Update="Views\CommandTask\_FieldModal.cshtml">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
+    <ItemGroup>
+      <AdditionalFiles Include="Views\Academic\TabAssignGroup\_AssociateGroupForm.cshtml" />
+      <AdditionalFiles Include="Views\Academic\TabAssignGroup\_DiplomaGroupForm.cshtml" />
+      <AdditionalFiles Include="Views\Academic\TabAssignGroup\_DoctorGroupForm.cshtml" />
+      <AdditionalFiles Include="Views\Academic\TabAssignGroup\_FoundationGroupForm.cshtml" />
+      <AdditionalFiles Include="Views\Academic\TabAssignGroup\_MasterGroupForm.cshtml" />
+      <AdditionalFiles Include="Views\Academic\TabAssignGroup\_OtherGroupForm.cshtml" />
+      <AdditionalFiles Include="Views\Academic\TabAssignGroup\_SpecializeGroupForm.cshtml" />
+      <AdditionalFiles Include="Views\Academic\TabAssignGroup\_UnPromoteGroupForm.cshtml" />
+      <AdditionalFiles Include="Views\ReportPartial\Academic\TabStudent\_TabMinistryDoc.cshtml" />
+      <AdditionalFiles Include="Views\ReportPartial\Admin\TabBooking\_BookingClothes.cshtml" />
+      <AdditionalFiles Include="Views\ReportPartial\Admin\TabBooking\_ReturnClothes.cshtml" />
+      <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_GraduateStudent.cshtml" />
+      <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StatisticStudent.cshtml" />
+      <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentAcceptCertificate.cshtml" />
+      <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentFeeCollection.cshtml" />
+      <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentLetterList.cshtml" />
+    </ItemGroup>
+</Project>

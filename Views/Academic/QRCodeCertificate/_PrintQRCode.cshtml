@@ -1,0 +1,292 @@
+﻿@model BBU_SYSTEM.ViewModel.ListData
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                @*< h3 class="card-title">Student Ministry Document</h3> *@
+                <div class="row">
+                    <div class="col-md-2">
+                        <label aria-required="true" class="required">Degree</label>
+                        <select id="cboDegreeTab2" class="form-control select2"
+                                style="width: 100%;">
+                            <option selected="selected" disabled value="0">Select Degree</option>
+                            @foreach (var data in Model.Degrees!)
+                            {
+                                <option value=@data.DegreeId>@data.DegreeName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="required">School</label>
+                        <select id="cboSchoolTab2" class="form-control select2" style="width: 100%;">
+                            <option selected="selected" disabled value="0">Select School</option>
+                            @foreach (var data in Model.Schools!)
+                            {
+                                <option value=@data.SchoolId>@data.SchoolName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <label>Promotion</label>
+                        <select id="cboPromotionTab2" class="form-control select2"
+                                style="width: 100%;">
+                            <option selected="selected" disabled value="0">Select Promotion</option>
+                            @*@foreach (var data in Model.promotions!)
+                            {
+                            <option value=@data.promotion_id>@data.promotion_no</option>
+                            }*@
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Field</label>
+                        <select id="cboFieldTab2" class="form-control select2" style="width: 100%;">
+                            <option selected="selected" disabled value="0">Select Field</option>
+                            @*@foreach (var data in Model.fields!)
+                            {
+                            <option value=@data.field_id>@data.field_name</option>
+                            }*@
+                        </select>
+                    </div>
+
+                    <div class="col-md-1">
+                        <label>Stage</label>
+                        <select id="cboStageTab2" class="form-control select2"
+                                style="width: 100%;">
+                            <option selected="selected" value="0">All Stage</option>
+                            @*@foreach (var data in Model.stages!)
+                            {
+                            <option value=@da1ta.stage_id>@data.stage_no</option>
+                            }*@
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Group</label>
+                        <select id="cboGroupTab2" class="form-control select2" style="width: 100%;">
+                            <option selected="selected" value="0">All Group</option>
+                            @*@foreach (var data in Model.stages!)
+                            {
+                            <option value=@data.stage_id>@data.stage_no</option>
+                            }*@
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>#</label>
+                        <button id="btnFilterStudentListTab2" class="form-control btn btn-success">
+                            Filter <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="tblStudentTab2" class="table table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Student Id</th>
+                        <th>Name English</th>
+                        <th>Name Khmer</th>
+                        <th>Gender</th>
+                        <th>Status</th>
+                        <th>Actioin</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#tblStudentTab2").DataTable();
+
+        $('#cboDegreeTab2').on('change', function (e) {
+            GetField();
+            GetPromotion();
+        });
+
+        $('#cboSchoolTab2').on('change', function (e) {
+            GetField();
+            GetPromotion();
+        });
+
+        $('#cboPromotionTab2').on('change', function (e) {
+            PromotionChange();
+        });
+
+        $('#cboStageTab2').on('change', function (e) {
+            StageChange();
+        });
+
+        $('#cboTermTab2').on('change', function (e) {
+            TermChange();
+        });
+
+        $('#btnFilterStudentListTab2').on('click', function (e) {
+            OnFilterTab2();
+        });
+
+
+        function GetField() {
+            const degreeId = $("#cboDegreeTab2").val();
+            const schoolId = $("#cboSchoolTab2").val();
+
+            const cboField = document.getElementById("cboFieldTab2");
+            cboField.innerText = "";
+            const optionField = document.createElement("option");
+            optionField.value = -1;
+            optionField.text = "Select Field";
+            optionField.disabled = true;
+            cboField.appendChild(optionField);
+            fields.forEach(item => {
+                if (item.degreeId === parseInt(degreeId) && item.schoolId === parseInt(schoolId)) {
+                    const option = document.createElement("option");
+                    option.value = item.fieldId;
+                    option.text = item.fieldName;
+                    cboField.appendChild(option);
+
+                }
+            });
+
+
+        }
+
+        function GetPromotion() {
+            const degreeId = $("#cboDegreeTab2").val();
+            const schoolId = $("#cboSchoolTab2").val();
+            const cboPromotion = document.getElementById("cboPromotionTab2");
+            cboPromotion.innerText = "";
+            const optionPro = document.createElement("option");
+            optionPro.value = -1;
+            optionPro.text = "Select Promotion";
+            optionPro.disabled = true;
+            cboPromotion.appendChild(optionPro);
+            promotions.forEach(item => {
+                if (item.degreeId === parseInt(degreeId) && item.schoolId === parseInt(schoolId)) {
+                    const option = document.createElement("option");
+                    option.value = item.promotionId;
+                    option.text = item.promotionNo;
+                    cboPromotion.appendChild(option);
+                }
+            });
+            $("#cboFieldTab2").val(-1);
+            $("#cboPromotionTab2").val(-1);
+        }
+
+        const fields = @Html.Raw(Json.Serialize(Model.Fields));
+        const promotions = @Html.Raw(Json.Serialize(Model.Promotions));
+        const stages = @Html.Raw(Json.Serialize(Model.Stages));
+        const terms = @Html.Raw(Json.Serialize(Model.Terms));
+        const groups = @Html.Raw(Json.Serialize(Model.Groups));
+
+
+        function PromotionChange() {
+            const promotionId = $("#cboPromotionTab2").val();
+            if (!promotionId) return;
+
+            const cboStage = document.getElementById("cboStageTab2");
+            cboStage.innerText = "";
+            const option = document.createElement("option");
+            option.value = 0;
+            option.text = "All Stage";
+            cboStage.appendChild(option);
+            stages.forEach(item => {
+                if (item.promotionId === parseInt(promotionId)) {
+                    const option = document.createElement("option");
+                    option.value = item.stageId;
+                    option.text = item.stageNo;
+                    cboStage.appendChild(option);
+                }
+            });
+            $("#cboStageTab2").val(0);
+            $("#cboGroupTab2").val(0);
+        }
+
+        function StageChange() {
+            GetGroup();
+        }
+
+        function GetGroup() {
+            const stage_id = $("#cboStageTab2").val();
+            const field_id = $("#cboFieldTab2").val();
+            if (!stage_id || !field_id) return;
+
+            const cboGroup = document.getElementById("cboGroupTab2");
+            cboGroup.innerText = "";
+            const option = document.createElement("option");
+            option.value = 0;
+            option.text = "All Group";
+            cboGroup.appendChild(option);
+            groups.forEach(item => {
+                if (item.stageId === parseInt(stage_id) && item.fieldId === parseInt(field_id)) {
+                    const option = document.createElement("option");
+                    option.value = item.groupId;
+                    option.text = item.groupName;
+                    cboGroup.appendChild(option);
+                }
+            });
+            $("#cboGroupTab2").val(0);
+        }
+
+        function OnFilterTab2() {
+            const degreeid = $("#cboDegreeTab2").val();
+            const schoolid = $("#cboSchoolTab2").val();
+            const fieldid = $("#cboFieldTab2").val();
+            const proid = $("#cboPromotionTab2").val();
+            const stageno = $("#cboStageTab2 option:selected").text();
+            const groupname = $("#cboGroupTab2 option:selected").text();
+
+            console.log(stageno + " = " + groupname);
+
+            if (!degreeid || !schoolid || !fieldid || !proid) return;
+            $("#tblStudentTab2").DataTable().clear().destroy();
+            $("#tblStudentTab2").DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/QRCodeCertificate/GetStudentRequestedQRCode",
+                    type: "POST",
+                    data: function (d) {
+                        d.degreeid = degreeid;
+                        d.schoolid = schoolid;
+                        d.fieldid = fieldid;
+                        d.promotionId = proid;
+                        d.stageNo = stageno;
+                        d.groupName = groupname;
+                    }
+                },
+                columns: [
+                    {data: "studentId"},
+                    {data: "studentName"},
+                    {data: "studentNameKhmer"},
+                    {data: "sex"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            if (row.status === "REGISTER") {
+                                return ` <span class="badge badge-warning">${row.status}</span>`;
+                            } else if (row.status === "ACTIVE") {
+                                return ` <span class="badge badge-primary">${row.status}</span>`;
+                            } else if (row.status === "QUIT") {
+                                return ` <span class="badge badge-danger">${row.status}</span>`;
+                            } else {
+                                return ` <span class="badge badge-warning">${row.status}</span>`;
+                            }
+
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return ` <a class="btn btn-success btn-sm"><i class="fas fa-qrcode"></i> QR</a>
+                                        <a class="btn btn-primary btn-sm"><i class="fas fa-print"></i> Print</a>`;
+                        }
+                    },
+                ],
+            });
+        }
+    });
+
+
+</script>

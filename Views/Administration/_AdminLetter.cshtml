@@ -1,0 +1,214 @@
+@using BBU_SYSTEM.DTOs
+@model BBU_SYSTEM.ViewModel.LetterViewModel
+@{
+    var student = new StudentDto();
+    var letterCertification = new LetterCertificationDto();
+}
+<div class="modal fade" id="modalAdminLetter" tabindex="-1" role="dialog" aria-labelledby="AdminLetterModal"
+     aria-hidden="true" data-backdrop="static" data-keyboard="false" style="overflow-y: auto;">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Admin Letter</h4>
+                <button type="button" id="btnClose" class="btn btn-danger btn-sm float-right"><i
+                        class="fas fa-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-3">
+                                <label>student_id</label>
+                                <input type="hidden" class="form-control form-control-sm"
+                                       asp-for="@letterCertification.Id"
+                                       readonly/>
+                                <input type="text" class="form-control form-control-sm"
+                                       asp-for="@letterCertification.StuId"
+                                       readonly/>
+                            </div>
+                            <div class="col-4">
+                                <label>student_name_khmer</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       asp-for="@letterCertification.NameInKh"
+                                       readonly/>
+                            </div>
+                            <div class="col-5">
+                                <label>student_name</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       asp-for="@letterCertification.NameInEng"
+                                       readonly/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3">
+                                <label>dob</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       asp-for="@letterCertification.BirthDate"
+                                       readonly>
+                            </div>
+                            <div class="col-4">
+                                <label>Gender</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       asp-for="@letterCertification.Sex"
+                                       readonly/>
+                            </div>
+                            <div class="col-5">
+                                <label>phone</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       asp-for="@student.Phone"
+                                       readonly/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-3">
+                                <label>Degree</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       asp-for="@letterCertification.Degree"
+                                       readonly/>
+                            </div>
+                            <div class="col-5">
+                                <label>School</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       asp-for="@letterCertification.School"
+                                       readonly/>
+                            </div>
+                            <div class="col-2">
+                                <label>Stage</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       id="txtStage" readonly/>
+                            </div>
+                            <div class="col-2">
+                                <label>Term</label>
+                                <input type="text" class="form-control form-control-sm" id="txtTerm"
+                                       readonly/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3">
+                                <label>Promotion</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       asp-for="@letterCertification.Promotion"
+                                       readonly/>
+                            </div>
+                            <div class="col-6">
+                                <label>Field</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       asp-for="@letterCertification.Field"
+                                       readonly/>
+                            </div>
+                            <div class="col-3">
+                                <label>Group</label>
+                                <input type="text" class="form-control form-control-sm"
+                                       id="txtGroup" readonly/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <form id="formLetterCertification">
+                            <div class="row">
+                                <div class="col-1">
+                                    <label>issued_no</label>
+                                    <input type="number" asp-for="@letterCertification.IssuedNo"
+                                           class="form-control form-control-sm" readonly value="0">
+                                </div>
+                                <div class="col-4">
+                                    <label>letter_type</label>
+                                    <select class="form-control form-control-sm select2"
+                                            asp-for="@letterCertification.CategoryId">
+                                        @* <option selected="selected" disabled>Select Letter Type</option> *@
+                                    </select>
+                                </div>
+                                <div class="col-1">
+                                    <label>qty</label>
+                                    <input type="number" class="form-control form-control-sm"
+                                           asp-for="@letterCertification.Amount" min="1" value="1">
+                                </div>
+                                <div class="col-2">
+                                    <label>receive_date</label>
+                                    <input type="date" class="form-control form-control-sm"
+                                           asp-for="@letterCertification.ReceivedDate">
+                                </div>
+                                <div class="col-2">
+                                    <label>withdraw_date</label>
+                                    <input type="date" class="form-control form-control-sm"
+                                           asp-for="@letterCertification.IssuedDate">
+                                </div>
+                                <div class="col-2">
+                                    <label>taken</label>
+                                    <div class="form-group clearfix">
+                                        <div class="icheck-primary d-inline">
+                                            <input type="checkbox" id="chbTaken"
+                                                   asp-for="@letterCertification.IssuedStatus">
+                                            <label for="chbTaken"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-10">
+                                    <label>other</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                           asp-for="@letterCertification.Other" placeholder=""/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-12">
+                        <button id="btnNew" class="btn btn-primary btn-sm">New</button>
+                        <button id="btnSaveChange" class="btn btn-success btn-sm" form="frmDiscount">Save Change
+                        </button>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12" id="accordion">
+                        <div class="card card-warning card-outline">
+                            <a class="d-block w-100" data-toggle="collapse" href="#collapseFour">
+                                <div class="card-header">
+                                    <h4 class="card-title w-100">
+                                        2. History
+                                    </h4>
+                                </div>
+                            </a>
+                            <div id="collapseFour" class="collapse" data-parent="#accordion">
+                                <div class="card-body">
+                                    <div id="listPrivilege" class="card-body table-responsive p-0"
+                                         style="height: 300px">
+                                        <table id="tblLetterCertificate"
+                                               class="table table-sm table-head-fixed text-nowrap table-bordered table-striped"
+                                               style="width: 100%;">
+                                            <thead>
+                                            <tr>
+                                                <th>id</th>
+                                                <th>admin_no</th>
+                                                <th>issued_date</th>
+                                                <th>issued_no</th>
+                                                <th>received_date</th>
+                                                <th>amount</th>
+                                                <th>found_no</th>
+                                                <th>short_course_no</th>
+                                                <th>action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

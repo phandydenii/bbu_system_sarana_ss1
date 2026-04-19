@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["OpenMenu"] = "CommandTask";
+    ViewData["Action"] = "University";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">University</h3>
+                <button type="submit" class="btn btn-success btn-sm float-right" data-toggle="modal"
+                        data-target="#UniversityModal">
+                    <i class="fas fa-plus"></i>
+                    Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblUniversity" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Name Khmer</th>
+                        <th>Short Name</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_UniversityModal"/>
+
+@section Scripts{
+
+    <script>
+        const tblUniversity = $("#tblUniversity");
+        $(document).ready(function () {
+            fetchUniversity();
+        });
+
+        function fetchUniversity() {
+            tblUniversity.DataTable().clear().destroy();
+            tblUniversity.DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/University/get-universities",
+                    type: "POST"
+                },
+                columns: [
+                    {data: "universityId"},
+                    {data: "universityName"},
+                    {data: "universityNameInKhmer"},
+                    {data: "abbreviationName"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                        <a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i> Edit</a>
+                        <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
+                    `;
+                        }
+                    }
+                ]
+            });
+        }
+    </script>
+}

@@ -1,0 +1,91 @@
+﻿@model BBU_SYSTEM.ViewModel.UserViewModel
+@{
+    ViewData["OpenMenu"] = "Administration";
+    ViewData["Action"] = "AdministrationUser";
+    var users = Model.Users!;
+}
+<div class="row">
+    <div class="col-12">
+        <div class="row">
+            @foreach (var u in users)
+            {
+                <div class="col-2">
+                    <div class="card card-primary card-outline">
+                        <div class="card-body box-profile">
+                            <div class="text-center">
+                                <img class="profile-user-img img-fluid img-circle"
+                                     src="/Images/add_user.png" alt="User profile picture">
+                            </div>
+                            <h3 class="profile-username text-center">@u.UserName</h3>
+                            <p class="text-muted text-center">@u.UserGroup</p>
+                            @* <ul class="list-group list-group-unbordered mb-3">
+                                <li class="list-group-item">
+                                    <b>Followers</b> <a class="float-right">1,322</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>Friends</b> <a class="float-right">13,287</a>
+                                </li>
+                            </ul> *@
+                            <a href="#" class="btn btn-primary btn-block"><b>Manage</b></a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@* <div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">User</h3>
+            </div>
+            <div class="card-body">
+                <table id="tblAdminUser" class="table table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>User Id</th>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> *@
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+    });
+
+    function LoadData() {
+        $("#tblAdminUser").DataTable().clear().destroy();
+        $("#tblAdminUser")
+            .DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: `/user/administrationuser`,
+                    type: "POST",
+                },
+                columns: [
+                    {data: "user_id"},
+                    {data: "user_name"},
+                    {data: "password"},
+                    {data: "user_group"},
+                    {data: "status"}
+                ]
+            })
+            .buttons()
+            .container()
+            .appendTo("#example1_wrapper .col-md-6:eq(0)");
+    }
+</script>

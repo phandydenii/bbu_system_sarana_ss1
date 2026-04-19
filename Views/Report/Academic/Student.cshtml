@@ -1,0 +1,311 @@
+@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AcademicReport";
+    ViewData["Action"] = "StudentReport";
+
+    var menus = new Dictionary<string, string>
+    {
+        {"student_skill_list", "Skill Student List"},
+        {"student_all_status", "Student All Status"},
+        {"student_score_list", "Student Score List"},
+        {"student_ministry_doc", "MoEYS Student"}
+    };
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="margin" id="rangeButtons">
+            <button type="button" class="btn btn-primary btn-sm" value="student_list"><i class="fas fa-check mr-1"></i> Student List</button>
+            @foreach (var st in menus)
+            {
+                <button type="button" class="btn btn-outline-primary btn-sm" value="@st.Key">@st.Value</button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="formContainer"></div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_ModalReport"/>
+@section Scripts
+{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Term.js"></script>
+    <script src="~/function/Group.js"></script>
+    <script>
+        const cboDegree = $("#cboDegree");
+        const cboSchool = $("#cboSchool");
+        const cboField = $("#cboField");
+        const cboPromotion = $("#cboPromotion");
+        const cboStage = $("#cboStage");
+        const cboTerm = $("#cboTerm");
+        const cboGroup = $("#cboGroup");
+        const tblStudent = $("#tblStudent");
+
+
+        const formContainer = $("#formContainer");
+        const rangeButtons = $(".rangeButtons");
+        $(document).ready(async function () {
+            renterForm("student_list");
+        });
+
+        function renterForm(form) { 
+            formContainer.html("");
+            if (!form) return;
+            $(".select2").select2();
+            formContainer.load("/report-partial/academic/student/" + form, function () {
+                $(".select2").select2({
+                    width: "100%",
+                    placeholder: "Select an option"
+                });
+            });
+            
+        }
+        rangeButtons.on("click", "button", function (e) {
+            showLoading();
+            $("#rangeButtons").find("button").removeClass("btn-primary").addClass("btn-outline-primary").find("i").remove();
+            $(this).removeClass("btn-outline-primary").addClass("btn-primary");
+            $(this).prepend('<i class="fas fa-check mr-1"></i>');
+            renterForm(e.target.value);
+            hideLoading(1);
+        });
+        
+        // $(document).ready(function () {
+        //     tblStudent.DataTable();
+        //     GetDegree();
+        //     GetSchool();
+        //     GetField();
+        //     GetPromotion();
+        //     GetStage();
+        //     GetTerm();
+        //     GetGroup();
+        // });
+        
+        $("#rangeButtons").on("click", "button", function (e) {
+             $("#rangeButtons").find("button").removeClass("btn-primary").addClass("btn-outline-primary").find("i").remove();
+             $(this).removeClass("btn-outline-primary").addClass("btn-primary");
+             $(this).prepend('<i class="fas fa-check mr-1"></i>');
+            renterForm(e.target.value);
+        });
+        
+        cboDegree.change(function () {
+            GetField();
+            GetPromotion();
+            GetStage();
+            GetTerm();
+            GetGroup();
+        });
+
+        cboSchool.change(function () {
+            GetField();
+            GetPromotion();
+        });
+
+        cboPromotion.change(function () {
+            GetStage();
+            GetTerm();
+            GetGroup();
+        });
+        cboStage.change(function () {
+            GetTerm();
+            GetGroup();
+        });
+        cboTerm.change(function () {
+            GetGroup();
+        });
+
+        async function GetDegree() {
+            cboDegree.empty();
+            cboDegree.append(`<option value='' disabled>Select Degree</option>`);
+            const degrees = await Degree.GetAllDegree();
+            degrees.forEach(item => {
+                cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
+            });
+            cboDegree.val('').trigger("change");
+        }
+
+        async function GetSchool() {
+            cboSchool.empty();
+            cboSchool.append("<option value='' disabled>Select School</option>");
+            const schools = await School.GetSchool()
+            schools.forEach(function (item) {
+                cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
+            });
+            cboSchool.val('').trigger("change");
+        }
+
+
+        async function GetField() {
+            const degreeId = parseInt(cboDegree.val());
+            const schoolId = parseInt(cboSchool.val());
+            cboField.empty();
+            cboField.append("<option value='' disabled>Select Field</option>");
+            if (!degreeId || !schoolId) {
+                cboField.val('');
+                return;
+            }
+
+            const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
+            fields.forEach(item => {
+                cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
+            });
+            cboField.val('').trigger("change");
+        }
+
+        async function GetPromotion() {
+            const degreeId = cboDegree.val();
+            const schoolId = cboSchool.val();
+            cboPromotion.empty();
+            cboPromotion.append("<option value='' disabled>Select Promotion</option>");
+            if (!degreeId || !schoolId) {
+                cboPromotion.val('');
+                return;
+            }
+            const promotions = await Promotion.GetPromotions();
+            let hasPromotion = false;
+            promotions.forEach(item => {
+                if (item.degree === parseInt(degreeId) && item.school === parseInt(schoolId)) {
+                    cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`);
+                    hasPromotion = true;
+                }
+            });
+            if (!hasPromotion) {
+                cboPromotion.empty();
+                cboPromotion.append("<option value='' disabled>No promotion available</option>");
+            }
+            cboPromotion.val('').trigger("change");
+        }
+
+        async function GetStage() {
+            const promotionId = cboPromotion.val();
+            cboStage.empty();
+            cboStage.append("<option value='' disabled>Select Stage</option>");
+            if (!promotionId) {
+                cboPromotion.val('');
+                return;
+            }
+            const stages = await Stage.GetStages();
+            stages.forEach(item => {
+                if (item.promotionId === parseInt(promotionId)) {
+                    cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
+                }
+            });
+            cboStage.val('').trigger("change");
+        }
+
+        async function GetTerm() {
+            const stageId = cboStage.val();
+            cboTerm.empty();
+            cboTerm.append("<option value='' disabled>Select Term</option>");
+            if (!stageId) {
+                cboTerm.val('');
+                return;
+            }
+            const terms = await Term.GetTerms();
+            terms.forEach(item => {
+                if (item.stageId === parseInt(stageId)) {
+                    cboTerm.append(`<option value='${item.termNo}'>${item.termNo}</option>`);
+                }
+            });
+            cboTerm.val('').trigger("change");
+        }
+
+        async function GetGroup() {
+            const stageId = cboStage.val();
+            const fieldId = cboField.val();
+
+            cboGroup.empty();
+            cboGroup.append("<option value='' disabled>Select Group</option>");
+            if (!stageId || !fieldId) {
+                cboGroup.val('');
+                return;
+            }
+            const groups = await Group.GetGroups();
+            groups.forEach(item => {
+                if (item.stageId === parseInt(stageId) && item.fieldId === parseInt(fieldId)) {
+                    cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
+                }
+            });
+            cboGroup.val('').trigger("change");
+        }
+        
+        function OnFilter(){
+            showLoading();
+            const term_no = cboTerm.find('option:selected').text();
+            const group_id = cboGroup.val();
+            if (!group_id || !term_no) return;
+            tblStudent.DataTable().clear().destroy(); 
+            tblStudent.DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                ajax: {
+                    url: `/student/GetStudents`,
+                    type: "POST",
+                    data: {
+                        groupid: group_id,
+                        termno: term_no
+                    },
+                },
+                columns: [
+                    {data: "studentId"},
+                    {data: "studentName"},
+                    {data: "sex"},
+                    {
+                        data: "dateOfBirth",
+                        render: function (data, type, row) {
+                            return `${formatDate(data)}`
+                        }
+                    },
+                    {data: "documentin"},
+                    {data: "documentout"},
+                    {data: "authenticated_no"},
+                    {
+                        data: "status",
+                        render: function (data, type, row) {
+                            return data
+                        }
+                    }
+                ]
+            });
+            hideLoading(1);
+        }
+        function Print() {
+            $.ajax({
+                url: '/Report/Print',
+                type: 'POST',
+                data: { groupId: 2, termNo: 2 }, // example parameters
+                xhrFields: {
+                    responseType: 'blob' // important for PDF
+                },
+                success: function (blob) {
+                    // const url = URL.createObjectURL(blob);
+                    // const iframe = document.getElementById("printFrame");
+                    //
+                    // iframe.src = url;
+                    //
+                    // iframe.onload = function () {
+                    //     $("#reportLoading").hide(); // ✅ hide loading
+                    //     iframe.contentWindow.focus();
+                    //     iframe.contentWindow.print();
+                    //
+                    //     setTimeout(() => URL.revokeObjectURL(url), 1000);
+                    // };
+                    // Create a URL for the blob
+                    const url = window.URL.createObjectURL(blob);
+                    // Open PDF in new tab
+                    window.open(url, '_blank');
+                },
+                error: function (err) {
+                    console.error(err);
+                }
+            });
+        };
+    </script>
+}

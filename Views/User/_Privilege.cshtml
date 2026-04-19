@@ -1,0 +1,44 @@
+@using BBU_SYSTEM.DTOs
+@{
+    var privilege = new PrivilegeDto(); 
+}
+<div class="modal fade" id="modelPrivilege" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Privilege</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formPrivilege">
+                    <input asp-for="@privilege.PrivilegeId" hidden readonly class="form-control" value="0"/>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="required">Name</label>
+                                <input type="text" asp-for="@privilege.PrivilegeName" class="form-control"
+                                       placeholder="Enter name" pattern="^\S+$" title="Spaces are not allowed">
+                                <p class="text-warning"><i class="fas fa-warning"></i> Space not allow</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="required">Privilege Group</label> 
+                                <select class="form-control select2" asp-for="@privilege.PrivilegeGroupId">
+                                    @* <option value="Administration Task">Administration Task</option>  *@
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form> 
+            </div>
+            <div class="modal-footer float-right">
+                <button type="submit" id="btnSubmit" form="formPrivilege" class="btn btn-primary"><i class="fas fa-save"></i> Save changes
+                </button>
+                <button type="button" id="btnClose" class="btn btn-danger"><i class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

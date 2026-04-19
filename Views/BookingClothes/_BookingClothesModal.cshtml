@@ -1,0 +1,90 @@
+@{
+    var booking = new Booking();
+}
+<div class="modal fade" id="BookingClothesModal" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Payment Detail</h4>
+                <button id="btnSelectItem" type="button" class="btn btn-primary btn-sm float-right"><i
+                        class="fa-solid fa-sitemap"></i> Select
+                    Item
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="PaymentForm" asp-action="CreatePayment" asp-controller="Invoice">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-3">
+                                    <label>total_khr</label>
+                                    <input type="number" class="form-control edit-mode" readonly value="0"/>
+                                </div>
+                                <div class="col-3">
+                                    <label>discount_khr</label>
+                                    <input type="number" class="form-control edit-mode" value="0">
+                                </div>
+                                <div class="col-3">
+                                    <label>total_pay_khr</label>
+                                    <input type="number" class="form-control edit-mode" readonly value="0"/>
+                                </div>
+                                <div class="col-3">
+                                    <label>pay_khr</label>
+                                    <input type="number" class="form-control edit-mode" value="0">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <label>total_usd</label>
+                                    <input type="number" class="form-control edit-mode" readonly value="0"/>
+                                </div>
+                                <div class="col-3">
+                                    <label>discount_usd</label>
+                                    <input type="number" class="form-control edit-mode" value="0">
+                                </div>
+                                <div class="col-3">
+                                    <label>total_pay_usd</label>
+                                    <input type="number" class="form-control edit-mode" readonly value="0"/>
+                                </div>
+                                <div class="col-3">
+                                    <label>pay_usd</label>
+                                    <input type="number" class="form-control edit-mode" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <table id="tblBookingDetail" class="table table-bordered table-striped"
+                                   style="width: 100%;">
+                                <thead>
+                                <tr>
+                                    <th>id</th>
+                                    <th>itemid</th>
+                                    <th>name</th>
+                                    <th>qty</th>
+                                    <th>price</th>
+                                    <th>amount</th>
+                                    <th>action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success float-right" id="btnSavePayment"><i
+                        class="fas fa-save"></i> Save Payment
+                </button>
+                <button type="button" id="btnCloseBooking" class="btn btn-danger float-right"><i
+                        class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="_ItemModal"/>

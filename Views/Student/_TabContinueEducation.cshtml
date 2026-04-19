@@ -1,0 +1,35 @@
+﻿@using BBU_SYSTEM.DTOs
+@using Student = BBU_SYSTEM.Modelsss.Student
+@{
+    var student = new StudentDto();
+}
+<div class="form-group row">
+    <label class="col-sm-1 col-form-label">Term</label>
+    <div class="col-sm-2">
+        <select class="custom-select" asp-for="@student.CheckCompleteTerm" disabled="disabled">
+            <option value="" disabled="disabled" selected="selected">Select</option>
+            <option value="1">Term 1</option>
+            <option value="2">Term 2</option>
+            <option value="3">Term 3</option>
+            <option value="4">Term 4</option>
+            <option value="5">Term 5</option>
+            <option value="6">Term 6</option>
+            <option value="7">Term 7</option>
+            <option value="8">Term 8</option>
+            <option value="9">Term 9</option>
+            <option value="10">Term 10</option>
+        </select>
+    </div>
+    <div class="col-sm-4">
+        <div class="form-group">
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="customSwitch1" asp-for="@student.CheckComplete" readonly="readonly">
+                <label class="custom-control-label" for="customSwitch1">Student not yet complete</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<label>CheckCompleteNote</label>
+<textarea type="text" class="form-control" asp-for="@student.CheckCompleteNote" rows="5" readonly="readonly"></textarea>

@@ -1,0 +1,319 @@
+﻿@using BBU_SYSTEM.DTOs 
+@{
+    ViewData["OpenMenu"] = "CommandTask";
+    ViewData["Action"] = "FieldCertificate";
+    var fieldCertificate = new FieldCertificateDto();
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Field Certificate</h3>
+                <button type="button" id="btnAddFieldCertificate" class="btn btn-primary float-right"><i
+                        class="fas fa-plus"></i> Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblFieldCertificate" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        @* <th>Id</th> *@ 
+                        <th>Degree</th>
+                        <th>Degree Khmer</th> 
+                        <th>type</th>
+                        <th>Field</th>
+                        <th>type_kh</th>
+                        <th>Field Khmer</th>
+                        <th>Promotion</th> 
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_FieldCertificateModal"/>
+
+<script src="~/function/FieldCertificate.js"></script>
+
+@section Scripts
+{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Term.js"></script>
+    <script src="~/function/Group.js"></script>
+    <script>
+        const inputName = "fieldCertificate_";
+        const cboDegree = $(`#${inputName}DegreeId`);
+        const cboSchool = $(`#${inputName}SchoolId`);
+        const cboField = $(`#${inputName}FieldId`);
+        const cboPromotion = $(`#${inputName}PromotionNo`);
+        const txtDegreeName = $(`#${inputName}DegreeName`);
+        const txtDegreeNameKhmer = $(`#${inputName}DegreeNameKhmer`);
+        const txtFieldName = $(`#${inputName}FieldName`);
+        const txtFieldNameKhmer = $(`#${inputName}FieldNameKhmer`);
+        const tblFieldCertificate = $("#tblFieldCertificate");
+        const formFieldCertificate = $("#formFieldCertificate");
+        const fieldCertificateModal =$("#fieldCertificateModal");
+        const rdoAcademic = $("#rdoAcademic");
+        const rdoProffesional = $("#rdoProffesional");
+        let fieldList = [], degreeList = [];
+        $(document).ready(async function () {
+            fetchFieldCertificate();
+            // await GetDegree();
+            // await GetSchool();
+        });
+
+        async function GetDegree() { 
+            cboDegree.empty();
+            cboDegree.append(`<option value='' disabled>Select Degree</option>`);
+            const degrees = await Degree.GetAllDegree();
+            degreeList = degrees;
+            degrees.forEach(item => {
+                cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
+            });
+            cboDegree.val('').trigger("change");
+        }
+
+        async function GetSchool() { 
+            cboSchool.empty();
+            cboSchool.append("<option value='' disabled>Select School</option>");
+            const schools = await School.GetSchool()
+            schools.forEach(function (item) {
+                cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
+            });
+            cboSchool.val('').trigger("change");
+        }
+
+        function fetchFieldCertificate() {
+            tblFieldCertificate.DataTable().clear().destroy();
+            tblFieldCertificate.DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: `/field-certificate/get-field-certificates`,
+                    type: "POST",
+                    dataType: "json",
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                },
+                columns: [
+                    {data: "degreeName"},
+                    {data: "degreeNameKhmer"},
+                    {data: "type"},
+                    {data: "fieldName"},
+                    {data: "typeKhmer"},
+                    {data: "fieldNameKhmer"},
+                    {data: "promotionNo"}, 
+                    {
+                        data: null,
+                        render: function (data, type, row) { 
+                            return `<a id="btnEdit" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>`;
+                        }
+                    }
+                ]
+            })
+        }
+        
+        document.getElementById("btnAddFieldCertificate").addEventListener("click",async function () {
+            showLoading();
+            fieldCertificateModal.find(".modal-title").text("Add New");
+            formFieldCertificate[0].reset();
+            await GetDegree();
+            await GetSchool();
+            fieldCertificateModal.modal("show");
+            hideLoading(1);
+        });
+
+        tblFieldCertificate.on("click","", function (event) {
+            fieldCertificateModal.find(".modal-title").text("Update");
+            fieldCertificateModal.modal("show");
+        })
+        document.getElementById("btnClose").addEventListener("click", function () {
+            formFieldCertificate[0].reset();
+            fieldCertificateModal.modal("hide");
+        });
+        
+        cboDegree.on("change", function () {
+            GetField();
+            GetPromotion();
+        });
+        
+        cboSchool.on("change", function () {
+            GetField();
+            GetPromotion();
+        });
+
+        async function GetField() {
+            const degreeId = parseInt(cboDegree.val());
+            const schoolId = parseInt(cboSchool.val());
+            cboField.empty();
+            cboField.append("<option value='' disabled>Select Field</option>");
+            if (!degreeId || !schoolId) {
+                cboField.val('');
+                return;
+            }
+
+            const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
+            fieldList = fields;
+            fields.forEach(item => {
+                cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
+            });
+            cboField.val('').trigger("change");
+        }
+
+        async function GetPromotion() {
+            const degreeId = cboDegree.val();
+            const schoolId = cboSchool.val();
+            cboPromotion.empty();
+            cboPromotion.append("<option value='' disabled>Select Promotion</option>");
+            if (!degreeId || !schoolId) {
+                cboPromotion.val('');
+                return;
+            }
+            const promotions = await Promotion.GetPromotions();
+            let hasPromotion = false;
+            promotions.forEach(item => {
+                if (item.degree === parseInt(degreeId) && item.school === parseInt(schoolId)) {
+                    cboPromotion.append(`<option value='${item.promotionNo}'>${item.promotionNo}</option>`);
+                    hasPromotion = true;
+                }
+            });
+            if (!hasPromotion) {
+                cboPromotion.empty();
+                cboPromotion.append("<option value='' disabled>No promotion available</option>");
+            }
+            cboPromotion.val('').trigger("change");
+        }
+        cboField.on("change", function (e) {
+            if (e.target.value !== "") {
+                setField();
+            }
+        })
+        
+        function setField() {
+            const degree = degreeList.find(item => item.degreeId === parseInt(cboDegree.val()));
+            const field = fieldList.find(item => item.fieldId === parseInt(cboField.val()));
+            // console.log(degree);
+            // console.log(field);
+            txtDegreeName.val(`${degree.degreeName} of ${field.degreeName}`);
+            txtDegreeNameKhmer.val(`${degree.degreeInKhmer}${field.degreeNameInKhmer}`);
+
+            if(rdoAcademic === true){
+                txtFieldName.val(`${field.fieldName}`);
+                txtFieldNameKhmer.val(`${field.fieldNameInKhmer}`);
+
+                $("#fieldCertificate_Type").val("in");
+                $("#fieldCertificate_TypeKhmer").val(`${field.type ? "ជំនាញ" : "ឯកទេស"}`);
+            }else{
+                txtFieldName.val("");
+                txtFieldNameKhmer.val("");
+
+                $("#fieldCertificate_Type").val("");
+                $("#fieldCertificate_TypeKhmer").val("");
+            }
+        }
+
+        formFieldCertificate.on("submit", function (event) {
+            event.preventDefault();
+            const form = $(this);
+            const formData = form.serialize();
+            $.ajax({
+                url: '/Field/field-certificate/save-change',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.status.code === "200") {
+                        ShowToastSuccess("Saved successfully!");
+                        formFieldCertificate[0].reset();
+                        fieldCertificateModal.modal("hide");
+                        tblFieldCertificate.DataTable().ajax.reload();
+                    } else {
+                        ShowToastError(response.message);
+                    }
+                },
+                error: function (error) {
+                    ShowToastError(error.responseText);
+                    console.log(error.responseText);
+                }
+            });
+        });
+        
+        tblFieldCertificate.on("click","#btnEdit",async function (event) {
+            showLoading();
+            event.preventDefault();
+            const $row = $(this).closest("tr");
+            const data = tblFieldCertificate.DataTable().row($row).data();
+            console.log(data);
+            await GetDegree();
+            await GetSchool();
+            
+            cboDegree.val(data.degreeId).trigger("change");
+            cboSchool.val(data.schoolId).trigger("change");
+         
+            await GetField();
+            await GetPromotion();
+            
+            $("#fieldCertificate_Id").val(data.id);
+            cboField.val(data.fieldId).trigger("change");
+            cboPromotion.val(data.promotionNo).trigger("change");
+            
+            txtDegreeName.val(data.degreeName);
+            txtDegreeNameKhmer.val(data.degreeNameKhmer);
+            
+            if(data.fieldName !== "" && data.fieldName !== null) {
+                $("#rdoAcademic").prop("checked", true);
+                $("#groupOfField").removeAttr("hidden");
+
+                txtFieldName.val(data.fieldName);
+                txtFieldNameKhmer.val(data.fieldNameKhmer);
+
+                $("#fieldCertificate_Type").val(data.type);
+                $("#fieldCertificate_TypeKhmer").val(data.typeKhmer);
+            }else{
+                $("#rdoProffesional").prop("checked", true);
+                $("#groupOfField").prop("hidden", "hidden");
+
+                txtFieldName.val("");
+                txtFieldNameKhmer.val("");
+
+                $("#fieldCertificate_Type").val("");
+                $("#fieldCertificate_TypeKhmer").val("");
+            }
+            hideLoading(1);
+        });
+        
+        rdoProffesional.on("change", function (e) {
+            $("#groupOfField").prop("hidden", "hidden");
+            $("#fieldCertificate_Type").removeAttr("required");
+            $("#fieldCertificate_TypeKhmer").removeAttr("required");
+            $("#fieldCertificate_FieldName").removeAttr("required");
+            $("#fieldCertificate_FieldNameKhmer").removeAttr("required");
+            setField();
+        });
+        rdoAcademic.on("change", function (e) {
+            $("#groupOfField").removeAttr("hidden");
+            $("#fieldCertificate_Type").prop("required", "required");
+            $("#fieldCertificate_TypeKhmer").prop("required", "required");
+            $("#fieldCertificate_FieldName").prop("required", "required");
+            $("#fieldCertificate_FieldNameKhmer").prop("required", "required");
+            setField();
+        });
+    </script>
+}
+

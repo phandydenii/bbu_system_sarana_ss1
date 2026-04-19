@@ -1,0 +1,38 @@
+﻿@using BBU_SYSTEM.Models.Req
+@model BBU_SYSTEM.ViewModel.RegisryDetailViewModel
+@{
+    var registryReq = new RegistryReq();
+    var sf = new StudentCertificate();
+}
+<div class="row">
+    <div class="col-md-12">
+        <table id="tblCertificate"
+               class="table table-sm table-bordered table-striped"
+               style="width: 100%;"
+               >
+            <thead>
+            <tr>
+                <th class="hide-col">id</th>
+                <th>certificate</th>
+                <th>cert_grade</th>
+                <th>Issue No</th>
+                <th>is_receive</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="5" class="text-end">
+                    <button type="button"
+                            id="btnAddCertificate"
+                            class="btn btn-outline-info btn-sm btn-block">
+                        <i class="fa fa-plus"></i> Add Certificate
+                    </button>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,151 @@
+@{
+    ViewData["OpenMenu"] = "CommandTask";
+    ViewData["Action"] = "Degree";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Degree</h3>
+                <button type="submit" class="btn btn-success btn-sm float-right" data-toggle="modal"
+                        data-target="#DegreeModal">
+                    <i class="fas fa-plus"></i>
+                    Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblDegree" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Name Khmer</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_ValidationScriptsPartial"/>
+<partial name="_DegreeModal"/>
+
+@section Scripts
+{
+    <script src="~/function/Degree.js"></script>
+    <script>
+        const tblDegree = $("#tblDegree");
+        const degreeModal = $("#DegreeModal");
+        const btnClose = $("#btnClose");
+
+        $(document).ready(async function () {
+            fetchDegree();
+        });
+
+        function fetchDegree() {
+            tblDegree.DataTable().clear().destroy();
+            tblDegree.DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/degree/get-degrees",
+                    type: "POST",
+                },
+                columns: [
+                    {data: "degreeId"},
+                    {data: "degreeName"},
+                    {data: "degreeInKhmer"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                        <a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i> Edit</a>
+                        <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
+                    `;
+                        }
+                    }
+                ]
+            });
+        }
+
+        tblDegree.on('click', '#btnEdit', function () {
+            const $row = $(this).closest('tr');
+            const selectedRow = tblDegree.DataTable().row($row).data();
+            console.log(selectedRow);
+            const degree = new Degree(selectedRow);
+            console.log(degree.degreeInKhmer);
+            $("#degree_DegreeId").val(degree.degreeId);
+            $("#degree_DegreeName").val(degree.degreeName);
+            $("#degree_DegreeInKhmer").val(degree.degreeInKhmer);
+            $("#DegreeModal").modal("show");
+        })
+
+        tblDegree.on("click", "#btnDelete", function () {
+            const $row = $(this).closest('tr');
+            const selectedRow = tblDegree.DataTable().row($row).data();
+            if (!confirm('Are you sure you want to delete this degree?')) return;
+            $.ajax({
+                url: '/degree/delete/' + selectedRow.degreeId,
+                method: 'DELETE',
+                success: function (response) {
+                    if (response.code === "200") {
+                        ShowToastSuccess("Delete successfully!");
+                        $("#tblDegree").DataTable().ajax.reload();
+                    } else {
+                        ShowToastError(response.message);
+                    }
+                },
+                error: function (error) {
+                    if (error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    }
+                }
+            });
+        });
+
+        document.getElementById("degreeForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const form = $(this);
+            const formData = form.serialize();
+            $("#degree_id").val();
+            $.ajax({
+                url: '/Degree/SaveChange',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.code === "200") {
+                        ShowToastSuccess("Saved successfully!");
+                        $('#degreeForm')[0].reset();
+                        $("#DegreeModal").modal("hide");
+                        $("#tblDegree").DataTable().ajax.reload();
+                    } else {
+                        ShowToastError(response.message);
+                    }
+                },
+                error: function (error) {
+                    if (error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    }
+                }
+            });
+        });
+
+        btnClose.on('click', function () {
+            $('#degreeForm')[0].reset();
+            $("#DegreeModal").modal("hide");
+            $("#tblDegree").DataTable().ajax.reload();
+        })
+    </script>
+}

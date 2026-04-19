@@ -1,0 +1,93 @@
+@using BBU_SYSTEM.DTOs
+@{
+    var summaryReport = new SummaryReportDto();
+}
+<div class="modal fade" id="modalChartReport" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Chart Report</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formChartReport">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="@summaryReport.Id" hidden readonly class="form-control" value="0"/>
+                    <div class="row">
+                        <div class="col-10">
+                            <div class="form-group">
+                                <label class="required">Title</label>
+                                <input type="text" asp-for="@summaryReport.TitleEng" class="form-control" required="required">
+                                <span asp-validation-for="@summaryReport.TitleEng" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label>Order</label>
+                                <input type="number" asp-for="@summaryReport.Ordering" class="form-control"
+                                       placeholder="Enter name" required="required">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-10">
+                            <div class="form-group">
+                                <label class="required">Title Khmer</label>
+                                <input type="text" asp-for="@summaryReport.TitleKm" class="form-control" required="required">
+                                <span asp-validation-for="@summaryReport.TitleKm" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label>Chart Type</label>
+                                <select class="custom-select" asp-for="@summaryReport.ChartType">
+                                    <option value="bar">Bar</option>
+                                    <option value="line">Line</option>
+                                    <option value="pie">Pie</option>
+                                    <option value="doughnut">Doughnut</option>
+                                    <option value="radar">Radar</option>
+                                    <option value="polarArea">Polar Area</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>Description (Optional)</label>
+                                <input type="text" asp-for="@summaryReport.Description" class="form-control"
+                                       placeholder="Enter name khmer">
+                                <span asp-validation-for="@summaryReport.Description" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="required">Query</label>
+                                <textarea type="text" asp-for="@summaryReport.Query" class="form-control"
+                                  placeholder="Enter name khmer" rows="10" required="required"></textarea>
+                                <span asp-validation-for="@summaryReport.Query" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="chbShow" asp-for="@summaryReport.Show">
+                                    <label class="custom-control-label" for="chbShow">Show</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="formChartReport" id="btnSave" class="btn btn-primary float-right"><i class="fas fa-save"></i> Save changes
+                </button>
+                <button type="button" class="btn btn-danger float-right" id="btnClose"><i class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

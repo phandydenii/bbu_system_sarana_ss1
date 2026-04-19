@@ -1,0 +1,341 @@
+﻿@model BBU_SYSTEM.ViewModel.RegistryViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                @*<h3 class="card-title">Registry</h3>*@
+                <div class="row">
+                    <div class="form-group">
+                        <label>From Date:</label>
+                        <input type="date" id="dtpFrom" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>To Date:</label>
+                        <input type="date" id="dtpTo" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>#</label>
+                        <button onclick="OnSearch()" class="btn form-control btn-success">Search</button>
+                    </div>
+                    <div class="form-group">
+                        <label>#</label>
+                        <button class="btn form-control btn-primary" data-toggle="modal"
+                                data-target="#RegistryModal">New Register
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="tblRegistry" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>Student Id</th>
+                        <th>Name English</th>
+                        <th>Name Khmer</th>
+                        <th>Gender</th>
+                        <th>DOB</th>
+                        <th>Registry Date</th>
+                        <th>Degree</th>
+                        <th>School</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_ValidationScriptsPartial"/>
+<partial name="_RegistryModal"/>
+<script>
+    let rowCert = @Model.StudentCertificates!.Count;
+    let rowSh = @Model.Schoolarships!.Count;
+    $(document).ready(function () {
+        fetchStudent();
+        $("#tblRegistry").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#tblRegistry_wrapper .col-md-6:eq(0)');
+    });
+    $(function () {
+        $("#tblRegistry").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#tblRegistry_wrapper .col-md-6:eq(0)');
+    });
+
+    function fetchStudent() {
+        $("#tblRegistry").DataTable().clear().destroy();
+        $("#tblRegistry").DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            ajax: {
+                url: "/Administration/GetStudentRegistryList",
+                type: "POST",
+                data: function (d) {
+                    d.from = $('#dtpFrom').val();
+                    d.to = $('#dtpTo').val();
+                }
+            },
+            columns: [
+                {data: "student_id"},
+                {data: "student_name"},
+                {data: "student_name_in_khmer"},
+                {data: "sex"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const dt = formatDate(row.date_of_birth);
+                        return `${dt}`
+                    }
+                },
+                {data: "registration_date"},
+                {data: "degree"},
+                {data: "school_name"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+
+                        return `
+                                                                <div class="input-group-prepend">
+                                                                    <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+                                                                        Action
+                                                                    </button>
+                                                                    <div class="dropdown-menu" style="min-width: 8rem;">
+                                                                        <div class="col-md-12">
+                                                                            <a href="/details/${row.student_id}" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0rem">Edit</a>
+                                                                            <a href="/academic/details?student_id=${row.student_id}" class="btn btn-warning btn-sm" style="display: block;margin:.2rem 0rem">View</a>
+                                                                            <a class="btn btn-danger btn-sm" style="display: block;margin:.2rem 0rem">Delete</a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                `;
+                    }
+                }
+            ]
+        });
+    }
+
+
+    function OnSearch() {
+        fetchStudent();
+    }
+
+
+    document.getElementById('addRowCertificate').addEventListener('click', function () {
+        const tableBody = document.querySelector('#tblCertificate tbody');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+                                                <td>
+                                                    <input class="form-control form-control-sm" />
+                                                </td>
+                                                <td>
+                                                    <input class="form-control form-control-sm" />
+                                                </td>
+                                                <td>
+                                                    <input class="form-control form-control-sm" />
+                                                </td>
+                                                <td>
+                                                    <input class="form-control form-control-sm" />
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-sm btn-danger removeRowCertificate">Remove</button>
+                                                </td>
+                                            `;
+
+        tableBody.appendChild(row);
+        rowCert++;
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target && e.target.classList.contains('removeRowCertificate')) {
+            e.target.closest('tr').remove();
+        }
+    });
+
+
+    document.getElementById('addRowSchoolarship').addEventListener('click', function () {
+
+        const tableBody = document.querySelector('#tblSchoolarship tbody');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+                                                        <td>
+                                                            <input class="form-control form-control-sm" />
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control form-control-sm" />
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control form-control-sm" />
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-control form-control-sm" />
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-danger removeRowSchoolarship">Remove</button>
+                                                        </td>
+                                                    `;
+
+        tableBody.appendChild(row);
+        rowSh++;
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target && e.target.classList.contains('removeRowSchoolarship')) {
+            e.target.closest('tr').remove();
+        }
+    });
+
+
+    function OnClose() {
+        for (let i = 0; i <= @Model.StudentCertificates.Count; i++) {
+            console.log(i);
+        }
+
+    }
+
+    //document.getElementById("cboDegree").addEventListener('change', function (e) {
+    //    alert(e.target.value);
+    //});
+    function DegreeChange() {
+        $("#cboSchool").val(-1);
+    }
+
+    const fields = @Html.Raw(Json.Serialize(Model.Fields));
+    const promotions = @Html.Raw(Json.Serialize(Model.Promotions));
+    const stages = @Html.Raw(Json.Serialize(Model.Stages));
+    const terms = @Html.Raw(Json.Serialize(Model.Terms));
+    const groups = @Html.Raw(Json.Serialize(Model.Groups));
+
+    function SchoolChange() {
+        const degree_id = $("#cboDegree").val();
+        const school_id = $("#cboSchool").val();
+        //alert(degree_id + school_id);
+        if (!degree_id || !school_id) return;
+
+        const cboField = document.getElementById("cboField");
+        cboField.innerText = "";
+        const optionField = document.createElement("option");
+        optionField.value = -1;
+        optionField.text = "Select Field";
+        optionField.disabled = true;
+        cboField.appendChild(optionField);
+        fields.forEach(item => {
+            if (item.degree_id == degree_id && item.school_id == school_id) {
+                const option = document.createElement("option");
+                option.value = item.field_id;
+                option.text = item.field_name;
+                cboField.appendChild(option);
+            }
+        });
+
+        const cboProgram = document.getElementById("cboProgram");
+        cboProgram.innerText = "";
+        const optionProgram = document.createElement("option");
+        optionProgram.value = -1;
+        optionProgram.text = "Select Program";
+        optionProgram.disabled = true;
+        cboProgram.appendChild(optionProgram);
+        fields.forEach(item => {
+            if (item.degree_id == degree_id && item.school_id == school_id) {
+                const option = document.createElement("option");
+                option.value = item.degree_id;
+                option.text = item.degree_name;
+                cboProgram.appendChild(option);
+            }
+        });
+
+        const cboPromotion = document.getElementById("cboPromotion");
+        cboPromotion.innerText = "";
+        const optionPro = document.createElement("option");
+        optionPro.value = -1;
+        optionPro.text = "Select Promotion";
+        optionPro.disabled = true;
+        cboPromotion.appendChild(optionPro);
+        promotions.forEach(item => {
+            if (item.degree_id == degree_id && item.school_id == school_id) {
+                const option = document.createElement("option");
+                option.value = item.promotion_id;
+                option.text = item.promotion_no;
+                cboPromotion.appendChild(option);
+            }
+        });
+        $("#cboField").val(-1);
+        $("#cboPromotion").val(-1);
+        $("#cboProgram").val(-1);
+    }
+
+    function PromotionChange() {
+        const promotion_id = $("#cboPromotion").val();
+        if (!promotion_id) return;
+
+        const cboStage = document.getElementById("cboStage");
+        cboStage.innerText = "";
+        const option = document.createElement("option");
+        option.value = -1;
+        option.text = "Select Stage";
+        option.disabled = true;
+        cboStage.appendChild(option);
+        stages.forEach(item => {
+            if (item.promotion_id == promotion_id) {
+                const option = document.createElement("option");
+                option.value = item.stage_id;
+                option.text = item.stage_no;
+                cboStage.appendChild(option);
+            }
+        });
+        $("#cboStage").val(-1);
+        $("#cboGroup").val(-1);
+    }
+
+    function StageChange() {
+        const stage_id = $("#cboStage").val();
+        if (!stage_id) return;
+        const cboTerm = document.getElementById("cboTerm");
+        cboTerm.innerText = "";
+        const option = document.createElement("option");
+        option.value = -1;
+        option.text = "Select Term";
+        option.disabled = true;
+        cboTerm.appendChild(option);
+        terms.forEach(item => {
+            if (item.stage_id == stage_id) {
+                const option = document.createElement("option");
+                option.value = item.term_id;
+                option.text = item.term_no;
+                cboTerm.appendChild(option);
+            }
+        });
+        $("#cboTerm").val(-1);
+    }
+
+    function TermChange() {
+        const stage_id = $("#cboStage").val();
+        const field_id = $("#cboField").val();
+        if (!stage_id || !field_id) return;
+
+        const cboGroup = document.getElementById("cboGroup");
+        cboGroup.innerText = "";
+        const option = document.createElement("option");
+        option.value = -1;
+        option.text = "Select Group";
+        option.disabled = true;
+        cboGroup.appendChild(option);
+        groups.forEach(item => {
+            if (item.stage_id == stage_id && item.field_id == field_id) {
+                const option = document.createElement("option");
+                option.value = item.group_id;
+                option.text = item.group_name;
+                cboGroup.appendChild(option);
+            }
+        });
+        $("#cboGroup").val(-1);
+    }
+</script>

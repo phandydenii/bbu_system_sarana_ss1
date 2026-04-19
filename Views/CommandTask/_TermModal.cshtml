@@ -1,0 +1,62 @@
+﻿@* @model dynamic *@
+@{
+    var term = new BBU_SYSTEM.DTOs.TermDto();
+}
+<div class="modal fade" id="modalTerm" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Term</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formTerm" aria-hidden="true">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>Term No</label>
+                                <input type="hidden" asp-for="@term.StageId">
+                                <input type="hidden" asp-for="@term.TermId">
+                                <input type="number" asp-for="@term.TermNo" class="form-control" readonly
+                                       style="text-align: center" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Academic Year Start</label>
+                                <input type="number" asp-for="@term.AcademicYearStart" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Academic Year End</label>
+                                <input type="number" asp-for="@term.AcademicYearEnd" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="date" asp-for="@term.StartDate" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="date" asp-for="@term.EndDate" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btnSubmit" type="submit" class="btn btn-success float-right" form="termForm"><i
+                        class="fa-solid fa-download"></i> Save
+                </button>
+                <a id="CloseTerm" class="btn btn-danger float-right"><i class="fa-solid fa-xmark"></i> Close</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,848 @@
+﻿@using BBU_SYSTEM.Helper;
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+@{
+    var username = User.Identity?.Name;
+    var menuItem = new Menu();
+    var currentController = ViewData["Controller"] as string;
+    var currentAction = ViewData["Action"] as string;
+    var activeAction = ViewData["ActiveAction"] as string;
+    var userPriviledge = @User.FindAll("Privilege").ToList();
+}
+<style>
+    .layout-navbar-fixed.layout-fixed .wrapper .sidebar {
+        margin-top: 0;
+    }
+</style>
+<aside class="main-sidebar sidebar-light-primary elevation-4 ">
+    <!-- Brand Logo -->
+    <img src="~/Images/logo.png" alt="/AdminLTE Logo" class="brand-image"
+         style="width: 100%;background-color: #18196c !important;"/>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="~/Images/add_user.png" class="img-circle elevation-2" alt="User Image"
+                     style="background-color: white;"/>
+            </div>
+            <div class="info">
+                <a class="d-block">@username</a>
+            </div>
+        </div>
+        <!-- SidebarSearch Form -->
+        <div class="form-inline">
+            <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar" type="search" placeholder="Search"
+                       aria-label="Search"/>
+                <div class="input-group-append">
+                    <button class="btn btn-sidebar">
+                        <i class="fas fa-search fa-fw"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column text-md nav-compact nav-child-indent"
+                data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-item @(ViewData["Controller"] as string == "Home" ? "menu-open" : "")">
+                    <a asp-controller="home" asp-action="index"
+                       class="nav-link @(ViewData["Controller"] as string == "Home" ? "active" : "")">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>@Localizer["Home"]</p>
+                    </a>
+                </li>
+                <li class="nav-item @(ViewData["Controller"] as string == "DailyReport" ? "menu-open" : "")">
+                    <a asp-controller="DailyReport" asp-action="Index"
+                       class="nav-link @(ViewData["Controller"] as string == "DailyReport" ? "active" : "")">
+                        <i class="nav-icon fas fa-bookmark"></i>
+                        <p>@Localizer["DailyReport"]</p>
+                    </a>
+                </li>
+                @if (User.IsInRole("ADMIN") || User.Identity!.Name == "Officer")
+                {
+                    <li class=" nav-item @(ViewData["OpenMenu"] as string == "Administration" ? "menu-open" : "")">
+                        <a href="#"
+                           class="nav-link @(ViewData["OpenMenu"] as string == "Administration" ? "active" : "")">
+                            <i class="nav-icon fa-solid fa-circle-info"></i>
+                            <p>
+                                @Localizer["AdminTask"]
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a asp-controller="registry" asp-action="index"
+                                   class="nav-link @(ViewData["Action"] as string == "Register" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Register"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="payment" asp-action="create"
+                                   class="nav-link @(ViewData["Action"] as string == "Create" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Payment"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Product" asp-action="Index"
+                                   class="nav-link @(ViewData["Action"] as string == "Index" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Item"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Administration" asp-action="Discount"
+                                   class="nav-link @(ViewData["Action"] as string == "Discount" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Discount"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="BookingClothes" asp-action="Create"
+                                   class="nav-link @(ViewData["Action"] as string == "BookingClothes" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["BookingClothes"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item menu-is-opening menu-open">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>
+                                        @Localizer["Certificate"]
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+
+                                </a>
+                                <ul class="nav nav-treeview" style="display: block;">
+                                    <li class="nav-item">
+                                        <a asp-controller="Administration" asp-action="GraduateCertificate"
+                                           class="nav-link @(ViewData["Action"] as string == "GraduateLetter" ? "active" : "")">
+                                            <i class="far fa-dot-circle nav-icon"></i>
+                                            <p>@Localizer["GraduateLetter"]</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a asp-controller="Administration" asp-action="AdminLetter"
+                                           class="nav-link @(ViewData["Action"] as string == "AdminLetter" ? "active" : "")">
+                                            <i class="far fa-dot-circle nav-icon"></i>
+                                            <p>@Localizer["AdminLetter"]</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a asp-controller="Administration" asp-action="CategoryLetter"
+                                           class="nav-link @(ViewData["Action"] as string == "LetterType" ? "active" : "")">
+                                            <i class="far fa-dot-circle nav-icon"></i>
+                                            <p>@Localizer["LetterType"]</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                @if (User.IsInRole("ACADEMIC") || User.Identity!.Name == "Officer")
+                {
+                    <li class="nav-item @(ViewData["OpenMenu"] as string == "AcademicTask" ? "menu-open" : "")">
+                        <a href="#"
+                           class="nav-link @(ViewData["OpenMenu"] as string == "AcademicTask" ? "active" : "")">
+                            <i class="nav-icon fa-solid fa-graduation-cap"></i>
+                            <p>
+                                @Localizer["AcademicTask"]
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @if (User.HasClaim("Privilege", "MNStudent"))
+                            {
+                                <li class="nav-item">
+                                    <a asp-controller="Student" asp-action="Status" asp-route-status="all"
+                                       class="nav-link @(ViewData["Action"] as string == "ManageStudent" ? "active" : "")">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["Student"]</p>
+                                    </a>
+                                </li>
+                            }
+                            <li class="nav-item">
+                                <a asp-controller="Academic" asp-action="AssignStudentGroup"
+                                   class="nav-link @(ViewData["Action"] as string == "AssignGroup" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["AssignStudentGroup"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Academic" asp-action="RequestQrCode"
+                                   class="nav-link @(ViewData["Action"] as string == "RequestQRCode" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["RequestQRCode"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Academic" asp-action="Course"
+                                   class="nav-link @(ViewData["Action"] as string == "Course" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Course"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Academic" asp-action="Score"
+                                   class="nav-link @(ViewData["Action"] as string == "Score" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Score"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Academic" asp-action="OtherBranchScore"
+                                   class="nav-link @(ViewData["Action"] as string == "OtherBranchScore" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["OtherBranchScore"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Academic" asp-action="ContinueEducation"
+                                   class="nav-link @(ViewData["Action"] as string == "ContinueEducation" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["ContinueEducation"]</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a asp-controller="Academic" asp-action="DoctoralContract"
+                                   class="nav-link @(ViewData["Action"] as string == "DoctoralContract" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["DoctoralContract"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Academic" asp-action="Room"
+                                   class="nav-link @(ViewData["Action"] as string == "ManageRoom" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Room"]</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                @if (User.IsInRole("DEAN") || User.Identity!.Name == "DEAN" || User.Identity!.Name == "Officer")
+                {
+                    <li class="nav-item @(ViewData["OpenMenu"] as string == "Dean" ? "menu-open" : "")">
+                        <a href="#" class="nav-link @(ViewData["OpenMenu"] as string == "Dean" ? "active" : "")">
+                            <i class="nav-icon fa-solid fa-chalkboard-user"></i>
+                            <p>
+                                @Localizer["Dean"]
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a asp-controller="Dean" asp-action="Course"
+                                   class="nav-link @(ViewData["Action"] as string == "DeanCourse" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Course"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Dean" asp-action="Learner"
+                                   class="nav-link @(ViewData["Action"] as string == "Learner" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Learner"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Dean" asp-action="mark"
+                                   class="nav-link @(ViewData["Action"] as string == "Mark" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Mark"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="dean" asp-action="ReStudyMark"
+                                   class="nav-link @(ViewData["Action"] as string == "RestudyMark" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["RestudyMark"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Dean" asp-action="StateExamMark"
+                                   class="nav-link @(ViewData["Action"] as string == "StateExamMark" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["StateExamMark"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="dean" asp-action="ThesisMark"
+                                   class="nav-link @(ViewData["Action"] as string == "ThesisMark" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["ThesisMark"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="dean" asp-action="PracticumMark"
+                                   class="nav-link @(ViewData["Action"] as string == "PracticumMark" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["PracticumMark"]</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                @if (User.IsInRole("LIBRARY") || User.Identity!.Name == "Officer")
+                {
+                    <li class="nav-item @(ViewData["Controller"] as string == "Library" ? "menu-open" : "")">
+                        <a href="#" class="nav-link @(ViewData["Controller"] as string == "Library" ? "active" : "")">
+                            <i class="nav-icon fas fa-solid fa-book"></i>
+                            <p>
+                                @Localizer["Library"]
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a asp-controller="Student" asp-action="Index" class="nav-link ">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>វត្តមាននិស្សិត</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Student" asp-action="Index" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>គណនីអ្នកប្រើ</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                @if (User.IsInRole("HR") || User.Identity!.Name == "Officer")
+                {
+                    <li class="nav-item @(ViewData["Controller"] as string == "HR" ? "menu-open" : "")">
+                        <a href="#" class="nav-link @(ViewData["Controller"] as string == "HR" ? "active" : "")">
+                            <i class="nav-icon fa-solid fa-users-gear"></i>
+                            <p>
+                                @Localizer["HR"]
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a asp-controller="Hr" asp-action="Index" class="nav-link ">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Index</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Student" asp-action="Index" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>គណនីអ្នកប្រើ</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                @if (User.IsInRole("Officer") || User.IsInRole("ADMIN") || User.IsInRole("ACADEMIC") || User.Identity!.Name == "Officer")
+                {
+                    <li class="nav-item @(ViewData["OpenMenu"] as string == "CommandTask" ? "menu-open" : "")">
+                        <a href="#" class="nav-link @(ViewData["OpenMenu"] as string == "CommandTask" ? "active" : "")">
+                            <i class="nav-icon fa-solid fa-list"></i>
+                            <p>
+                                @Localizer["CommandTask"]
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="Degree"
+                                   class="nav-link @(ViewData["Action"] as string == "Degree" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Degree"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="PromotionGroup"
+                                   class="nav-link @(ViewData["Action"] as string == "PromotionGroup" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["PromotionGroup"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="Branch"
+                                   class="nav-link @(ViewData["Action"] as string == "Branch" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Branch"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="University"
+                                   class="nav-link @(ViewData["Action"] as string == "University" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["University"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="Faculty"
+                                   class="nav-link @(ViewData["Action"] as string == "Faculty" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Faculty"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="School"
+                                   class="nav-link @(ViewData["Action"] as string == "School" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["School"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="Field"
+                                   class="nav-link @(ViewData["Action"] as string == "Field" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Field"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="FieldCertificate"
+                                   class="nav-link @(ViewData["Action"] as string == "FieldCertificate" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["FieldCertificate"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="Province"
+                                   class="nav-link @(ViewData["Action"] as string == "Province" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Province"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="Race"
+                                   class="nav-link @(ViewData["Action"] as string == "Race" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Race"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="Nationality"
+                                   class="nav-link @(ViewData["Action"] as string == "Nationality" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Nationality"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="CommandTask" asp-action="Disability"
+                                   class="nav-link @(ViewData["Action"] as string == "Disability" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Disability"]</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                @if (User.Identity!.Name == "Officer")
+                {
+                    <li class="nav-item @(ViewData["OpenMenu"] as string == "Setting" ? "menu-open" : "")">
+                        <a href="#" class="nav-link @(ViewData["OpenMenu"] as string == "Setting" ? "active" : "")">
+                            <i class="nav-icon fa-solid fa-gear"></i>
+                            <p>
+                                @Localizer["Setting"]
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a asp-controller="Setting" asp-action="ChartReport"
+                                   class="nav-link @(ViewData["Action"] as string == "ChartReport" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Chart Report</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+
+                <li class="nav-item @(ViewData["OpenMenu"] as string == "Report" ? "menu-open" : "")">
+                    <a href="#" class="nav-link @(ViewData["OpenMenu"] as string == "Report" ? "active" : "")">
+                        <i class="nav-icon fas fa-book"></i>
+                        <p>
+                            @Localizer["Report"]
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item @(ViewData["OpenSubMenu"] as string == "AdminReport" ? "menu-open" : "")">
+                            <a href="#"
+                               class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@Localizer["Admin"] <i class="right fas fa-angle-left"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="Registration"
+                                       class="nav-link @(ViewData["Action"] as string == "RegistrationReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["Registration"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="Payment"
+                                       class="nav-link @(ViewData["Action"] as string == "PaymentReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["Payment"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="BookClothes"
+                                       class="nav-link @(ViewData["Action"] as string == "BookClothesReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["BookClothes"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="Other"
+                                       class="nav-link @(ViewData["Action"] as string == "OtherReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["Other"]</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item @(ViewData["OpenSubMenu"] as string == "AcademicReport" ? "menu-open" : "")">
+                            <a href="#" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@Localizer["Academic"] <i class="right fas fa-angle-left"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="PassingCandidate"
+                                       class="nav-link @(ViewData["Action"] as string == "PassingCandidateReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["PassingCandidate"]</p>
+                                        @* == 
+                                -Report 1
+                                -Report 2
+                                -Report 3
+                                -Report 4
+                                -Report 5
+                                -Report Academic Pass to DHE
+                                -Student Entrance Pass
+*@
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="Student"
+                                       class="nav-link @(ViewData["Action"] as string == "StudentReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["Student"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="Certificate"
+                                       class="nav-link @(ViewData["Action"] as string == "CertificateReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["Certificate"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="StudentResult"
+                                       class="nav-link @(ViewData["Action"] as string == "StudentResultReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["StudentResult"]</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item @(ViewData["OpenSubMenu"] as string == "ContinueEducationReport" ? "menu-open" : "")">
+                            <a href="#" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@Localizer["ContinueEducation"] <i class="right fas fa-angle-left"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="ContinueStudent"
+                                       class="nav-link @(ViewData["Action"] as string == "StudentContinueReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["ContinueEducation"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="ReExamination"
+                                       class="nav-link @(ViewData["Action"] as string == "ReExaminationReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["ReExamination"]</p>
+                                        @* 
+                                            -Faild Student list
+                                            -ReExam student list
+                                            -student reexam payment list
+                                            -restudy student list
+                                            -reexamination reulst 
+                                            -Request reexam subject
+                                            -restudy reexam student list
+                                        *@
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="CreditCompletion"
+                                       class="nav-link @(ViewData["Action"] as string == "CreditCompletionReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["CreditCompletion"]</p>
+                                        @* 
+                                            -Complimental Student
+                                            -Complimental Student payment
+                                        *@
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item @(ViewData["OpenSubMenu"] as string == "SPOReport" ? "menu-open" : "")">
+                            <a href="#" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@Localizer["SPO"] <i class="right fas fa-angle-left"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="SpoStateExamResult"
+                                       class="nav-link @(ViewData["Action"] as string == "StateExaminationResultReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["StateExamResult"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="SpoGraduate"
+                                       class="nav-link @(ViewData["Action"] as string == "GraduateReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["Graduate"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="SpoGraduateMasterDoctor"
+                                       class="nav-link @(ViewData["Action"] as string == "GraduateMasterDoctorReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["GraduateMasterDoctor"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="SpoStudentStatistic"
+                                       class="nav-link @(ViewData["Action"] as string == "StudentStatisticReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["StudentStatistic"]</p>
+                                        @* 
+                                            -Student Statistic by Academic Year
+                                            -Student Statistic by Academic Year 2
+                                            -Student Statistic by Province
+                                            -Student Statistic by Group
+                                            -Student Statistic by High School
+                                        *@
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="SpoStudentCardList"
+                                       class="nav-link @(ViewData["Action"] as string == "StudentCardListReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["StudentCardList"]</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item @(ViewData["OpenSubMenu"] as string == "FoundationYearReport" ? "menu-open" : "")">
+                            <a href="#" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@Localizer["FoundationYear"] <i class="right fas fa-angle-left"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="FoundationYearStudents"
+                                       class="nav-link @(ViewData["Action"] as string == "FYStudentListReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>FoundationYearStudent</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="FoundationYearScoreSheet"
+                                       class="nav-link @(ViewData["Action"] as string == "ScoreSheetReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["ScoreSheet"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="ExaminationList"
+                                       class="nav-link @(ViewData["Action"] as string == "ExaminationList" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["ExaminationList"]</p>
+                                    </a>
+                                </li>
+                                @* <li class="nav-item"> *@
+                                @*     <a asp-controller="Report" asp-action="F" *@
+                                @*        class="nav-link @(ViewData["Action"] as string == "ExaminationList2Report" ? "active" : "")"> *@
+                                @*         <i class="far fa-dot-circle nav-icon"></i> *@
+                                @*         <p>@Localizer["ExaminationList2"]</p> *@
+                                @*     </a> *@
+                                @* </li> *@
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="FoundationYearFailStudentList"
+                                       class="nav-link @(ViewData["Action"] as string == "FailStudentListReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["FailStudentList"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="FoundationYearReExamResult"
+                                       class="nav-link @(ViewData["Action"] as string == "FYReExamResultReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["FYReExamResult"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="FoundationYearExamResult"
+                                       class="nav-link @(ViewData["Action"] as string == "FoundationYearExamResult" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["FYExamResult"]</p>
+                                    </a>
+                                </li>
+                                @* <li class="nav-item"> *@
+                                @*     <a asp-controller="Report" asp-action="StudentResult" *@
+                                @*        class="nav-link @(ViewData["Action"] as string == "FYExamResult2Report" ? "active" : "")"> *@
+                                @*         <i class="far fa-dot-circle nav-icon"></i> *@
+                                @*         <p>@Localizer["FYExamResult2"]</p> *@
+                                @*     </a> *@
+                                @* </li> *@
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="CertificateFyCourse"
+                                       class="nav-link @(ViewData["Action"] as string == "CertificateOfFYCourseReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["CertificateOfFYCourse"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="FyStudentQuitSuspendSuppress"
+                                       class="nav-link @(ViewData["Action"] as string == "StudentQuitSuspendSuppressReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["StudentQuitSuspendSuppress"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="FyStudentStatisticByProvince"
+                                       class="nav-link @(ViewData["Action"] as string == "StudentStatisticByProvinceReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["StudentStatisticByProvince"]</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item @(ViewData["OpenSubMenu"] as string == "DeanReport" ? "menu-open" : "")">
+                            <a href="#" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@Localizer["Dean"] <i class="right fas fa-angle-left"></i></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="DeanStudentStatus"
+                                       class="nav-link @(ViewData["Action"] as string == "StudentStatusReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["Student_Status"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="DeanScoreSheet"
+                                       class="nav-link @(ViewData["Action"] as string == "ScoreSheetReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["ScoreSheet"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="DeanSkillStudents"
+                                       class="nav-link @(ViewData["Action"] as string == "SkillStudentReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["SkillStudent"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="DeanStudentList"
+                                       class="nav-link @(ViewData["Action"] as string == "DeanStudentList" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["StudentList"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="DeanExaminationResult"
+                                       class="nav-link @(ViewData["Action"] as string == "ExamResultReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["ExamResult"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="DeanStateExamResult"
+                                       class="nav-link @(ViewData["Action"] as string == "StateExamResultReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["StateExamResult"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="DeanProjectPaperResult"
+                                       class="nav-link @(ViewData["Action"] as string == "ProjectPaperResultReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["ProjectPaperResult"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="DeanPracticumResult"
+                                       class="nav-link @(ViewData["Action"] as string == "PracticumResultReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["PracticumResult"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="DeanSummaryFailList"
+                                       class="nav-link @(ViewData["Action"] as string == "SummaryFailListReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["SummaryFailList"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-controller="Report" asp-action="DeanInformationRevision"
+                                       class="nav-link @(ViewData["Action"] as string == "InformationRevisionReport" ? "active" : "")">
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>@Localizer["InformationRevision"]</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                @if (User.IsInRole("SUPPER_ADMIN") || User.Identity!.Name == "Officer")
+                {
+                    <li class="nav-item @(ViewData["Controller"] as string == "User" ? "menu-open" : "")">
+                        <a href="#" class="nav-link @(ViewData["Controller"] as string == "User" ? "active" : "")">
+                            <i class="nav-icon fas fa-user"></i>
+                            <p>
+                                @Localizer["User"]
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a asp-controller="user" asp-action="Index"
+                                   class="nav-link @(ViewData["Action"] as string == "Index" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["User"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="user" asp-action="Privilege"
+                                   class="nav-link @(ViewData["Action"] as string == "Privilege" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>@Localizer["Roles"]</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="user" asp-action="PrivilegeGroup"
+                                   class="nav-link @(ViewData["Action"] as string == "PrivilegeGroup" ? "active" : "")">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>ក្រុមសិទ្ធ</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</aside>

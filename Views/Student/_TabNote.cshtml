@@ -1,0 +1,10 @@
+﻿@using BBU_SYSTEM.DTOs
+@{
+    var student = new StudentDto(); 
+}
+<div class="custom-control custom-checkbox">
+    <input class="custom-control-input" type="checkbox" asp-for="@student.IsReceivePhoto" readonly="readonly">
+    <label for="@student.IsReceivePhoto" class="custom-control-label">Photo Received</label>
+</div>
+<label>Note</label> 
+<textarea type="text" class="form-control" asp-for="@student.Note" rows="5" readonly="readonly"></textarea>

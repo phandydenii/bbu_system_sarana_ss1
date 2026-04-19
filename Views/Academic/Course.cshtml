@@ -1,0 +1,117 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "AcademicTask";
+    ViewData["Action"] = "Course";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Student</h3>
+                <button type="button" id="btnAddNew" class="btn btn-success btn-sm float-right">
+                    <i class="fas fa-plus"></i>
+                    Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblCourse" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>full_name</th>
+                        <th>full_name_khmer</th>
+                        <th>short_name</th>
+                        <th>short_name_khmer</th>
+                        <th>credit</th>
+                        <th>hours</th>
+                        <th>status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_Course"/>
+
+@section Scripts
+{
+    <script>
+        const tblCourse = $("#tblCourse");
+        const modalCourse = $("#modalCourse");
+        const formCourse = $("#formCourse");
+        $(document).ready(function () {
+            fetchCourse();
+        });
+        function fetchCourse() {
+            tblCourse.DataTable().clear().destroy();
+            tblCourse.DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                ajax: {
+                    url: "/course/get-courses",
+                    type: "POST",
+                },
+                columns: [
+                    {data: "courseId"},
+                    {data: "courseFullName"},
+                    {data: "courseFullNameInKhmer"},
+                    {data: "courseShortName"},
+                    {data: "courseShortNameInKhmer"},
+                    {data: "credit"},
+                    {data: "numberOfHours"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                        <a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i> Edit</a>
+                        <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
+                    `;
+                        }
+                    }
+                ]
+            })
+        }
+        tblCourse.on("click","#btnEdit", function (event) {
+            event.preventDefault();
+            modalCourse.modal("show");
+        });
+
+        formCourse.on("submit", function (event) {
+            event.preventDefault();
+            showLoading();
+            const form = $(this);
+            const formData = form.serialize();
+            $.ajax({
+                url: '/course/save-changes',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.status.code === "200") {
+                        ShowToastSuccess("Saved successfully!");
+                        tblCourse.ajax.reload();
+                    } else {
+                        ShowToastError(response.message);
+                    }
+                },
+                error: function (error) {
+                    if (error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    }
+                }
+            });
+            hideLoading(2);
+        });
+        $("#btnAddNew").click(function () {
+            modalCourse.modal("show");
+        })
+        $("#btnClose").click(function () {
+            formCourse[0].reset();
+            modalCourse.modal("hide");
+        })
+    </script>
+}

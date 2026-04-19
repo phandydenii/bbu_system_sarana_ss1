@@ -1,0 +1,100 @@
+@using BBU_SYSTEM.ViewModel.Report
+@{
+    var registeredStudent = new RegisteredViewModel();
+}
+<div class="col-12">
+    <div class="row">
+        <div class="col-3">
+            <form id="frmReportRegistered">
+                <div class="row">
+                    <div class="col-12">
+                        <label aria-required="true" class="required">Degree</label>
+                        <select asp-for="@registeredStudent.DegreeId" class="form-control select2"></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label>Promotion</label>
+                        <input type="number" asp-for="@registeredStudent.PromotionNo" class="form-control" min="1"
+                               value="1">
+                    </div>
+                    <div class="col-6">
+                        <label>Stage</label>
+                        <input type="number" asp-for="@registeredStudent.StageNo" class="form-control" min="1"
+                               value="1">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <label>From Date</label>
+                        <input type="datetime-local" asp-for="@registeredStudent.FromDate" class="form-control">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <label>To Date</label>
+                        <input type="datetime-local" asp-for="@registeredStudent.ToDate" class="form-control">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label>Reporter</label>
+                        <input type="text" asp-for="@registeredStudent.Receiver" class="form-control">
+                    </div>
+                    <div class="col-6">
+                        <label>Receiver</label>
+                        <input type="text" asp-for="@registeredStudent.Reporter" class="form-control">
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="button" id="btnPreview" class="form-control btn btn-primary">Preview</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-9">
+            <div class="row">
+                <iframe src="" width="95%" height="700px" id="reportContainer"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $("#btnPreview").on("click", function() {
+        
+    });
+    $(document).ready(async function () {
+        fetchStudent();
+    });
+    function fetchStudent() {
+        let tblStudent = $("#tblStudent");
+        tblStudent.DataTable().clear().destroy();
+        tblStudent.DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            ajax: {
+                url: `/student/academic/student-list/register`,
+                type: "POST",
+                error: function (xhr, status, error) {
+                    ShowToastError(xhr.responseText);
+                }
+            },
+            columns: [
+                {data: "studentId"},
+                {data: "studentName"},
+                {data: "studentNameInKhmer"},
+                {data: "sex"},
+                {
+                    data: "dateOfBirth",
+                    render: function (data, type, row) {
+                        const dt = formatDate(data);
+                        return `${dt}`
+                    }
+                },
+            ]
+        });
+    }
+</script>

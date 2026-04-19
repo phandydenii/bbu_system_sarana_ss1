@@ -1,0 +1,173 @@
+@{
+    ViewData["OpenMenu"] = "Setting";
+    ViewData["Action"] = "ChartReport";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Chart Report</h3>
+                <button type="button" id="btnAddNew" class="btn btn-success btn-sm float-right" data-toggle="modal"
+                        data-target="#DegreeModal">
+                    <i class="fas fa-plus"></i>
+                    Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblChartReport" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Order</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Query</th>
+                        <th>type</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_ValidationScriptsPartial"/>
+<partial name="_ChartReportModal"/>
+@section Scripts
+{
+    <script>
+        const tblChartReport = $("#tblChartReport");
+        const modalChartReport = $("#modalChartReport");
+        const btnClose = $("#btnClose");
+        const formChartReport = $("#formChartReport");
+        
+        $(document).ready(async function () {
+            fetchData();
+        });
+
+        function fetchData() {
+            tblChartReport.DataTable().clear().destroy();
+            tblChartReport.DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/summary-report/gets",
+                    type: "POST",
+                },
+                columns: [
+                    {data: "id"},
+                    {
+                        data: null,
+                        render: function (data, type, full) {
+                            return `<badge class="badge badge-warning">${data.ordering}</badge>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, full) {
+                            return `
+                            ${data.show === true ? '<badge class="badge badge-primary"><i class="fas fa-eye"></i></badge>' 
+                                : '<badge class="badge badge-danger"><i class="fas fa-eye-slash"></i></badge>'}
+                            ${data.titleEng}
+                        `;
+                        }
+                    },
+                    {data: "description"},
+                    {
+                        data: "query",
+                        render: function (data, type, full) {
+                            return `${data.length > 50 ? data.substring(0, 50) + "..." : data}`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, full) {
+                            return `<badge class="badge badge-secondary">${data.chartType}</badge>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                        <a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i></a>
+                        <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></a>
+                    `;
+                        }
+                    }
+                ]
+            });
+        }
+        $("#btnAddNew").on("click", async function () {
+            modalChartReport.find(".modal-title").text("Add New");
+            modalChartReport.modal("show");
+        });
+        tblChartReport.on("click","#btnEdit", async function (e) {
+            e.preventDefault();
+            const $row = $(this).closest('tr');
+            const selectedRow = tblChartReport.DataTable().row($row).data();
+            console.log(selectedRow);
+
+            $("#summaryReport_Id").val(selectedRow.id);
+            $("#summaryReport_TitleEng").val(selectedRow.title);
+            $("#summaryReport_TitleKm").val(selectedRow.titleKm);
+            $("#summaryReport_Description").val(selectedRow.description);
+            $("#summaryReport_Query").val(selectedRow.query);
+            $("#chbShow").prop("checked", selectedRow.show);
+            modalChartReport.find(".modal-title").text("Update");
+            modalChartReport.modal("show");
+        });
+        formChartReport.on("submit", async function (e) {
+            e.preventDefault();
+            if (!this.checkValidity()) {
+                this.reportValidity();
+                return;
+            }
+            showLoading();
+            const form = $(this);
+            const formData = form.serialize();
+            try {
+                const response = await $.ajax({
+                    url: '/summary-report/save-changes',
+                    method: 'POST',
+                    data: formData
+                });
+
+                if (response.status.code === "200") {
+                    ShowToastSuccess("Saved successfully!");
+                    formChartReport[0].reset();
+                    modalChartReport.modal("hide");
+                    tblChartReport.DataTable().ajax.reload();
+                } else {
+                    ShowToastError(response.status.message || "Something went wrong");
+                }
+
+            } catch (xhr) {
+                let message = "Internal Server Error";
+
+                if (xhr.responseJSON && xhr.responseJSON.status) {
+                    message = xhr.responseJSON.status.message;
+                } else if (xhr.responseText) {
+                    message = xhr.responseText;
+                }
+
+                ShowToastError(message);
+                console.error("AJAX Error:", xhr);
+            }
+            hideLoading(1);
+        });
+        
+        btnClose.on("click", async function () {
+            formChartReport[0].reset();
+            modalChartReport.modal("hide")
+        })
+    </script>
+}

@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/BBU_SYSTEM.props" />
+</Project>

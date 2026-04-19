@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "AcademicTask";
+    ViewData["Action"] = "AssignGroup";
+
+    var campuses = new Dictionary<string, string>
+    {
+        // { "associate", "ក្រុមបរិញ្ញាបត្ររង" }, //degree, school,field, promotion, stage, study-time
+        { "foundation", "ក្រុមបរិញ្ញាបត្រមូលដ្ឋាន" }, //degree, school,field, promotion, stage, study-time
+        { "specialize", "ក្រុមបរិញ្ញាបត្រជំនាញ" }, //degree, school,academic-year, promotion, stage, study-time
+        { "master", "ក្រុមអនុបណ្ឌិត" }, //degree, school, promotion, stage, study-time
+        { "doctor", "ក្រុមបណ្ឌិត" }, //degree, school, promotion, stage, study-time
+        { "diploma", "ក្រុមបាក់ឌុប" }, //degree, school, promotion, stage, study-time
+        { "other", "សាខាផ្សេង/សាកលផ្សេង/បរិញ្ញាបត្ររងទៅបរិញ្ញាបត្រ" },
+        { "unpromoted", "មិនទាន់ឡើងថ្នាក់" }, //degree, school, promotion, stage, study-time
+    };
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="margin" id="rangeButtons">
+                            <button type="button" class="btn btn-primary btn-sm" value="associate"><i
+                                    class="fas fa-user-graduate"></i> ក្រុមបរិញ្ញាបត្ររង
+                            </button>
+                            @foreach (var st in campuses)
+                            {
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                        value="@st.Key">@st.Value</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="formContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+@section Scripts
+{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Term.js"></script>
+    <script src="~/function/Group.js"></script>
+    <script src="~/function/AssignStudentGroup.js"></script>
+}

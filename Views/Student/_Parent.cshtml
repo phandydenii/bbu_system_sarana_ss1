@@ -1,0 +1,13 @@
+﻿@using BBU_SYSTEM.DTOs
+@{
+    var student = new StudentDto();
+}
+
+<label>Father Name</label>
+<input type="text" class="form-control" asp-for="@student.FatherNameInKhmer">
+<label>Father Occupation</label>
+<input type="text" class="form-control"  asp-for="@student.FatherOccupationInKhmer">
+<label>Mother Name</label>
+<input type="text" class="form-control" asp-for="@student.MotherNameInKhmer">
+<label>Mother Occupation</label>
+<input type="text" class="form-control" asp-for="@student.MotherOccupationInKhmer">

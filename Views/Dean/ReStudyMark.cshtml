@@ -1,0 +1,481 @@
+﻿@using BBU_SYSTEM.DTOs
+@model BBU_SYSTEM.ViewModel.ListData
+@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "Dean";
+    ViewData["Action"] = "RestudyMark";
+    var student = new Student();
+    var invoice = new InvoiceDto();
+    var group = new GroupDto();
+    var groupRoom = new GroupRoomDto();
+    var term = new Term();
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-5">
+                        <div class="row">
+                            <div class="col-3">
+                                <label>student_id</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" id="studentId" readonly>
+                                    <div class="input-group-append" style="cursor: pointer;" id="btnSearchStudent">
+                                        <span class="input-group-text" style="background-color: green;"><i
+                                                                                                            class="fa-solid fa-magnifying-glass" style="color: white;"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <label>name</label>
+                                <input type="text" class="form-control form-control-sm" id="studentName" readonly/>
+                            </div>
+                            <div class="col-4">
+                                <label>name_khmer</label>
+                                <input type="text" class="form-control form-control-sm" id="studentNameInKhmer" readonly/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3">
+                                <label>dob</label>
+                                <input type="text" class="form-control form-control-sm" id="dateOfBirth" readonly>
+                            </div>
+                            <div class="col-2">
+                                <label>gender</label>
+                                <input type="text" class="form-control form-control-sm" id="sex" readonly/>
+                            </div>
+                            <div class="col-3">
+                                <label>phone</label>
+                                <input type="text" class="form-control form-control-sm" id="phone" readonly/>
+                            </div>
+                            <div class="col-4">
+                                <label>status</label>
+                                <input type="text" class="form-control form-control-sm" id="status" readonly/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="row">
+                            <div class="col-2">
+                                <label>degree</label>
+                                <input type="text" class="form-control form-control-sm" id="degree" readonly>
+                            </div>
+                            <div class="col-5">
+                                <label>school</label>
+                                <input type="text" class="form-control form-control-sm" id="school" readonly>
+                            </div>
+                            <div class="col-5">
+                                <label>Field</label>
+                                <input type="text" class="form-control form-control-sm" id="field" readonly>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-2">
+                                <label>promotion</label>
+                                <input type="text" class="form-control form-control-sm" id="promotion" readonly>
+                            </div>
+                            <div class="col-2">
+                                <label>stage</label>
+                                <input type="number" class="form-control form-control-sm" id="stage" readonly>
+                            </div>
+                            <div class="col-2">
+                                <label>term</label>
+                                <input type="number" class="form-control form-control-sm" id="term" readonly>
+                            </div>
+                            <div class="col-2">
+                                <label>group</label>
+                                <input type="text" class="form-control form-control-sm" id="group" readonly>
+                            </div>
+                            <div class="col-2">
+                                <label>room</label>
+                                <input type="text" class="form-control form-control-sm" id="room" readonly>
+                            </div>
+                            <div class="col-2">
+                                <label>study time</label>
+                                <input type="text" class="form-control form-control-sm" id="study_time" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-6">
+                        <table id="tblStudentScore"
+                               class="table table-bordered table-sm table-striped text-nowrap"
+                               style="width: 100%;">
+                            <thead>
+                            <tr>
+                                <th class="hide-col">course_id</th>
+                                <th>term</th>
+                                <th>name</th>
+                                <th>midterm</th>
+                                <th>final</th>
+                                <th>total</th>
+                                <th>#</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="card card-outline card-primary">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Exam Score History</h3>
+                                    </div>
+                                    <div class="card-body table-responsive p-0" style="height: 200px;">
+                                        <table id="tblExamScoreHistory"
+                                               class="table table-sm table-bordered table-striped table-head-fixed text-nowrap">
+                                            <thead>
+                                            <tr>
+                                                <th>id</th>
+                                                <th>term</th>
+                                                <th>midterm</th>
+                                                <th>final</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="card card-outline card-success">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Re-Study Score History</h3>
+                                    </div>
+                                    <div class="card-body table-responsive p-0" style="height: 200px;">
+                                        <table id="tblReStudyScoreHistory" class="table table-sm table-bordered table-striped table-head-fixed text-nowrap">
+                                            <thead>
+                                            <tr>
+                                                <th>id</th> 
+                                                <th>midterm</th>
+                                                <th>final</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card card-outline card-warning">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Re-Exam 1</h3>
+                                    </div>
+                                    <div class="card-body table-responsive p-0" style="height: 200px;">
+                                        <table id="tblReExam1"
+                                               class="table table-sm table-bordered table-striped table-head-fixed text-nowrap">
+                                            <thead>
+                                            <tr>
+                                                <th>id</th>
+                                                <th>term</th>
+                                                <th>midterm</th>
+                                                <th>final</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="card card-outline card-warning">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Re-Exam 2</h3>
+                                    </div>
+                                    <div class="card-body table-responsive p-0" style="height: 200px;">
+                                        <table id="tblReExam2" class="table table-sm table-bordered table-striped table-head-fixed text-nowrap">
+                                            <thead>
+                                            <tr>
+                                                <th>id</th>
+                                                <th>term</th>
+                                                <th>midterm</th>
+                                                <th>final</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button class="btn btn-success btn-sm">
+                                    <i class="fas fa-plus"></i> Add Re-Study Subject
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_studentPartial"/>
+
+@section Scripts
+{
+    <script>
+        const tblStudentScore = $("#tblStudentScore");
+        const tblExamScoreHistory = $("#tblExamScoreHistory");
+        const tblReStudyScoreHistory  = $("#tblReStudyScoreHistory");
+
+
+        const tblReExam1 = $("#tblReExam1");
+        const tblReExam2 = $("#tblReExam2");
+        const studentId = $("#studentId");
+        $(document).ready(function () {
+            tblStudentScore.DataTable({
+                responsive: true,
+            });
+        });
+
+        document.getElementById("btnSearchStudent").addEventListener("click", function (e) {
+            $("#StudentModal").modal("show");
+            const tblSearchStudent = $("#tblSearchStudent");
+            tblSearchStudent.DataTable().clear().destroy();
+            tblSearchStudent.DataTable({
+                processing: true,
+                serverSide: true,
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: true,
+                scrollCollapse: true,
+                ajax: {
+                    url: "/student/academic/student-list",
+                    type: "POST",
+                },
+                columns: [
+                    {data: "studentId"},
+                    {data: "studentName"},
+                    {data: "studentNameInKhmer"},
+                    {data: "sex"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            if (row.status === "REGISTER") {
+                                return ` <span class="badge badge-warning">${row.status}</span>`;
+                            } else if (row.status === "ACTIVE") {
+                                return ` <span class="badge badge-primary">${row.status}</span>`;
+                            } else if (row.status === "QUIT") {
+                                return ` <span class="badge badge-danger">${row.status}</span>`;
+                            } else {
+                                return `<span class="badge badge-secondary">${row.status}</span>`;
+                            }
+                        },
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `<a onclick="OnSelectStudent(this)"  class="btn btn-success btn-xs">Select</a>`;
+                        },
+                    },
+                ],
+            });
+        });
+
+        function OnSelectStudent(e) {
+            const $input = $(e);
+            const $row = $input.closest('tr');
+            const selectedRow = $("#tblSearchStudent").DataTable().row($row).data();
+            if (selectedRow) {
+                getStudent(selectedRow.studentId);
+                getStudentScore(selectedRow.studentId);
+                $("#StudentModal").modal("hide");
+            }
+        }
+
+        function getStudent(student_id) {
+            $.ajax({
+                url: "/student/academic/student-id/" + student_id,
+                type: "GET",
+                data: {student_id: student_id},
+                success: function (data) {
+                    if (data) {
+                        const student = data["student"];
+                        const degree = data["degree"];
+                        // console.log(degree);
+                        const school = data["school"];
+                        const field = data["field"];
+                        const promotion = data["promotion"];
+                        const stage = data["stage"];
+                        const term = data["term"];
+                        const group = data["group"];
+                        const groupRoom = data["groupRoom"];
+                        const registry = data["registry"];
+                        $("#studentId").val(student.studentId);
+                        $("#studentName").val(`${student.studentName}`);
+                        $("#studentNameInKhmer").val(`${student.studentNameInKhmer}`);
+                        $("#phone").val(student.phone);
+                        $("#dateOfBirth").val(formatDate(student.dateOfBirth, "DD-MMM-YYYY"));
+                        $("#sex").val(student.sex);
+                        $("#status").val(student.status);
+                        $("#degree").val(degree.degreeName);
+                        $("#school").val(school.schoolName);
+                        $("#field").val(field.fieldName);
+                        $("#promotion").val(promotion.promotionNo);
+                        $("#stage").val(stage.stageNo);
+                        $("#term").val(term.termNo);
+                        $("#group").val(group.groupName);
+                        $("#room").val(group.roomName);
+                        // console.log(data);
+                    } else {
+                        alert("Student not found.");
+                    }
+                },
+                error: function () {
+                    alert("Error fetching student data.");
+                }
+            });
+        }
+
+        function getStudentScore(student_id) {
+            tblStudentScore.DataTable().clear().destroy();
+            tblStudentScore.DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                ajax: {
+                    url: "/scores/get-student-score/" + student_id,
+                    type: "POST",
+                },
+                columns: [
+                    {data: "courseId"},
+                    {data: "termNo"},
+                    {data: "courseFullName"},
+                    {
+                        data: "midTermScore",
+                        render: function (data, type, row) {
+                            return `<input type="number" class="form-control form-control-sm form-control form-control-sm-sm is-warning" name="midterm" value="${data ? data.toFixed(2) : 0.00}" readonly/>`;
+                        }
+                    },
+                    {
+                        data: "finalScore",
+                        render: function (data, type, row) {
+                            return `<input type="number" class="form-control form-control-sm form-control form-control-sm-sm is-warning" name="final" value="${data ? data.toFixed(2) : 0.00}" readonly/>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            const mid = parseInt(row.midTermScore);
+                            const fin = parseInt(row.finalScore);
+                            return mid + fin;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `<button id="btnEdit" class="btn btn-warning btn-sm"><i class="fa-solid fa-pen-to-square"></i></button>`;
+                        }
+                    }
+                ],
+                columnDefs: [
+                    {
+                        targets: [0],
+                        visible: false,
+                        searchable: false
+                    }
+                ]
+            })
+        }
+
+        tblStudentScore.on("click", "tbody tr", function (event) {
+            tblStudentScore.find('tbody tr').removeClass('highlight');
+            $(this).addClass('highlight');
+            const $row = $(this).closest('tr');
+            const selectedRow = tblStudentScore.DataTable().row($row).data();
+            GetScoreHistory(studentId.val());
+            GetReStudyHistory(studentId.val(), selectedRow.courseId);
+        });
+
+        async function GetScoreHistory(student_id) {
+            try {
+                const response = await $.ajax({
+                    url: "/scores/get-score-history/" + student_id,
+                    method: 'POST',
+                    data: {isAll: true}
+                });
+                if (response.status.code === "200") {
+                    tblExamScoreHistory.find("tbody").empty();
+                    response.data.forEach(item => {
+                        tblExamScoreHistory.find("tbody").append(`
+                            <tr>
+                                <td>${item.courseId}</td>
+                                <td>${item.termNo}</td>
+                                <td>${item.midTermScore}</td>
+                                <td>${item.finalScore}</td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    console.log(response.status.code);
+                }
+            } catch (err) {
+                console.log(err?.responseText ?? err);
+            }
+
+        }
+
+        async function GetReStudyHistory(studentId,courseId) {
+            try {
+                const response = await $.ajax({
+                    url: `/scores/get-restudy-history/${studentId}/${courseId}`,
+                    method: 'POST',
+                    data: {isAll: true}
+                });
+                if (response.status.code === "200") {
+                    tblReStudyScoreHistory.find("tbody").empty();
+                    response.data.forEach(item => {
+                        tblReStudyScoreHistory.find("tbody").append(`
+                            <tr>
+                                <td>${item.courseId}</td> 
+                                <td>${item.midTermScore}</td>
+                                <td>${item.finalScore}</td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    console.log(response.status.code);
+                }
+            } catch (err) {
+                console.log(err?.responseText ?? err);
+            }
+        }
+        
+        tblStudentScore.on("click", "#btnEdit", function (event) {
+            event.preventDefault(); 
+            const $row = $(this).closest('tr'); 
+            $row.find('input[name="midterm"]').prop('readonly', false);
+            $row.find('input[name="final"]').prop('readonly', false);
+
+            $(this)
+                .attr('id', 'btnSave')
+                .removeClass('btn-warning')
+                .addClass('btn-success')
+                .html('<i class="fas fa-check"></i>');
+        });
+        tblStudentScore.on("click", "#btnSave", function (event) {
+            event.preventDefault();
+            const $row = $(this).closest('tr'); 
+            $row.find('input[name="midterm"]').prop('readonly', true);
+            $row.find('input[name="final"]').prop('readonly', true);
+
+            $(this)
+                .attr('id', 'btnEdit')
+                .removeClass('btn-success')
+                .addClass('btn-warning')
+                .html('<i class="fa-solid fa-pen-to-square"></i>');
+        });
+    </script>
+}

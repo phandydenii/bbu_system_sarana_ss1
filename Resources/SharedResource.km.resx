@@ -1,0 +1,236 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Home" xml:space="preserve"><value>ទំព័រដើម</value></data>
+  <data name="TotalStudent" xml:space="preserve"><value>និស្សិតសរុប</value></data>
+  <data name="ActiveStudent" xml:space="preserve"><value>និស្សិតកំពុងសិក្សា</value></data>
+  <data name="RegisterStudent" xml:space="preserve"><value>និស្សិតចុះឈ្មោះ</value></data>
+  <data name="Quit" xml:space="preserve"><value>បោះបង់ការសិក្សា</value></data>
+  <data name="Student" xml:space="preserve"><value>និស្សិត</value></data>
+  <data name="DailyReport" xml:space="preserve"><value>របាយការណ៍ប្រចាំថ្ងៃ</value></data>
+  <data name="Register" xml:space="preserve"><value>ចុះឈ្មោះ</value></data>
+  <data name="Payment" xml:space="preserve"><value>ការបង់ប្រាក់</value></data>
+  <data name="Item" xml:space="preserve"><value>មុខទំនិញបង់ប្រាក់</value></data>
+  <data name="Discount" xml:space="preserve"><value>បញ្ចុះតម្លៃ</value></data>
+  <data name="BookingClothes" xml:space="preserve"><value>ការកក់សម្លៀកបំពាក់</value></data>
+  <data name="Certificate" xml:space="preserve"><value>វិញ្ញាបនបត្រ</value></data>
+  <data name="GraduateLetter" xml:space="preserve"><value>សញ្ញាបត្របញ្ចប់ការសិក្សា</value></data>
+  <data name="AdminLetter" xml:space="preserve"><value>លិខិតរដ្ឋបាល</value></data>
+  <data name="LetterType" xml:space="preserve"><value>ប្រភេទលិខិត</value></data>
+  <data name="AdminTask" xml:space="preserve"><value>ការងាររដ្ឋបាល</value></data>
+  <data name="AcademicTask" xml:space="preserve"><value>ការងារសិក្សាធិការ</value></data>
+  <data name="AssignStudentGroup" xml:space="preserve"><value>បែងចែកក្រុមនិស្សិត</value></data>
+  <data name="RequestQRCode" xml:space="preserve"><value>ស្នើសុំឃ្យូអរកូដ</value></data>
+  <data name="Course" xml:space="preserve"><value>វគ្គសិក្សា</value></data>
+  <data name="Score" xml:space="preserve"><value>ពិន្ទុ</value></data>
+  <data name="OtherBranchScore" xml:space="preserve"><value>ពិន្ទុមកពីសាខាផ្សេង</value></data>
+  <data name="ContinueEducation" xml:space="preserve"><value>បន្តការសិក្សា</value></data>
+  <data name="DoctoralContract" xml:space="preserve"><value>កិច្ចសន្យាថ្នាក់បណ្ឌិត</value></data>
+  <data name="Room" xml:space="preserve"><value>គ្រប់គ្រងបន្ទប់</value></data>
+  <data name="Dean" xml:space="preserve"><value>ព្រឹទ្ធបុរស</value></data>
+  <data name="ManageCourse" xml:space="preserve"><value>គ្រប់គ្រងវគ្គសិក្សា</value></data>
+  <data name="Learner" xml:space="preserve"><value>គ្រប់គ្រងអ្នកសិក្សា</value></data>
+  <data name="Mark" xml:space="preserve"><value>បញ្ចូលពិន្ទុ</value></data>
+  <data name="RestudyMark" xml:space="preserve"><value>ពិន្ទុរៀនឡើងវិញ</value></data>
+  <data name="StateExamMark" xml:space="preserve"><value>ពិន្ទុប្រឡងបញ្ចប់</value></data>
+  <data name="ThesisMark" xml:space="preserve"><value>ពិន្ទុសារណា</value></data>
+  <data name="PracticumMark" xml:space="preserve"><value>ពិន្ទុចុះកម្មសិក្សា</value></data>
+  <data name="CommandTask" xml:space="preserve"><value>ការងារបញ្ជា</value></data>
+  <data name="Degree" xml:space="preserve"><value>សញ្ញាបត្រ</value></data>
+  <data name="PromotionGroup" xml:space="preserve"><value>ជំនាន់ និង ក្រុម</value></data>
+  <data name="Branch" xml:space="preserve"><value>សាខា</value></data>
+  <data name="University" xml:space="preserve"><value>សាកលវិទ្យាល័យ</value></data>
+  <data name="Faculty" xml:space="preserve"><value>មហាវិទ្យាល័យ</value></data>
+  <data name="School" xml:space="preserve"><value>សាលា</value></data>
+  <data name="Field" xml:space="preserve"><value>ជំនាញ</value></data>
+  <data name="FieldCertificate" xml:space="preserve"><value>វិញ្ញាបនបត្រជំនាញ</value></data>
+  <data name="Province" xml:space="preserve"><value>ខេត្ត</value></data>
+  <data name="Race" xml:space="preserve"><value>ជនជាតិ</value></data>
+  <data name="Nationality" xml:space="preserve"><value>សញ្ជាតិ</value></data>
+  <data name="Disability" xml:space="preserve"><value>ពិការភាព</value></data>
+  <data name="Report" xml:space="preserve"><value>របាយការណ៍</value></data>
+  <data name="Admin" xml:space="preserve"><value>អ្នកគ្រប់គ្រង</value></data>
+  <data name="Registration" xml:space="preserve"><value>ការចុះឈ្មោះ</value></data>
+  <data name="BookClothes" xml:space="preserve"><value>កក់សម្លៀកបំពាក់</value></data>
+  <data name="Other" xml:space="preserve"><value>ផ្សេងៗ</value></data>
+  <data name="Academic" xml:space="preserve"><value>កិច្ចការសិក្សា</value></data>
+  <data name="PassingCandidate" xml:space="preserve"><value>បេក្ខជនជាប់</value></data> 
+  <data name="StudentResult" xml:space="preserve"><value>លទ្ធផលសិក្សានិស្សិត</value></data>
+  <data name="ReExamination" xml:space="preserve"><value>ការប្រឡងឡើងវិញ</value></data>
+  <data name="CreditCompletion" xml:space="preserve"><value>ការបង្គ្រប់ក្រេឌីត</value></data>
+  <data name="SPO" xml:space="preserve"><value>SPO</value></data>
+  <data name="StateExamResult" xml:space="preserve"><value>លទ្ធផលប្រឡងរដ្ឋ</value></data>
+  <data name="Graduate" xml:space="preserve"><value>និស្សិតបញ្ចប់ការសិក្សា</value></data>
+  <data name="GraduateMasterDoctor" xml:space="preserve"><value>បញ្ចប់ថ្នាក់អនុបណ្ឌិត និងបណ្ឌិត</value></data>
+  <data name="StudentStatistic" xml:space="preserve"><value>ស្ថិតិនិស្សិត</value></data>
+  <data name="StudentCardList" xml:space="preserve"><value>បញ្ជីកាតនិស្សិត</value></data>
+  <data name="FoundationYear" xml:space="preserve"><value>ឆ្នាំសិក្សាមូលដ្ឋាន</value></data>
+  <data name="StudentList" xml:space="preserve"><value>បញ្ជីឈ្មោះនិស្សិត</value></data>
+  <data name="ScoreSheet" xml:space="preserve"><value>ព្រឹត្តិបត្រពិន្ទុ</value></data>
+  <data name="ExaminationList" xml:space="preserve"><value>បញ្ជីឈ្មោះប្រឡង</value></data>
+  <data name="ExaminationList2" xml:space="preserve"><value>បញ្ជីឈ្មោះប្រឡង ២</value></data>
+  <data name="FailStudentList" xml:space="preserve"><value>បញ្ជីឈ្មោះនិស្សិតធ្លាក់</value></data>
+  <data name="FYReExamResult" xml:space="preserve"><value>លទ្ធផលប្រឡងសង FY</value></data>
+  <data name="FYExamResult" xml:space="preserve"><value>លទ្ធផលប្រឡង FY</value></data>
+  <data name="FYExamResult2" xml:space="preserve"><value>លទ្ធផលប្រឡង FY ២</value></data>
+  <data name="CertificateOfFYCourse" xml:space="preserve"><value>វិញ្ញាបនបត្របញ្ជាក់ការសិក្សា FY</value></data>
+  <data name="StudentQuitSuspendSuppress" xml:space="preserve"><value>និស្សិតបោះបង់ ព្យួរ និងលុបឈ្មោះ</value></data>
+  <data name="StudentStatisticByProvince" xml:space="preserve"><value>ស្ថិតិនិស្សិតតាមខេត្ត</value></data>
+  <data name="Student_Status" xml:space="preserve"><value>ស្ថានភាពនិស្សិត</value></data>
+  <data name="SkillStudent" xml:space="preserve"><value>និស្សិតតាមជំនាញ</value></data>
+  <data name="ListOfSubject" xml:space="preserve"><value>បញ្ជីមុខវិជ្ជា</value></data>
+  <data name="ExamResult" xml:space="preserve"><value>លទ្ធផលប្រឡង</value></data>
+  <data name="DeanStateExamResult" xml:space="preserve"><value>លទ្ធផលប្រឡងរដ្ឋ (ព្រឹទ្ធបុរស)</value></data>
+  <data name="ProjectPaperResult" xml:space="preserve"><value>លទ្ធផលសៀវភៅសារណា</value></data>
+  <data name="PracticumResult" xml:space="preserve"><value>លទ្ធផលចុះកម្មសិក្សា</value></data>
+  <data name="SummaryFailList" xml:space="preserve"><value>បញ្ជីសរុបនិស្សិតធ្លាក់</value></data>
+  <data name="InformationRevision" xml:space="preserve"><value>ការកែសម្រួលព័ត៌មាន</value></data>
+  <data name="Library" xml:space="preserve">
+    <value>បណ្ណាល័យ</value>
+  </data>
+  <data name="HR" xml:space="preserve">
+    <value>ធនធានមនុស្ស</value>
+  </data>
+  <data name="Setting" xml:space="preserve">
+    <value>កំណត់</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>អ្នកប្រើប្រាស់</value>
+  </data>
+  <data name="Roles" xml:space="preserve"><value>សិទ្ធិ</value></data>
+  <data name="UserRoles" xml:space="preserve"><value>សិទ្ធិអ្នកប្រើប្រាស់</value></data>
+  <data name="QuitStudent" xml:space="preserve">
+    <value>និស្សិតបោះបង់ការសិក្សា</value>
+  </data>
+  <data name="CompletedStudent" xml:space="preserve">
+    <value>និស្សិតបញ្ចប់ការសិក្សា</value>
+  </data>
+  <data name="GraduatedStudent" xml:space="preserve">
+    <value>និស្សិតបញចប់ការសិក្សាជាស្ថាពរ</value>
+  </data>
+  <data name="Id" xml:space="preserve"><value>លេខ</value></data>
+  <data name="Title" xml:space="preserve"><value>ចំណងជើង</value></data>
+  <data name="CreateDate" xml:space="preserve"><value>កាលបរិច្ឆេទបង្កើត</value></data>
+  <data name="Description" xml:space="preserve"><value>ការពិពណ៌នា</value></data>
+  <data name="Action" xml:space="preserve"><value>សកម្មភាព</value></data>
+  <data name="Add" xml:space="preserve"><value>បន្ថែម</value></data>
+  <data name="Edit" xml:space="preserve"><value>កែរប្រែ</value></data>
+  <data name="Delete" xml:space="preserve"><value>លុប</value></data>
+  <data name="View" xml:space="preserve"><value>មើល</value></data>
+</root>

@@ -1,0 +1,65 @@
+﻿@using BBU_SYSTEM.DTOs;
+@{
+    var promotion = new PromotionDto();
+}
+<div class="modal fade" id="modalPromotion" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Promotion</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formPromotion">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="@promotion.PromotionNo"></label>
+                                <input type="hidden" asp-for="@promotion.DegreeId" class="form-control" value="0">
+                                <input type="hidden" asp-for="@promotion.SchoolId" class="form-control" value="0">
+                                <input type="hidden" asp-for="@promotion.PromotionId" class="form-control" value="0">
+                                <input type="number" asp-for="@promotion.PromotionNo" class="form-control" readonly
+                                       style="text-align: center" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="@promotion.AcademicYearStart"></label>
+                                <input type="number" asp-for="@promotion.AcademicYearStart" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="@promotion.AcademicYearEnd"></label>
+                                <input type="number" asp-for="@promotion.AcademicYearEnd" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>graduate_date1</label>
+                                <input type="date" asp-for="@promotion.GraduateDate1" class="form-control"> 
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>graduate_date2</label>
+                                <input type="date" asp-for="@promotion.GraduateDate2" class="form-control"> 
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button form="formPromotion" type="submit" class="btn btn-success float-right"><i
+                        class="fa-solid fa-download"></i> Save
+                </button>
+                <button id="ClosePromotion" type="button" class="btn btn-danger float-right"><i
+                        class="fa-solid fa-xmark"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

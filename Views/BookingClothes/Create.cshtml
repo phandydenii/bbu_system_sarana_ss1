@@ -1,0 +1,263 @@
+@using BBU_SYSTEM.DTOs
+
+@{
+    ViewData["OpenMenu"] = "Administration";
+    ViewData["Action"] = "BookingClothes";
+    var student = new Student();
+    var group = new GroupDto();
+    var groupRoom = new GroupRoomDto();
+    var invoice = new InvoiceDto();
+}
+<div class="card">
+    <div class="card-header">
+        <label>Create Payment</label>
+        <button id="btnCreateNewPayment" type="button" class="btn btn-primary float-right"><i
+                class="fa-solid fa-plus"></i>
+            Booking Now
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-5">
+                <div class="row">
+                    <div class="col-3">
+                        <label class="required">student_id</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" asp-for="@invoice.StudentId" readonly/>
+                            <div class="input-group-append" style="cursor: pointer;" id="btnSearchStudent">
+                                    <span class="input-group-text" style="background-color: green;"><i
+                                            class="fa-solid fa-magnifying-glass" style="color: white;"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-5">
+                        <label>name</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@student.StudentName" readonly/>
+                    </div>
+                    <div class="col-4">
+                        <label>gender</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@student.Sex" readonly/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <label>dob</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@student.DateOfBirth" readonly>
+                    </div>
+                    <div class="col-5">
+                        <label>name_khmer</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@student.StudentNameInKhmer" readonly/>
+                    </div>
+                    <div class="col-4">
+                        <label>phone</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@student.Phone" readonly/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="row">
+                    <div class="col-2">
+                        <label>degree</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@invoice.DegreeId" readonly>
+                    </div>
+                    <div class="col-4">
+                        <label>school</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@invoice.SchoolId" readonly>
+                    </div>
+                    <div class="col-4">
+                        <label>field</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@invoice.FieldId" readonly>
+                    </div>
+                    <div class="col-2">
+                        <label>promotion</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@invoice.PromotionId" readonly>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-2">
+                        <label>stage</label>
+                        <input type="number" class="form-control form-control-sm" asp-for="@invoice.StageId" readonly>
+                    </div>
+                    <div class="col-2">
+                        <label>term</label>
+                        <input type="number" class="form-control form-control-sm" asp-for="@invoice.TermNo" readonly>
+                    </div>
+                    <div class="col-2">
+                        <label>group</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@invoice.GroupId" readonly>
+                    </div>
+                    @* <div class="col-2"> *@
+                    @* <label>room</label> *@
+                    <input type="hidden" class="form-control form-control-sm" asp-for="@groupRoom.RoomName" readonly>
+                    @* </div> *@
+                    <div class="col-2">
+                        <label>study_time</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@group.StudyTime" readonly>
+                    </div>
+                    <div class="col-2">
+                        <label>start_date</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@invoice.StartDate" readonly>
+                    </div>
+                    <div class="col-2">
+                        <label>end_date</label>
+                        <input type="text" class="form-control form-control-sm" asp-for="@invoice.EndDate" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <table id="tblInvoice" class="table table-sm table-bordered table-striped" style="width: 100%;">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>no</th>
+                <th>invoice_date</th>
+                <th>term</th>
+                <th>grand_total</th>
+                <th>discount</th>
+                <th>vat</th>
+                <th>owe</th>
+                <th>total_pay</th>
+                <th>pay_khr</th>
+                <th>pay_usd</th>
+                <th>action</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+<partial name="_StudentModal"/>
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script src="/AdminLTE/plugins/select2/js/select2.full.min.js"></script>
+@section Scripts
+{
+    <script>
+        const tblSearchStudent = $("#tblSearchStudent");
+        const btnSearchStudent = $("#btnSearchStudent");
+        const modalStudent = $("#StudentModal");
+        //1=====Search Student====
+        btnSearchStudent.on("click", function () {
+            showLoading();
+            tblSearchStudent.DataTable().clear().destroy();
+            tblSearchStudent.DataTable({
+                processing: true,
+                serverSide: true,
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: true,
+                scrollCollapse: true,
+                ajax: {
+                    url: "/student/academic/student-list",
+                    type: "POST",
+                },
+                columns: [
+                    {data: "studentId"},
+                    {data: "studentName"},
+                    {data: "studentNameInKhmer"},
+                    {data: "sex"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            if (row.status === "REGISTER") {
+                                return ` <span class="badge badge-warning">${row.status}</span>`;
+                            } else if (row.status === "ACTIVE") {
+                                return ` <span class="badge badge-primary">${row.status}</span>`;
+                            } else if (row.status === "QUIT") {
+                                return ` <span class="badge badge-danger">${row.status}</span>`;
+                            } else {
+                                return `<span class="badge badge-secondary">${row.status}</span>`;
+                            }
+                        },
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `<a id="btnSelectStudent" class="btn btn-success btn-xs btn-block">Select</a>`;
+                        },
+                    },
+                ],
+            });
+            modalStudent.modal("show");
+            hideLoading(1);
+        });
+
+        //2====Select Student====
+        tblSearchStudent.on("click", "#btnSelectStudent", function () {
+            showLoading();
+            const $row = $(this).closest('tr');
+            const selectedRow = tblSearchStudent.DataTable().row($row).data();
+            if (selectedRow) {
+                document.getElementById("btnCreateNewPayment").disabled = false;
+                getStudent(selectedRow.studentId); 
+                modalStudent.modal("hide");
+            }
+            hideLoading(1);
+        });
+
+        function getStudent(student_id) {
+            $.ajax({
+                url: "/student/academic/student-id/" + student_id,
+                type: "GET",
+                data: {student_id: student_id},
+                success: function (data) {
+                    if (data) {
+                        const student = data["student"];
+                        const degree = data["degree"];
+                        const school = data["school"];
+                        const field = data["field"];
+                        const promotion = data["promotion"];
+                        const stage = data["stage"];
+                        const term = data["term"];
+                        const group = data["group"];
+                        const groupRoom = data["groupRoom"];
+                        const registry = data["registry"];
+                        $("#invoice_StudentId").val(student.studentId);
+                        $("#student_StudentName").val(`${student.studentName}`);
+                        $("#student_StudentNameInKhmer").val(`${student.studentNameInKhmer}`);
+                        $("#student_Sex").val(student.sex);
+                        $("#student_Phone").val(student.phone);
+                        $("#student_DateOfBirth").val(formatDate(student.dateOfBirth, "DD-MMM-YYYY"));
+                        $("#invoice_DegreeId").val(degree.degreeName);
+                        $("#invoice_SchoolId").val(school.schoolName);
+
+                        $("#invoice_FieldId").val(field.fieldName);
+                        if (student.status !== "REGISTER") {
+                            $("#invoice_PromotionId").val(promotion.promotionNo);
+                            $("#invoice_StageId").val(stage.stageNo);
+
+                            $("#invoice_TermNo").val(term.termNo);
+                            $("#group_StudyTime").val(group.studyTime);
+                            $("#invoice_StartDate").val(formatDate(term.startDate, "DD-MMM-YYYY"));
+                            $("#invoice_EndDate").val(formatDate(term.endDate, "DD-MMM-YYYY"));
+                            $("#invoice_GroupId").val(group.groupName);
+                            if (groupRoom) {
+                                $("#groupRoom_RoomName").val(groupRoom.roomName ?? "");
+                            }
+                        } else if (student.status === "REGISTER") {
+                            $("#invoice_PromotionId").val(registry.promotionNo);
+                            $("#invoice_StageId").val(registry.stageNo);
+                            $("#invoice_TermNo").val(registry.termNo);
+                            $("#group_StudyTime").val(registry.studyTime);
+                            $("#invoice_StartDate").val("");
+                            $("#invoice_enddate").val("");
+                            $("#invoice_EndDate").val("");
+                            $("#groupRoom_RoomName").val("");
+                        }
+                    } else {
+                        alert("Student not found.");
+                    }
+                },
+                error: function () {
+                    alert("Error fetching student data.");
+                }
+            });
+        }
+    </script>
+}

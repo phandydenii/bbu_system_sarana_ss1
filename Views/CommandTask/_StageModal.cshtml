@@ -1,0 +1,44 @@
+﻿@using BBU_SYSTEM.DTOs
+@{
+    var stage = new StageDto();
+}
+<div class="modal fade" id="modalStage" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Stage</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formStage">
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label>Promotion</label>
+                                <input type="number" asp-for="@stage.PromotionId" class="form-control" readonly
+                                       style="text-align: center" value="0">
+                            </div>
+                        </div>
+                        <div class="col-10">
+                            <div class="form-group">
+                                <label>Stage No</label>
+                                <input type="hidden" asp-for="@stage.StageId" class="form-control" readonly
+                                       style="text-align: center" value="0">
+                                <input type="number" asp-for="@stage.StageNo" class="form-control"
+                                       style="text-align: center" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success float-right" form="formStage"><i
+                        class="fa-solid fa-download"></i> Save
+                </button>
+                <a id="closeStage" class="btn btn-danger float-right"><i class="fa-solid fa-xmark"></i> Close</a>
+            </div>
+        </div>
+    </div>
+</div>

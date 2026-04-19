@@ -1,0 +1,87 @@
+﻿@using BBU_SYSTEM.DTOs
+@{
+    var studentDiscount = new StudentDiscountDto();
+}
+
+<div class="modal fade" id="DiscountModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Discount</h4>
+                <button type="button" id="btnClose" class="btn btn-sm btn-danger">
+                    <i class="fas fa-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label class="required">Student Id</label>
+                            <input type="text" id="studentId" class="form-control" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label class="required">Name</label>
+                            <input type="text" id="studentName" class="form-control" readonly="readonly">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label class="required">Name Khmer</label>
+                            <input type="text" id="studentNameKhmer" class="form-control" readonly="readonly">
+                        </div>
+                    </div>
+                </div>
+                <form id="frmDiscount">
+                    <input type="hidden" asp-for="@studentDiscount.StudentDiscountId">
+                    <input type="hidden" asp-for="@studentDiscount.StudentId">
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label class="required">term</label>
+                                <input type="number" asp-for="@studentDiscount.Term" class="form-control" required="required">
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label class="required">discount%</label>
+                                <input type="number" asp-for="@studentDiscount.Discount" class="form-control" required="required">
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="form-group">
+                                <label>note (Optional)</label>
+                                <input type="text" asp-for="@studentDiscount.Note" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-12">
+                        <button id="btnNew" class="btn btn-primary btn-sm">New</button>
+                        <button id="btnSaveChange" class="btn btn-success btn-sm" form="frmDiscount">Save Change</button>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="tblStudentDiscountDetail" class="table table-sm table-bordered table-striped"
+                               style="width: 100%;">
+                            <thead>
+                            <tr>
+                                <th>Discount ID</th>
+                                <th>Discount</th>
+                                <th>Term</th>
+                                <th>Note</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

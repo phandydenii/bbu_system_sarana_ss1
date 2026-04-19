@@ -1,0 +1,116 @@
+@using BBU_SYSTEM.DTOs
+@{
+    var fieldCertificate = new FieldCertificateDto();
+}
+<div class="modal fade" id="fieldCertificateModal" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Field Certificate</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formFieldCertificate">
+                    <input type="hidden" asp-for="@fieldCertificate.Id"/>
+                    <div class="row">
+                        <div class="col-4">
+                            <label>Degree</label>
+                            <select class="form-control select2" asp-for="@fieldCertificate.DegreeId"></select>
+                        </div>
+                        <div class="col-8">
+                            <label>School</label>
+                            <select class="form-control select2" asp-for="@fieldCertificate.SchoolId"></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <label>From Promotion</label>
+                            <select class="form-control select2" asp-for="@fieldCertificate.PromotionNo">
+                            </select>
+                        </div>
+                        <div class="col-8">
+                            <label>Field</label>
+                            <select class="form-control select2" asp-for="@fieldCertificate.FieldId"></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Degree Name</label>
+                                <input type="text" class="form-control" required asp-for="@fieldCertificate.DegreeName"
+                                       placeholder="Enter degree name">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Degree Name In Khmer</label>
+                                <input type="text" class="form-control" required
+                                       asp-for="@fieldCertificate.DegreeNameKhmer"
+                                       placeholder="Enter degree name khmer">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="rdoProffesional" name="r1" checked="checked">
+                                    <label for="rdoProffesional">Use degree and field in single line.</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="rdoAcademic" name="r1">
+                                    <label for="rdoAcademic">Use degree and field in double line.</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="groupOfField" hidden="hidden">
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label class="required">type</label>
+                                    <input type="text" class="form-control" placeholder="In"
+                                           asp-for="@fieldCertificate.Type">
+                                </div>
+                            </div>
+                            <div class="col-9">
+                                <div class="form-group">
+                                    <label>Field Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter name"
+                                           asp-for="@fieldCertificate.FieldName">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label class="required">type_khmer</label>
+                                    <input type="text" class="form-control" asp-for="@fieldCertificate.TypeKhmer"
+                                           placeholder="ជំនាញ / ឯកទេស">
+                                </div>
+                            </div>
+                            <div class="col-9">
+                                <div class="form-group">
+                                    <label>Field Name In Khmer</label>
+                                    <input type="text" class="form-control" asp-for="@fieldCertificate.FieldNameKhmer"
+                                            placeholder="Enter name khmer">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success" form="formFieldCertificate"><i class="fas fa-refresh"></i>
+                    Save Change
+                </button>
+                <button type="button" id="btnClose" class="btn btn-danger"><i
+                        class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div> 

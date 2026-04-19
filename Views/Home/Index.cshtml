@@ -1,0 +1,646 @@
+﻿@model BBU_SYSTEM.ViewModel.HomeViewModel
+@using System.Globalization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["TitleContent"] = "Dashboard";
+    ViewData["Controller"] = "Home";
+    ViewData["Action"] = "Dashboard";
+    // var listtt = @User.FindAll("Privilege").ToList();
+    
+}
+<h1>@ViewData["ServerName"]</h1>
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>@Model.TotalStudent</h3>
+                <p>@Localizer["TotalStudent"]</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-users"></i>
+            </div>
+            @if (User.HasClaim("Privilege", "MNStudent") || User.Identity!.Name == "Officer")
+            {
+                <a asp-controller="Student" asp-action="Status" asp-route-status="all" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>@Model.TotalActive</h3>
+                <p>@Localizer["ActiveStudent"]</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-check"></i>
+            </div>
+            @if (User.HasClaim("Privilege", "MNStudent"))
+            {
+                <a asp-controller="Student" asp-action="Status" asp-route-status="active" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>@Model.TotalRegister</h3>
+                <p>@Localizer["RegisterStudent"]</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            @if (User.HasClaim("Privilege", "MNStudent") || User.Identity!.Name == "Officer")
+            {
+                <a asp-controller="Student" asp-action="Status" asp-route-status="register" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3>@Model.TotalQuit</h3>
+                <p>@Localizer["QuitStudent"]</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-minus"></i>
+            </div>
+            @if (User.HasClaim("Privilege", "MNStudent"))
+            {
+                <a asp-controller="Student" asp-action="Status" asp-route-status="quit" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-fuchsia">
+            <div class="inner">
+                <h3>@Model.TotalGraduated</h3>
+                <p>@Localizer["GraduatedStudent"]</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            @if (User.HasClaim("Privilege", "MNStudent"))
+            {
+                <a asp-controller="Student" asp-action="Status" asp-route-status="graduated" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-pink">
+            <div class="inner">
+                <h3>@Model.TotalCompleted</h3>
+                <p>@Localizer["CompletedStudent"]</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            @if (User.HasClaim("Privilege", "MNStudent"))
+            {
+                <a asp-controller="Student" asp-action="Status" asp-route-status="completed" class="small-box-footer">
+                    More info <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+</div>
+@if (User.HasClaim("Privilege", "MSFullControl"))
+{
+    <div id="reportContainer" class="row"></div>
+}
+
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script>
+    Chart.register(ChartDataLabels);
+    $(document).ready(function () {
+        showLoading()
+         fetchSummaryReport();
+        hideLoading(1)
+     });
+
+    async function fetchSummaryReport() {
+        const localize = `@CultureInfo.CurrentCulture.Name`;
+        // console.log(localize);
+        try {
+            const response = await fetch("/summary-report/gets?isAll=true", {
+                method: "POST"
+            });
+            if (!response.ok) throw new Error("Request failed "+response.statusText);
+
+            const result = await response.json();
+            if (!result || !result.data) return;
+            result.data.forEach(r => {
+                if(r.query.trim() !== "") {
+                    const title = localize.startsWith("en") ? r.title : (r.titleKm || r.title);
+                    // if(localize ==="en"){
+                    //     title = r.title;
+                    // }else{
+                    //     if(r.titleKm){
+                    //         title = r.titleKm;
+                    //     }else {
+                    //         title = r.title;
+                    //     }
+                    // }
+                    const html = `
+                    <div class="col-md-6 mb-4">
+                        <div class="card card-outline card-primary query-block" data-chart="${r.chartType || 'bar'}">
+                            <div class="card-header">
+                                <h3 class="card-title">${title}</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool btnPrint">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart">
+                                    <canvas class="chartCanvas" height="250"></canvas>
+                                </div>
+                                <textarea class="txtQuery d-none">${r.query}</textarea>
+                            </div>
+                        </div>
+                    </div>`;
+                    const $block = $(html);
+                    $("#reportContainer").append($block);
+                    runQueryAndDrawChart1($block.find(".query-block"));
+
+                    // // Add print event
+                    // $block.find(".btnPrint").click(function () {
+                    //     // printChart($block);
+                    //     printDiv($block)
+                    // });
+
+                    // // Draw chart after DOM appended
+                    // drawChart($block.find(".chartCanvas")[0], r.query, r.chartType || 'bar');
+                    //
+                    // // Bind print after chart drawn
+                    // $block.find(".btnPrint").click(() => printChart($block));
+                }
+            });
+        } catch (e) {
+            console.error("Fetch summary report error:", e);
+        }
+    }
+
+    function runQueryAndDrawChart1($block) {
+        const query = $block.find(".txtQuery").val();
+        let chartType = $block.data("chart");
+
+        const validTypes = ["bar", "line", "pie", "doughnut", "radar", "polarArea"];
+        if (!validTypes.includes(chartType)) chartType = "bar";
+
+        const canvas = $block.find(".chartCanvas")[0];
+        if (!query || !canvas) return;
+
+        const ctx = canvas.getContext("2d");
+
+        $.ajax({
+            url: "/report/run-query",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({query}),
+            success: function (data) {
+                if (!data || data.length === 0) return;
+
+                const labels = data.map(x => x.label);
+                const values = data.map(x => Number(x.value));
+
+                if ($block.data("chartInstance")) {
+                    $block.data("chartInstance").destroy();
+                }
+
+                const chart = new Chart(ctx, {
+                    type: chartType,
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Result',
+                                data: values,
+                                backgroundColor: labels.map(() => getRandomColor()),
+                                maxBarThickness: 80,
+                                barPercentage: 0.8,
+                                categoryPercentage: 0.6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: Math.max(...values) * 1.1,
+                                ticks: {precision: 0}
+                            }
+                        },
+                        plugins: {
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'end',
+                                color: '#000',
+                                font: {weight: 'bold', size: 12},
+                                formatter: value => value
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+
+                $block.data("chartInstance", chart);
+            },
+            error: function (err) {
+                console.error("RunQuery error:", err.responseText);
+            }
+        });
+    }
+
+    function runQueryAndDrawMultipleChart($block) {
+        const query = $block.find(".txtQuery").val();
+        let chartType = $block.data("chart");
+
+        const validTypes = ["bar", "line"];
+        if (!validTypes.includes(chartType)) chartType = "bar";
+
+        const canvas = $block.find(".chartCanvas")[0];
+        if (!query || !canvas) return;
+
+        const ctx = canvas.getContext("2d");
+
+        $.ajax({
+            url: "/Report/MutipleChartRunQuery",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ query }),
+            success: function (data) {
+
+                if (!data || data.length === 0) return;
+                const labelKey = Object.keys(data[0])[0];      // faculty
+                const valueKeys = Object.keys(data[0]).slice(1); // male, female, total
+
+                const labels = data.map(x => x[labelKey]);
+
+                const datasets = valueKeys.map(key => ({
+                    label: key,
+                    value: key,
+                    data: data.map(x => Number(x[key]) || 0),
+                    backgroundColor: getRandomColor(), // ✅ ONE color per dataset
+                    maxBarThickness: 50
+                }));
+
+                new Chart(ctx, {
+                    type: "bar", // 🔥 MUST be bar
+                    data: {
+                        labels,
+                        datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                stacked: false
+                            },
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: "top"
+                            },
+                            datalabels: {
+                                display: true,           // ✅ show numbers
+                                anchor: "end",
+                                align: "end",
+                                color: "#000",
+                                font: {
+                                    weight: "bold",
+                                    size: 12
+                                },
+                                formatter: value => value // ✅ show actual number
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels] // ✅ REQUIRED
+
+                });
+                // // 1️⃣ First column = labels (faculty)
+                // const labelKey = Object.keys(data[0])[0];
+                // const labels = data.map(x => x[labelKey]);
+                //
+                // // 2️⃣ Remaining columns = datasets
+                // const valueKeys = Object.keys(data[0]).slice(1);
+                //
+                // const datasets = valueKeys.map(key => ({
+                //     label: key,
+                //     data: data.map(x => Number(x[key]) || 0),
+                //     backgroundColor: labels.map(() => getRandomColor()),
+                //     maxBarThickness: 60,
+                //     barPercentage: 0.9,
+                //     categoryPercentage: 0.7
+                // }));
+                //
+                // // destroy old chart
+                // if ($block.data("chartInstance")) {
+                //     $block.data("chartInstance").destroy();
+                // }
+                //
+                // const chart = new Chart(ctx, {
+                //     type: "bar",
+                //     data: {
+                //         labels,
+                //         datasets
+                //     },
+                //     options: {
+                //         responsive: true,
+                //         maintainAspectRatio: false,
+                //         // scales: {
+                //         //     x: { stacked: true },
+                //         //     y: {
+                //         //         beginAtZero: true,
+                //         //         ticks: { precision: 0 }
+                //         //     }
+                //         // },
+                //         scales: {
+                //             x: { stacked: true },
+                //             y: { stacked: true }
+                //         },
+                //         plugins: {
+                //             legend: {
+                //                 position: "top"
+                //             },
+                //             datalabels: {
+                //                 anchor: 'end',
+                //                 align: 'end',
+                //                 color: '#000',
+                //                 font: { weight: 'bold', size: 11 },
+                //                 formatter: value => value
+                //             }
+                //         }
+                //     },
+                //     plugins: [ChartDataLabels]
+                // });
+
+                $block.data("chartInstance", chart);
+            },
+            error: function (err) {
+                console.error("RunQuery error:", err.responseText);
+            }
+        });
+    }
+
+
+
+    function getRandomColor() {
+        return "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
+    }
+
+    function drawChart(canvas, query, chartType = "bar") {
+        $.ajax({
+            url: "/Report/RunQuery",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ query }),
+            success: function (data) {
+
+                const labels = data.map(x => x.faculty);
+
+                const dataset1 = data.map(x => x.col1);
+                const dataset2 = data.map(x => x.col2);
+                const dataset3 = data.map(x => x.col3);
+
+                new Chart(canvas, {
+                    type: chartType,
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: "Column 1",
+                                data: dataset1,
+                                backgroundColor: "#007bff"
+                            },
+                            {
+                                label: "Column 2",
+                                data: dataset2,
+                                backgroundColor: "#28a745"
+                            },
+                            {
+                                label: "Column 3",
+                                data: dataset3,
+                                backgroundColor: "#ffc107"
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { precision: 0 }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: "top"
+                            },
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'end',
+                                font: { weight: 'bold' }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            },
+            error: function (err) {
+                console.error("RunQuery error:", err.responseText);
+            }
+        });
+    }
+
+    // Draw Chart function
+    function drawChart1(canvas, query, chartType) {
+        // Run your server query
+        $.ajax({
+            url: "/Report/RunQuery",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ query }),
+            success: function (data) {
+                const labels = data.map(x => x.label);
+                const values = data.map(x => x.value);
+
+                new Chart(canvas, {
+                    type: chartType,
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Result',
+                            data: values,
+                            backgroundColor: labels.map(() => getRandomColor()),
+                            maxBarThickness: 45
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, ticks: { precision: 0 } }
+                        },
+                        plugins: {
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'end',
+                                font: { weight: 'bold' }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            },
+            error: function (err) {
+                console.error("RunQuery error:", err.responseText);
+            }
+        });
+    }
+    
+    function drawChart2(canvas, query, chartType = "bar") {
+        $.ajax({
+            url: "/Report/RunQuery",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ query }),
+            success: function (data) {
+
+                const labels = data.map(x => x.faculty);
+
+                const dataset1 = data.map(x => x.col1);
+                const dataset2 = data.map(x => x.col2);
+                const dataset3 = data.map(x => x.col3);
+
+                new Chart(canvas, {
+                    type: chartType,
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: "Column 1",
+                                data: dataset1,
+                                backgroundColor: "#007bff"
+                            },
+                            {
+                                label: "Column 2",
+                                data: dataset2,
+                                backgroundColor: "#28a745"
+                            },
+                            {
+                                label: "Column 3",
+                                data: dataset3,
+                                backgroundColor: "#ffc107"
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { precision: 0 }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: "top"
+                            },
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'end',
+                                font: { weight: 'bold' }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            },
+            error: function (err) {
+                console.error("RunQuery error:", err.responseText);
+            }
+        });
+    }
+
+
+    // Print Chart function
+    function printChart($card) {
+        const canvas = $card.find(".chartCanvas")[0];
+        const chartTitle = $card.find(".card-title").text();
+
+        setTimeout(() => {
+            const imgData = canvas.toDataURL();
+            const win = window.open("", "_blank");
+            win.document.write(`
+            <html>
+                <head>
+                    <title>${chartTitle}</title>
+                    <style>
+                        body { text-align:center; font-family:Arial; }
+                        h3 { margin-bottom:20px; }
+                        img { max-width:100%; height:auto; }
+                    </style>
+                </head>
+                <body>
+                    <h3>${chartTitle}</h3>
+                    <img src="${imgData}" />
+                </body>
+            </html>
+        `);
+            win.document.close();
+            win.focus();
+            win.print();
+            win.close();
+        }, 200);
+    }
+
+
+    // function printChart($card) {
+    //     const canvas = $card.find(".chartCanvas")[0];
+    //     const chartTitle = $card.find(".card-title").text();
+    //
+    //     // Open a new window
+    //     const win = window.open("", "_blank");
+    //     win.document.write(`<html><head><title>${chartTitle}</title></head><body style="text-align:center;">`);
+    //     win.document.write(`<h3>${chartTitle}</h3>`);
+    //     win.document.write(`<img src="${canvas.toDataURL()}" style="max-width:100%;height:auto;">`);
+    //     win.document.write("</body></html>");
+    //     win.document.close();
+    //     win.focus();
+    //     win.print();
+    //     win.close();
+    // }
+    
+    
+</script>
+
+
+

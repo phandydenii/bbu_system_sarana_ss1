@@ -1,0 +1,405 @@
+﻿@using System.Text.Json
+@using BBU_SYSTEM.DTOs
+@using BBU_SYSTEM.ViewModel
+@{
+    ViewData["OpenMenu"] = "AcademicTask";
+    ViewData["Action"] = "ManageStudent";
+    var studentId = ViewContext.RouteData.Values["studentId"]!.ToString() ?? "";
+    var studentViewModel = new StudentViewModel();
+    var student = new StudentDto();
+    var registry = new RegistryDto();
+    // var privileges = @User.FindAll("Privilege").ToList();
+    var privileges = User.FindAll("Privilege").Select(p => p.Value).ToList();
+
+    var isFull = privileges.Contains("MSFullControl");
+    var isUpdate = privileges.Contains("MSUpdate");
+    var isSuppress = privileges.Contains("MSSuppress");
+    var isChangeBranch = privileges.Contains("MSChangeBranch");
+    var isChangeSchool = privileges.Contains("MSChangeSchool");
+    var isQuit = privileges.Contains("MSQuit");
+    var isSuspend = privileges.Contains("MSSuspend");
+    var isAdjustGroup = privileges.Contains("ASAdjustGroup");
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card card-outline card-success">
+            <div class="card-header">
+                <h3 class="card-title">Student Information</h3>
+                <div class="card-tools">
+                    <div id="actionButtons">
+                        @if (isFull 
+                             || isUpdate 
+                             || isSuppress 
+                             || isChangeBranch 
+                             || isChangeSchool 
+                             || isQuit
+                             || isAdjustGroup
+                             || isSuspend)
+                        {
+                            <button id="btnEdit" class="btn btn-outline-primary btn-sm"><i class="fas fa-pen"></i>
+                            </button>
+                        }
+                        @if (isFull || isUpdate)
+                        {
+                            <button id="btnUpdate" class="btn btn-pink btn-sm d-none" form="frmStudent">
+                                <i class="fas fa-wrench"></i> Update
+                            </button>
+                        }
+                        @if (isFull || isSuppress)
+                        {
+                            <button class="btn btn-primary btn-sm d-none" id="btnSuppress" data-action="suppress">
+                                <i class="fas fa-exclamation-triangle"></i> <span id="lblSuppress">Suppress</span>
+                            </button>
+                        }
+                        @if (isFull || isChangeBranch)
+                        {
+                            <button class="btn btn-default btn-sm d-none" id="btnChangeBranch"
+                                    data-action="changeBranch">
+                                <i class="fas fa-sync-alt"></i> <span id="lblChangeBranch">Change Branch</span>
+                            </button>
+                        }
+                        @if (isFull || isChangeSchool)
+                        {
+                            <button class="btn btn-warning btn-sm d-none" id="btnChangeSchool"
+                                    data-action="changeSchool">
+                                <i class="fas fa-retweet"></i> <span id="lblChangeSchool">Change School</span>
+                            </button>
+                        }
+                        @if (isFull || isQuit)
+                        {
+                            <button class="btn btn-secondary btn-sm d-none" id="btnQuit" data-action="quit">
+                                <i class="fas fa-ban"></i> <span id="lblQuit">Quit</span>
+                            </button>
+                        }
+                        @if (isFull || isSuspend)
+                        {
+                            <button class="btn btn-success btn-sm d-none" id="btnSuspend" data-action="suspend">
+                                <i class="fas fa-stop-circle"></i> <span id="lblSuspend">Suspend</span>
+                            </button>
+                        }
+                        @if (isFull || isAdjustGroup)
+                        {
+                            <button class="btn btn-info btn-sm d-none" id="btnAdjust" data-action="adjust">
+                                <i class="fas fa-sliders-h"></i> Adjust
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" style="display: block;">
+                <input type="hidden" value="@studentId" id="txtStudentId">
+                <form id="frmStudent">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="card card-primary card-outline card-outline-tabs">
+                                <div class="card-header p-0 border-bottom-0">
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="personal-tab" data-toggle="pill"
+                                               href="#personal" role="tab"
+                                               aria-controls="personal">Personal</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="personal-contact-tab" data-toggle="pill"
+                                               href="#personal-contact" role="tab"
+                                               aria-controls="personal-contact" aria-selected="false">
+                                                Personal Contact
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="relative-contact-tab" data-toggle="pill"
+                                               href="#relative-contact" role="tab"
+                                               aria-controls="relative-contact" aria-selected="false">
+                                                Relative Contact
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="parent-tab" data-toggle="pill"
+                                               href="#parent" role="tab"
+                                               aria-controls="parent" aria-selected="false">Parent</a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                                <div class="card-body">
+                                    <div class="tab-content">
+                                        <div class="tab-pane fade show active" id="personal" role="tabpanel"
+                                             aria-labelledby="personal-tab">
+                                            <partial name="_Personal"/>
+                                        </div>
+                                        <div class="tab-pane fade" id="personal-contact" role="tabpanel"
+                                             aria-labelledby="personal-contact-tab">
+                                            <partial name="_PersonalContact"/>
+                                        </div>
+                                        <div class="tab-pane fade" id="relative-contact" role="tabpanel"
+                                             aria-labelledby="relative-contact-tab">
+                                            <partial name="_RelativeContact"/>
+                                        </div>
+                                        <div class="tab-pane fade" id="parent" role="tabpanel"
+                                             aria-labelledby="parent-tab">
+                                            <partial name="_Parent"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="card card-outline card-primary">
+                                <div class="card-body" style="display: block;">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <label>Degree</label>
+                                            <input type="text" class="form-control" id="txtDegree" readonly/>
+                                        </div>
+                                        <div class="col-9">
+                                            <label>School</label>
+                                            <input type="text" class="form-control" id="txtSchool" readonly/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <label>Promotion</label>
+                                            <input type="text" class="form-control" id="txtPromotion" readonly/>
+                                        </div>
+                                        <div class="col-9">
+                                            <label>Field Group</label>
+                                            <input type="text" class="form-control" id="txtFieldGroup" readonly/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <label>Stage</label>
+                                            <input type="text" class="form-control" id="txtStage" readonly/>
+                                        </div>
+                                        <div class="col-9">
+                                            <label>Field Student</label>
+                                            <select asp-for="@student.FieldId" class="form-control select2">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <label>Term</label>
+                                            <input type="text" class="form-control" id="txtTerm" readonly>
+                                        </div>
+                                        <div class="col-3">
+                                            <label>Study Time</label>
+                                            <input type="text" class="form-control" id="txtStudyTime" readonly>
+                                        </div>
+                                        <div class="col-3">
+                                            <label>Room</label>
+                                            <input type="text" class="form-control" id="txtRoom" readonly>
+                                        </div>
+                                        <div class="col-3">
+                                            <label>Group</label>
+                                            <select id="cboGroup" class="form-control select2">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox"
+                                                       asp-for="@student.IsContinuedStudent">
+                                                <label for="@student.IsContinuedStudent" class="custom-control-label">Continued
+                                                    Student</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox"
+                                                       asp-for="@student.AssociateToBachelor">
+                                                <label for="@student.AssociateToBachelor" class="custom-control-label">Associate
+                                                    to Bachelor</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card card-outline card-indigo">
+            <div class="card-header">
+                <h3 class="card-title">History</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body" style="display: block;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card card-primary card-outline card-outline-tabs">
+                            <div class="card-header p-0 border-bottom-0">
+                                <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="scholarship-tab"
+                                           data-toggle="pill"
+                                           href="#scholarship" role="tab"
+                                           aria-controls="scholarship" aria-selected="false">
+                                            អាហារូបករណ៍
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="issue-letter-tab" data-toggle="pill"
+                                           href="#issue-letter" role="tab"
+                                           aria-controls="issue-letter" aria-selected="false">លិខិត</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="certificate-tab" data-toggle="pill"
+                                           href="#certificate" role="tab"
+                                           aria-controls="certificate"
+                                        >សញ្ញាបត្របាក់ឌុប</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="branch-history-tab" data-toggle="pill"
+                                           href="#branch-history" role="tab"
+                                           aria-controls="branch-history">ប្រវត្តដូរសាខា</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="suppress-history-tab"
+                                           data-toggle="pill"
+                                           href="#suppress-history" role="tab"
+                                           aria-controls="suppress-history">ព្យួរបណ្តោះអាសន្ន</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="payment-tab" data-toggle="pill"
+                                           href="#payment" role="tab"
+                                           aria-controls="payment">បង់ថ្លៃសិក្សា</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="suspend-tab" data-toggle="pill"
+                                           href="#suspend" role="tab"
+                                           aria-controls="suspend">ព្យួរការសិក្សា</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="group-history-tab" data-toggle="pill"
+                                           href="#group-history" role="tab"
+                                           aria-controls="group-history">ប្រវត្តក្រុមសិក្សា</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="extend-from-tab" data-toggle="pill"
+                                           href="#extend-from" role="tab"
+                                           aria-controls="extend-from">ផ្ទេរសាខា</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="complementation-tab" data-toggle="pill"
+                                           href="#complementation" role="tab"
+                                           aria-controls="complementation">ការបំពេញបន្ថែម</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="quit-tab" data-toggle="pill"
+                                           href="#quit" role="tab"
+                                           aria-controls="quit">បោះបង់ការសិក្សា</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="continue-education-tab"
+                                           data-toggle="pill"
+                                           href="#continue-education" role="tab"
+                                           aria-controls="continue-education" aria-selected="false">
+                                            បន្តការសិក្សា
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="note-tab"
+                                           data-toggle="pill"
+                                           href="#note" role="tab"
+                                           aria-controls="note" aria-selected="false">
+                                            ចំណាំ
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <div class="tab-content">
+                                    <div class="tab-pane fade" id="scholarship" role="tabpanel"
+                                         aria-labelledby="scholarship-tab">
+                                        <partial name="_TabScholarship"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="issue-letter" role="tabpanel"
+                                         aria-labelledby="issue-letter-tab">
+                                        <partial name="_TabIssueLetter"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="certificate" role="tabpanel"
+                                         aria-labelledby="certificate-tab">
+                                        <partial name="_TabCertificate"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="branch-history" role="tabpanel"
+                                         aria-labelledby="branch-history-tab">
+                                        <partial name="_TabBranchHistory"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="suppress-history" role="tabpanel"
+                                         aria-labelledby="suppress-history-tab">
+                                        <partial name="_TabSuppressHistory"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="payment" role="tabpanel"
+                                         aria-labelledby="payment-tab">
+                                        <partial name="_TabPayment"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="suspend" role="tabpanel"
+                                         aria-labelledby="suspend-tab">
+                                        <partial name="_TabSuspend"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="group-history" role="tabpanel"
+                                         aria-labelledby="group-history-tab">
+                                        <partial name="_TabGroupHistory"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="extend-from" role="tabpanel"
+                                         aria-labelledby="extend-from-tab">
+                                        <partial name="_TabExtendFrom"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="complementation" role="tabpanel"
+                                         aria-labelledby="complementation-tab">
+                                        <partial name="_TabComplement"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="quit" role="tabpanel"
+                                         aria-labelledby="quit-tab">
+                                        <partial name="_TabQuit"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="continue-education" role="tabpanel"
+                                         aria-labelledby="continue-education-tab">
+                                        <partial name="_TabContinueEducation"/>
+                                    </div>
+                                    <div class="tab-pane fade" id="note" role="tabpanel"
+                                         aria-labelledby="note-tab">
+                                        <partial name="_TabNote"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+
+@section Scripts
+{
+    <script src="~/js/Components.js"></script>
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Term.js"></script>
+    <script src="~/function/Group.js"></script>
+    <script src="~/function/AcademicStudentDetail.js"></script>
+    <script>
+        const privileges = @Html.Raw(
+                               JsonSerializer.Serialize(
+                                   User.FindAll("Privilege").Select(p => p.Value)
+                               )
+                           );
+    </script>
+}

@@ -1,0 +1,91 @@
+@model BBU_SYSTEM.ViewModel.ListData
+@using BBU_SYSTEM.DTOs;
+@{
+    var field = new FieldDto();
+}
+<div class="modal fade" id="modalField" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add Field</h4> 
+            </div>
+            <div class="modal-body">
+                <form id="formField">
+                    <input asp-for="@field.FieldId" readonly class="form-control" hidden value="0"/>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>Degree</label>
+                                <select asp-for="@field.DegreeId" class="form-control select2"></select>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="form-group">
+                                <label>School</label>
+                                <select asp-for="@field.SchoolId" class="form-control select2"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Degree Name</label>
+                                <input type="text" asp-for="@field.DegreeName" class="form-control"
+                                       placeholder="Enter degree name">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Degree Name In Khmer</label>
+                                <input type="text" asp-for="@field.DegreeNameInKhmer" class="form-control"
+                                       placeholder="Enter degree name khmer">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Field Name</label>
+                                <input type="text" asp-for="@field.FieldName" class="form-control"
+                                       placeholder="Enter field name">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Field Name In Khmer</label>
+                                <input type="text" asp-for="@field.FieldNameInKhmer" id="degree_name_kh" class="form-control"
+                                       placeholder="Enter field name khmer">
+                            </div>
+                        </div>
+                    </div>
+                    <input type="checkbox" asp-for="@field.Type" hidden="hidden">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="rdoProffesional" name="r1" checked="checked">
+                                    <label for="rdoProffesional">Professional</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="rdoAcademic" name="r1">
+                                    <label for="rdoAcademic">Academic</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success float-right" form="formField"><i class="fas fa-save"></i>
+                    Save
+                </button>
+                <button class="btn btn-danger float-right" data-dismiss="modal"><i class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

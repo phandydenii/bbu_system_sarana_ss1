@@ -1,0 +1,653 @@
+const studId = $("#txtStudentId").val();
+const frmStudent = $("#frmStudent");
+const actionButtons = $("#actionButtons");
+const btnEdit = $("#btnEdit");
+
+async function BindData() {
+    await BindSelectOptions("/Province/get-provinces", "student_PlaceOfBirthId", "provinceId", "provinceName");
+    await BindSelectOptions("/Nationality/get-nationalities", "student_NationalityId", "nationalityId", "nationalityName");
+    await BindSelectOptions("/Province/get-provinces", "student_FromProvinceId", "provinceId", "provinceName");
+    await BindSelectOptions("/high-school/get-high-school", "student_FromHighSchoolNameInKhmer", "highSchoolNameInKhmer", "highSchoolNameInKhmer");
+    await BindSelectOptions("/student-job/get-student-jobs", "student_JobId", "jobId", "jobName");
+    await BindSelectOptions("/disability/get-disabilities", "student_DisabilityId", "disabilityId", "disabilityName");
+    await BindSelectOptions("/race/get-races", "student_RaceId", "raceId", "raceName");
+}
+
+$(document).ready(async function () {
+    frmStudent.prop("readonly", true);
+    await BindData();
+    await getStudent(studId);
+    await fetchStudentScholarship(studId);
+    await fetchStudentGroup(studId);
+    await fetchStudentExtend(studId);
+    await fetchStudentPayment(studId);
+    await fetchStudentBranchHistory(studId);
+    await fetchStudentIssueLetter(studId);
+    await fetchStudentCertificate(studId);
+    await fetchSuppress(studId);
+    await fetchSuspend(studId);
+    await fetchQuit(studId);
+    await fetchComplement(studId);
+
+    $('#custom-tabs-four-tab a:first').tab('show');
+    $('#frmStudent :input').prop('disabled', true);
+ });
+
+function checkPrivileges() {
+    console.log(privileges);
+    if(!privileges.includes('SUPPRESS')) {
+        actionButtons.find('#btnSuppress').remove();
+    }
+}
+btnEdit.on("click", function (e) {
+    $(this).html('<i class="fas fa-check"></i>');
+    actionButtons.find("button").removeClass("d-none");
+    $('#frmStudent :input').prop('disabled', false);
+});
+
+async function getStudent(student_id) {
+    $.ajax({
+        url: "/student/academic/student-id/" + student_id,
+        type: "GET",
+        data: {student_id: student_id},
+        success: function (result) {
+            const data = result.data;
+            if (data) {
+                const student = data["student"];
+                const contactPerson = data["contactPerson"];
+                const degree = data["degree"];
+                const school = data["school"];
+                const field = data["field"];
+                const promotion = data["promotion"];
+                const stage = data["stage"];
+                const term = data["term"];
+                const group = data["group"];
+                const groupRoom = data["groupRoom"];
+                const registry = data["registry"];
+                const fieldGroup = data["fieldGroup"];
+                // console.log(data);
+                $("#txtDegree").val(degree.degreeName);
+               
+                GetField(degree.degreeId, school.schoolId);
+                $("#student_FieldId").val(student.fieldId).trigger("change");
+                if(school.isFoundationSchool ===1){
+                    $("#txtSchool").val(`${school.schoolName} (${registry.schoolName})`); 
+                    $("#txtFieldGroup").val(`${fieldGroup.fieldName} (${field.fieldName}`);
+                }else{
+                    $("#txtSchool").val(school.schoolName);
+                    $("#txtFieldGroup").val(fieldGroup.fieldName);
+                }
+                
+                $("#txtPromotion").val(promotion.promotionNo);
+                $("#txtStage").val(stage.stageNo);
+                $("#txtTerm").val(term.termNo);
+                $("#txtStudyTime").val(group.studyTime);
+                $("#txtRoom").val(groupRoom.roomName);
+                $("#txtGroup").val(group.groupName);
+                
+                
+                $("#student_StudentId").val(student.studentId);
+                $("#student_StudentName").val(`${student.studentName}`);
+                $("#student_StudentNameInKhmer").val(`${student.studentNameInKhmer}`);
+                $("#student_Sex").val(student.sex);
+                $("#student_Phone").val(student.phone); 
+                $("#student_Email").val(student.email).trigger("change");
+                $("#student_Address").val(student.address).trigger("change");
+                $("#student_AddressInKhmer").val(student.addressInKhmer).trigger("change");
+                const student_Status = $("#student_Status");
+                if(student.status === "ACTIVE"){
+                    student_Status.addClass("bg-success");
+                }else if(student.status === "REGISTER"){
+                    student_Status.addClass("bg-warning");
+                }else if(student.status === "QUIT"){
+                    student_Status.addClass("bg-danger");
+                }else if(student.status === "GRADUATED"){
+                    student_Status.addClass("bg-fuchsia");
+                }else if(student.status === "COMPLETED"){
+                    student_Status.addClass("bg-pink");
+                }else {
+                    student_Status.addClass("bg-default");
+                }
+
+                student_Status.val(student.status);
+                $("#student_Note").val(student.note);
+                $("#student_CheckCompleteTerm").val(student.checkCompleteTerm);
+                $("#student_CheckComplete").val(student.checkComplete);
+                $("#student_CheckCompleteNote").val(student.checkCompleteNote);
+                $("#student_DateOfBirth").val(formatDateForInput(student.dateOfBirth)).trigger("change");
+                $("#student_MaritalStatus").val(student.maritalStatus);
+                $("#student_HighSchoolGraduatedYear").val(student.highSchoolGraduatedYear);
+                $("#student_FromHighSchoolNameInKhmer").val(student.fromHighSchoolNameInKhmer).trigger("change");
+
+                $("#student_PlaceOfBirthId").val(student.placeOfBirthId).trigger("change");
+                $("#student_NationalityId").val(student.nationalityId).trigger("change");
+                $("#student_FromProvinceId").val(student.fromProvinceId).trigger("change");
+                $("#student_RaceId").val(student.raceId).trigger("change");
+                $("#student_JobId").val(student.jobId).trigger("change");
+                $("#student_DisabilityId").val(student.disabilityId).trigger("change");
+                $("#registry_RegistrationId").val(registry.registrationId);
+                $("#registry_HighSchoolTableNo").val(registry.highSchoolTableNo).trigger("change");
+                $("#registry_HighSchoolResult").val(registry.highSchoolResult).trigger("change");
+
+                $("#contactPerson_ContactPersonName").val(contactPerson.contactPersonName).trigger("change");
+                $("#contactPerson_Job").val(contactPerson.job).trigger("change");
+                $("#contactPerson_Phone").val(contactPerson.phone).trigger("change");
+                $("#contactPerson_Address").val(contactPerson.address).trigger("change");
+
+                $("#student_FatherNameInKhmer").val(student.fatherNameInKhmer);
+                $("#student_FatherOccupationInKhmer").val(student.fatherOccupationInKhmer).trigger("change");
+                $("#student_MotherNameInKhmer").val(student.motherNameInKhmer).trigger("change");
+                $("#student_MotherOccupationInKhmer").val(student.motherOccupationInKhmer).trigger("change");
+                $("#student_IsContinuedStudent").prop("checked",student.isContinuedStudent===1);
+                $("#student_AssociateToBachelor").prop("checked",student.associateToBachelor===1);
+                $("#student_IsReceivePhoto").prop("checked",student.isPhotoReceived === 1);
+                GetGroup(promotion.promotionId, term.termNo);
+                $("#cboGroup").val(group.groupId).trigger("change");
+            } else {
+                ShowToastError("Student not found.");
+            }
+        },
+        error: function () {
+            ShowToastError("Error fetching student data.");
+        }
+    });
+}
+
+async function GetField(degreeId, schoolId) {
+    const cboField = $("#student_FieldId");
+    cboField.empty();
+    cboField.append("<option value='' disabled>Select</option>");
+    const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
+    fields.forEach(item => {
+        cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
+    });
+}
+
+async function GetGroup(promotionId, termNo) {
+    const cboGroup = $("#cboGroup");
+    const groups = await Group.GetGroups();
+    const stages = await Stage.GetStages();
+    const terms = await Term.GetTerms();
+    const filteredGroups = groups.filter(g =>
+        stages.some(s => s.stageId === g.stageId && s.promotionId === promotionId) &&
+        terms.some(t => t.stageId === g.stageId && t.termNo === termNo)
+    );
+    filteredGroups.forEach(item => {
+        cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
+    });
+}
+
+//=====1-_TabScholarship
+function fetchStudentScholarship(studentId) {
+    const tblStudentScholarship = $("#tblStudentScholarship");
+    tblStudentScholarship.DataTable().clear().destroy();
+    tblStudentScholarship.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/student-scholarship/get-student-scholarship/" + studentId,
+            type: "POST",
+            dataSrc: function (json) {
+                // console.log(json.data.length);
+                if (!json.data || json.data.length === 0) {
+                    $("#scholarship-tab").closest("li").remove();
+                    $("#scholarship").remove();
+                }
+                return json.data;
+            },
+            error: function (xhr, status, error) {
+                ShowToastError(xhr.responseText);
+            }
+        },
+        columns: [
+            {data: "studentScholarshipId"},
+            {data: "studentId"},
+            {data: "termNo"},
+            {data: "isFullScholarship"},
+            {data: "amount"},
+            {data: "sponsorName"},
+        ]
+    });
+}
+
+//====2-_TabIssueLetter
+function fetchStudentIssueLetter(studentId) {
+    const tblStudentIssueLetter = $("#tblStudentIssueLetter");
+    tblStudentIssueLetter.DataTable().clear().destroy();
+    tblStudentIssueLetter.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/student-letters/get-student-letter/" + studentId,
+            type: "POST",
+            dataSrc: function (json) {
+                if (!json.data || json.data.length === 0) {
+                    $("#issue-letter-tab").closest("li").remove();
+                    $("#issue-letter").remove();
+                }
+                return json.data;
+            },
+            error: function (xhr, status, error) {
+                ShowToastError(xhr.responseText);
+            }
+        },
+        columns: [
+            {data: "studentLetterId"},
+            {data: "studentId"},
+            {data: "letterName"},
+            {
+                data: "doneDate1",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            },
+            {
+                data: "doneDate2",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            },
+            {data: "issuedNo"},
+            {data: "issuedDate"},
+            {data: "author"},
+        ]
+    });
+}
+
+//====3-_TabCertificate
+function fetchStudentCertificate(studentId) {
+    const tblStudentCertificate = $("#tblStudentCertificate");
+    tblStudentCertificate.DataTable().clear().destroy();
+    tblStudentCertificate.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/student-certificate/get-student-certificate/" + studentId,
+            type: "POST",
+            dataSrc: function (json) {
+                if (!json.data || json.data.length === 0) {
+                    $("#certificate-tab").closest("li").remove();
+                    $("#certificate").remove();
+                }
+                return json.data;
+            },
+            error: function (xhr, status, error) {
+                ShowToastError(xhr.responseText);
+            }
+        },
+        columns: [
+            {data: "studentCertificateId"},
+            {data: "studentId"},
+            {data: "certificateName"},
+            {data: "grade"},
+            {data: "isReceived"},
+            {data: "certificateIssueNo"},
+        ]
+    });
+}
+
+
+//====4-_TabBranchHistory
+function fetchStudentBranchHistory(studentId) {
+    const tblBranchHistory = $("#tblBranchHistory");
+    tblBranchHistory.DataTable().clear().destroy();
+    tblBranchHistory.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/change-branch/get-student-change-branch/" + studentId,
+            type: "POST",
+            dataSrc: function (json) {
+                if (!json.data || json.data.length === 0) {
+                    $("#branch-history-tab").closest("li").remove();
+                    $("#branch-history").remove();
+                    $("#btnChangeBranch").data("action","changeBranch");
+                    $("#lblChangeBranch").text("Change Branch");
+                }else{
+                    $("#btnChangeBranch").data("action","return");
+                    $("#lblChangeBranch").text("Return");
+                }
+                return json.data;
+            },
+            error: function (xhr, status, error) {
+                ShowToastError(xhr.responseText);
+            }
+        },
+        columns: [
+            {data: "changeBranchId"},
+            {data: "studentId"},
+            {data: "toBranchId"},
+            {data: "termNo"},
+            {data: "fromDate"},
+            {data: "returnDate"},
+            {data: "degreeId"},
+            {data: "schoolId"},
+            {data: "fieldId"},
+            {data: "promotionId"},
+            {data: "stageId"},
+            {data: "groupId"},
+        ]
+    });
+}
+
+//===5-TabSuppressHistory
+function fetchSuppress(studentId) {
+    const tblSuppress = $("#tblSuppress");
+    tblSuppress.DataTable().clear().destroy();
+    tblSuppress.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/student-suppress/get-student-suppress/" + studentId,
+            type: "POST",
+            dataSrc: function (json) {
+                if (!json.data || json.data.length === 0) {
+                    $("#suppress-history-tab").closest("li").remove();
+                    $("#suppress-history").remove();
+                    $("#btnSuppress").data("action","suppress");
+                    $("#lblSuppress").text("Suppress");
+                }else{ 
+                    $("#btnSuppress").data("action","express");
+                    $("#lblSuppress").text("Express");
+                }
+                console.log(json.data);
+                return json.data;
+            },
+            error: function (xhr, status, error) {
+                ShowToastError(xhr.responseText);
+            }
+        },
+        columns: [
+            {data: "suppressId"},
+            {data: "studentId"},
+            {data: "termNo"},
+            {data: "suppressDate"},
+            {data: "expressDate"},
+            {data: "reasonOfSuppress"},
+        ]
+    });
+}
+
+//==6-TabAbsence
+
+//====7-_TabPayment
+function fetchStudentPayment(studentId) {
+    const tblStudentPayment = $("#tblStudentPayment");
+    tblStudentPayment.DataTable().clear().destroy();
+    tblStudentPayment.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/payment/get-student-payments/" + studentId,
+            type: "POST",
+            dataSrc: function (json) {
+                if (!json.data || json.data.length === 0) {
+                    $("#payment-tab").closest("li").remove();
+                    $("#payment").remove();
+                }
+                return json.data;
+            },
+            error: function (xhr, status, error) {
+                ShowToastError(xhr.responseText);
+            }
+        },
+        columns: [
+            {data: "paymentId"},
+            {data: "studentId"},
+            {data: "invoiceNo"},
+            {
+                data: "invoiceDate",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            },
+            {data: "termNo"},
+            {data: "paid"},
+            {data: "deposit"},
+            {data: "note"},
+            {data: "isInsurance"},
+            {data: "guardian"},
+        ]
+    });
+}
+
+//====8-_TabSuspend
+function fetchSuspend(studentId) {
+    const tblSuspend = $("#tblSuspend");
+    tblSuspend.DataTable().clear().destroy();
+    tblSuspend.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/student-suspend/get-student-suspend/" + studentId,
+            type: "POST",
+            dataSrc: function (json) {
+                if (!json.data || json.data.length === 0) {
+                    $("#suspend-tab").closest("li").remove();
+                    $("#suspend").remove();
+                    $("#btnSuspend").data("action","suspend");
+                    $("#lblSuspend").text("Suspend");
+                }else{
+                    $("#btnSuspend").data("action","resume");
+                    $("#lblSuspend").text("Resume");
+                }
+                return json.data;
+            },
+            error: function (xhr, status, error) {
+                ShowToastError(xhr.responseText);
+            }
+        },
+        columns: [
+            {data: "suspendId"},
+            {data: "studentId"},
+            {data: "termNo"},
+            {data: "promotionNo"},
+            {data: "groupName"},
+            {
+                data: "fromDate",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            },
+            {
+                data: "toDate",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            },
+            {data: "reasonOfSuspend"}
+        ]
+    });
+}
+
+//===9_TabGroupHistory
+function fetchStudentGroup(studentId) {
+    const tblStudentGroup = $("#tblStudentGroup");
+    tblStudentGroup.DataTable().clear().destroy();
+    tblStudentGroup.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/student-group/get-student-group/" + studentId,
+            type: "POST",
+            dataSrc: function (json) {
+                if (!json.data || json.data.length === 0) {
+                    $("#group-history-tab").closest("li").remove();
+                    $("#group-history").remove();
+                }
+                return json.data;
+            },
+            error: function (xhr, status, error) {
+                ShowToastError(xhr.responseText);
+            }
+        },
+        columns: [
+            {data: "studentGroupId"},
+            {data: "studentId"},
+            {data: "termNo"},
+            {data: "groupName"},
+        ]
+    });
+}
+
+
+//====10-_TabExtendFrom
+function fetchStudentExtend(studentId) {
+    const tblStudentExtend = $("#tblStudentExtend");
+    tblStudentExtend.DataTable().clear().destroy();
+    tblStudentExtend.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/extend/get-student-extend/" + studentId,
+            type: "POST",
+            dataSrc: function (json) {
+                // console.log(json.data);
+                if (!json.data || json.data.length === 0) {
+                    $("#extend-from-tab").closest("li").remove();
+                    $("#extend-from").remove();
+                }
+                return json.data;
+            },
+            error: function (xhr, status, error) {
+                ShowToastError(xhr.responseText);
+            }
+        },
+        columns: [
+            {data: "extendId"},
+            {data: "studentId"},
+            {data: "termNo"},
+            {data: "extendFrom"},
+            {data: "from"},
+            {data: "isCertificateReceived"},
+            {data: "isTranscriptReceived"},
+            {
+                data: "extendDate",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            },
+        ]
+    });
+}
+
+//====11-_TabComplement
+function fetchComplement(studentId) {
+    const tblComplement = $("#tblComplement");
+    tblComplement.DataTable().clear().destroy();
+    tblComplement.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/student-compliment-payment/get-student-complement-payment/" + studentId,
+            type: "POST",
+            dataSrc: function (json) {
+                if (!json.data || json.data.length === 0) {
+                    $("#complementation-tab").closest("li").remove();
+                    $("#complementation").remove();
+                }
+                return json.data;
+            },
+            error: function (xhr, status, error) {
+                ShowToastError(xhr.responseText);
+            }
+        },
+        columns: [
+            {data: "studentComplementPaymentId"},
+            {data: "studentId"},
+            {data: "invoiceNo"},
+            {
+                data: "invoiceDate",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            },
+            {data: "semester"},
+            {data: "paid"},
+            {data: "deposit"},
+            {data: "discount"},
+            {data: "reason"},
+            {data: "note"},
+        ]
+    });
+}
+
+//====12-_TabQuit
+function fetchQuit(studentId) {
+    const tblQuit = $("#tblQuit");
+    tblQuit.DataTable().clear().destroy();
+    tblQuit.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        ajax: {
+            url: "/student-quit/get-student-quit/" + studentId,
+            type: "POST",
+            dataSrc: function (json) {
+                if (!json.data || json.data.length === 0) {
+                    $("#quit-tab").closest("li").remove();
+                    $("#quit").remove(); 
+                    $("#btnQuit").data("action","quit");
+                    $("#lblQuit").text("Quit");
+                }else{ 
+                    $("#btnQuit").data("action","resume");
+                    $("#lblQuit").text("Resume");
+                }
+                return json.data;
+            },
+            error: function (xhr, status, error) {
+                ShowToastError(xhr.responseText);
+            }
+        },
+        columns: [
+            {data: "quitId"},
+            {data: "studentId"},
+            {data: "termNo"},
+            {data: "promotionNo"},
+            {data: "groupName"},
+            {
+                data: "quitDate",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            },
+            {data: "reasonOfQuit"}
+        ]
+    });
+}
+
+frmStudent.on("submit", function (event) {
+    event.preventDefault();
+    showLoading();
+    const form = $(this);
+    const formData = form.serialize();
+    $.ajax({
+        url: '/student/update-student',
+        method: 'PATCH',
+        data: formData,
+        success: function (response) {
+            if (response.status.code === "200") {
+                ShowToastSuccess("Saved successfully!"); 
+                window.location.reload();
+            } else {
+                ShowToastError(response.message);
+            }
+        },
+        error: function (error) {
+            if (error.responseJSON && error.responseJSON.message) {
+                ShowToastError(error.responseJSON.message);
+            }
+        }
+    });
+    hideLoading(2);
+});

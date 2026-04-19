@@ -1,0 +1,382 @@
+@using BBU_SYSTEM.DTOs
+@{
+    var user = new UserDto();
+    var userPriviledge = new UserPriviledgeDto();
+}
+<div class="modal fade" id="UserPriviledgeModal" data-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">User Priviledge</h4>
+            </div>
+            <div class="modal-body">
+                <form id="degreeForm">
+                    <input asp-for="@user.UserId" hidden readonly class="form-control" value="0"/>
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" asp-for="@user.UserName" class="form-control"
+                                       placeholder="Enter name">
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="text" asp-for="@user.Password" class="form-control"
+                                       placeholder="Enter name">
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label>User Group</label>
+                                <input type="text" asp-for="@user.UserGroup" class="form-control"
+                                       placeholder="Enter name">
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label>Status</label>
+                                <div class="form-group clearfix">
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="isShort">
+                                        <label for="isShort">Enable</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <hr>
+                <div class="permission">
+                    <div class="row">
+                        <div class="col-3">
+                            <label>Manage Student</label>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentFull">
+                                    <label class="custom-control-label" for="mngStudentFull">Full Controll</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentUpdate">
+                                    <label class="custom-control-label" for="mngStudentUpdate">Update</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentView">
+                                    <label class="custom-control-label" for="mngStudentView">View</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentSuppress">
+                                    <label class="custom-control-label" for="mngStudentSuppress">Suppres</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentSuspend">
+                                    <label class="custom-control-label" for="mngStudentSuspend">Suspend</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentResume">
+                                    <label class="custom-control-label" for="mngStudentResume">Resume</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentQuit">
+                                    <label class="custom-control-label" for="mngStudentQuit">Quit</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentExpress">
+                                    <label class="custom-control-label" for="mngStudentExpress">Express</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentPersonal">
+                                    <label class="custom-control-label" for="mngStudentPersonal">Personal</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentRelative">
+                                    <label class="custom-control-label" for="mngStudentRelative">Relative</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentNote">
+                                    <label class="custom-control-label" for="mngStudentNote">Note</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-3">
+                            <label>Manage Student</label>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentAddress">
+                                    <label class="custom-control-label" for="mngStudentAddress">Address</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentPhone">
+                                    <label class="custom-control-label" for="mngStudentPhone">Phone</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentChangeGroup">
+                                    <label class="custom-control-label" for="mngStudentChangeGroup">Change Group</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentChangeField">
+                                    <label class="custom-control-label" for="mngStudentChangeField">Chagen Field</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngStudentContact">
+                                    <label class="custom-control-label" for="mngStudentContact">Parent Contact</label>
+                                </div>
+                            </div>
+
+                            <label>Assign Group</label>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngAssignGroupFull">
+                                    <label class="custom-control-label" for="mngAssignGroupFull">Full Controll</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngAssignGroupAddjustGroup">
+                                    <label class="custom-control-label" for="mngAssignGroupAddjustGroup">Addjust
+                                        Group</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input"
+                                           id="mngAssignGroupFoundationGroup">
+                                    <label class="custom-control-label" for="mngAssignGroupFoundationGroup">Foundation
+                                        Group</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input"
+                                           id="mngAssignGroupSpecializeGroup">
+                                    <label class="custom-control-label" for="mngAssignGroupSpecializeGroup">Specialize
+                                        Group</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input"
+                                           id="mngAssignGroupAssociateGroup">
+                                    <label class="custom-control-label"
+                                           for="mngAssignGroupAssociateGroup">Associate</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <label>Manage Course</label>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngCrouseFull">
+                                    <label class="custom-control-label" for="mngCrouseFull">Full</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngCrouseUpdate">
+                                    <label class="custom-control-label" for="mngCrouseUpdate">Update</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngCrouseView">
+                                    <label class="custom-control-label" for="mngCrouseView">View</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngCrouseAdd">
+                                    <label class="custom-control-label" for="mngCrouseAdd">Add</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngCrouseDelete">
+                                    <label class="custom-control-label" for="mngCrouseDelete">Delete</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngCrouseAddLeaner">
+                                    <label class="custom-control-label" for="mngCrouseAddLeaner">Add Leaner</label>
+                                </div>
+                            </div>
+                            <label>Manage Room</label>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngRoomFull">
+                                    <label class="custom-control-label" for="mngRoomFull">Full Controll</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngRoomUpdate">
+                                    <label class="custom-control-label" for="mngRoomUpdate">Update</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngRoomDelete">
+                                    <label class="custom-control-label" for="mngRoomUpdate">Delete</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngRoomAdd">
+                                    <label class="custom-control-label" for="mngRoomAdd">Add</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngRoomView">
+                                    <label class="custom-control-label" for="mngRoomView">View</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <label>Manage Mark</label>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngMarkFull">
+                                    <label class="custom-control-label" for="mngMarkFull">Full Controll</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngMarkUpdate">
+                                    <label class="custom-control-label" for="mngMarkUpdate">Update</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngMarkDelete">
+                                    <label class="custom-control-label" for="mngMarkDelete">Delete</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngMarkView">
+                                    <label class="custom-control-label" for="mngMarkView">View</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngMarkAdd">
+                                    <label class="custom-control-label" for="mngMarkAdd">Add</label>
+                                </div>
+                            </div>
+                            <label>Manage Certificate</label>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngCertificateFull">
+                                    <label class="custom-control-label" for="mngCertificateFull">Full Controll</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngCertificateUpdate">
+                                    <label class="custom-control-label" for="mngCertificateUpdate">Update</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngCertificateDelete">
+                                    <label class="custom-control-label" for="mngCertificateDelete">Delete</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngCertificateView">
+                                    <label class="custom-control-label" for="mngCertificateView">View</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div
+                                    class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                    <input type="checkbox" class="custom-control-input" id="mngCertificateAdd">
+                                    <label class="custom-control-label" for="mngCertificateAdd">Add</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="submit" form="degreeForm" class="btn btn-primary"><i class="fas fa-save"></i> Save changes
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

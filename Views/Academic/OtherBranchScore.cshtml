@@ -1,0 +1,312 @@
+﻿@using BBU_SYSTEM.DTOs
+@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "AcademicTask";
+    ViewData["Action"] = "OtherBranchScore";
+
+    var student = new StudentDto();
+    var extend = new ExtendDto();
+    var otherBranchScore = new OtherBranchScoreDto();
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-5">
+                        <div class="row">
+                            <div class="col-3">
+                                <label class="required">student_id</label>
+                                <input type="text" class="form-control form-control-sm" asp-for="@student.StudentId" readonly/>
+                            </div>
+                            <div class="col-5">
+                                <label>name</label>
+                                <input type="text" class="form-control form-control-sm" asp-for="@student.StudentName" readonly/>
+                            </div>
+                            <div class="col-4">
+                                <label>name_khmer</label>
+                                <input type="text" class="form-control form-control-sm" asp-for="@student.StudentNameInKhmer" readonly/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3">
+                                <label>dob</label>
+                                <input type="text" class="form-control form-control-sm" asp-for="@student.DateOfBirth" readonly>
+                            </div>
+                            <div class="col-2">
+                                <label>gender</label>
+                                <input type="text" class="form-control form-control-sm" asp-for="@student.Sex" readonly/>
+                            </div>
+                            <div class="col-3">
+                                <label>phone</label>
+                                <input type="text" class="form-control form-control-sm" asp-for="@student.Phone" readonly/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="row">
+                            <div class="col-2">
+                                <label>extend_date</label>
+                                <input type="text" class="form-control form-control-sm" asp-for="@extend.ExtendDate" readonly>
+                            </div>
+                            <div class="col-2">
+                                <label>term</label>
+                                <input type="text" class="form-control form-control-sm" asp-for="@extend.TermNo" readonly>
+                            </div>
+                            <div class="col-8">
+                                <label>extend_from</label>
+                                <input type="text" class="form-control form-control-sm" asp-for="@extend.ExtendFrom" readonly>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-2">
+                                <label>receive_certificate</label>
+                                <input type="checkbox" class="form-control form-control-sm" asp-for="@extend.IsCerti" disabled>
+                            </div>
+                            <div class="col-2">
+                                <label>receive_transcript</label>
+                                <input type="checkbox" class="form-control form-control-sm" asp-for="@extend.IsTran" disabled>
+                            </div>
+
+                            <div class="col-8">
+                                <label>from</label>
+                                <input type="text" id="txtFrom" class="form-control form-control-sm" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="card card-outline card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Extend Student List</h3>
+                            </div>
+                            <div class="card-body">
+                                <table id="tblStudent" class="table table-bordered table-sm table-striped" style="width: 100%;">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Gender</th>
+                                        <th>DOB</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card card-outline card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Other Branch Score</h3>
+                            </div>
+                            <div class="card-body">
+                                <table id="tblOtherBranchScore" class="table table-bordered table-sm table-striped"
+                                       style="width: 100%;">
+                                    <thead>
+                                    <tr>
+                                        <th>id</th>
+                                        <th class="hide-col">student_group_id</th>
+                                        <th>term</th>
+                                        <th>name</th>
+                                        <th>midterm</th>
+                                        <th>final_score</th>
+                                        <th>grade</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+
+@section Scripts
+{
+    <script>
+        const tblOtherBranchScore = $("#tblOtherBranchScore");
+        const tblStudent = $("#tblStudent");
+        $(document).ready(function () {
+            fetchStudent();
+            tblOtherBranchScore.DataTable();
+        });
+
+        function fetchStudent() {
+            tblStudent.DataTable().clear().destroy();
+            tblStudent.DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                ajax: {
+                    url: `/extend/students`,
+                    type: "POST",
+                },
+                columns: [
+                    {data: "studentId"},
+                    {data: "studentName"},
+                    {data: "sex"},
+                    {
+                        data: "dateOfBirth",
+                        render: function (data, type, row) {
+                            return `${formatDate(data)}`
+                        }
+                    }
+                ]
+            })
+        }
+
+        tblStudent.on('click', 'tbody tr', function () {
+            showLoading();
+            tblStudent.find('tbody tr').removeClass('highlight');
+            $(this).addClass('highlight');
+            const $row = $(this).closest('tr');
+            const data = tblStudent.DataTable().row($row).data();
+            // console.log(data);
+            GetOtherBranchScore(data.studentId);
+            getStudent(data)
+            hideLoading(1);
+        });
+
+        function GetOtherBranchScore(studentId) {
+            if (!studentId) return;
+            tblOtherBranchScore.DataTable().clear().destroy();
+            tblOtherBranchScore.DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                ajax: {
+                    url: `/scores/get-other-brand-score/${studentId}`,
+                    type: "POST",
+                    dataSrc: function (json) {
+                        return json.data;
+                    }
+                },
+                columns: [
+                    {data: "otherBranchScoreId"},
+                    {data: "courseId", visible: false},
+                    {data: "termNo"},
+                    {data: "courseName"},
+                    {
+                        data: "midTermScore",
+                        render: function (data, type, row) {
+                            return data ? `<input type="number" class="form-control form-control-sm is-warning" name="otherBranchScore_MidTermScore" value="${data.toFixed(2)}" readonly/>` : 'N/A';
+                        }
+                    },
+                    {
+                        data: "finalScore",
+                        render: function (data, type, row) {
+                            return data ? `<input type="number" class="form-control form-control-sm form-control is-warning" name="otherBranchScore_FinalScore" value="${data.toFixed(2)}" readonly/>` : 'N/A';
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            const totalScore = (row.midTermScore || 0) + (row.finalScore || 0);
+                            if (totalScore >= 60) {
+                                return `<badge class="badge badge-success">Pass</badge>`;
+                            } else {
+                                return `<badge class="badge badge-danger">Fail</badge>`;
+                            }
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            const rows = JSON.stringify(row).replace(/"/g, '&quot;');
+                            return `<button id="btnEdit" class="btn btn-warning btn-xs"><i class="fa-solid fa-pen-to-square"></i></button>`;
+                        }
+                    }
+                ]
+            });
+        }
+
+        tblOtherBranchScore.on("click", "#btnEdit", function () {
+            // Find the clicked row
+            const $row = $(this).closest('tr');
+
+            // Enable the input fields in this row
+            $row.find('input[name="otherBranchScore_MidTermScore"]').prop('readonly', false);
+            $row.find('input[name="otherBranchScore_FinalScore"]').prop('readonly', false);
+
+            // Optionally change button to Save
+            $(this)
+                .attr('id', 'btnSave')
+                .removeClass('btn-warning')
+                .addClass('btn-success')
+                .html('<i class="fas fa-check"></i>');
+        });
+
+        tblOtherBranchScore.on("click", "#btnSave",async function (e) {
+            e.preventDefault();
+           
+            // Find the clicked row 
+            const $row = $(this).closest('tr');
+            const table = tblOtherBranchScore.DataTable();
+            const rowData = table.row($row).data();
+
+            if(e.target){
+                // Get edited values
+                const updatedMid = parseFloat($row.find('input[name="otherBranchScore_MidTermScore"]').val());
+                const updatedFinal = parseFloat($row.find('input[name="otherBranchScore_FinalScore"]').val());
+
+                try {
+                    const response = await $.ajax({
+                        url: "/scores/update-other-brand-score",
+                        method: 'PUT',
+                        data: {
+                            id: rowData.otherBranchScoreId,
+                            midterm: updatedMid,
+                            final: updatedFinal,
+                        },
+                    });
+                    if (response.status.code === "200") {
+                        ShowToastSuccess(response.status.message);
+                    }else{
+                        ShowToastError(response.status.message);
+                    }
+                }catch(err) {
+                    ShowToastError(err);
+                }
+            }
+           
+            // Enable the input fields in this row
+            $row.find('input[name="otherBranchScore_MidTermScore"]').prop('readonly', true);
+            $row.find('input[name="otherBranchScore_FinalScore"]').prop('readonly', true);
+
+            // Optionally change button to Save
+            $(this)
+                .attr('id', 'btnEdit')
+                .removeClass('btn-success')
+                .addClass('btn-warning')
+                .html('<i class="fa-solid fa-pen-to-square"></i>'); 
+            
+        });
+        
+        
+        function getStudent(data) {
+            $("#student_StudentId").val(data.studentId);
+            $("#student_StudentName").val(`${data.studentName}`);
+            $("#student_StudentNameInKhmer").val(`${data.studentNameInKhmer}`);
+            $("#student_Sex").val(data.sex);
+            $("#student_Phone").val(data.phone);
+            $("#student_DateOfBirth").val(formatDate(data.dateOfBirth, "DD-MMM-YYYY"));
+            $("#extend_TermNo").val(data.termNo);
+            $("#extend_ExtendDate").val(formatDate(data.extendDate, "DD-MMM-YYYY"));
+            $("#extend_ExtendFrom").val(data.extendFrom);
+            $("#txtFrom").val(data.from);
+            $("#extend_IsCerti").prop("checked", data.isCertificateReceived ===1);
+            $("#extend_IsTran").prop("checked", data.isTranscriptReceived ===1);
+        }
+    </script>
+}

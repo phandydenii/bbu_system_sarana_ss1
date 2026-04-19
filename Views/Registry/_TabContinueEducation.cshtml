@@ -1,0 +1,24 @@
+﻿@using BBU_SYSTEM.Models.Req
+@{
+    var registryReq = new RegistryReq();
+}
+<div class="row">
+    <div class="col-6">
+        <label>Term</label>
+        <input type="number" asp-for="@registryReq.Student!.CheckCompleteTerm" value="1" min="1"
+               class="form-control input-sm"/>
+    </div>
+    <div class="col-6">
+        <label>Status</label>
+        <div class="form-group clearfix">
+            <div class="icheck-primary d-inline">
+                <input type="checkbox" id="CheckComplete" asp-for="@registryReq.Student!.CheckComplete">
+                <label for="CheckComplete">Revieve</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<label>Note</label>
+<textarea type="text" rows="4" class="form-control"
+          asp-for="@registryReq.Student!.CheckCompleteNote" placeholder=""></textarea>

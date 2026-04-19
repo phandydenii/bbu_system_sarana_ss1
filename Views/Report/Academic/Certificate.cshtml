@@ -1,0 +1,67 @@
+@{
+    ViewData["Title"] = "Index";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AcademicReport";
+    ViewData["Action"] = "CertificateReport";
+
+    var report = new Dictionary<string, string>
+    {
+        // {"suspend","Letter of Suspend"},
+        {"change-branch","Letter of change branch"},
+        {"certificate-of-edu","Certificate of Education"},
+        {"certificate-qr","Certificate QR"},
+        {"student-rank","Student Rank"},
+        {"student-rank-province","Student Rank Province"},
+        {"study-record","Study Record"},
+        {"transcript","Transcript"},
+        {"provisional","Provisional"},
+    };
+}
+<div class="card card-primary card-outline">
+    <div class="card-header">
+        <div class="rangeButtons">
+            <button class="btn btn-sm btn-primary" value="suspend">Suspend</button>
+            @foreach (var i in report)
+            {
+                <button class="btn btn-sm btn-outline-primary" value="@i.Key">@i.Value</button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="formContainer"></div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="Academic/_StudentModal"/>
+
+@section Scripts
+{
+    <script>
+        const formContainer = $("#formContainer");
+        const rangeButtons = $(".rangeButtons");
+        const modalStudent = $("#StudentModal");
+        $(document).ready(async function () {
+            renterForm("suspend");
+        });
+
+        function renterForm(form) {
+            formContainer.html("");
+            if (!form) return;
+            $(".select2").select2();
+            formContainer.load("/report-partial/academic/student-certificate/" + form, function () {
+                $("#renderContainer select").select2({
+                    width: "100%",
+                    placeholder: "Select an option"
+                });
+            });
+        }
+        rangeButtons.on("click", "button", function (e) {
+            showLoading();
+            rangeButtons.find("button").removeClass("btn-primary").addClass("btn-outline-primary");
+            $(this).removeClass("btn-outline-primary").addClass("btn-primary");
+            renterForm(e.target.value);
+            hideLoading(1);
+        });
+        
+    </script>
+}

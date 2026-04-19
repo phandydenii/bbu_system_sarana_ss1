@@ -1,0 +1,72 @@
+﻿@using BBU_SYSTEM.DTOs
+@{
+    var group = new GroupDto();
+    var grouproom = new GroupRoomDto();
+    var req = new
+    {
+        group,
+        grouproom
+    };
+}
+<div class="modal fade" id="TransferModal" data-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Transfer</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"> 
+                <div class="row">
+                    <div class="col-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <label>Student Transfer</label>
+                                <label class="card-title float-right">Count: <span id="countStudent">0</span></label>
+                            </div>
+                            <div class="card-body table-responsive p-0" style="height: 500px;">
+                                <table id="tblTransferStudent" class="table table-sm table-bordered table-striped table-head-fixed text-nowrap">
+                                    <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Name</th>
+                                        <th>Gender</th>
+                                        <th>Date of Birth</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label>Transfer to Group</label>
+                        <table id="tblTransferGroup" class="table table-sm table-bordered table-hover dataTable dtr-inline"
+                               style="width: 100%;">
+                            <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Group</th>
+                                <th>Field Id</th>
+                                <th>Field</th>
+                                <th>Stage Id</th>
+                                <th>Stage</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnTransfer" class="btn btn-success float-right"><i class="fas fa-exchange"></i> Transfer
+                </button>
+                <button class="btn btn-danger float-right"><i class="fa-solid fa-xmark"></i> Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+

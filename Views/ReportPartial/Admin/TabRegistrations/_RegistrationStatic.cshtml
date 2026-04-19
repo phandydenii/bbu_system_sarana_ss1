@@ -1,0 +1,47 @@
+@using BBU_SYSTEM.ViewModel.Report
+@{
+    var registeredStatistic = new RegisteredStatisticViewModel();
+}
+<div class="col-12">
+    <div class="row">
+        <div class="col-3">
+            <div class="row">
+                <div class="col-6">
+                    <label>Promotion</label>
+                    <input type="number" asp-for="@registeredStatistic.PromotionNo" class="form-control">
+                </div>
+                <div class="col-6">
+                    <label>Stage</label>
+                    <input type="number" asp-for="@registeredStatistic.StageNo" class="form-control">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <label>start Date</label>
+                    <input type="date" asp-for="@registeredStatistic.StartDate" class="form-control">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <label>Signature</label>
+                    <input type="text" asp-for="@registeredStatistic.Signature" class="form-control">
+                </div>
+                <div class="col-6">
+                    <label>Position</label>
+                    <input type="text" asp-for="@registeredStatistic.Position" class="form-control">
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-12">
+                    <button type="submit" class="form-control btn btn-primary">Preview</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-9">
+            <div class="row">
+                <iframe src="" width="95%" height="700px" id="reportContainer"></iframe>
+            </div>
+        </div>
+    </div>
+</div>

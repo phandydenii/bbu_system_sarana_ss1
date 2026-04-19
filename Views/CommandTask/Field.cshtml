@@ -1,0 +1,251 @@
+@{
+    ViewData["OpenMenu"] = "CommandTask";
+    ViewData["Action"] = "Field"; 
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        <label>Degree</label>
+                        <div class="margin" id="rangeButtons">
+                            <button type="button" class="btn btn-primary" onclick="setActive(this)" value="0">All
+                            </button> 
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <label>School</label>
+                        <select id="cboSchool" class="form-control select2"></select>
+                    </div>
+                    <div class="col-2">
+                        <label>#</label>
+                        <button type="button" id="btnAddNew"
+                                class="form-control btn btn-primary float-right">Add New
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="tblField" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Name Khmer</th> 
+                        <th>Degree Name</th>
+                        <th>Degree Name Khmer</th>
+                        <th>Type</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_FieldModal"/>
+
+@section Scripts{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Term.js"></script>
+    <script src="~/function/Group.js"></script>
+    <script>
+        const tblField = $("#tblField");
+        const cboSchool = $("#cboSchool");
+        const modalField = $("#modalField");
+        const formField = $("#formField");
+        const degrees = [
+            {DegreeId: 1, DegreeName: "Associate"},
+            {DegreeId: 2, DegreeName: "Bachelor"},
+            {DegreeId: 3, DegreeName: "Diploma"},
+            {DegreeId: 4, DegreeName: "Master"},
+            {DegreeId: 5, DegreeName: "Doctor"},
+        ];
+        
+        $(document).ready(function () {
+            const container = document.getElementById("rangeButtons");
+            container.classList.add("margin");
+            degrees.forEach(function (degree) {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "btn btn-outline-primary";
+                btn.value = degree.DegreeId;
+                btn.innerText = degree.DegreeName;
+                btn.onclick = function () {
+                    setActive(this);
+                };
+                container.appendChild(btn);
+            });
+            GetSchool();
+            fetchField(0,0);
+
+            GetDegree();
+            GetSchool1();
+        });
+        async function GetSchool() {
+            cboSchool.empty();
+            cboSchool.append("<option value='' disabled>Select School</option>");
+            const schools = await School.GetSchool()
+            schools.forEach(function (item) {
+                cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
+            });
+            cboSchool.val('').trigger("change");
+        }
+        function setActive(button) {
+            const buttons = document.querySelectorAll('#rangeButtons .btn-primary');
+            buttons.forEach(btn => btn.classList.remove('btn-primary'));
+            buttons.forEach(btn => btn.classList.add('btn-outline-primary'));
+            button.classList.remove("btn-outline-primary");
+            button.classList.add("btn-primary");
+            console.log(parseInt(button.value));
+            if (parseInt(button.value) === 0) {
+                cboSchool.val(0)
+                fetchField(button.value, 0);
+            } else {
+                const school_id = cboSchool.val();
+                fetchField(button.value, school_id);
+            }
+        }
+
+        cboSchool.on("change", function (event) {
+            const degree_id = $('#rangeButtons .btn-primary').val();
+            const school_id = cboSchool.val();
+            fetchField(degree_id, school_id);
+        });
+
+        function fetchField(degreeId, schoolId) {
+            tblField.DataTable().clear().destroy();
+            tblField.DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/Field/get-fields",
+                    type: "POST",
+                    data: function (d) {
+                        d.degreeId = degreeId;
+                        d.schoolId = schoolId;
+                    },
+                },
+                columns: [
+                    {data: "fieldId"},
+                    {data: "fieldName"},
+                    {data: "fieldNameInKhmer"},
+                    {data: "degreeName"},
+                    {data: "degreeNameInKhmer"},
+                    {
+                        data: "type",
+                        render: function (data, type, row) {
+                            return data ? `<span class="badge badge-info">ACADEMIC</span>` : `<span class="badge badge-warning">PROFESSIONAL</span>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) { 
+                            return `<a id="btnEdit" class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</a>`;
+                        }
+                    }
+                ]
+            });
+        }
+
+        document.getElementById("btnAddNew").addEventListener("click", function (event) {
+            event.preventDefault();
+            GetDegree();
+            GetSchool1();
+            modalField.find(".modal-title").text("Add Degree");
+            formField[0].reset();
+            $("#modalField").modal("show");
+        });
+
+        tblField.on("click","#btnEdit", function (event) {
+            event.preventDefault();
+           
+            const $row = $(this).closest("tr");
+            const row = tblField.DataTable().row($row).data();
+            console.log(row);
+            if(row){
+                $("#field_FieldId").val(row.fieldId);
+                $("#field_DegreeId").val(row.degreeId).trigger("change");
+                $("#field_SchoolId").val(row.schoolId).trigger("change");
+                $("#field_DegreeName").val(row.degreeName);
+                $("#field_DegreeNameInKhmer").val(row.degreeNameInKhmer);
+                $("#field_FieldName").val(row.fieldName);
+                $("#field_FieldNameInKhmer").val(row.fieldNameInKhmer);
+                const isAcademic = row.type;
+                $("#rdoAcademic").prop("checked", isAcademic);
+                $("#rdoProffesional").prop("checked", !isAcademic);
+                modalField.find(".modal-title").text("Edit Degree");
+                modalField.modal("show");
+            }
+        })
+
+        async function GetDegree() {
+            const cboDegree = $("#field_DegreeId")
+            cboDegree.empty();
+            cboDegree.append(`<option value='' disabled>Select Degree</option>`);
+            const degrees = await Degree.GetAllDegree();
+            degrees.forEach(item => {
+                cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
+            });
+            cboDegree.val('').trigger("change");
+        }
+
+        async function GetSchool1() {
+            const cboSchool = $("#field_SchoolId")
+            cboSchool.empty();
+            cboSchool.append("<option value='' disabled>Select School</option>");
+            const schools = await School.GetSchool()
+            schools.forEach(function (item) {
+                cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
+            });
+            cboSchool.val('').trigger("change");
+        }
+
+        $("#rdoAcademic").on("change", function (event) {
+            $("#field_Type").prop("checked", event.target.checked);
+        });
+
+        $("#rdoProffesional").on("change", function (event) {
+            $("#field_Type").prop("checked", !event.target.checked);
+        });
+
+        formField.on("submit", function (event) {
+            event.preventDefault();
+            const form = $(this);
+            const formData = form.serialize();
+            $.ajax({
+                url: '/Field/save-change',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.status.code === "200") {
+                        ShowToastSuccess("Saved successfully!");
+                        formField[0].reset();
+                        modalField.modal("hide");
+                        tblField.DataTable().ajax.reload();
+                    } else {
+                        ShowToastError(response.message);
+                    }
+                },
+                error: function (error) {
+                    ShowToastError(error.responseText);
+                    console.log(error.responseText);
+                }
+            });
+        });
+    </script>
+}

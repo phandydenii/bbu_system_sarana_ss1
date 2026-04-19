@@ -1,0 +1,328 @@
+@{
+    var duration = new Dictionary<int, string>
+    { 
+        {2, "15"},
+        {3, "30"},
+        {4, "45"},
+        {5, "90"},
+        {6, "120"},
+        {7, "120-Up"},
+    };
+}
+<div class="card card-outline card-primary">
+    <div class="card-body">
+        <!-- Add files -->
+        <label class="btn btn-outline-success col fileinput-button dz-clickable">
+            <i class="fas fa-"></i>
+            <span>Add files</span>
+            <input type="file" id="fileInput" name="files" multiple onchange="previewFiles()" accept="image/*" hidden="hidden"/>
+        </label>
+        <div id="preview" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+        <div id="actions" class="row mb-3">
+            <div class="col-lg-6 mb-2 mb-lg-0">
+                <div class="btn-group w-100">
+                    <!-- Start upload -->
+                    <button type="button" class="btn btn-primary col start" onclick="uploadFiles()">
+                        <i class="fas fa-upload"></i>
+                        <span>Start upload</span>
+                    </button>
+                    <!-- Cancel upload -->
+                    <button type="button" class="btn btn-warning col cancel" onclick="resetFiles()">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Cancel upload</span>
+                    </button>
+                </div>
+            </div>
+        
+            <div class="col-lg-6 d-flex align-items-center">
+                <div class="fileupload-process w-100">
+                    <div id="totalProgress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div class="progress-bar progress-bar-success" style="width:0;" data-dz-uploadprogress=""></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <h3 class="card-title">Bar Chart</h3>
+        <div class="card-tools"> 
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-2">
+                <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            Promotion
+                        </span>
+                    </div>
+                    <input type="number" class="form-control" min="1" value="0"/>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            Duration
+                        </span>
+                    </div>
+                    <div id="rangeButtons">
+                        @foreach (var data in duration)
+                        {
+                            <button type="button" class="btn btn-outline-primary btn-sm" value="@data.Key">@data.Value</button>
+                        }
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="chart">
+            <div class="chartjs-size-monitor">
+                <div class="chartjs-size-monitor-expand">
+                    <div class=""></div></div>
+                <div class="chartjs-size-monitor-shrink">
+                    <div class=""></div></div></div>
+            <canvas id="barChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 669px;" width="1338" height="500" class="chartjs-render-monitor"></canvas>
+        </div>
+    </div>
+</div>
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<script>
+    let selectedFiles = [];
+
+    // Preview files before upload
+    function previewFiles() {
+        const input = document.getElementById("fileInput");
+        const preview = document.getElementById("preview");
+        preview.innerHTML = "";
+        selectedFiles = Array.from(input.files);
+
+        selectedFiles.forEach((file, index) => {
+            const div = document.createElement("div");
+            div.style.position = "relative";
+            div.style.width = "120px";
+            div.style.height = "120px";
+            div.style.border = "1px solid #ccc";
+            div.style.borderRadius = "6px";
+            div.style.overflow = "hidden";
+
+            // Image preview
+            if (file.type.startsWith("image/")) {
+                const img = document.createElement("img");
+                img.style.width = "100%";
+                img.style.height = "100%";
+                img.style.objectFit = "cover";
+
+                const reader = new FileReader();
+                reader.onload = e => img.src = e.target.result;
+                reader.readAsDataURL(file);
+
+                div.appendChild(img);
+            } else {
+                div.innerHTML = `<p style="text-align:center">${file.name}</p>`;
+            }
+
+            // Remove button per file 
+            const btn = document.createElement("button");
+            btn.type = "button"; // avoid form submit
+            btn.style.position = "absolute";
+            btn.style.top = "2px";
+            btn.style.right = "2px";
+            btn.style.background = "transparent"; // transparent background
+            btn.style.color = "red";
+            btn.style.border = "none";
+            btn.style.fontSize = "18px";
+            btn.style.cursor = "pointer";
+            btn.style.padding = "2px";
+
+            // Add Font Awesome icon
+            btn.innerHTML = '<i class="fas fa-times-circle"></i>';
+            btn.onclick = () => {
+                selectedFiles.splice(index, 1);
+                input.value = ""; // reset input if needed
+                previewFiles();
+            };
+            div.appendChild(btn);
+
+            preview.appendChild(div);
+        });
+    }
+
+    // Reset files
+    function resetFiles() {
+        selectedFiles = [];
+        document.getElementById("fileInput").value = "";
+        document.getElementById("preview").innerHTML = "";
+        // updateProgress(0);
+    }
+
+    // Update total progress bar
+    function updateProgress(percent) {
+        const bar = document.querySelector("#totalProgress .progress-bar");
+        bar.style.width = percent + "%";
+        bar.setAttribute("aria-valuenow", percent.toFixed(0));
+    }
+
+    // Upload files with progress
+    function uploadFiles() {
+        if (selectedFiles.length === 0) {
+            alert("Please select files");
+            return;
+        }
+
+        const formData = new FormData();
+        selectedFiles.forEach(f => formData.append("files", f));
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/hr/UploadMultiple"); // Your server endpoint
+
+        xhr.upload.addEventListener("progress", (e) => {
+            if (e.lengthComputable) {
+                const percent = (e.loaded / e.total) * 100;
+                updateProgress(percent);
+            }
+        });
+
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                alert("Upload success");
+                console.log(JSON.parse(xhr.responseText));
+                resetFiles();
+            } else {
+                alert("Upload failed");
+            }
+        };
+
+        xhr.onerror = () => {
+            alert("Upload error");
+        };
+
+        xhr.send(formData);
+    }
+
+    Chart.register(ChartDataLabels);
+    function generateColor(index, alpha = 0.8) {
+        const colors = [
+            [60,141,188],
+            [210,214,222],
+            [40,167,69],
+            [255,193,7],
+            [220,53,69],
+            [23,162,184],
+            [108,117,125]
+        ];
+
+        const c = colors[index % colors.length];
+        return {
+            background: `rgba(${c[0]},${c[1]},${c[2]},${alpha})`,
+            border: `rgba(${c[0]},${c[1]},${c[2]},1)`
+        };
+    }
+    
+    async function loadAreaChart(result) {
+        const areaChartData = {
+            labels: result.labels,
+            datasets: result.datasets.map((item, index) => {
+                const color = generateColor(index);
+
+                return {
+                    label: item.key,
+                    data: item.value,
+                    backgroundColor: color.background,
+                    borderColor: color.border,
+                    pointRadius: false,
+                    fill: true,
+                    tension: 0.3
+                };
+            })
+        };
+
+        renderAreaChart(areaChartData);
+    }
+
+    function renderAreaChart(data) {
+        const $canvas = $('#barChart');
+        if (!$canvas.length) return;
+        const ctx = $canvas[0].getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: false
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: "top"
+                    },
+                    datalabels: {
+                        display: true,           // ✅ show numbers
+                        anchor: "end",
+                        align: "end",
+                        color: "#000",
+                        font: {
+                            weight: "bold",
+                            size: 12
+                        },
+                        formatter: value => value // ✅ show actual number
+                    }
+                }
+            },
+            plugins: [ChartDataLabels] // ✅ REQUIRED
+        });
+    }
+  $(async function () {
+      // const result = {
+      //     "labels": ["January", "February", "March", "April", "May", "June", "July"],
+      //     "datasets": [
+      //         { "year": "2020", "data": [28, 48, 40, 19, 86, 27, 90] },
+      //         { "year": "2021", "data": [65, 59, 80, 81, 56, 55, 40] },
+      //         { "year": "2022", "data": [33, 44, 55, 66, 77, 88, 99] },
+      //         { "year": "2023", "data": [33, 44, 55, 66, 77, 88, 99] },
+      //         { "year": "2024", "data": [33, 44, 55, 66, 77, 88, 99] },
+      //         { "year": "2025", "data": [33, 44, 55, 66, 77, 88, 99] },
+      //     ]
+      // }
+      try {
+          const query = "select school_id as schoolname, FORMAT(INVOICE_DATE, 'yyyy-MM') AS OweMonth,\n" +
+              "    COUNT(*) as total\n" +
+              "from invoice_tbl\n" +
+              "where owe > 0 \n" +
+              "and invoice_date between '2025-10-01' and '2025-11-30'\n" +
+              "group by school_id, FORMAT(INVOICE_DATE, 'yyyy-MM')\n" +
+              "order by  schoolname";
+          $.ajax({
+              url: "/Report/MutiChartRunQuery",
+              type: "POST",
+              contentType: "application/json",
+              data: JSON.stringify({ query: query }),
+              success: function (data) {
+                  // console.log(data);
+                  loadAreaChart(data);
+              },
+              error: function (err) {
+                  console.error("RunQuery error:", err.responseText);
+              }
+          });
+      }catch(e) {
+          console.log(e.responseText);
+      }
+      // loadAreaChart(result);
+  })
+</script>

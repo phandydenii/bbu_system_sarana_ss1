@@ -1,0 +1,93 @@
+@using BBU_SYSTEM.DTOs
+@{
+    var user = new UserDto(); 
+}
+<div class="modal fade" id="modelUser" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">User</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formUser">
+                    <input asp-for="@user.UserId" hidden readonly class="form-control" value="0"/>
+                    
+                    <div class="form-group">
+                        <label class="required">Username</label>
+                        <input type="text" asp-for="@user.UserName" class="form-control"
+                               placeholder="Enter name">
+                    </div>
+                    <div class="row"> 
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="required">Password</label>
+                                <input type="text" asp-for="@user.Password" class="form-control" placeholder="Enter password">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="required">Confirm Password</label>
+                                <input type="text" id="txtConfirmPassword" class="form-control" placeholder="Enter confirm password">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-10">
+                            <div class="form-group">
+                                <label>User Group</label> 
+                                <select class="form-control select2" asp-for="@user.UserGroup">
+                                    <option value="Administration Task">Administration Task</option>
+                                    <option value="Academic Task">Academic Task</option>
+                                    <option value="Dean">Dean</option>
+                                    <option value="Library">Library</option>
+                                    <option value="HR">HR</option>
+                                    <option value="Command Task">Command Task</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label>Status</label>
+                                <div class="form-group clearfix">
+                                    <div class="icheck-primary d-inline">
+                                        <input type="checkbox" id="isShort">
+                                        <label for="isShort">Enable</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+               
+                <div id="listPrivilege" class="card-body table-responsive p-0" style="height: 300px;display: none">
+                    <div class="row">
+                        <div class="col-2">
+                            User Privilege
+                        </div>
+                        <div class="col-10">
+                            <hr>
+                            </div>
+                    </div>
+                    <table id="tblUserPrivilege" class="table table-sm table-head-fixed text-nowrap table-bordered table-striped" style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>name</th>
+                            <th>group</th> 
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+              </div>
+                
+            </div>
+            <div class="modal-footer float-right">
+                <button type="submit" form="degreeForm" class="btn btn-primary"><i class="fas fa-save"></i> Save changes
+                </button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

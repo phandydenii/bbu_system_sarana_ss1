@@ -1,0 +1,76 @@
+@{
+    ViewData["OpenMenu"] = "CommandTask";
+    ViewData["Action"] = "Nationality";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Nationality</h3>
+                <button type="button" id="btnAddNationality" class="btn btn-primary float-right">
+                    Add New
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="tblNationality" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name English</th>
+                        <th>Name Khmer</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_NationalityModal"/>
+<script>
+    $(document).ready(function () {
+        fetchNationality();
+    });
+
+    function fetchNationality() {
+        $("#tblNationality").DataTable({
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "/Nationality/get-nationalities",
+                type: "POST"
+            },
+            columns: [
+                {data: "nationalityId"},
+                {data: "nationalityName"},
+                {data: "nationalityInKhmer"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const jsonData = JSON.stringify(row).replace(/"/g, '&quot;');
+                        return `<a onclick="OnEdit('${jsonData}')" class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</a>`;
+                    }
+
+
+                }
+            ]
+        });
+    }
+
+    document.getElementById("btnAddNationality").addEventListener("click", function (e) {
+        $("#formNationality")[0].reset();
+        e.preventDefault();
+        $("#nationalityModal").modal("show");
+    });
+
+</script>
