@@ -361,4 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/BBU_SYSTEM/appsettings.json
+
+#ignore custom file 
+appsettings.json
