@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="../buildMultiTargeting/BBU_SYSTEM.props" />
-</Project>
