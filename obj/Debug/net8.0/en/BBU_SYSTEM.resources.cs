@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BBU_SYSTEM")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute(" ")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+126d32139f78921ee4c79d95e15d101e6b35e952")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4359f80b5264be2f7a53033f90ce15ce7b1cc7d2")]
 [assembly: System.Reflection.AssemblyProductAttribute("BBU_SYSTEM")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BBU_SYSTEM")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

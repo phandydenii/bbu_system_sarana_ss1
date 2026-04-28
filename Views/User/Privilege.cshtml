@@ -64,7 +64,10 @@
                             `;
                         }
                     }
-                ]
+                ],
+                initComplete: function () { 
+                    MyApp.utils.dataTableDebounceSearch("#tblPrivileges", 500); 
+                }
             })
         }
         tblPrivileges.on("click","#btnEdit", function (e) {

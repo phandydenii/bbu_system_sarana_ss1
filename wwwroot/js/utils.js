@@ -11,6 +11,33 @@
 //     return campus;
 // }
 
+// debounce search
+window.MyApp = window.MyApp || {};
+MyApp.utils = {
+    debounce : function (func, delay) {
+        let timer; 
+        return function (...args) {
+            clearTimeout(timer); 
+            timer = setTimeout(() => {
+                func.apply(this, args);
+            }, delay);
+        };
+    },
+    dataTableDebounceSearch : function (tableSelector, delay = 500) {
+        const table = $(tableSelector).DataTable();
+        const input = $(tableSelector + "_filter input");
+        const debouncedSearch = this.debounce(function (value) {
+            table.search(value).draw();
+        }, delay);
+        input.off(); // remove ALL old datatable events
+        input.on("input", function () {
+            debouncedSearch(this.value);
+        });
+    }
+}; 
+// end of debounce search
+
+
 function formatDate(dateStr, formart = "DD-MMM-YYYY") {
     return moment(dateStr).format(formart);
 }

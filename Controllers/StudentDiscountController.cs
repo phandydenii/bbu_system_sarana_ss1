@@ -43,6 +43,12 @@ public class StudentDiscountController(ICampusDbContext campusDbContext, IMapper
                     Email = s.Email
                 }
             ).Distinct().AsQueryable();
+        if (!string.IsNullOrEmpty(searchValue))
+            query = query.Where(d =>
+                d.StudentId!.Contains(searchValue) ||
+                d.StudentName!.ToString().Contains(searchValue) ||
+                d.StudentNameInKhmer!.ToString().Contains(searchValue) 
+            );
         var recordsTotal = query.Count();
         var data = query.Skip(skip).Take(pageSize).ToList();
         return Json(new

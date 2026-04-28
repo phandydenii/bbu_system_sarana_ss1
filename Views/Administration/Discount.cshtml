@@ -61,7 +61,7 @@
                     {
                          data: null,
                         render: function (data, type, row) {
-                             return formatDate(row.date_of_birth);;
+                             return formatDate(row.date_of_birth);
                         }
                     },
                     {data: "phone"},
@@ -71,7 +71,10 @@
                             return `<a id="btnView" class="btn btn-success btn-sm"><i class="fas fa-add"></i> Add Discount</a>`;
                         }
                     }
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblStudentDiscount", 500);
+                }
             })
         }
 

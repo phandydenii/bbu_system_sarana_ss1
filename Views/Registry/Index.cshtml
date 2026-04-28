@@ -100,7 +100,10 @@
                             return `<a href="/registry/details/${row.studentId}" class="btn btn-success btn-sm"><i class="fas fa-gear"></i> Manage</a>`;
                         }
                     }
-                ], 
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblRegistry", 500);
+                }
             });
         }
     </script>

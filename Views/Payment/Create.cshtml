@@ -226,6 +226,9 @@
                         },
                     },
                 ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblSearchStudent", 500);
+                }
             });
             modalStudent.modal("show");
             hideLoading(1);

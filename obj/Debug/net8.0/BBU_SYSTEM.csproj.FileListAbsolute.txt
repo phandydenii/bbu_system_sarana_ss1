@@ -1466,10 +1466,11 @@ D:\my_work\bbu_sarana_project\obj\Debug\net8.0\staticwebassets.build.json
 D:\my_work\bbu_sarana_project\obj\Debug\net8.0\staticwebassets.build.json.cache
 D:\my_work\bbu_sarana_project\obj\Debug\net8.0\staticwebassets.development.json
 D:\my_work\bbu_sarana_project\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-D:\my_work\bbu_sarana_project\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 D:\my_work\bbu_sarana_project\obj\Debug\net8.0\BBU_SYSTEM.csproj.Up2Date
 D:\my_work\bbu_sarana_project\obj\Debug\net8.0\BBU_SYSTEM.dll
 D:\my_work\bbu_sarana_project\obj\Debug\net8.0\refint\BBU_SYSTEM.dll
 D:\my_work\bbu_sarana_project\obj\Debug\net8.0\BBU_SYSTEM.pdb
 D:\my_work\bbu_sarana_project\obj\Debug\net8.0\BBU_SYSTEM.genruntimeconfig.cache
 D:\my_work\bbu_sarana_project\obj\Debug\net8.0\ref\BBU_SYSTEM.dll
+D:\my_work\bbu_sarana_project\obj\Debug\net8.0\en\BBU_SYSTEM.resources.cs
+D:\my_work\bbu_sarana_project\obj\Debug\net8.0\km\BBU_SYSTEM.resources.cs
