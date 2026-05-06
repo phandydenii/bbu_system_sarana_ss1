@@ -82,7 +82,10 @@
                 columns: [
                     {data: "schoolId"}, 
                     {data: "schoolName"}, 
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblSchool", 500);
+                }
             })
         }
 
@@ -110,7 +113,10 @@
                     {data: "courseId"},
                     {data: "courseFullName"},
                     {data: "courseFullNameInKhmer"}
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblCourse", 500);
+                }
             })
         }
 

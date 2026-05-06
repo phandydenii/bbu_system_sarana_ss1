@@ -139,7 +139,10 @@
                                     `;
                         }
                     }
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblProduct", 500);
+                }
             });
         }
 
@@ -173,7 +176,10 @@
                             return `<a class="btn btn-warning btn-sm" ><i class="fas fa-edit"></i> Edit</a>`;
                         }
                     }
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblProductPayOnline", 500);
+                }
             });
         }
 
