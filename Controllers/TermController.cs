@@ -6,6 +6,7 @@ using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace BBU_SYSTEM.Controllers;
 
@@ -84,6 +85,8 @@ public class TermController(ICampusDbContext campusDbContext, IMapper mapper, IH
     [HttpPost("save-change")]
     public async Task<IActionResult> CreteTerm(TermDto term)
     {
+        var json = System.Text.Json.JsonSerializer.Serialize(term);
+        await Helper.Telegram.SendDebugToMyTelegramDirect($"This is term:\n{json}");
         var db = campusDbContext.DbContext(_campus);
         ArgumentNullException.ThrowIfNull(term);
         try
@@ -103,11 +106,17 @@ public class TermController(ICampusDbContext campusDbContext, IMapper mapper, IH
             }
             
             //get old term and update to passed
-            var oldTerm =  await db.TblTerm.OrderByDescending(x=>x.TermId).FirstOrDefaultAsync(x => x.StageId == term.StageId);
-            oldTerm!.Status = "PASSED";
-            mapper.Map(term, oldTerm);
-            db.TblTerm.Update(oldTerm!);
-            await db.SaveChangesAsync();
+            var oldTerm =  await db.TblTerm.OrderByDescending(x=>x.TermId).FirstOrDefaultAsync(x => x.StageId == term.StageId);  
+            if (oldTerm != null)
+            {
+                oldTerm.Status = "PASSED"; 
+                await db.SaveChangesAsync();
+            } 
+            
+            if (term.TermNo > 1 && oldTerm == null)
+            {
+                return new ServerResponse().BadRequest("Old term not found. Cannot copy students to new term.");
+            }
             
             //save new term
             term.Status = "ACTIVE";

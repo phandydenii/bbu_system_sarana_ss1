@@ -1,17 +1,22 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BBU_SYSTEM.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BBU_SYSTEM.Controllers;
 
 [Authorize]
 [Route("command-task")]
-public class CommandTaskController()
+public class CommandTaskController(ICampusDbContext campusDbContext,IHttpContextAccessor context)
     : Controller
 {
+    private readonly string _campus = context.HttpContext?.User?.FindFirst("CampusKey")?.Value ?? "pp";
     [Route("promotion-groups")]
-    public IActionResult PromotionGroup()
+    public async Task<IActionResult> PromotionGroup()
     {
-        return View();
+        var db = campusDbContext.DbContext(_campus);
+        var degrees = await db.TblDegree.ToDictionaryAsync(x => x.DegreeId, x => x.DegreeName);
+        return View(degrees);
     }
 
     [Route("branch")]

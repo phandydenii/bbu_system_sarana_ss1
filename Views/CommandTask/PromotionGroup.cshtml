@@ -1,15 +1,18 @@
+@model Dictionary<int, string>
 @{
     ViewData["OpenMenu"] = "CommandTask";
-    ViewData["Action"] = "PromotionGroup";
-    
-    var degrees = new Dictionary<int, string>
+    ViewData["Action"] = "PromotionGroup"; 
+    /*var degrees = new Dictionary<int, string>
     { 
         {2, "Bachelor"},
         {3, "Diploma"},
         {4, "Master"},
         {5, "Doctor"},
     };
+    */
+    var degrees = Model;
 }
+
 <div class="row">
     <div class="col-md-12">
         <div class="card">
@@ -18,8 +21,7 @@
                 <div class="row">
                     <div class="col-6">
                         <label>Degree</label>
-                        <div id="rangeButtons">
-                            <button class="btn btn-primary" value="1">Associate</button>
+                        <div id="rangeButtons"> 
                             @foreach (var data in degrees)
                             {
                                 <button class="btn btn-outline-primary" value="@data.Key">@data.Value</button>
@@ -101,8 +103,7 @@
                                                     New</a>
                                                 <a id="btnDeleteStage" class="btn btn-danger btn-sm"
                                                    style="display: block;margin:.2rem 0">
-                                                    <i
-                                                        class="fa-solid fa-trash"></i> Delete</a>
+                                                    <i class="fa-solid fa-trash"></i> Delete</a>
                                             </div>
                                         </div>
                                     </li>
@@ -147,8 +148,7 @@
                                                     Edit</a>
                                                 <a onclick="DeleteTerm()" class="btn btn-danger btn-sm"
                                                    style="display: block;margin:.2rem 0">
-                                                    <i
-                                                        class="fa-solid fa-trash"></i> Delete</a>
+                                                    <i class="fa-solid fa-trash"></i> Delete</a>
                                             </div>
                                         </div>
                                     </li>
@@ -194,8 +194,7 @@
                                                     Edit</a>
                                                 <a class="btn btn-danger btn-sm"
                                                    style="display: block;margin:.2rem 0">
-                                                    <i
-                                                        class="fa-solid fa-trash"></i> Delete</a>
+                                                    <i class="fa-solid fa-trash"></i> Delete</a>
                                                 <a onclick="OnTransfer()" class="btn btn-info btn-sm"
                                                    style="display: block;margin:.2rem 0">Transfer</a>
                                             </div>
@@ -253,14 +252,10 @@
         const cboStudyTime = $("#group_StudyTime");
         const btnNewGroup = $("#btnNewGroup");
         const cboRoom = $("#groupRoom_RoomName");
-        const btnDegrees = $('#rangeButtons');
-
+        const btnDegrees = $('#rangeButtons'); 
+        
         $(document).ready(() => {
             GetSchool();
-            fetchPromotion();
-            fetchStage();
-            fetchTerm();
-            fetchGroup();
         });
         async function GetSchool() {
             cboSchool.empty();
@@ -270,8 +265,7 @@
                 cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
             });
             cboSchool.val('').trigger("change");
-        }
-
+        } 
         btnDegrees.on("click", "button", function (e) {
             // remove active style from all buttons
             btnDegrees.find("button").removeClass("btn-primary").addClass("btn-outline-primary");
@@ -280,18 +274,15 @@
             if(cboSchool.val() !== ""){
                 fetchPromotion();
             }
-        });
-        
+        }); 
         function SchoolChange() {
             fetchPromotion(); 
-         }
-
-        ///=====Promotion====
+         }  
+        //#region =====Promotion====
         const tblPromotion = $("#tblPromotion");
         const modalPromotion = $("#modalPromotion");
         const formPromotion = $("#formPromotion");
-        const promotionAcademicYearStart = $("#promotion_AcademicYearStart");
-
+        const promotionAcademicYearStart = $("#promotion_AcademicYearStart"); 
         function fetchPromotion() {
             const degreeId = $('#rangeButtons button.btn-primary').val();
             const schoolId = cboSchool.val();
@@ -334,22 +325,20 @@
                 ],
                 order: [[0, 'desc']]
             });
-        }
-
+        } 
         tblPromotion.on('click', 'tbody tr', function () {
             tblPromotion.find('tbody tr').removeClass('highlight');
             $(this).addClass('highlight');
             fetchStage();
             tblTerm.DataTable().clear().destroy();
             tblGroup.DataTable().clear().destroy(); 
-        });
-
+        }); 
         $("#btnNewPromotion").on("click",async function () {
             const lastPromotion =await fetchLastPromotion();
             $("#promotion_PromotionNo").val(lastPromotion.promotionNo + 1);
             $("#promotion_AcademicYearStart").val(lastPromotion.academicYearStart + 1);
             $("#promotion_AcademicYearEnd").val(lastPromotion.academicYearStart + 1 + 4);
-            $("#modalPromotion").modal("show");
+            modalPromotion.modal("show");
         });
         async function fetchLastPromotion() {
             try {
@@ -368,8 +357,8 @@
             $("#promotion_AcademicYearEnd").val(new Date(e.target.value).getFullYear() + 4);
         });
         $("#ClosePromotion").on("click", function () {
-            $("#formPromotion")[0].reset();
-            $("#modalPromotion").modal("hide");
+            formPromotion[0].reset();
+            modalPromotion.modal("hide");
         })
         $("#btnEditPromotion").on("click", function (event) {
             const $row = tblPromotion.find('tbody tr.highlight'); // select highlighted row
@@ -383,7 +372,7 @@
                 $("#promotion_AcademicYearEnd").val(selectedRow.academicYearEnd);
                 $("#promotion_GraduateDate1").val(new Date(selectedRow.graduateDate1).toISOString().split('T')[0]);
                 $("#promotion_GraduateDate2").val(new Date(selectedRow.graduateDate2).toISOString().split('T')[0]);
-                $("#modalPromotion").modal("show");
+                modalPromotion.modal("show");
                 fetchStage();
                 fetchTerm();
                 fetchGroup();
@@ -397,28 +386,24 @@
                 url: '/promotion/save-change',
                 method: 'POST',
                 data: formData,
-                success: function (response) {
-                    if (response.code === "200") {
+                success: function (response) { 
+                    if (response.status.code === "200") {
                         ShowToastSuccess("Saved successfully!");
                         formPromotion[0].reset();
                         modalPromotion.modal("hide");
                         tblPromotion.DataTable().ajax.reload();
                     } else {
-                        ShowToastError(response.message);
+                        ShowToastError(response.status.message); 
                     }
                 },
                 error: function (error) {
-                    ShowToastError(error.responseText);
+                    ShowToastError(error.responseText); 
                 }
-            });
-            fetchStage();
-            fetchTerm();
-            fetchGroup();
-            fetchPromotion();
+            });  
         })
-        ///=====End Promotion====
+        //#endregion ====Promotion====
 
-        //=====Stage==
+        //#region ==Stage==
         const tblStage = $("#tblStage");
         const formStage = $("#formStage");
         const modalStage = $("#modalStage");
@@ -464,8 +449,7 @@
                     {data: "stageNo"},
                 ]
             })
-        }
-
+        } 
         tblStage.on("click", "tbody tr", function () {
              $('#tblStage tbody tr').removeClass('highlight');
             $(this).addClass('highlight'); 
@@ -476,30 +460,25 @@
             const $rowPro = tblPromotion.find('tbody tr.highlight');
             const promotion = tblPromotion.DataTable().row($rowPro).data();
             const $rowSt = tblStage.find('tbody tr.highlight');
-            const stage = tblStage.DataTable().row($rowSt).data();
-             
+            const stage = tblStage.DataTable().row($rowSt).data(); 
             if (promotion || stage){
                 $("#stage_PromotionId").val(promotion.promotionId);
             }
-            modalStage.modal("show");
-            fetchTerm();
-            fetchGroup();
+            modalStage.modal("show"); 
         });
         $("#btnDeleteStage").on("click", function () {
             const $rowSt = tblStage.find('tbody tr.highlight');
             const stage = tblStage.DataTable().row($rowSt).data();
             if(!stage){
-                alert("Please select stage");
-                return;
-            }
-            
-            if(confirm("Are you sure you want to delete this stage?")){
+                return ShowToastInfo("Please select stage"); 
+            }  
+            if(ShowBoxConfirm("Are you sure you want to delete this stage?")){
                 $.ajax({
                     url: '/stage/delete/' + stage.stageId,
                     method: 'DELETE', 
                     success: function (response) {
                         if (response.code === "200") {
-                            ShowToastSuccess("Saved successfully!"); 
+                            ShowToastSuccess(`Stage ${stage.stageNo} remove successfully!`); 
                             tblStage.DataTable().ajax.reload();
                         } else {
                             ShowToastError(response.message);
@@ -508,9 +487,8 @@
                     error: function (error) {
                         ShowToastError(error.responseText);
                     }
-                });
-                 fetchTerm();
-                fetchGroup();
+                }); 
+                fetchStage();
             }
         });
         formStage.on("submit", function (e) {
@@ -522,33 +500,30 @@
                 method: 'POST',
                 data: formData,
                 success: function (response) {
-                    if (response.code === "200") {
-                        ShowToastSuccess("Saved successfully!");
+                    if (response.status.code === "200") {
+                        ShowToastSuccess("Stage saved successfully!");
                         formStage[0].reset();
                         modalStage.modal("hide");
                         tblStage.DataTable().ajax.reload();
                     } else {
-                        ShowToastError(response.message);
+                        ShowToastError(response.status.message);
                     }
                 },
                 error: function (error) {
                     ShowToastError(error.responseText);
                 }
-            });
-            fetchTerm();
-            fetchGroup();
+            }); 
         });
         $("#closeStage").on("click", function () {
             modalStage.modal("hide");
             formStage[0].reset();
         })
-        //=====End Stage==
+        //#endregion ==Stage==
 
-        //==========Term========
+        //#region====Term====
         const tblTerm = $("#tblTerm");
-        const formTerm = $("#termForm");
-        const modalTerm = $("#modalTerm");
-
+        const formTerm = $("#formTerm");
+        const modalTerm = $("#modalTerm"); 
         const termAcademicYearStart = $("#term_AcademicYearStart");
         const termStartDate = $("#term_StartDate");
         const termEndDate = $("#term_EndDate");
@@ -593,43 +568,67 @@
                     {data: "termNo"},
                 ]
             });
-        }
-
-
+        } 
         tblTerm.on('click', 'tbody tr', function () {
             tblTerm.find('tbody tr').removeClass('highlight');
             $(this).addClass('highlight');
             fetchGroup();
          });
-
         async function OnPromoteNew() {
             const $rowSt = tblStage.find('tbody tr.highlight');
             const stage = tblStage.DataTable().row($rowSt).data(); 
             if (!stage){
                return ShowToastInfo("Please select stage");
             }
-            const lastTerm = await getLastTerm(stage.stageId);
-            console.log(lastTerm);
+            const lastTerm = await getLastTerm(stage.stageId); 
             if (!lastTerm) {
                 $("#term_TermNo").val(1);
                 modalTerm.find(".modal-title").text("Create New Term");
             }else{
                 $("#term_TermNo").val(parseInt(lastTerm.termNo + 1));
                 modalTerm.find(".modal-title").text("Promote New Term");
-            } 
+            }
+            if (stage){
+                $("#term_StageId").val(stage.stageId);
+            }
             termStartDate.val(new Date(Date.now()).toISOString().split('T')[0]);
             termEndDate.val(new Date(Date.now()).toISOString().split('T')[0]);
             modalTerm.modal("show"); 
-            fetchGroup();
         }
+        formTerm.off("submit").on("submit", function (e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
 
+            const form = $(this);
+            const formData = form.serialize();
+
+            $.ajax({
+                url: '/term/save-change',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.status.code === "200") {
+                        ShowToastSuccess("Term saved successfully!");
+                        formTerm[0].reset();
+                        modalTerm.modal("hide");
+                        tblTerm.DataTable().ajax.reload();
+                    } else {
+                        ShowToastError(response.status.message);
+                    }
+                },
+                error: function (error) {
+                    ShowToastError(error.responseText);
+                }
+            });
+
+            return false;
+        });
         function  DeleteTerm(){
             const $rowSt = tblTerm.find('tbody tr.highlight');
             const term = tblTerm.DataTable().row($rowSt).data();
             if(!term){
                 return ShowToastInfo("Please select term"); 
-            }
-
+            } 
             if(ShowBoxConfirm("Are you sure you want to delete this term?")){
                 $.ajax({
                     url: '/term/delete/' + term.termId,
@@ -658,13 +657,13 @@
                 method: 'POST',
                 data: formData,
                 success: function (response) {
-                    if (response.code === "200") {
-                        ShowToastSuccess("Saved successfully!");
+                    if (response.status.code === "200") {
+                        ShowToastSuccess("Term saved successfully!");
                         formTerm[0].reset();
                         modalTerm.modal("hide");
                         tblTerm.DataTable().ajax.reload();
                     } else {
-                        ShowToastError(response.message);
+                        ShowToastInfo(response.status.message);
                     }
                 },
                 error: function (error) {
@@ -675,7 +674,7 @@
         });
         $("#CloseTerm").on("click", function () {
             modalTerm.modal("hide");
-            formStage[0].reset();
+            formTerm[0].reset();
             tblTerm.DataTable().ajax.reload();
         })
         async function getLastTerm(stageId) {
@@ -690,8 +689,7 @@
             }catch(error) {
                 console.log(error.responseText);
             }
-        }
-        
+        } 
         termAcademicYearStart.on("input", function (e) {
             $("#term_AcademicYearEnd").val(parseInt(e.target.value) + 1);
         });
@@ -699,8 +697,7 @@
             const d = new Date(e.target.value);
             d.setMonth(d.getMonth() + 4);
             $("#term_EndDate").val(d.toISOString().split('T')[0]);
-        });
-
+        }); 
         function OnEditTerm() {
             const $row = tblTerm.find('tbody tr.highlight');
             const selectedRow = tblTerm.DataTable().row($row).data();
@@ -714,10 +711,9 @@
             $("#term_EndDate").val(new Date(selectedRow.endDate).toISOString().split('T')[0]);
             modalTerm.modal("show");
         }
+        //#endregion ====Term====
 
-        //======End Term====
-
-        ///=====Group====
+        //#region =====Group====
         const tblGroup = $("#tblGroup");
         const modalGroup = $('#modalGroup');
         const formGroup = $("#formGroup");
@@ -776,21 +772,17 @@
                     },
                 ]
             });
-        }
-
+        } 
         tblGroup.on('click', 'tbody tr', function () {
             tblGroup.find('tbody tr').removeClass('highlight');
             $(this).addClass('highlight');
-        });
-
+        }); 
         btnNewGroup.on("click", function (e) {
             e.preventDefault();
             const $rowSt = tblStage.find('tbody tr.highlight');
-            const stage = tblStage.DataTable().row($rowSt).data();
-
+            const stage = tblStage.DataTable().row($rowSt).data(); 
             const $rowTerm = tblTerm.find('tbody tr.highlight');
-            const term = tblTerm.DataTable().row($rowTerm).data();
-            
+            const term = tblTerm.DataTable().row($rowTerm).data(); 
             if(!stage || !term) return;
             const groupForm = document.getElementById("formGroup");
             if (groupForm) {
@@ -954,7 +946,7 @@
                 }
             });
         });
-        //==============End Group======
+        //#endregion  ======Group======
 
         //==============
         async function GetField() {

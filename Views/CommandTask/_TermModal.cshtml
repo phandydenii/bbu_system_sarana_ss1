@@ -9,15 +9,14 @@
                 <h4 class="modal-title">Term</h4>
             </div>
             <div class="modal-body">
-                <form id="formTerm" aria-hidden="true">
+                <form id="formTerm">
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group">
                                 <label>Term No</label>
                                 <input type="hidden" asp-for="@term.StageId">
                                 <input type="hidden" asp-for="@term.TermId">
-                                <input type="number" asp-for="@term.TermNo" class="form-control" readonly
-                                       style="text-align: center" value="0">
+                                <input type="number" asp-for="@term.TermNo" class="form-control" readonly style="text-align: center" value="0">
                             </div>
                         </div>
                     </div>
@@ -52,8 +51,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button id="btnSubmit" type="submit" class="btn btn-success float-right" form="termForm"><i
-                        class="fa-solid fa-download"></i> Save
+                <button id="btnSubmit" type="submit" class="btn btn-success float-right" form="formTerm"> 
+                    <i class="fa-solid fa-download"></i> Save
                 </button>
                 <a id="CloseTerm" class="btn btn-danger float-right"><i class="fa-solid fa-xmark"></i> Close</a>
             </div>
