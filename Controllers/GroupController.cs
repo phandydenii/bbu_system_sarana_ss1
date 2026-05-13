@@ -2,6 +2,7 @@
 using BBU_SYSTEM.DTOs;
 using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
+using BBU_SYSTEM.Modelsss;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -234,27 +235,61 @@ public class GroupController(ICampusDbContext campusDbContext, IMapper mapper, I
     }
 
     [HttpPost("save-change")]
-    public async Task<IActionResult> CreteGroup(GroupDto group, GroupRoomDto grouproom)
+    public async Task<IActionResult> CreteGroup(GroupDto group, GroupRoomDto groupRoom)
     {
         var db = campusDbContext.DbContext(_campus);
-        if (group == null || grouproom == null) throw new Exception("Bad Request");
-        var tran = await db.Database.BeginTransactionAsync();
+        if (group == null || groupRoom == null) return new ServerResponse().BadRequest("Data is requried to input!");
+        var tran = await db.Database.BeginTransactionAsync(); 
         try
         {
-            var data = mapper.Map<GroupDto, Group>(group);
-            await db.TblGroup.AddAsync(data);
-            await db.SaveChangesAsync();
-
-            grouproom.GroupId = data.GroupId;
-            var dataGroup = mapper.Map<GroupRoomDto, GroupRoom>(grouproom);
-            await db.TblGroupRoom.AddAsync(dataGroup);
-            await db.SaveChangesAsync();
-            await tran.CommitAsync();
-            return new ServerResponse().Success(dataGroup);
+            // 1.group
+            Models.Group? groupEntity; 
+            if (group.GroupId > 0)
+            { 
+                groupEntity = await db.TblGroup.FirstOrDefaultAsync(x => x.GroupId == group.GroupId); 
+                if (groupEntity == null) return new ServerResponse().NotFound("Group not found");
+                mapper.Map(group, groupEntity);
+                await db.SaveChangesAsync();
+            }
+            else
+            { 
+                groupEntity = mapper.Map<GroupDto, Models.Group>(group);  
+                groupEntity.GroupId = 0; 
+                await db.TblGroup.AddAsync(groupEntity);
+                await db.SaveChangesAsync();
+            } 
+            // 2.group room 
+            groupRoom.GroupId = groupEntity.GroupId; 
+            Models.GroupRoom? groupRoomEntity; 
+            if (groupRoom.GroupRoomId > 0)
+            { 
+                groupRoomEntity = await db.TblGroupRoom.FirstOrDefaultAsync(x => x.GroupRoomId == groupRoom.GroupRoomId); 
+                if (groupRoomEntity == null)  return new ServerResponse().NotFound("Group room not found");
+                mapper.Map(groupRoom,groupRoomEntity); 
+                await db.SaveChangesAsync();
+            }
+            else
+            { 
+                groupRoomEntity = mapper.Map<GroupRoomDto, Models.GroupRoom>(groupRoom); 
+                groupRoomEntity.GroupRoomId = 0;
+                groupRoomEntity.GroupId = groupEntity.GroupId; 
+                await db.TblGroupRoom.AddAsync(groupRoomEntity);
+                await db.SaveChangesAsync();
+            } 
+            await tran.CommitAsync(); 
+            return new ServerResponse().Success(new
+            {
+                group = groupEntity,
+                groupRoom = groupRoomEntity
+            });
         }
         catch (Exception ex)
         {
             await tran.RollbackAsync();
+            var realError = ex.InnerException?.Message ?? ex.Message; 
+            await Helper.Telegram.SendDebugToMyTelegramDirect(
+                $"Group save error:\n{realError}"
+            );
             return new ServerResponse().ErrorInternal(ex);
         }
     }

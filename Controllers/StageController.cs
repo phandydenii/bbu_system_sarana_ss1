@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using BBU_SYSTEM.Data;
 using BBU_SYSTEM.DTOs;
 using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BBU_SYSTEM.Controllers;
 
@@ -64,8 +66,16 @@ public class StageController(ICampusDbContext campusDbContext, IMapper mapper, I
     {
         try
         {
-            var db = campusDbContext.DbContext(_campus); 
-            stage.Status = "ACTIVE";
+            var db = campusDbContext.DbContext(_campus);
+            stage.Status = StageStatusConstant.Active;
+            if (stage.StageId > 0)
+            {
+                var entity = await db.TblStage.FirstOrDefaultAsync(x => x.StageId == stage.StageId);
+                if (entity == null) return new ServerResponse().NotFound("Stage not found");
+                mapper.Map(stage, entity);
+                await db.SaveChangesAsync();
+                return new ServerResponse().Success(entity);
+            }
             var data = mapper.Map<StageDto, Stage>(stage);
             await db.TblStage.AddAsync(data);
             await db.SaveChangesAsync();

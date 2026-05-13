@@ -3,11 +3,14 @@
     var group = new GroupDto();
     var groupRoom = new GroupRoomDto();
 }
-<div class="modal fade" id="modalGroup" data-backdrop="static">
+<div class="modal fade" id="modalGroup" data-backdrop="static"> 
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Group</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="formGroup">
@@ -16,14 +19,14 @@
                     <div class="row">
                         <div class="col-4">
                             <div class="form-group">
-                                <label asp-for="@group.GroupName"></label>
+                                <label>Group Name</label>
                                 <input type="text" asp-for="@group.GroupName" class="form-control">
                                 <span asp-validation-for="@group.GroupName" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
-                                <label asp-for="@group.StudyTime"></label>
+                                <label>Study Time</label>
                                 <select asp-for="@group.StudyTime" class="form-control select2">
                                 </select>
                             </div>
@@ -31,10 +34,9 @@
                         <div class="col-4">
                             <div class="form-group">
                                 <label asp-for="@group.CreatedInTermNo"></label>
-                                <input type="text" asp-for="@group.CreatedInTermNo" class="form-control">
+                                <input type="number" asp-for="@group.CreatedInTermNo" class="form-control">
                                 <span asp-validation-for="@group.CreatedInTermNo" class="text-danger"></span>
-                            </div>
-
+                            </div> 
                         </div>
                     </div>
                     <div class="row">
@@ -45,29 +47,29 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>note</label>
+                        <label>Note</label>
                         <input type="text" asp-for="@group.Note" class="form-control"> 
                     </div>
-                    <p>Group Room</p>
+                    <h5>Group Room</h5>
                     <hr/>
                     <div class="row">
                         <div class="col-4">
                             <div class="form-group">
-                                <label>term_no</label>
+                                <label>Term No</label>
                                 <input type="hidden" asp-for="@groupRoom.GroupRoomId" class="form-control">
                                 <input type="number" asp-for="@groupRoom.TermNo" class="form-control"> 
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
-                                <label>room_name</label>
+                                <label>Room Name</label>
                                 <select asp-for="@groupRoom.RoomName" class="form-control select2">
                                 </select>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
-                                <label>start_payment</label>
+                                <label>Start Payment</label>
                                 <input type="date" asp-for="@groupRoom.StartPayment" class="form-control"> 
                             </div>
                         </div>
