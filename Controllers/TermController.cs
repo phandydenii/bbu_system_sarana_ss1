@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BBU_SYSTEM.Data;
 using BBU_SYSTEM.DTOs;
 using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
@@ -26,13 +27,10 @@ public class TermController(ICampusDbContext campusDbContext, IMapper mapper, IH
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
             var pageSize = length != null ? int.Parse(length) != -1 ? Convert.ToInt32(length) : 10 : 10;
             var skip = start != null ? Convert.ToInt32(start) : 0;
-
             // var pageSize = length != null ? Convert.ToInt32(length) : 0;
             // var skip = start != null ? Convert.ToInt32(start) : 0;
-
             var db = campusDbContext.DbContext(_campus);
             var query = db.TblTerm.AsQueryable();
             if (stageId > 0) query = query.Where(x => x.StageId == stageId).AsQueryable();
@@ -85,20 +83,15 @@ public class TermController(ICampusDbContext campusDbContext, IMapper mapper, IH
     [HttpPost("save-change")]
     public async Task<IActionResult> CreteTerm(TermDto term)
     {
-        var json = System.Text.Json.JsonSerializer.Serialize(term);
-        await Helper.Telegram.SendDebugToMyTelegramDirect($"This is term:\n{json}");
         var db = campusDbContext.DbContext(_campus);
         ArgumentNullException.ThrowIfNull(term);
         try
         {
-            term.Status = "ACTIVE";
+            term.Status = TermStatusConstant.Active;
             if (term.TermId > 0)
             {
                 var termUpdate = await db.TblTerm.Where(x => x.TermId == term.TermId).FirstOrDefaultAsync();
-                if (termUpdate == null)
-                {
-                    return new ServerResponse().BadRequest();
-                }
+                if (termUpdate == null) return new ServerResponse().BadRequest(); 
                 mapper.Map(term, termUpdate);
                 db.TblTerm.Update(termUpdate);
                 await db.SaveChangesAsync();
@@ -109,17 +102,16 @@ public class TermController(ICampusDbContext campusDbContext, IMapper mapper, IH
             var oldTerm =  await db.TblTerm.OrderByDescending(x=>x.TermId).FirstOrDefaultAsync(x => x.StageId == term.StageId);  
             if (oldTerm != null)
             {
-                oldTerm.Status = "PASSED"; 
+                oldTerm.Status = TermStatusConstant.Pass; 
                 await db.SaveChangesAsync();
-            } 
-            
+            }  
             if (term.TermNo > 1 && oldTerm == null)
             {
                 return new ServerResponse().BadRequest("Old term not found. Cannot copy students to new term.");
             }
             
             //save new term
-            term.Status = "ACTIVE";
+            term.Status = TermStatusConstant.Active;
             var data = mapper.Map<TermDto, Term>(term);
             await db.TblTerm.AddAsync(data);
             await db.SaveChangesAsync();

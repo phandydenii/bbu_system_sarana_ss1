@@ -1,15 +1,7 @@
 @model Dictionary<int, string>
 @{
     ViewData["OpenMenu"] = "CommandTask";
-    ViewData["Action"] = "PromotionGroup"; 
-    /*var degrees = new Dictionary<int, string>
-    { 
-        {2, "Bachelor"},
-        {3, "Diploma"},
-        {4, "Master"},
-        {5, "Doctor"},
-    };
-    */
+    ViewData["Action"] = "PromotionGroup";  
     var degrees = Model;
 }
 
@@ -192,11 +184,11 @@
                                                 <a id="btnEditGroup" class="btn btn-warning btn-sm"
                                                    style="display: block;margin:.2rem 0"><i class="fas fa-edit"></i>
                                                     Edit</a>
+                                                <a onclick="OnTransfer()" class="btn btn-info btn-sm"
+                                                   style="display: block;margin:.2rem 0">Transfer</a>
                                                 <a class="btn btn-danger btn-sm"
                                                    style="display: block;margin:.2rem 0">
                                                     <i class="fa-solid fa-trash"></i> Delete</a>
-                                                <a onclick="OnTransfer()" class="btn btn-info btn-sm"
-                                                   style="display: block;margin:.2rem 0">Transfer</a>
                                             </div>
                                         </div>
                                     </li>
@@ -591,17 +583,16 @@
             if (stage){
                 $("#term_StageId").val(stage.stageId);
             }
+            $("#term_TermId").val(0);
             termStartDate.val(new Date(Date.now()).toISOString().split('T')[0]);
             termEndDate.val(new Date(Date.now()).toISOString().split('T')[0]);
             modalTerm.modal("show"); 
         }
         formTerm.off("submit").on("submit", function (e) {
             e.preventDefault();
-            e.stopImmediatePropagation();
-
+            e.stopImmediatePropagation(); 
             const form = $(this);
-            const formData = form.serialize();
-
+            const formData = form.serialize(); 
             $.ajax({
                 url: '/term/save-change',
                 method: 'POST',
@@ -647,31 +638,7 @@
                 }); 
                 fetchGroup();
             }
-        }
-        formTerm.on("submit", function (e) {
-            e.preventDefault();
-            const form = $(this);
-            const formData = form.serialize();
-            $.ajax({
-                url: '/term/save-change',
-                method: 'POST',
-                data: formData,
-                success: function (response) {
-                    if (response.status.code === "200") {
-                        ShowToastSuccess("Term saved successfully!");
-                        formTerm[0].reset();
-                        modalTerm.modal("hide");
-                        tblTerm.DataTable().ajax.reload();
-                    } else {
-                        ShowToastInfo(response.status.message);
-                    }
-                },
-                error: function (error) {
-                    ShowToastError(error.responseText);
-                }
-            });
-            fetchGroup();
-        });
+        } 
         $("#CloseTerm").on("click", function () {
             modalTerm.modal("hide");
             formTerm[0].reset();
@@ -713,7 +680,7 @@
         }
         //#endregion ====Term====
 
-        //#region =====Group====
+        //#region  ======Group====== 
         const tblGroup = $("#tblGroup");
         const modalGroup = $('#modalGroup');
         const formGroup = $("#formGroup");
@@ -783,9 +750,8 @@
             const stage = tblStage.DataTable().row($rowSt).data(); 
             const $rowTerm = tblTerm.find('tbody tr.highlight');
             const term = tblTerm.DataTable().row($rowTerm).data(); 
-            if(!stage || !term) return;
-            const groupForm = document.getElementById("formGroup");
-            if (groupForm) {
+            if(!stage || !term) return; 
+            if (formGroup) {
                 $("#group_StageId").val(stage.stageId);
                 $("#groupRoom_TermNo").val(term.termNo);
                 GetField();
@@ -794,8 +760,15 @@
             }
             modalGroup.find(".modal-title").text("Create New Group");
             modalGroup.modal("show");
+            ShowToastInfo("User click new group")
+        }); 
+        formGroup.off("submit").on("submit", function (e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            const form = $(this);
+            const formData = form.serialize();
+            console.log(formData);
         });
-
         btnEditGroup.on("click", async function () {
             const $row = tblGroup.find('tbody tr.highlight');
             const selectedRow = tblGroup.DataTable().row($row).data();
@@ -809,27 +782,22 @@
             $("#group_CreatedInTermNo").val(selectedRow.createdInTermNo);
             $("#group_Note").val(selectedRow.note);
             cboStudyTime.val(selectedRow.studyTime).trigger("change");
-            cboField.val(selectedRow.fieldId).trigger("change");
-
+            cboField.val(selectedRow.fieldId).trigger("change"); 
             await GetGroupRoom(selectedRow.groupId);
             modalGroup.find(".modal-title").text("Update Group");
             modalGroup.modal("show");
-        });
-
+        }); 
         $("#CloseGroup").on("click", function () {
             formGroup[0].reset();
             modalGroup.modal("hide");
-        });
-        
+        }); 
         function OnTransfer() {
             const degreeId = $('#rangeButtons button.btn-primary').val();
             const schoolId = cboSchool.val();
             const promotion = tblPromotion.DataTable().row(tblPromotion.find('tbody tr.highlight')).data();
             const term = tblTerm.DataTable().row(tblTerm.find('tbody tr.highlight')).data();
-            const group = tblGroup.DataTable().row(tblGroup.find('tbody tr.highlight')).data();
-            
-            if (!degreeId || !schoolId || !promotion || !term || !group) return;
-
+            const group = tblGroup.DataTable().row(tblGroup.find('tbody tr.highlight')).data(); 
+            if (!degreeId || !schoolId || !promotion || !term || !group) return; 
             const tblTransferGroup = $("#tblTransferGroup");
             tblTransferGroup.DataTable().clear().destroy();
             tblTransferGroup.DataTable({
@@ -906,8 +874,7 @@
             //     ]
             // });
             modalTransfer.modal("show");
-        }
-
+        } 
         tblTransferStudent.on('click', 'tbody tr', function () {
             const row = $(this);
             // If already highlighted → remove highlight and stop
@@ -919,20 +886,15 @@
             }
             let count = tblTransferStudent.find('tbody tr.highlight').length;
             $("#countStudent").text(count);
-        });
-        
+        }); 
         $("#btnTransfer").on("click", async function () {
-            let idList = [];
-
+            let idList = []; 
             tblTransferStudent.find("tbody tr.highlight").each(function () {
                 const row = $(this);
                 const id = row.find("td").eq(0).text().trim();
                 idList.push(id);
-            });
-
-            console.log("Sending ID List:", idList);
-            
-            // === POST to Controller ===
+            }); 
+            console.log("Sending ID List:", idList);  
             $.ajax({
                 url: '/student/transfer/'+2336,
                 type: 'POST',
@@ -946,14 +908,15 @@
                 }
             });
         });
-        //#endregion  ======Group======
-
-        //==============
+        //#endregion  ======Group====== 
+ 
+        
+        // Bind Select2 Data
         async function GetField() {
             const degreeId = parseInt(btnDegrees.find('button.btn-primary').val());
             const schoolId = parseInt(cboSchool.val());
             if (!degreeId || !schoolId) {
-                console.warn("Missing degree or school ID");
+                ShowToastInfo("Missing degree or school ID");
                 return;
             }
             const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
@@ -971,8 +934,8 @@
                     url: "/group/get-study-time",
                     method: 'GET',
                     dataType: "json",
-                });
-                if (response.code === "200" && response.data !== "") {
+                }); 
+                if (response.status.code === "200" && response.data !== "") {
                     cboStudyTime.empty();
                     cboStudyTime.append("<option value='' disabled selected>Select study time</option>");
                     response.data.forEach(item => {
@@ -980,7 +943,7 @@
                     });
                     cboStudyTime.trigger('change.select2');
                 } else {
-                    ShowToastError(response.message);
+                    ShowToastError(response.status.message);
                 }
             } catch (err) {
                 ShowToastError(err);
@@ -999,7 +962,7 @@
                     error: function (data) {
                         console.log(data.responseText);
                     }
-                });
+                }); 
                  if (response.code === "200" && response.data !== "") {
                     cboRoom.empty();
                     cboRoom.append("<option value='' disabled selected>Select study time</option>");
@@ -1018,8 +981,7 @@
         async function GetGroupRoom(groupId) {
             try {
                 const $rowTerm = tblTerm.find('tbody tr.highlight');
-                const term = tblTerm.DataTable().row($rowTerm).data();
-
+                const term = tblTerm.DataTable().row($rowTerm).data(); 
                 const $rowGroup = tblTerm.find('tbody tr.highlight');
                 const group = tblTerm.DataTable().row($rowGroup).data();
                 const response = await $.ajax({
@@ -1034,7 +996,7 @@
                     error: function (data) {
                         console.log(data.responseText);
                     }
-                });
+                }); 
                 if (response.status.code === "200") {
                     const data = response.data; 
                     $("#groupRoom_GroupRoomId").val(data.groupRoomId);
@@ -1043,7 +1005,7 @@
                     $("#groupRoom_StartPayment").val(data.startPayment ?? new Date().toLocaleString());
 
                 } else {
-                    ShowToastError(response.message);
+                    ShowToastError(response.status.message);
                 }
             } catch (err) {
                 ShowToastError(err);
