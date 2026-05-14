@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BBU_SYSTEM.Data;
 using BBU_SYSTEM.DTOs;
 using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
@@ -163,7 +164,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             join sc in db.TblSchool on pr.SchoolId equals sc.SchoolId
             join de in db.TblDegree on pr.DegreeId equals de.DegreeId
             join f in db.TblField on s.FieldId equals f.FieldId
-            where t.Status == "ACTIVE"
+            where t.Status == TermStatusConstant.Active
             select new
             {
                 sg.StudentGroupId,

@@ -830,9 +830,9 @@
                 }
             });
         });
-        // transfer student
+        // transfer section
         $("#btnToggleTransferFullScreen").on("click", function () {
-            const dialog = $("#modalGroup .group-modal-dialog");
+            const dialog = $("#TransferModal .transfer-modal-dialog");
             const icon = $(this).find("i");
             dialog.toggleClass("modal-fullscreen-custom");
             if (dialog.hasClass("modal-fullscreen-custom")) {
@@ -847,7 +847,8 @@
             const promotion = tblPromotion.DataTable().row(tblPromotion.find('tbody tr.highlight')).data();
             const term = tblTerm.DataTable().row(tblTerm.find('tbody tr.highlight')).data();
             const group = tblGroup.DataTable().row(tblGroup.find('tbody tr.highlight')).data(); 
-            if (!degreeId || !schoolId || !promotion || !term || !group) return; 
+            if (!degreeId || !schoolId || !promotion || !term || !group) return ShowToastInfo("Please select data for transfer!"); 
+            // group side
             const tblTransferGroup = $("#tblTransferGroup");
             tblTransferGroup.DataTable().clear().destroy();
             tblTransferGroup.DataTable({
@@ -875,68 +876,144 @@
                     {data: "stageId"},
                     {data: "stageNo"},
                 ]
+            }); 
+            // student side
+            tblTransferStudent.DataTable().clear().destroy();
+            tblTransferStudent.DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: false,
+                ordering: false,
+                info: false,
+                responsive: true,
+                autoWidth: true,
+                processing: true,
+                serverSide: true,
+                columnDefs: [
+                    {
+                        targets: 0,
+                        orderable: false,
+                        searchable: false,
+                        className: "text-center no-sort"
+                    }
+                ],
+                headerCallback: function (thead) {
+                    $(thead).find("th").eq(0)
+                        .removeClass("sorting sorting_asc sorting_desc")
+                        .addClass("no-sort text-center")
+                        .html(`
+                <input type="checkbox"
+                       class="chkTransferStudentAll"
+                       style="width:16px;height:16px;cursor:pointer;">
+            `);
+                },
+                ajax: {
+                    url: "/student/GetStudents",
+                    type: "POST",
+                    data: function (d) {
+                        d.degreeId = degreeId;
+                        d.schoolid = schoolId;
+                        @*d.termno = term.termNo;
+                        d.groupid = group.groupId;*@
+                    },
+                },
+                columns: [
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        className: "text-center",
+                        render: function (data, type, row) {
+                            return `<input type="checkbox" class="chkTransferStudentRow" value="${row.studentId}">`;
+                        }
+                    },
+                    {data: "studentId"},
+                    {data: "studentName"},
+                    {data: "sex"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            const dt = formatDate(row.dateOfBirth);
+                            return `${dt}`
+                        }
+                    },
+                ],
+                drawCallback: function () {
+                    $("#chkTransferStudentAll").prop("checked", false);
+                    $("#countStudent").text(0);
+                }
             });
-            const tbody = $("#tblTransferStudent tbody");
-            // Generate 15 rows (0–14)
-            for (let i = 0; i <= 14; i++) {
-                const row = `
-                    <tr> 
-                        <td>PP00${i}</td>
-                        <td>John Doe ${i + 1}</td>
-                        <td>Male</td>
-                        <td>11-7-2014</td>
-                    </tr>
-                `;
-                tbody.append(row);
-            }
-            // tblTransferStudent.DataTable().clear().destroy();
-            // tblTransferStudent.DataTable({
-            //     paging: true,
-            //     lengthChange: false,
-            //     searching: false,
-            //     ordering: false,
-            //     info: false,
-            //     responsive: true,
-            //     autoWidth: true,
-            //     processing: true,
-            //     serverSide: true,
-            //     ajax: {
-            //         url: "/student/GetStudents",
-            //         type: "POST",
-            //         data: function (d) {
-            //             d.degreeId = degreeId;
-            //             d.schoolid = schoolId;
-            //             d.termno = term.termNo;
-            //             d.groupid = group.groupId;
-            //         },
-            //     },
-            //     columns: [
-            //         {data: "studentId"},
-            //         {data: "studentName"},
-            //         {data: "sex"},
-            //         {
-            //             data: null,
-            //             render: function (data, type, row) {
-            //                 const dt = formatDate(row.startTerm);
-            //                 return `${dt}`
-            //             }
-            //         },
-            //     ]
-            // });
             modalTransfer.modal("show");
-        } 
-        tblTransferStudent.on('click', 'tbody tr', function () {
-            const row = $(this);
-            // If already highlighted → remove highlight and stop
-            if (row.hasClass('highlight')) {
-                row.removeClass('highlight');
+        }   
+        // select one
+        $(document).off("change.transferStudentRow", ".chkTransferStudentRow")
+            .on("change.transferStudentRow", ".chkTransferStudentRow", function () {
+                const row = $(this).closest("tr"); 
+                if ($(this).is(":checked")) {
+                    row.addClass("highlight");
+                } else {
+                    row.removeClass("highlight");
+                } 
+                updateTransferStudentSelectAll();
+                updateTransferStudentCount();
+            });
+        // select multiple
+        $("#chkTransferStudentAll").on("click",function (e) {
+                e.stopPropagation(); 
+                console.log("SELECT ALL CLICKED");
+                ShowToastInfo("Select all clicked"); 
+                const checked = $(this).is(":checked");
+                const table = $("#tblTransferStudent").DataTable(); 
+                $(table.rows({ page: "current" }).nodes()).each(function () {
+                    const row = $(this);
+                    const checkbox = row.find(".chkTransferStudentRow");
+
+                    checkbox.prop("checked", checked);
+
+                    if (checked) {
+                        row.addClass("highlight");
+                    } else {
+                        row.removeClass("highlight");
+                    }
+                });
+
+                updateTransferStudentCount();
+            });
+        function syncTransferStudentRow(row) {
+            const checked = row.find(".chkTransferStudentRow").is(":checked"); 
+            if (checked) {
+                row.addClass("highlight");
             } else {
-                // Add highlight to clicked row
-                row.addClass('highlight'); 
+                row.removeClass("highlight");
             }
-            let count = tblTransferStudent.find('tbody tr.highlight').length;
+        }
+        function updateTransferStudentCount() {
+            const table = $("#tblTransferStudent").DataTable(); 
+            let count = 0; 
+            $(table.rows({ page: "current" }).nodes()).each(function () {
+                if ($(this).find(".chkTransferStudentRow").prop("checked")) {
+                    count++;
+                }
+            }); 
             $("#countStudent").text(count);
-        }); 
+        }
+
+        function updateTransferStudentSelectAll() {
+            const table = $("#tblTransferStudent").DataTable();
+            const rows = $(table.rows({ page: "current" }).nodes());
+
+            const total = rows.length;
+            const checked = rows.find(".chkTransferStudentRow:checked").length;
+
+            $(".chkTransferStudentAll").prop("checked", total > 0 && total === checked);
+        }
+        function getSelectedTransferStudentIds() {
+            const ids = []; 
+            $("#tblTransferStudent tbody .chkTransferStudentRow:checked").each(function () {
+                ids.push($(this).val());
+            }); 
+            return ids;
+        }
         $("#btnTransfer").on("click", async function () {
             let idList = []; 
             tblTransferStudent.find("tbody tr.highlight").each(function () {
@@ -944,8 +1021,8 @@
                 const id = row.find("td").eq(0).text().trim();
                 idList.push(id);
             }); 
-            console.log("Sending ID List:", idList);  
-            $.ajax({
+            console.log("Sending ID List:", idList);   
+            @*$.ajax({
                 url: '/student/transfer/'+2336,
                 type: 'POST',
                 contentType: 'application/json',
@@ -956,7 +1033,7 @@
                 error: function (err) {
                     console.log("Error:", err);
                 }
-            });
+            });*@
         });
         //#endregion  ======Group====== 
  
