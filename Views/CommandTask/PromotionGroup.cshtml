@@ -190,10 +190,13 @@
                                                    style="display: block;margin:.2rem 0"><i class="fas fa-edit"></i>
                                                     Edit</a>
                                                 <a onclick="OnTransfer()" class="btn btn-info btn-sm"
-                                                   style="display: block;margin:.2rem 0">Transfer</a>
+                                                   style="display: block;margin:.2rem 0">
+                                                    <i class="fas fa-exchange"></i> 
+                                                    Transfer
+                                                </a>
                                                 <a class="btn btn-danger btn-sm"
                                                    style="display: block;margin:.2rem 0">
-                                                    <i class="fa-solid fa-trash"></i> Delete</a>
+                                                    <i class="fa-solid fa-trash"></i>Delete</a>
                                             </div>
                                         </div>
                                     </li>
@@ -709,6 +712,8 @@
         const formGroup = $("#formGroup");
         const modalTransfer = $("#TransferModal");
         const tblTransferStudent = $("#tblTransferStudent");
+        const tblTransferGroup = $("#tblTransferGroup");
+        const checkBoxAllStudent = $(".chkTransferStudentAll");
         function fetchGroup() {
             const $rowStage = tblStage.find('tbody tr.highlight');
             const stage = tblStage.DataTable().row($rowStage).data();
@@ -901,11 +906,7 @@
                     $(thead).find("th").eq(0)
                         .removeClass("sorting sorting_asc sorting_desc")
                         .addClass("no-sort text-center")
-                        .html(`
-                <input type="checkbox"
-                       class="chkTransferStudentAll"
-                       style="width:16px;height:16px;cursor:pointer;">
-            `);
+                        .html(`<input type="checkbox" class="chkTransferStudentAll" style="width:16px;height:16px;cursor:pointer;">`);
                 },
                 ajax: {
                     url: "/student/GetStudents",
@@ -913,8 +914,8 @@
                     data: function (d) {
                         d.degreeId = degreeId;
                         d.schoolid = schoolId;
-                        @*d.termno = term.termNo;
-                        d.groupid = group.groupId;*@
+                        d.termno = term.termNo;
+                        @*d.groupid = group.groupId;*@
                     },
                 },
                 columns: [
@@ -944,8 +945,26 @@
                 }
             });
             modalTransfer.modal("show");
-        }   
-        // select one
+        }
+        // select group for transfer
+        tblTransferGroup.on('click', 'tbody tr', function () {
+            tblTransferGroup.find('tbody tr').removeClass('highlight');
+            $(this).addClass('highlight'); 
+        });
+        // select all student
+        $(document).off("change", ".chkTransferStudentAll")
+            .on("change", ".chkTransferStudentAll", function () {
+                const isChecked = $(this).prop("checked");
+                const tableRows = tblTransferStudent.find("tbody tr"); 
+                tableRows.find(".chkTransferStudentRow").prop("checked", isChecked); 
+                if (isChecked) {
+                    tableRows.addClass("highlight");
+                } else {
+                    tableRows.removeClass("highlight");
+                } 
+                updateTransferStudentCount();
+            });
+        // select one student
         $(document).off("change.transferStudentRow", ".chkTransferStudentRow")
             .on("change.transferStudentRow", ".chkTransferStudentRow", function () {
                 const row = $(this).closest("tr"); 
@@ -957,88 +976,71 @@
                 updateTransferStudentSelectAll();
                 updateTransferStudentCount();
             });
-        // select multiple
-        $("#chkTransferStudentAll").on("click",function (e) {
-                e.stopPropagation(); 
-                console.log("SELECT ALL CLICKED");
-                ShowToastInfo("Select all clicked"); 
-                const checked = $(this).is(":checked");
-                const table = $("#tblTransferStudent").DataTable(); 
-                $(table.rows({ page: "current" }).nodes()).each(function () {
-                    const row = $(this);
-                    const checkbox = row.find(".chkTransferStudentRow");
 
-                    checkbox.prop("checked", checked);
-
-                    if (checked) {
-                        row.addClass("highlight");
-                    } else {
-                        row.removeClass("highlight");
-                    }
-                });
-
-                updateTransferStudentCount();
-            });
-        function syncTransferStudentRow(row) {
-            const checked = row.find(".chkTransferStudentRow").is(":checked"); 
-            if (checked) {
-                row.addClass("highlight");
-            } else {
-                row.removeClass("highlight");
-            }
-        }
+        // Helper for Select student
         function updateTransferStudentCount() {
-            const table = $("#tblTransferStudent").DataTable(); 
-            let count = 0; 
-            $(table.rows({ page: "current" }).nodes()).each(function () {
+            const tb = tblTransferStudent.DataTable();
+            let count = 0;
+            $(tb.rows({ page: "current" }).nodes()).each(function () {
                 if ($(this).find(".chkTransferStudentRow").prop("checked")) {
                     count++;
                 }
-            }); 
+            });
             $("#countStudent").text(count);
-        }
-
+        } 
         function updateTransferStudentSelectAll() {
-            const table = $("#tblTransferStudent").DataTable();
-            const rows = $(table.rows({ page: "current" }).nodes());
-
+            const tb = tblTransferStudent.DataTable();
+            const rows = $(tb.rows({ page: "current" }).nodes()); 
             const total = rows.length;
             const checked = rows.find(".chkTransferStudentRow:checked").length;
-
-            $(".chkTransferStudentAll").prop("checked", total > 0 && total === checked);
+            checkBoxAllStudent.prop("checked", total > 0 && total === checked);
         }
+
+        // Reset data states on close
+        modalTransfer.on("hidden.bs.modal", function () {
+            checkBoxAllStudent.prop("checked", false);
+        }); 
         function getSelectedTransferStudentIds() {
-            const ids = []; 
-            $("#tblTransferStudent tbody .chkTransferStudentRow:checked").each(function () {
+            const ids = [];
+            tblTransferStudent.find("tbody .chkTransferStudentRow:checked").each(function () {
                 ids.push($(this).val());
-            }); 
+            });
             return ids;
         }
-        $("#btnTransfer").on("click", async function () {
-            let idList = []; 
-            tblTransferStudent.find("tbody tr.highlight").each(function () {
-                const row = $(this);
-                const id = row.find("td").eq(0).text().trim();
-                idList.push(id);
-            }); 
-            console.log("Sending ID List:", idList);   
-            @*$.ajax({
-                url: '/student/transfer/'+2336,
+
+        $("#btnTransfer").on("click", function () { 
+            const idList = getSelectedTransferStudentIds(); 
+            const selectedGroupRow = tblTransferGroup.find("tbody tr.highlight");
+            const targetGroup = tblTransferGroup.DataTable().row(selectedGroupRow).data(); 
+            if (idList.length === 0) {
+                return ShowToastInfo("Please select at least one student to transfer.");
+            }
+            if (!targetGroup) {
+                return ShowToastInfo("Please select a target group from the table to transfer students into.");
+            } 
+            console.log("Sending Selected Student ID List Array:", idList);
+            console.log("Target Destination Group details:", targetGroup);
+
+            /*
+            $.ajax({
+                url: '/student/transfer/' + targetGroup.groupId,
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(idList),
                 success: function (res) {
-                    console.log("Success:", res);
+                    ShowToastSuccess("Students transferred successfully!");
+                    tblTransferStudent.DataTable().ajax.reload();
                 },
                 error: function (err) {
-                    console.log("Error:", err);
+                    ShowToastError("Error handling student transfer execution.");
                 }
-            });*@
+            });
+            */
         });
         //#endregion  ======Group====== 
  
         
-        // Bind Select2 Data
+        //#region Bind Select2 Data
         async function GetField() {
             const degreeId = parseInt(btnDegrees.find('button.btn-primary').val());
             const schoolId = parseInt(cboSchool.val());
@@ -1138,6 +1140,7 @@
                 ShowToastError(err);
             }
         }
+        //#endregion Bind Selec2 Data
     </script>
 }
 
