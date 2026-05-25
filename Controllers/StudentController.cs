@@ -110,21 +110,38 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         return View();
     }
 
-    [HttpPost("transfer/{groupId:int}")]
-    public IActionResult TransferStudents([FromBody] List<string> idList, int groupId)
+    [HttpPost("transfer/{groupId:int}/{fromGroupId:int}/{termNo:int}")]
+    public async Task<IActionResult> TransferStudents([FromBody] List<string> idList, int groupId, int fromGroupId,int termNo)
     {
         try
         {
-            // Example: print received IDs
+            if (idList.Count == 0)
+            {
+                return BadRequest(new
+                {
+                    data = new { },
+                    status = new
+                    {
+                        code = "400",
+                        message = "No students selected."
+                    }
+                });
+            } 
+            var db = campusDbContext.DbContext(_campus); 
             foreach (var id in idList)
             {
-                Console.WriteLine(@"ID received: " + id);
-                Console.WriteLine(@"Group Id: " + groupId);
-            }
-
-            // TODO: Your logic here
-
-            return Ok(new { message = "Received " + idList.Count + " students" });
+                if (string.IsNullOrWhiteSpace(id)) continue;   
+                var studentId = id.Trim(); 
+                await db.Database.ExecuteSqlInterpolatedAsync($@"
+                    UPDATE STUDENT_GROUP
+                    SET GROUP_ID = {groupId}
+                    WHERE STUDENT_ID = {studentId}
+                      AND GROUP_ID = {fromGroupId}
+                      AND TERM_NO = {termNo}
+                ");
+            } 
+            await db.SaveChangesAsync(); 
+            return new ServerResponse().Success();
         }
         catch (Exception e)
         {
@@ -152,7 +169,6 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         var pageSize = length != null ? Convert.ToInt32(length) : 0;
         var skip = start != null ? Convert.ToInt32(start) : 0;
 
-        //var campus = HttpContext.Session.GetString("campus");
         var db = campusDbContext.DbContext(_campus);
         var query = (from sg in db.TblStudentGroup
             join s in db.TblStudent on sg.StudentId equals s.StudentId

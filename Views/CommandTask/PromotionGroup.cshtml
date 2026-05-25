@@ -915,7 +915,7 @@
                         d.degreeId = degreeId;
                         d.schoolid = schoolId;
                         d.termno = term.termNo;
-                        @*d.groupid = group.groupId;*@
+                        d.groupid = group.groupId;
                     },
                 },
                 columns: [
@@ -1009,33 +1009,37 @@
         }
 
         $("#btnTransfer").on("click", function () { 
-            const idList = getSelectedTransferStudentIds(); 
-            const selectedGroupRow = tblTransferGroup.find("tbody tr.highlight");
-            const targetGroup = tblTransferGroup.DataTable().row(selectedGroupRow).data(); 
+            const idList = getSelectedTransferStudentIds();  
+            const targetGroup = tblTransferGroup.DataTable().row(tblTransferGroup.find("tbody tr.highlight")).data(); 
+            const fromGroup = tblGroup.DataTable().row(tblGroup.find("tbody tr.highlight")).data();
+            const fromTerm = tblTerm.DataTable().row(tblTerm.find("tbody tr.highlight")).data();
             if (idList.length === 0) {
                 return ShowToastInfo("Please select at least one student to transfer.");
             }
             if (!targetGroup) {
                 return ShowToastInfo("Please select a target group from the table to transfer students into.");
-            } 
-            console.log("Sending Selected Student ID List Array:", idList);
-            console.log("Target Destination Group details:", targetGroup);
-
-            /*
+            }
+            showLoading();
             $.ajax({
-                url: '/student/transfer/' + targetGroup.groupId,
+                url: '/student/transfer/' + targetGroup.groupId + '/' + fromGroup.groupId + '/' +fromTerm.termNo,
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(idList),
-                success: function (res) {
-                    ShowToastSuccess("Students transferred successfully!");
-                    tblTransferStudent.DataTable().ajax.reload();
+                success: function (res) { 
+                    if (res.status.code === "200"){ 
+                        modalTransfer.modal("hide");
+                        ShowToastSuccess(`Students succeed transferred from ${fromGroup.groupName} to ${targetGroup.groupName}!`);
+                        return;
+                    }
+                    ShowToastInfo("Fails to transferred students!") 
                 },
                 error: function (err) {
                     ShowToastError("Error handling student transfer execution.");
+                },
+                complete: function () {
+                    hideLoading();
                 }
-            });
-            */
+            });  
         });
         //#endregion  ======Group====== 
  

@@ -63,7 +63,10 @@
                     }
 
                 }
-            ]
+            ],
+            initComplete: function () {
+                MyApp.utils.dataTableDebounceSearch("#tblProvince", 500);
+            }
         });
     }
 
