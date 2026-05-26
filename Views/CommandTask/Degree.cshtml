@@ -100,7 +100,7 @@
                 url: '/degree/delete/' + selectedRow.degreeId,
                 method: 'DELETE',
                 success: function (response) {
-                    if (response.code === "200") {
+                    if(response.status && response.status.code === "200") {
                         ShowToastSuccess("Delete successfully!");
                         $("#tblDegree").DataTable().ajax.reload();
                     } else {
@@ -125,7 +125,7 @@
                 method: 'POST',
                 data: formData,
                 success: function (response) {
-                    if (response.code === "200") {
+                    if (response.status && response.status.code === "200") {
                         ShowToastSuccess("Saved successfully!");
                         $('#degreeForm')[0].reset();
                         $("#DegreeModal").modal("hide");
