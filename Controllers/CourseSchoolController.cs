@@ -1,6 +1,11 @@
+using BBU_SYSTEM.Helper;
+using BBU_SYSTEM.Models.Req;
+using BBU_SYSTEM.Modelsss;  
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace BBU_SYSTEM.Controllers;
 
@@ -45,5 +50,40 @@ public class CourseSchoolController(ICampusDbContext campusDbContext, IHttpConte
             recordsTotal,
             data
         });
+    }
+
+    [HttpPost("assig-course-to-school")]
+    public async Task<IActionResult> AssignCourseToSchool([FromBody] AssignCourseToSchoolReq req)
+    {
+        try
+        {
+            if (req.CourseIds.Count < 0) 
+                return new ServerResponse().BadRequest("Atlas one course to be  assigned!");
+            var db = campusDbContext.DbContext(_campus);
+            var courseIds = req.CourseIds.Where(x => x > 0).Distinct().ToList();
+            var existingCourseIds = await db.TblCourseSchools
+                .Where(x => x.SchoolId == req.SchoolId)
+                .Select(x => x.CourseId)
+                .ToListAsync();
+            var newCourseIds = courseIds
+                .Where(courseId => !existingCourseIds.Contains(courseId))
+                .ToList();  
+            if (!newCourseIds.Any())
+                return new ServerResponse().Success(msg:"All selected courses already assigned to this school!"); 
+            foreach (var courseId in newCourseIds)
+            {
+                db.TblCourseSchools.Add(new Models.CourseSchool()
+                {
+                    SchoolId = req.SchoolId,
+                    CourseId = courseId
+                });
+            } 
+            await db.SaveChangesAsync(); 
+            return new ServerResponse().Success(msg:$"{newCourseIds.Count} Course was assigned to School Id {req.SchoolId}");
+        }
+        catch (Exception e)
+        {
+            return new ServerResponse().ErrorInternal(e);
+        }
     }
 }

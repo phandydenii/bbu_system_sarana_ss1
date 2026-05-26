@@ -4,6 +4,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Course</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 @* <button type="button" class="btn btn-success float-right" id="btnNewSubject"><i class="fas fa-plus"></i> *@
                 @*     Add New Course *@
                 @* </button> *@
@@ -41,8 +44,9 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <a type="button" class="btn btn-danger" asp-action="Course" asp-controller="Dean"><i
-                        class="fas fa-close"></i> Close</a>
+                <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-danger" id="btnClose">
+                    <i class="fas fa-close"></i> Close
+                </button>
             </div>
         </div>
     </div>

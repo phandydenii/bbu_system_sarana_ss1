@@ -151,7 +151,6 @@
             e.preventDefault();
             const $row = $(this).closest('tr');
             const json = tblAssignCourse.DataTable().row($row).data();
-            console.log(json);
             const value = json.courseId;
             const text = value + "-" + json.courseFullName;
 
@@ -162,10 +161,36 @@
         });
 
         btnAssignCourse.on('click', function () {
-            const selectedValues = $('#stateSelect').val(); 
-            selectedValues.forEach(selectedValue => {
-                console.log(selectedValue);
-            })
+            const schoolId = tblSchool.find('tbody tr.highlight td:eq(0)').text().trim();
+            const selectedValues = $('#stateSelect').val();
+            if (!schoolId || schoolId <= 0) {
+                return ShowToastInfo("Please select school!");
+            } 
+            if (!selectedValues || selectedValues.length === 0) {
+                return ShowToastInfo("Please select at least one course!"); 
+            }
+            const req = {
+                schoolId: parseInt(schoolId),
+                courseIds: selectedValues.map(x => parseInt(x))
+            }; 
+            $.ajax({
+                url: "/course-school/assig-course-to-school",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(req),
+                success: function (res) { 
+                    if (res.status.code === "200"){
+                        tblSchool.DataTable().ajax.reload();
+                        $("#AssignCourseModal").modal("hide");
+                        return ShowToastSuccess(res.status.message); 
+                    }
+                    ShowToastInfo(res.status.message);
+                },
+                error: function (xhr) { 
+                    console.log(xhr);
+                    ShowToastError("Something went wrong!");
+                }
+            });
         });
     </script>
 }
