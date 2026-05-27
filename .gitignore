@@ -364,3 +364,7 @@ FodyWeavers.xsd
 
 #ignore custom file 
 appsettings.json
+
+# Rider / JetBrains IDE files
+.idea/
+*.sln.iml
