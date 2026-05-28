@@ -267,20 +267,20 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         try
         {
             
-            var db = campusDbContext.DbContext(_campus);
-            var promotionNo = db.TblPromotion.Where(x=>x.PromotionId==req.PromotionId).Select(x=>x.PromotionNo).FirstOrDefault();
-            var stageNo = db.TblStage.Where(x=>x.StageId==req.StageId).Select(x=>x.StageNo).FirstOrDefault();
-            var query = (from s in db.TblStudent
-                where s.FieldId == req.FieldId && s.Status == "REGISTER"
-                                               && (from r in db.TblRegistry
-                                                   where r.TermNo == 1
-                                                         && r.DegreeId == 1
-                                                         && r.SchoolId == req.SchoolId
-                                                         && r.PromotionNo == promotionNo
-                                                         && r.StageNo == stageNo
-                                                         && r.StudyTime == req.StudyTime
-                                                   select r.StudentId
-                                               ).Contains(s.StudentId)
+            var db = campusDbContext.DbContext(_campus);  
+            var query =
+                from s in db.TblStudent
+                join r in db.TblRegistry on s.StudentId equals r.StudentId
+                join p in db.TblPromotion on r.PromotionNo equals p.PromotionNo
+                join st in db.TblStage on r.StageNo equals st.StageNo
+                where s.FieldId == req.FieldId
+                      && s.Status == "REGISTER"
+                      && r.TermNo == 1
+                      && r.DegreeId == 1
+                      && r.SchoolId == req.SchoolId
+                      && r.StudyTime == req.StudyTime
+                      && p.PromotionId == req.PromotionId
+                      && st.StageId == req.StageId
                 select new
                 {
                     s.StudentId,
@@ -291,7 +291,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                     s.Phone,
                     s.Email,
                     s.Status
-                }).AsQueryable();
+                };
 
             if (isAll)
             {

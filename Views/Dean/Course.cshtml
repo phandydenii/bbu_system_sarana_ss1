@@ -142,11 +142,16 @@
                             return `<a class="btn btn-secondary btn-xs" id="btnSelectSubject">select</a>`;
                         }
                     },
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblAssignCourse", 500);
+                }
             })
             $("#AssignCourseModal").modal("show");
         });
-
+        $("#AssignCourseModal").on("hidden.bs.modal", function () {
+            $("#stateSelect").val(null).trigger("change");
+        });
         tblAssignCourse.on('click', '#btnSelectSubject', function (e) {
             e.preventDefault();
             const $row = $(this).closest('tr');

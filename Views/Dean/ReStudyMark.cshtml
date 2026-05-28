@@ -22,8 +22,7 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control form-control-sm" id="studentId" readonly>
                                     <div class="input-group-append" style="cursor: pointer;" id="btnSearchStudent">
-                                        <span class="input-group-text" style="background-color: green;"><i
-                                                                                                            class="fa-solid fa-magnifying-glass" style="color: white;"></i></span>
+                                        <span class="input-group-text" style="background-color: green;"><i class="fa-solid fa-magnifying-glass" style="color: white;"></i></span>
                                     </div>
                                 </div>
                             </div>
@@ -236,7 +235,8 @@
             });
         });
 
-        document.getElementById("btnSearchStudent").addEventListener("click", function (e) {
+        $("#btnSearchStudent").on("click", function (e) {
+            e.preventDefault();
             $("#StudentModal").modal("show");
             const tblSearchStudent = $("#tblSearchStudent");
             tblSearchStudent.DataTable().clear().destroy();
@@ -252,7 +252,7 @@
                 autoWidth: true,
                 scrollCollapse: true,
                 ajax: {
-                    url: "/student/academic/student-list",
+                    url: "/student/academic/student-list/all",
                     type: "POST",
                 },
                 columns: [
@@ -281,6 +281,9 @@
                         },
                     },
                 ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblSearchStudent", 500);
+                }
             });
         });
 
@@ -303,8 +306,7 @@
                 success: function (data) {
                     if (data) {
                         const student = data["student"];
-                        const degree = data["degree"];
-                        // console.log(degree);
+                        const degree = data["degree"]; 
                         const school = data["school"];
                         const field = data["field"];
                         const promotion = data["promotion"];

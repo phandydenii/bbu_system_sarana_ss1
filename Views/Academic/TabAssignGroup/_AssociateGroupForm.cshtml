@@ -358,6 +358,8 @@
         }
 
         btnFilter.on("click", async function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             const activeValue = $("#rangeButtons").find("button.btn-primary").val();
             if (!activeValue) return;
             showLoading()
