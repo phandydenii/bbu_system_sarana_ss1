@@ -98,13 +98,18 @@ class Promotion {
         return jsonArray.map(item => new Promotion(item));
     }
 
-    static async GetPromotions() {
+    static async GetPromotions({ isSelect2 = true, degreeId= 0,  schoolId= 0}) {
         try {
             const response = await $.ajax({
                 url: "/promotion/get-promotions",
                 method: 'POST',
-                data: {isAll: true}
+                data: {
+                    isAll : isSelect2,
+                    degreeId,
+                    schoolId,
+                }
             });
+            console.log(response);
             if (response.status.code === "200" && response.data !== "") {
                 return Promotion.fromApiArray(response.data);
             } else {

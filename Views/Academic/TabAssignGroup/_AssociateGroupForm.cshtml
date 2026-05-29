@@ -154,45 +154,49 @@
         GetSchool();
         btnFilter.prop("disabled", true);
         btnAssignGroup.prop("disabled", true);
+        
         // ======================
-        // Change events
+        // Cbo Change events tracking
         // ======================
         cboDegree.change(async function () {
             await GetField();
-            await GetPromotion();
             await GetStage();
             await GetTerm();
             await GetGroup();
             await GetStudyTime();
         });
-
         cboSchool.change(async function () {
             await GetField();
             await GetPromotion();
         });
-
         cboPromotion.change(async function () {
             await GetStage();
             await GetTerm();
             await GetGroup();
         });
-
         cboStage.change(async function () {
             await GetTerm();
             await GetGroup();
-        });
-
+        }); 
         cboTerm.change(async function () {
             await GetGroup();
         });
-
         cboStudyTime.change(function (e) {
             if (e.target.value === "") return;
             btnFilter.prop("disabled", false);
         });
+        cboStudyTime.on("change", async function (event) {
+            await GetGroup();
+        })
+        chbGroupAllStage.on("change", async function (event) {
+            await GetGroup();
+        });
+        chbGroupAllStudyTime.on("change", async function (event) {
+            await GetGroup();
+        });
 
         // ======================
-        // Async fetch functions
+        // Get Select2 Data
         // ======================
         async function GetDegree() {
             cboDegree.empty();
@@ -204,7 +208,6 @@
             cboDegree.val('1').trigger("change");
             cboDegree.select2({width: "100%"}); // re-init Select2 after options
         }
-
         async function GetSchool() {
             cboSchool.empty();
             cboSchool.append("<option value='' disabled>Select School</option>");
@@ -215,14 +218,12 @@
             cboSchool.val('').trigger("change");
             cboSchool.select2({width: "100%"});
         }
-
         async function GetField() {
             const degreeId = parseInt(cboDegree.val());
             const schoolId = parseInt(cboSchool.val());
             cboField.empty();
             cboField.append("<option value='' disabled>Select Field</option>");
-            if (!degreeId || !schoolId) return;
-
+            if (!degreeId || !schoolId) return; 
             const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
             fields.forEach(item => {
                 cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
@@ -230,30 +231,23 @@
             cboField.val('').trigger("change");
             cboField.select2({width: "100%"});
         }
-
         async function GetPromotion() {
             const degreeId = cboDegree.val();
             const schoolId = cboSchool.val();
             cboPromotion.empty();
             cboPromotion.append("<option value='' disabled>Promotion</option>");
-            if (!degreeId || !schoolId) return;
-
-            const promotions = await Promotion.GetPromotions();
-            let hasPromotion = false;
+            if (!degreeId || !schoolId) return; 
+            const promotions = await Promotion.GetPromotions({isSelect2: true, degreeId, schoolId}); 
             promotions.forEach(item => {
-                if (item.degree === parseInt(degreeId) && item.school === parseInt(schoolId)) {
-                    cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`);
-                    hasPromotion = true;
-                }
+                cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`); 
             });
-            if (!hasPromotion) {
+            if (!promotions) {
                 cboPromotion.empty();
                 cboPromotion.append("<option value='' disabled>No promotion available</option>");
             }
             cboPromotion.val('').trigger("change");
             cboPromotion.select2({width: "100%"});
         }
-
         async function GetStage() {
             const promotionId = cboPromotion.val();
             cboStage.empty();
@@ -269,7 +263,6 @@
             cboStage.val('').trigger("change");
             cboStage.select2({width: "100%"});
         }
-
         async function GetTerm() {
             const stageId = cboStage.val();
             cboTerm.empty();
@@ -285,7 +278,6 @@
             cboTerm.val('').trigger("change");
             cboTerm.select2({width: "100%"});
         }
-
         async function GetStudyTime() {
             cboStudyTime.empty();
             cboStudyTime.append("<option value='' disabled selected>Study Time</option>");
@@ -301,39 +293,11 @@
                 ShowToastError("Failed to load study times.");
             }
         }
-
-        // ======================
-        // Select all students checkbox
-        // ======================
-        $("#allStudent").on("change", function (event) {
-            if (event.target.checked) {
-                tblStudent.find('tbody tr').addClass('highlight');
-            } else {
-                tblStudent.find('tbody tr').removeClass('highlight');
-            }
-            let count = tblStudent.find('tbody tr.highlight').length;
-            $("#countStudent").text(count);
-        });
-
-
-        cboStudyTime.on("change", async function (event) {
-            await GetGroup();
-        })
-        chbGroupAllStage.on("change", async function (event) {
-            await GetGroup();
-        });
-
-        chbGroupAllStudyTime.on("change", async function (event) {
-            await GetGroup();
-        });
-
         async function GetGroup() {
             const pro = cboPromotion.find(":selected").val();
             const stageNo = cboStage.find(":selected").text();
             const studyTime = cboStudyTime.find(":selected").val();
-            if (!pro || !stageNo || !studyTime) {
-                return;
-            }
+            if (!pro || !stageNo || !studyTime) return;
             $.ajax({
                 url: "/group/get-groups-filter",
                 type: "POST",
@@ -344,19 +308,21 @@
                     allStage: chbGroupAllStage.is(":checked"),
                     allTime: chbGroupAllStudyTime.is(":checked"),
                 },
-                success: function (res) {
-                    // console.log(res.data);
+                success: function (res) { 
                     cboGroup.empty().append(`<option value="">Group</option>`);
                     res.data.forEach(x => {
                         cboGroup.append(`<option value="${x.groupId}">${x.groupName}</option>`);
                     });
                 },
                 error: function (xhr) {
-                    console.log(xhr.responseText);
+                    ShowToastError(xhr.responseText);
                 }
             });
         }
 
+        // ======================
+        // Select all students checkbox
+        // ======================
         btnFilter.on("click", async function (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -364,51 +330,83 @@
             if (!activeValue) return;
             showLoading()
             if (activeValue === "associate") {
-                await filterAssociate();
+                await loadStudentTable();
             }
             hideLoading(1)
         });
-
-
-        async function filterAssociate() {
-            //degree, school,field, promotion, stage, study-time 
-            const form = document.getElementById("frmFilter"); // ✅ pure DOM
-            const formData = new FormData(form);
-
-            // IMPORTANT: FormData values must be STRING or BLOB
-            formData.append("isAll", "true");
-
-            // let data = $("#frmFilter").serializeArray(); // array of {name, value}
-            // data.push({ name: "isAll", value: true });
-            // console.log(data);
-            $.ajax({
-                url: `/student/get-students-registry-associate`,
-                method: "POST",
-                data: formData,
-                processData: false,   // ✅ REQUIRED
-                contentType: false,   // ✅ REQUIRED
-                // data: JSON.stringify(data),
-                success: function (data) {
-                    console.log(data);
-                    // clear old table data
-                    tblStudent.find("tbody").empty();
-                    let no = 1;
-                    // loop and append
-                    data.data.forEach(function (item) {
-                        tblStudent.find("tbody").append(`
-                            <tr>
-                                <td>${no}</td>
-                                <td>${item.studentId}</td>
-                                <td>${item.studentName}</td>
-                                <td>${item.sex}</td>
-                                <td>${formatDate(item.dateOfBirth)}</td>
-                            </tr>
-                        `);
-                        no += 1;
-                    });
+        $("#allStudent").on("change", function (event) {
+            if (event.target.checked) {
+                tblStudent.find('tbody tr').addClass('highlight');
+            } else {
+                tblStudent.find('tbody tr').removeClass('highlight');
+            }
+            let count = tblStudent.find('tbody tr.highlight').length;
+            $("#countStudent").text(count);
+        }); 
+        let dtStudent = null;
+        function loadStudentTable() {
+            if (dtStudent) {
+                dtStudent.ajax.reload(null, false);
+                return;
+            }
+            dtStudent = $("#tblStudent").DataTable({
+                paging: true,
+                lengthChange: false,
+                pageLength: 100,
+                searching: false,
+                ordering: false,
+                info: false, 
+                responsive: false,
+                autoWidth: false,
+                scrollX: true,
+                scrollY: "420px",
+                scrollCollapse: true, 
+                processing: true, 
+                ajax: {
+                    url: "/student/get-students-registry-associate",
+                    type: "POST",
+                    data: function (d) {
+                        d.DegreeId = $("#cboDegree").val();
+                        d.SchoolId = $("#cboSchool").val();
+                        d.FieldId = $("#cboField").val();
+                        d.PromotionId = $("#cboPromotion").val();
+                        d.StageId = $("#cboStage").val();
+                        d.StudyTime = $("#cboStudyTime").val();
+                        d.isAll = true;
+                    },
+                    dataSrc: function (json) {
+                        return json.data || [];
+                    },
+                    error: function (xhr) {
+                        console.log(xhr.responseText);
+                        ShowToastError("Failed to load students.");
+                    }
                 },
-                error: function (xhr) {
-                    console.log(xhr.responseText);
+
+                columns: [
+                    {
+                        data: null,
+                        className: "text-center",
+                        render: function (data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    { data: "studentId", className: "text-center" },
+                    { data: "studentName" },
+                    { data: "sex", className: "text-center" },
+                    {
+                        data: "dateOfBirth",
+                        className: "text-center",
+                        render: function (data) {
+                            return formatDate(data);
+                        }
+                    }
+                ],
+
+                drawCallback: function () {
+                    $("#countStudent").text(0);
+                    $("#allStudent").prop("checked", false);
+                    $("#btnAssignGroup").prop("disabled", true);
                 }
             });
         }
