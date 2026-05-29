@@ -265,8 +265,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     public async Task<IActionResult> GetStudentRegistryAssociateGroup(AssignGroupViewModel req,bool isAll = false)
     {
         try
-        {
-            
+        { 
             var db = campusDbContext.DbContext(_campus);  
             var query =
                 from s in db.TblStudent

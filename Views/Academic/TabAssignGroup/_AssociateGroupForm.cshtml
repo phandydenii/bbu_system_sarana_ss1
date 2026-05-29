@@ -68,8 +68,7 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Students List</h3>
-                <h3 class="card-title float-right">Selected Students: <span id="countStudent">0</span>
-                </h3>
+                <h3 class="card-title float-right">Selected Students: <span id="countStudent">0</span></h3>
             </div>
             <div class="card-body table-responsive p-0" style="height: 500px;">
                 <table id="tblStudent"
@@ -115,10 +114,9 @@
                             </div>
                         </div>
                     </div>
-                    @* <label class="col-sm-2"> Assign to group</label> *@
-                    <div class="col-sm-3">
+                    <div class="col-sm-4"> 
                         <select id="cboGroup" class="form-control select2">
-                            <option selected="selected" disabled value="-1">Select Group</option>
+                            <option selected="selected" disabled value="-1">Assign to group</option>
                         </select>
                     </div>
                     <button id="btnAssignGroup" class="btn btn-success btn-sm col-sm-1">
@@ -321,7 +319,7 @@
         }
 
         // ======================
-        // Select all students checkbox
+        // Student Result
         // ======================
         btnFilter.on("click", async function (e) {
             e.preventDefault();
@@ -349,7 +347,7 @@
                 dtStudent.ajax.reload(null, false);
                 return;
             }
-            dtStudent = $("#tblStudent").DataTable({
+            dtStudent = tblStudent.DataTable({
                 paging: true,
                 lengthChange: false,
                 pageLength: 100,
@@ -377,12 +375,10 @@
                     dataSrc: function (json) {
                         return json.data || [];
                     },
-                    error: function (xhr) {
-                        console.log(xhr.responseText);
-                        ShowToastError("Failed to load students.");
+                    error: function (xhr) { 
+                        ShowToastError(xhr.responseText || "Failed to load students.");
                     }
-                },
-
+                }, 
                 columns: [
                     {
                         data: null,
@@ -401,8 +397,7 @@
                             return formatDate(data);
                         }
                     }
-                ],
-
+                ], 
                 drawCallback: function () {
                     $("#countStudent").text(0);
                     $("#allStudent").prop("checked", false);
