@@ -69,44 +69,84 @@ public class NationalityController(ICampusDbContext campusDbContext, IMapper map
     }
 
 
-    [HttpPost("SaveChanage")]
-    public async Task<IActionResult> SaveChanage([FromForm] NationalityDto? nationalityDto)
+    [HttpPost("SaveChange")]
+    public async Task<IActionResult> SaveChange([FromForm] NationalityDto? nationalityDto)
+{
+    try
     {
-        try
+        if (nationalityDto == null)
         {
-            if (nationalityDto == null)
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "Bad Request!"
-                });
-            var db = campusDbContext.DbContext(_campus);
-            var nationality = db.TblNationality.FirstOrDefault(x => x.NationalityId == nationalityDto.NationalityId);
-            if (nationality != null)
+            return BadRequest(new
             {
-                mapper.Map(nationalityDto, nationality);
-                db.TblNationality.Update(nationality);
-                await db.SaveChangesAsync();
-            }
-            else
+                code = "400",
+                message = "Bad Request!"
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(nationalityDto.NationalityName))
+        {
+            return BadRequest(new
             {
-                await db.TblNationality.AddAsync(mapper.Map<NationalityDto, Nationality>(nationalityDto));
-                await db.SaveChangesAsync();
-            }
+                code = "400",
+                message = "Nationality name is required."
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(nationalityDto.NationalityInKhmer))
+        {
+            return BadRequest(new
+            {
+                code = "400",
+                message = "Nationality name Khmer is required."
+            });
+        }
+
+        var db = campusDbContext.DbContext(_campus);
+
+        var nationality = db.TblNationality
+            .FirstOrDefault(x => x.NationalityId == nationalityDto.NationalityId);
+
+        if (nationality != null)
+        {
+            nationality.NationalityName = nationalityDto.NationalityName.Trim();
+            nationality.NationalityInKhmer = nationalityDto.NationalityInKhmer.Trim();
+
+            db.TblNationality.Update(nationality);
+            await db.SaveChangesAsync();
 
             return Ok(new
             {
                 code = "200",
-                message = "Succeded!"
+                message = "Updated successfully!"
             });
         }
-        catch (Exception ex)
+
+        var newNationality = new Nationality
         {
-            return StatusCode(500, new
-            {
-                code = "500",
-                message = $"Internal Server Error:{ex.Message}"
-            });
-        }
+            NationalityName = nationalityDto.NationalityName.Trim(),
+            NationalityInKhmer = nationalityDto.NationalityInKhmer.Trim()
+        };
+
+        await db.TblNationality.AddAsync(newNationality);
+        await db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            code = "200",
+            message = "Saved successfully!"
+        });
     }
+    catch (Exception ex)
+    {
+        var realError = ex.InnerException != null
+            ? ex.InnerException.Message
+            : ex.Message;
+
+        return StatusCode(500, new
+        {
+            code = "500",
+            message = $"Internal Server Error: {realError}"
+        });
+    }
+}
 }

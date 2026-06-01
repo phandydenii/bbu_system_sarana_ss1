@@ -21,43 +21,46 @@
                         </div>
                         <div class="col-8">
                             <div class="form-group">
-                                <label>School</label>
-                                <select asp-for="@field.SchoolId" class="form-control select2"></select>
+                                <label class="required">School</label>
+                                <select asp-for="@field.SchoolId" class="form-control select2" required></select>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
-                                <label>Degree Name</label>
-                                <input type="text" asp-for="@field.DegreeName" class="form-control"
-                                       placeholder="Enter degree name">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Degree Name In Khmer</label>
-                                <input type="text" asp-for="@field.DegreeNameInKhmer" class="form-control"
-                                       placeholder="Enter degree name khmer">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Field Name</label>
+                                <label class="required">Field Name</label>
                                 <input type="text" asp-for="@field.FieldName" class="form-control"
-                                       placeholder="Enter field name">
+                                       placeholder="Enter field name" required>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="form-group">
-                                <label>Field Name In Khmer</label>
-                                <input type="text" asp-for="@field.FieldNameInKhmer" id="degree_name_kh" class="form-control"
-                                       placeholder="Enter field name khmer">
+                                <label class="required">Field Name In Khmer</label>
+                                <input type="text"
+                                       asp-for="@field.FieldNameInKhmer"
+                                       class="form-control"
+                                       placeholder="Enter field name khmer" required/>
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="required">Degree Name</label>
+                                <input type="text" asp-for="@field.DegreeName" class="form-control"
+                                       placeholder="Enter degree name" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="required">Degree Name In Khmer</label>
+                                <input type="text" asp-for="@field.DegreeNameInKhmer" class="form-control"
+                                       placeholder="Enter degree name khmer" required>
+                            </div>
+                        </div>
+                    </div>
+                   
                     <input type="checkbox" asp-for="@field.Type" hidden="hidden">
                     <div class="row">
                         <div class="col-6">
@@ -80,10 +83,11 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-success float-right" form="formField"><i class="fas fa-save"></i>
-                    Save
+                <button type="submit" class="btn btn-success float-right" form="formField">
+                    <i class="fas fa-save"></i> Save
                 </button>
-                <button class="btn btn-danger float-right" data-dismiss="modal"><i class="fas fa-close"></i> Close
+                <button type="button" class="btn btn-danger float-right" data-dismiss="modal">
+                    <i class="fas fa-close"></i> Close
                 </button>
             </div>
         </div>

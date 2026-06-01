@@ -35,6 +35,7 @@
 
 @section Scripts{
     <script>
+        const btnClose = $("#btnClose");
         const tblFaculty = $("#tblFaculty");
         $(document).ready(function () {
             fetchFaculty();
@@ -71,6 +72,130 @@
                 ]
             });
         }
+        function clearFacultyForm() {
+            $('#facultyForm')[0].reset();
+
+            $("#faculty_FacultyId").val(0);
+            $("#faculty_FacultyName").val("");
+            $("#faculty_FacultyNameInKhmer").val("");
+        }
+
+        function openAddFaculty() {
+            clearFacultyForm();
+            $("#FacultyModal").modal("show");
+        }
+
+        tblFaculty.on('click', '#btnEdit', function () {
+            let $row = $(this).closest('tr');
+
+            if ($row.hasClass('child')) {
+                $row = $row.prev();
+            }
+
+            const selectedRow = tblFaculty.DataTable().row($row).data();
+
+            if (!selectedRow) {
+                ShowToastError("Cannot get selected faculty data.");
+                return;
+            }
+
+            $("#faculty_FacultyId").val(selectedRow.facultyId);
+            $("#faculty_FacultyName").val(selectedRow.facultyName);
+            $("#faculty_FacultyNameInKhmer").val(selectedRow.facultyNameInKhmer);
+
+            $("#FacultyModal").modal("show");
+        });
+
+        tblFaculty.on("click", "#btnDelete", function () {
+            let $row = $(this).closest('tr');
+
+            if ($row.hasClass('child')) {
+                $row = $row.prev();
+            }
+
+            const selectedRow = tblFaculty.DataTable().row($row).data();
+
+            if (!selectedRow) {
+                ShowToastError("Cannot get selected faculty data.");
+                return;
+            }
+
+            if (!confirm('Are you sure you want to delete this faculty?')) return;
+
+            $.ajax({
+                url: '/faculty/delete/' + selectedRow.facultyId,
+                method: 'DELETE',
+                success: function (response) {
+                    if (response.code === "200" || response.status?.code === "200") {
+                        ShowToastSuccess("Deleted successfully!");
+                        $("#tblFaculty").DataTable().ajax.reload(null, false);
+                    } else {
+                        ShowToastError(response.message || response.status?.message || "Delete failed.");
+                    }
+                },
+                error: function (error) {
+                    if (error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    } else {
+                        ShowToastError("Delete failed.");
+                    }
+                }
+            });
+        });
+
+        document.getElementById("facultyForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const facultyName = $("#faculty_FacultyName").val().trim();
+            const facultyNameKhmer = $("#faculty_FacultyNameInKhmer").val().trim();
+            const facultyId = $("#faculty_FacultyId").val();
+
+            if (facultyName === "") {
+                ShowToastError("Faculty name is required.");
+                $("#faculty_FacultyName").focus();
+                return;
+            }
+
+            if (facultyNameKhmer === "") {
+                ShowToastError("Faculty name in Khmer is required.");
+                $("#faculty_FacultyNameInKhmer").focus();
+                return;
+            }
+
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: "/Faculty/SaveChange",
+                method: "POST",
+                data: formData,
+                success: function (response) {
+                    if (response.code === "200" || response.status?.code === "200") {
+                        if (facultyId && facultyId !== "0") {
+                            ShowToastSuccess("Updated successfully!");
+                        } else {
+                            ShowToastSuccess("Saved successfully!");
+                        }
+
+                        $("#facultyForm")[0].reset();
+                        $("#faculty_FacultyId").val(0);
+                        $("#FacultyModal").modal("hide");
+                        $("#tblFaculty").DataTable().ajax.reload(null, false);
+                    } else {
+                        ShowToastError(response.message || response.status?.message || "Save failed.");
+                    }
+                },
+                error: function (error) {
+                    ShowToastError(error.responseJSON?.message || "Server error.");
+                }
+            });
+        });
+
+        btnClose.on('click', function () {
+            clearFacultyForm();
+            $("#FacultyModal").modal("hide");
+            $("#tblFaculty").DataTable().ajax.reload(null, false);
+        });
+        
     </script>
 }
 

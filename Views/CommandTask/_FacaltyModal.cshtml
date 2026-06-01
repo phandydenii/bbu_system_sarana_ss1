@@ -1,38 +1,49 @@
-@model BBU_SYSTEM.DTOs.FacultyDto
-<div class="modal fade" id="FacultyModal" tabindex="-1" role="dialog" aria-labelledby="FacultyModalLabel"
-     aria-hidden="true" data-backdrop="static" data-keyboard="false" style="overflow-y: auto;">
+@using BBU_SYSTEM.DTOs
+@{
+    var faculty = new FacultyDto();
+}
+
+<div class="modal fade" id="FacultyModal" data-backdrop="static">
     <div class="modal-dialog">
         <div class="modal-content">
+
             <div class="modal-header">
                 <h4 class="modal-title">Faculty</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+
             <div class="modal-body">
-                <form id="frmFaculty" asp-action="CreateFaculty" method="post">
-                    @Html.AntiForgeryToken()
+                <form id="facultyForm">
+                    <input asp-for="@faculty.FacultyId" hidden readonly class="form-control" value="0" />
+
                     <div class="form-group">
-                        <input asp-for="FacultyId" class="form-control" hidden/>
-                        <label asp-for="FacultyName" class="control-label"></label>
-                        <input asp-for="FacultyName" class="form-control"/>
-                        <span asp-validation-for="FacultyName" class="text-danger"></span>
+                        <label class="required">Faculty Name</label>
+                        <input type="text" asp-for="@faculty.FacultyName" class="form-control"
+                               placeholder="Enter faculty name" required>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="FacultyNameInKhmer" class="control-label"></label>
-                        <input asp-for="FacultyNameInKhmer" class="form-control"/>
-                        <span asp-validation-for="FacultyNameInKhmer" class="text-danger"></span>
+                        <label class="required">Faculty Name Khmer</label>
+                        <input type="text" asp-for="@faculty.FacultyNameInKhmer" class="form-control"
+                               placeholder="Enter faculty name khmer" required>
                     </div>
                 </form>
             </div>
+
             <div class="modal-footer justify-content-between">
-                <button type="submit" form="degreeForm" class="btn btn-primary"><i class="fas fa-save"></i> Save changes
+                <button type="submit" form="facultyForm" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Save changes
                 </button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
+
+                <button type="button" class="btn btn-danger" id="btnClose">
+                    <i class="fas fa-close"></i>
+                    Close
                 </button>
             </div>
+
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
-}

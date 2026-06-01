@@ -2,7 +2,7 @@
 @{
     var university = new UniversityDto();
 }
-<div class="modal fade" id="UniversityModal" data-backdrop="static">
+<div class="modal fade" id="universityModal" data-backdrop="static">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,24 +12,38 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="degreeForm">
+                <form id="formUniversity">
                     <input asp-for="@university.UniversityId" hidden readonly class="form-control" value="0"/>
+                    <input type="hidden" id="nationality_NationalityId" name="NationalityId" value="0"/>
                     <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" asp-for="@university.UniversityName" class="form-control"
-                               placeholder="Enter name">
+                        <label class="required">Name</label>
+                        <input type="text"
+                               asp-for="@university.UniversityName"
+                               class="form-control"
+                               placeholder="Enter name" required>
                     </div>
+
                     <div class="form-group">
-                        <label>Name Khmer</label>
-                        <input type="text" asp-for="@university.UniversityNameInKhmer" class="form-control"
+                        <label class="required">Name Khmer</label>
+                        <input type="text"
+                               asp-for="@university.UniversityNameInKhmer"
+                               class="form-control"
                                placeholder="Enter name khmer">
                     </div>
+                    <label>Abbreviation Name</label>
+                    <input type="text"
+                           asp-for="@university.AbbreviationName"
+                           class="form-control"
+                           placeholder="Enter abbreviation" />
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="submit" form="degreeForm" class="btn btn-primary"><i class="fas fa-save"></i> Save changes
+                <button type="submit" form="formUniversity" class="btn btn-success">
+                    <i class="fas fa-save"></i> Save
                 </button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
+
+                <button type="button" class="btn btn-danger btnCloseUniversity">
+                    <i class="fas fa-close"></i> Close
                 </button>
             </div>
         </div>

@@ -12,50 +12,66 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="degreeForm">
-                    <input asp-for="@school.SchoolId" hidden readonly class="form-control" value="0"/>
+                <form id="schoolForm">
+                    <input type="hidden" id="school_SchoolId" name="SchoolId" value="0" />
+
                     <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" asp-for="@school.SchoolName" class="form-control"
-                               placeholder="Enter name">
+                        <label class="required">Name</label>
+                        <input type="text"
+                               id="school_SchoolName"
+                               name="SchoolName"
+                               class="form-control"
+                               placeholder="Enter name" required/>
                     </div>
+
                     <div class="form-group">
-                        <label>Name Khmer</label>
-                        <input type="text" asp-for="@school.SchoolNameInKhmer" class="form-control"
-                               placeholder="Enter name khmer">
+                        <label class="required">Name Khmer</label>
+                        <input type="text"
+                               id="school_SchoolNameInKhmer"
+                               name="SchoolNameInKhmer"
+                               class="form-control"
+                               placeholder="Enter name khmer" required/>
                     </div>
+
                     <div class="row">
                         <div class="col-3">
                             <div class="form-group">
-                                <label>Code</label>
-                                <input type="text" asp-for="@school.SchoolCode" class="form-control"
-                                       placeholder="Enter short name">
+                                <label class="required">Code</label>
+                                <input type="text"
+                                       id="school_SchoolCode"
+                                       name="SchoolCode"
+                                       class="form-control"
+                                       placeholder="Enter code" required/>
                             </div>
                         </div>
+
                         <div class="col-9">
                             <div class="form-group">
-                                <label>Faculty</label>
-                                <select id="cboSchool" class="form-control select2"
-                                        style="width: 100%;">
-                                    <option selected="selected" disabled value="0">Select Faculty</option>
-                                    @* @foreach (var data in Model.Schools!) *@
-                                    @* { *@
-                                    @*     <option value=@data.SchoolId>@data.SchoolName</option> *@
-                                    @* } *@
+                                <label class="required">Faculty</label>
+                                <select id="school_FacultyId"
+                                        name="FacultyId"
+                                        class="form-control select2" required>
+                                    <option value="">Select Faculty</option>
                                 </select>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group clearfix">
-                        <div class="icheck-primary d-inline">
-                            <input type="checkbox" id="isShort">
-                            <label for="isShort">is foundation</label>
-                        </div>
+
+                    <div class="form-group">
+                        <input type="checkbox" id="chkFoundation" />
+                        <label>is foundation</label>
+
+                        <input type="hidden"
+                               id="school_IsFoundationSchool"
+                               name="IsFoundationSchool"
+                               value="0" />
                     </div>
                 </form>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="submit" form="degreeForm" class="btn btn-primary"><i class="fas fa-save"></i> Save changes
+                <button type="submit" form="schoolForm" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Save changes
                 </button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
                 </button>

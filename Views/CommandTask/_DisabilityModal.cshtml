@@ -1,4 +1,7 @@
-@* @model List<BBU_SYSTEM.Model.Disability> *@
+@using BBU_SYSTEM.DTOs
+@{
+    var disability = new DisabilityDto();
+}
 <div class="modal fade" id="disabilityModal" data-backdrop="static">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -7,23 +10,25 @@
             </div>
             <div class="modal-body">
                 <form id="formDisability">
+                    <input asp-for="@disability.Id" hidden readonly class="form-control" value="0"/>
                     <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" class="form-control"
-                               placeholder="Enter name">
+                        <label class="required">Name</label>
+                        <input type="text" asp-for="@disability.DisabilityName" class="form-control"
+                               placeholder="Enter name" required>
                     </div>
                     <div class="form-group">
-                        <label>Name Khmer</label>
-                        <input type="text" class="form-control"
-                               placeholder="Enter name khmer">
+                        <label class="required">Name Khmer</label>
+                        <input type="text" asp-for="@disability.DisabilityNameKh" class="form-control"
+                               placeholder="Enter name khmer" required>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-success float-right" form="fieldForm"><i class="fas fa-save"></i>
-                    Save
+                <button type="submit" form="formDisability" class="btn btn-success">
+                    <i class="fas fa-save"></i> Save
                 </button>
-                <button class="btn btn-danger float-right" data-dismiss="modal"><i class="fas fa-close"></i> Close
+                <button type="button" class="btn btn-danger btnCloseDisability">
+                    Close
                 </button>
             </div>
         </div>

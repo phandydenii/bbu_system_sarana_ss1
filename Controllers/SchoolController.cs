@@ -84,26 +84,141 @@ public class SchoolController(ICampusDbContext campusDbContext, IMapper mapper, 
     [HttpPost("SaveChange")]
     public async Task<IActionResult> SaveChange([FromForm] SchoolDto? schoolDto)
     {
+    try
+    {
+        if (schoolDto == null)
+        {
+            return BadRequest(new
+            {
+                code = "400",
+                message = "Bad Request!"
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(schoolDto.SchoolName))
+        {
+            return BadRequest(new
+            {
+                code = "400",
+                message = "School name is required."
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(schoolDto.SchoolNameInKhmer))
+        {
+            return BadRequest(new
+            {
+                code = "400",
+                message = "School name in Khmer is required."
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(schoolDto.SchoolCode))
+        {
+            return BadRequest(new
+            {
+                code = "400",
+                message = "School code is required."
+            });
+        }
+
+        if (schoolDto.FacultyId <= 0)
+        {
+            return BadRequest(new
+            {
+                code = "400",
+                message = "Faculty is required."
+            });
+        }
+
+        var db = campusDbContext.DbContext(_campus);
+
+        var school = db.TblSchool.FirstOrDefault(x => x.SchoolId == schoolDto.SchoolId);
+
+        if (school != null)
+        {
+            school.SchoolName = schoolDto.SchoolName.Trim();
+            school.SchoolNameInKhmer = schoolDto.SchoolNameInKhmer.Trim();
+            school.SchoolCode = schoolDto.SchoolCode.Trim();
+            school.FacultyId = schoolDto.FacultyId;
+            school.IsFoundationSchool = schoolDto.IsFoundationSchool;
+
+            await db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                code = "200",
+                message = "Updated successfully!"
+            });
+        }
+
+        var newSchool = new School
+        {
+            SchoolName = schoolDto.SchoolName.Trim(),
+            SchoolNameInKhmer = schoolDto.SchoolNameInKhmer.Trim(),
+            SchoolCode = schoolDto.SchoolCode.Trim(),
+            FacultyId = schoolDto.FacultyId,
+            IsFoundationSchool = schoolDto.IsFoundationSchool
+        };
+
+        await db.TblSchool.AddAsync(newSchool);
+        await db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            code = "200",
+            message = "Saved successfully!"
+        });
+    }
+    catch (Exception ex)
+    {
+        var realError = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
+        return StatusCode(500, new
+        {
+            code = "500",
+            message = $"Internal Server Error: {realError}"
+        });
+    }
+    }
+    [HttpDelete("delete/{schoolId:int}")]
+    public async Task<IActionResult> Delete(int schoolId)
+    {
         try
         {
-            if (schoolDto == null)
-                return new ServerResponse().BadRequest();
             var db = campusDbContext.DbContext(_campus);
-            var school = db.TblSchool.FirstOrDefault(x => x.SchoolId == schoolDto.SchoolId);
-            if (school != null)
+
+            var school = db.TblSchool.FirstOrDefault(x => x.SchoolId == schoolId);
+
+            if (school == null)
             {
-                mapper.Map(schoolDto, school);
-                db.TblSchool.Update(school);
-                await db.SaveChangesAsync();
+                return BadRequest(new
+                {
+                    code = "400",
+                    message = "School not found!"
+                });
             }
 
-            await db.TblSchool.AddAsync(mapper.Map<SchoolDto, School>(schoolDto));
+            db.TblSchool.Remove(school);
             await db.SaveChangesAsync();
-            return new ServerResponse().Success(schoolDto);
+
+            return Ok(new
+            {
+                code = "200",
+                message = "Deleted successfully!"
+            });
         }
         catch (Exception ex)
         {
-            return new ServerResponse().ErrorInternal(ex);
+            var realError = ex.InnerException != null
+                ? ex.InnerException.Message
+                : ex.Message;
+
+            return StatusCode(500, new
+            {
+                code = "500",
+                message = $"Internal Server Error: {realError}"
+            });
         }
     }
 }

@@ -68,45 +68,87 @@ public class RaceController(ICampusDbContext campusDbContext, IMapper mapper, IH
         }
     }
 
-    [HttpPost("SaveChanage")]
-    public async Task<IActionResult> SaveChanage([FromForm] RaceDto? raceDto)
+    [HttpPost("SaveChange")]
+    public async Task<IActionResult> SaveChange([FromForm] RaceDto? raceDto)
+{
+    try
     {
-        try
+        if (raceDto == null)
         {
-            if (raceDto == null)
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "Bad Request!"
-                });
-            var db = campusDbContext.DbContext(_campus);
-            var race = db.TblRace.FirstOrDefault(x => x.RaceId == raceDto.RaceId);
-            if (race != null)
+            return BadRequest(new
             {
-                mapper.Map(raceDto, race);
-                db.TblRace.Update(race);
-                await db.SaveChangesAsync();
-            }
-            else
+                code = "400",
+                message = "Bad Request!"
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(raceDto.RaceName))
+        {
+            return BadRequest(new
             {
-                await db.TblRace.AddAsync(mapper.Map<RaceDto, Race>(raceDto));
-                ;
-                await db.SaveChangesAsync();
-            }
+                code = "400",
+                message = "Race name is required."
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(raceDto.RaceInKhmer))
+        {
+            return BadRequest(new
+            {
+                code = "400",
+                message = "Race name Khmer is required."
+            });
+        }
+
+        var db = campusDbContext.DbContext(_campus);
+
+        var race = db.TblRace.FirstOrDefault(x => x.RaceId == raceDto.RaceId);
+
+        if (race != null)
+        {
+            // Update
+            race.RaceName = raceDto.RaceName.Trim();
+            race.RaceInKhmer = raceDto.RaceInKhmer.Trim();
+
+            db.TblRace.Update(race);
+            await db.SaveChangesAsync();
 
             return Ok(new
             {
                 code = "200",
-                message = "Succeded!"
+                message = "Updated successfully!"
             });
         }
-        catch (Exception ex)
+        else
         {
-            return StatusCode(500, new
+            // Insert
+            var newRace = new Race
             {
-                code = "500",
-                message = $"Internal Server Error:{ex.Message}"
+                RaceName = raceDto.RaceName.Trim(),
+                RaceInKhmer = raceDto.RaceInKhmer.Trim()
+            };
+
+            await db.TblRace.AddAsync(newRace);
+            await db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                code = "200",
+                message = "Saved successfully!"
             });
         }
     }
+    catch (Exception ex)
+    {
+        var realError = ex.InnerException != null
+            ? ex.InnerException.Message
+            : ex.Message;
+
+        return StatusCode(500, new
+        {
+            code = "500",
+            message = $"Internal Server Error: {realError}"
+        });
+    }
+}
 }

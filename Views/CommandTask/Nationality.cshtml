@@ -8,7 +8,8 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Nationality</h3>
-                <button type="button" id="btnAddNationality" class="btn btn-primary float-right">
+                <button type="button" id="btnNewNationality" class="btn btn-success btn-sm float-right">
+                    <i class="fas fa-plus"></i>
                     Add New
                 </button>
             </div>
@@ -34,9 +35,27 @@
 <script>
     $(document).ready(function () {
         fetchNationality();
+
+        $("#btnNewNationality").on("click", function (e) {
+            e.preventDefault();
+
+            clearNationalityForm();
+
+            $("#nationalityModal").find(".modal-title").text("Add Nationality");
+            $("#nationalityModal").modal("show");
+        });
+
+        $(document).on("click", ".btnCloseNationality", function () {
+            clearNationalityForm();
+            $("#nationalityModal").modal("hide");
+        });
     });
 
     function fetchNationality() {
+        if ($.fn.DataTable.isDataTable("#tblNationality")) {
+            $("#tblNationality").DataTable().clear().destroy();
+        }
+
         $("#tblNationality").DataTable({
             paging: true,
             lengthChange: true,
@@ -51,26 +70,100 @@
                 type: "POST"
             },
             columns: [
-                {data: "nationalityId"},
-                {data: "nationalityName"},
-                {data: "nationalityInKhmer"},
+                { data: "nationalityId" },
+                { data: "nationalityName" },
+                { data: "nationalityInKhmer" },
                 {
                     data: null,
-                    render: function (data, type, row) {
-                        const jsonData = JSON.stringify(row).replace(/"/g, '&quot;');
-                        return `<a onclick="OnEdit('${jsonData}')" class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</a>`;
+                    orderable: false,
+                    searchable: false,
+                    render: function () {
+                        return `
+                            <a href="javascript:void(0)" class="btnEdit btn btn-success btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        `;
                     }
-
-
                 }
             ]
         });
     }
 
-    document.getElementById("btnAddNationality").addEventListener("click", function (e) {
+    function clearNationalityForm() {
         $("#formNationality")[0].reset();
-        e.preventDefault();
+
+        $("#nationality_NationalityId").val(0);
+        $("#nationality_NationalityName").val("");
+        $("#nationality_NationalityInKhmer").val("");
+    }
+
+    $("#tblNationality").on("click", ".btnEdit", function () {
+        let row = $(this).closest("tr");
+
+        if (row.hasClass("child")) {
+            row = row.prev();
+        }
+
+        const selectedRow = $("#tblNationality").DataTable().row(row).data();
+
+        if (!selectedRow) {
+            ShowToastError("Cannot get selected nationality data.");
+            return;
+        }
+
+        $("#nationality_NationalityId").val(selectedRow.nationalityId);
+        $("#nationality_NationalityName").val(selectedRow.nationalityName);
+        $("#nationality_NationalityInKhmer").val(selectedRow.nationalityInKhmer);
+
+        $("#nationalityModal").find(".modal-title").text("Edit Nationality");
         $("#nationalityModal").modal("show");
     });
 
+    $("#formNationality").on("submit", function (e) {
+        e.preventDefault();
+
+        const nationalityId = $("#nationality_NationalityId").val() || "0";
+        const nationalityName = ($("#nationality_NationalityName").val() || "").trim();
+        const nationalityKhmer = ($("#nationality_NationalityInKhmer").val() || "").trim();
+
+        if (nationalityName === "") {
+            ShowToastError("Nationality name is required.");
+            $("#nationality_NationalityName").focus();
+            return;
+        }
+
+        if (nationalityKhmer === "") {
+            ShowToastError("Nationality name Khmer is required.");
+            $("#nationality_NationalityInKhmer").focus();
+            return;
+        }
+
+        $.ajax({
+            url: "/Nationality/SaveChange",
+            method: "POST",
+            data: {
+                NationalityId: nationalityId,
+                NationalityName: nationalityName,
+                NationalityInKhmer: nationalityKhmer
+            },
+            success: function (response) {
+                if (response.code === "200" || response.status?.code === "200") {
+                    if (nationalityId !== "0") {
+                        ShowToastSuccess("Updated successfully!");
+                    } else {
+                        ShowToastSuccess("Saved successfully!");
+                    }
+
+                    clearNationalityForm();
+                    $("#nationalityModal").modal("hide");
+                    $("#tblNationality").DataTable().ajax.reload(null, false);
+                } else {
+                    ShowToastError(response.message || response.status?.message || "Save failed.");
+                }
+            },
+            error: function (error) {
+                ShowToastError(error.responseJSON?.message || "Server error.");
+            }
+        });
+    });
 </script>

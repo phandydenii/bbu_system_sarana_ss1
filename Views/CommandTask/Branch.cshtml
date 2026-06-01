@@ -7,8 +7,7 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Branch</h3>
-                <button type="submit" class="btn btn-success btn-sm float-right" data-toggle="modal"
-                        data-target="#BranchModal">
+                <button type="button" class="btn btn-success btn-sm float-right" onclick="openAddBranch()">
                     <i class="fas fa-plus"></i>
                     Add New
                 </button>
@@ -22,6 +21,7 @@
                         <th>Name Khmer</th>
                         <th>Short</th>
                         <th>Address</th>
+                        <th>Phone</th>
                         <th>action</th>
                     </tr>
                     </thead>
@@ -37,45 +37,211 @@
 
 @section Scripts{
     <script>
-        const tblBranch = $("#tblBranch");
-        $(document).ready(function () {
-            fetchBranch();
-        });
+    const tblBranch = $("#tblBranch");
+    const branchModal = $("#BranchModal");
+    const branchForm = $("#branchForm");
 
-        function fetchBranch() {
+    const branchIdInput = $("#branch_BranchId");
+    const branchNameInput = $("#branch_BranchName");
+    const branchNameKhmerInput = $("#branch_BranchNameInKhmer");
+    const shortNameInput = $("#branch_ShortName");
+    const addressInput = $("#branch_Address");
+    const phoneInput = $("#branch_Phone");
+
+    $(document).ready(function () {
+        fetchBranch();
+    });
+
+    function fetchBranch() {
+        if ($.fn.DataTable.isDataTable("#tblBranch")) {
             tblBranch.DataTable().clear().destroy();
-            tblBranch.DataTable({
-                paging: true,
-                lengthChange: true,
-                searching: true,
-                ordering: true,
-                info: true,
-                responsive: true,
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "/branch/get-branch",
-                    type: "POST"
-                },
-                columns: [
-                    {data: "branchId"},
-                    {data: "branchName"},
-                    {data: "branchNameInKhmer"},
-                    {data: "shortName"},
-                    {data: "address"},
-                    // { data: "phone" },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `
-                        <a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i> Edit</a>
-                        <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
-                    `;
-                        }
-                    }
-                ]
-            });
         }
 
-    </script>
+        tblBranch.DataTable({
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "/branch/get-branch",
+                type: "POST"
+            },
+            columns: [
+                { data: "branchId" },
+                { data: "branchName" },
+                { data: "branchNameInKhmer" },
+                { data: "shortName" },
+                { data: "address" },
+                { data: "phone" },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function () {
+                        return `
+                            <a href="javascript:void(0)" class="btnEdit btn btn-success btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="javascript:void(0)" class="btnDelete btn btn-danger btn-sm">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </a>
+                        `;
+                    }
+                }
+            ]
+        });
+    }
+
+    function clearBranchForm() {
+        branchForm[0].reset();
+
+        branchIdInput.val(0);
+        branchNameInput.val("");
+        branchNameKhmerInput.val("");
+        shortNameInput.val("");
+        addressInput.val("");
+        phoneInput.val("");
+    }
+
+    function openAddBranch() {
+        clearBranchForm();
+        branchModal.find(".modal-title").text("Add Branch");
+        branchModal.modal("show");
+    }
+
+    tblBranch.on("click", ".btnEdit", function (event) {
+        event.preventDefault();
+
+        let rowElement = $(this).closest("tr");
+
+        if (rowElement.hasClass("child")) {
+            rowElement = rowElement.prev();
+        }
+
+        const selectedRow = tblBranch.DataTable().row(rowElement).data();
+
+        if (!selectedRow) {
+            ShowToastError("Cannot get selected branch data.");
+            return;
+        }
+
+        branchIdInput.val(selectedRow["branchId"]);
+        branchNameInput.val(selectedRow["branchName"]);
+        branchNameKhmerInput.val(selectedRow["branchNameInKhmer"]);
+        shortNameInput.val(selectedRow["shortName"] || "");
+        addressInput.val(selectedRow["address"] || "");
+        phoneInput.val(selectedRow["phone"] || "");
+
+        branchModal.find(".modal-title").text("Edit Branch");
+        branchModal.modal("show");
+    });
+
+    tblBranch.on("click", ".btnDelete", function (event) {
+        event.preventDefault();
+
+        let rowElement = $(this).closest("tr");
+
+        if (rowElement.hasClass("child")) {
+            rowElement = rowElement.prev();
+        }
+
+        const selectedRow = tblBranch.DataTable().row(rowElement).data();
+
+        if (!selectedRow) {
+            ShowToastError("Cannot get selected branch data.");
+            return;
+        }
+
+        if (!confirm("Are you sure you want to delete this branch?")) {
+            return;
+        }
+
+        $.ajax({
+            url: "/branch/delete/" + selectedRow["branchId"],
+            method: "DELETE",
+            success: function (response) {
+                const code = response["code"] || response["status"]?.["code"];
+                const message = response["message"] || response["status"]?.["message"];
+
+                if (code === "200" || code === 200) {
+                    ShowToastSuccess(message || "Delete successfully!");
+                    tblBranch.DataTable().ajax.reload(null, false);
+                } else {
+                    ShowToastError(message || "Delete failed.");
+                }
+            },
+            error: function (xhr) {
+                const message =
+                    xhr["responseJSON"]?.["message"] ||
+                    xhr["responseJSON"]?.["status"]?.["message"] ||
+                    "Delete failed.";
+
+                ShowToastError(message);
+            }
+        });
+    });
+
+    $(document).on("submit", "#branchForm", function (event) {
+        event.preventDefault();
+
+        const branchId = branchIdInput.val() || "0";
+        const branchName = (branchNameInput.val() || "").trim();
+        const branchNameKhmer = (branchNameKhmerInput.val() || "").trim();
+
+        if (branchName === "") {
+            ShowToastError("Branch name is required.");
+            branchNameInput.focus();
+            return;
+        }
+
+        if (branchNameKhmer === "") {
+            ShowToastError("Branch name Khmer is required.");
+            branchNameKhmerInput.focus();
+            return;
+        }
+
+        $.ajax({
+            url: "/branch/save-branch",
+            method: "POST",
+            data: branchForm.serialize(),
+            success: function (response) {
+                const code = response["code"] || response["status"]?.["code"];
+                const message = response["message"] || response["status"]?.["message"];
+
+                if (code === "200" || code === 200) {
+                    if (branchId !== "0") {
+                        ShowToastSuccess(message || "Updated successfully!");
+                    } else {
+                        ShowToastSuccess(message || "Saved successfully!");
+                    }
+
+                    clearBranchForm();
+                    branchModal.modal("hide");
+                    tblBranch.DataTable().ajax.reload(null, false);
+                } else {
+                    ShowToastError(message || "Save failed.");
+                }
+            },
+            error: function (xhr) {
+                const message =
+                    xhr["responseJSON"]?.["message"] ||
+                    xhr["responseJSON"]?.["status"]?.["message"] ||
+                    "Server error.";
+
+                ShowToastError(message);
+            }
+        });
+    });
+
+    $(document).on("click", "#btnClose", function (event) {
+        event.preventDefault();
+
+        clearBranchForm();
+        branchModal.modal("hide");
+    });
+</script>
 }

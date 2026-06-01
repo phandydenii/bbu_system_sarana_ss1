@@ -43,5 +43,6 @@ public class AutoMapperConfiguration : Profile
         CreateMap<Score, ScoreDto>().ReverseMap();
         CreateMap<FieldCertificate,FieldCertificateDto>().ReverseMap();
         CreateMap<SummaryReport,SummaryReportDto>().ReverseMap(); 
+        CreateMap<University, UniversityDto>().ReverseMap();
     }
 }

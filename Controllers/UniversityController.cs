@@ -67,45 +67,125 @@ public class UniversityController(ICampusDbContext campusDbContext, IMapper mapp
         }
     }
 
-    [HttpPost("SaveChanage")]
-    public async Task<IActionResult> SaveChanage([FromForm] UniversityDto? university)
+   [HttpPost("SaveChange")]
+public async Task<IActionResult> SaveChange([FromForm] UniversityDto? universityDto)
+{
+    try
     {
-        try
+        if (universityDto == null)
         {
-            if (university == null)
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "Bad Request!"
-                });
-            var db = campusDbContext.DbContext(_campus);
-            var universityEntity = db.TblUsersity.FirstOrDefault(x => x.UniversityId == university.UniversityId);
-            if (universityEntity != null)
+            return BadRequest(new
             {
-                mapper.Map(university, universityEntity);
-                db.TblUsersity.Update(universityEntity);
-                await db.SaveChangesAsync();
-            }
-            else
+                code = "400",
+                message = "Bad Request!"
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(universityDto.UniversityName))
+        {
+            return BadRequest(new
             {
-                var newUniversity = mapper.Map<UniversityDto, University>(university);
-                await db.TblUsersity.AddAsync(newUniversity);
-                await db.SaveChangesAsync();
-            }
+                code = "400",
+                message = "University name is required."
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(universityDto.UniversityNameInKhmer))
+        {
+            return BadRequest(new
+            {
+                code = "400",
+                message = "University name Khmer is required."
+            });
+        }
+
+        var db = campusDbContext.DbContext(_campus);
+
+        var university = db.TblUsersity
+            .FirstOrDefault(x => x.UniversityId == universityDto.UniversityId);
+
+        if (university != null)
+        {
+            university.UniversityName = universityDto.UniversityName.Trim();
+            university.UniversityNameInKhmer = universityDto.UniversityNameInKhmer.Trim();
+            university.AbbreviationName = universityDto.AbbreviationName?.Trim();
+
+            db.TblUsersity.Update(university);
+            await db.SaveChangesAsync();
 
             return Ok(new
             {
                 code = "200",
-                message = "Succeded!"
+                message = "Updated successfully!"
             });
         }
-        catch (Exception ex)
+
+        var newUniversity = new University
         {
-            return StatusCode(500, new
+            UniversityName = universityDto.UniversityName.Trim(),
+            UniversityNameInKhmer = universityDto.UniversityNameInKhmer.Trim(),
+            AbbreviationName = universityDto.AbbreviationName?.Trim()
+        };
+
+        await db.TblUsersity.AddAsync(newUniversity);
+        await db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            code = "200",
+            message = "Saved successfully!"
+        });
+    }
+    catch (Exception ex)
+    {
+        var realError = ex.InnerException?.Message ?? ex.Message;
+
+        return StatusCode(500, new
+        {
+            code = "500",
+            message = $"Internal Server Error: {realError}"
+        });
+    }
+}
+[HttpDelete("delete/{universityId:int}")]
+public async Task<IActionResult> Delete(int universityId)
+{
+    try
+    {
+        var db = campusDbContext.DbContext(_campus);
+
+        var university = db.TblUsersity
+            .FirstOrDefault(x => x.UniversityId == universityId);
+
+        if (university == null)
+        {
+            return BadRequest(new
             {
-                code = "500",
-                message = $"Internal Server Error:{ex.Message}"
+                code = "400",
+                message = "University not found!"
             });
         }
+
+        db.TblUsersity.Remove(university);
+        await db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            code = "200",
+            message = "Deleted successfully!"
+        });
     }
+    catch (Exception ex)
+    {
+        var realError = ex.InnerException != null
+            ? ex.InnerException.Message
+            : ex.Message;
+
+        return StatusCode(500, new
+        {
+            code = "500",
+            message = $"Internal Server Error: {realError}"
+        });
+    }
+}
 }

@@ -8,8 +8,7 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">University</h3>
-                <button type="submit" class="btn btn-success btn-sm float-right" data-toggle="modal"
-                        data-target="#UniversityModal">
+                <button type="button" id="btnNewUniversity" class="btn btn-success btn-sm float-right" >
                     <i class="fas fa-plus"></i>
                     Add New
                 </button>
@@ -38,42 +37,158 @@
 @section Scripts{
 
     <script>
-        const tblUniversity = $("#tblUniversity");
-        $(document).ready(function () {
-            fetchUniversity();
+    const tblUniversity = $("#tblUniversity");
+    const universityModal = $("#universityModal");
+
+    $(document).ready(function () {
+        fetchUniversity();
+
+        $("#btnNewUniversity").on("click", function (e) {
+            e.preventDefault();
+
+            clearUniversityForm();
+
+            $("#universityModal").find(".modal-title").text("Add University");
+            $("#universityModal").modal("show");
         });
 
-        function fetchUniversity() {
+        $(document).on("click", ".btnCloseUniversity", function () {
+            clearUniversityForm();
+            universityModal.modal("hide");
+        });
+    });
+
+    function fetchUniversity() {
+        if ($.fn.DataTable.isDataTable("#tblUniversity")) {
             tblUniversity.DataTable().clear().destroy();
-            tblUniversity.DataTable({
-                paging: true,
-                lengthChange: true,
-                searching: true,
-                ordering: true,
-                info: true,
-                responsive: true,
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "/University/get-universities",
-                    type: "POST"
-                },
-                columns: [
-                    {data: "universityId"},
-                    {data: "universityName"},
-                    {data: "universityNameInKhmer"},
-                    {data: "abbreviationName"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `
-                        <a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i> Edit</a>
-                        <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
-                    `;
-                        }
-                    }
-                ]
-            });
         }
-    </script>
+
+        tblUniversity.DataTable({
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "/University/get-universities",
+                type: "POST"
+            },
+            columns: [
+                { data: "universityId" },
+                { data: "universityName" },
+                { data: "universityNameInKhmer" },
+                { data: "abbreviationName" },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function () {
+                        return `
+                            <a href="javascript:void(0)" class="btnEdit btn btn-success btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        `;
+                    }
+                }
+            ]
+        });
+    }
+
+    function clearUniversityForm() {
+        $("#formUniversity")[0].reset();
+
+        $("#university_UniversityId").val(0);
+        $("#university_UniversityName").val("");
+        $("#university_UniversityNameInKhmer").val("");
+        $("#university_AbbreviationName").val("");
+    }
+
+    $("#tblUniversity").on("click", ".btnEdit", function () {
+        let row = $(this).closest("tr");
+
+        if (row.hasClass("child")) {
+            row = row.prev();
+        }
+
+        const selectedRow = tblUniversity.DataTable().row(row).data();
+
+        if (!selectedRow) {
+            ShowToastError("Cannot get selected university data.");
+            return;
+        }
+
+        $("#university_UniversityId").val(selectedRow.universityId);
+        $("#university_UniversityName").val(selectedRow.universityName);
+        $("#university_UniversityNameInKhmer").val(selectedRow.universityNameInKhmer);
+        $("#university_AbbreviationName").val(selectedRow.abbreviationName);
+
+        universityModal.find(".modal-title").text("Edit University");
+        universityModal.modal("show");
+    });
+
+    $(document).on("click", ".btnCloseUniversity", function (e) {
+        e.preventDefault();
+
+        clearUniversityForm();
+        $("#universityModal").modal("hide");
+    });
+
+    $(document).on("submit", "#formUniversity", function (e) {
+        e.preventDefault();
+
+        const universityId = $("#university_UniversityId").val() || "0";
+        const universityName = ($("#university_UniversityName").val() || "").trim();
+        const universityNameKhmer = ($("#university_UniversityNameInKhmer").val() || "").trim();
+        const abbreviationName = ($("#university_AbbreviationName").val() || "").trim();
+
+        if (universityName === "") {
+            ShowToastError("University name is required.");
+            $("#university_UniversityName").focus();
+            return;
+        }
+
+        if (universityNameKhmer === "") {
+            ShowToastError("University name Khmer is required.");
+            $("#university_UniversityNameInKhmer").focus();
+            return;
+        }
+
+        $.ajax({
+            url: "/University/SaveChange",
+            method: "POST",
+            data: {
+                UniversityId: universityId,
+                UniversityName: universityName,
+                UniversityNameInKhmer: universityNameKhmer,
+                AbbreviationName: abbreviationName
+            },
+            success: function (response) {
+                const code = response.code || response.status?.code;
+                const message = response.message || response.status?.message;
+
+                if (code === "200" || code === 200) {
+                    ShowToastSuccess(message || (universityId !== "0"
+                        ? "Updated successfully!"
+                        : "Saved successfully!"));
+
+                    clearUniversityForm();
+                    $("#universityModal").modal("hide");
+                    $("#tblUniversity").DataTable().ajax.reload(null, false);
+                } else {
+                    ShowToastError(message || "Save failed.");
+                }
+            },
+            error: function (error) {
+                ShowToastError(
+                    error.responseJSON?.message ||
+                    error.responseJSON?.status?.message ||
+                    "Server error."
+                );
+            }
+        });
+    });
+</script>
 }

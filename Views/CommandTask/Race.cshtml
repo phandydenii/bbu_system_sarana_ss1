@@ -7,7 +7,7 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Race</h3>
-                <button type="button" id="btnNewRace" class="btn btn-primary float-right">
+                <button type="button" id="btnNewRace" class="btn btn-success btn-sm float-right" >
                     <i class="fas fa-plus"></i>
                     Add New
                 </button>
@@ -33,10 +33,28 @@
 <partial name="_RaceModal"/>
 <script>
     $(document).ready(function () {
-        fetchSchool();
+        fetchRace();
+
+        $("#btnNewRace").on("click", function (e) {
+            e.preventDefault();
+
+            clearRaceForm();
+
+            $("#raceModal").find(".modal-title").text("Add Race");
+            $("#raceModal").modal("show");
+        });
+
+        $(document).on("click", ".btnCloseRace", function () {
+            clearRaceForm();
+            $("#raceModal").modal("hide");
+        });
     });
 
-    function fetchSchool() {
+    function fetchRace() {
+        if ($.fn.DataTable.isDataTable("#tblSchool")) {
+            $("#tblSchool").DataTable().clear().destroy();
+        }
+
         $("#tblSchool").DataTable({
             paging: true,
             lengthChange: true,
@@ -51,25 +69,98 @@
                 type: "POST"
             },
             columns: [
-                {data: "raceId"},
-                {data: "raceName"},
-                {data: "raceInKhmer"},
+                { data: "raceId" },
+                { data: "raceName" },
+                { data: "raceInKhmer" },
                 {
                     data: null,
-                    render: function (data, type, row) {
-                        const jsonData = JSON.stringify(row).replace(/"/g, '&quot;');
-                        return `<a onclick="OnEdit('${jsonData}')" class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</a>`;
+                    orderable: false,
+                    searchable: false,
+                    render: function () {
+                        return `
+                            <a href="javascript:void(0)" class="btnEdit btn btn-success btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        `;
                     }
                 }
             ]
         });
     }
 
-
-    document.getElementById("btnNewRace").addEventListener("click", function (e) {
-        e.preventDefault();
+    function clearRaceForm() {
         $("#formRace")[0].reset();
+
+        $("#race_RaceId").val(0);
+        $("#race_RaceName").val("");
+        $("#race_RaceInKhmer").val("");
+    }
+
+    $("#tblSchool").on("click", ".btnEdit", function () {
+        let row = $(this).closest("tr");
+
+        if (row.hasClass("child")) {
+            row = row.prev();
+        }
+
+        const selectedRow = $("#tblSchool").DataTable().row(row).data();
+
+        if (!selectedRow) {
+            ShowToastError("Cannot get selected race data.");
+            return;
+        }
+
+        $("#race_RaceId").val(selectedRow.raceId);
+        $("#race_RaceName").val(selectedRow.raceName);
+        $("#race_RaceInKhmer").val(selectedRow.raceInKhmer);
+
+        $("#raceModal").find(".modal-title").text("Edit Race");
         $("#raceModal").modal("show");
     });
 
+    $("#formRace").on("submit", function (e) {
+        e.preventDefault();
+
+        const raceId = $("#race_RaceId").val() || "0";
+        const raceName = ($("#race_RaceName").val() || "").trim();
+        const raceKhmer = ($("#race_RaceInKhmer").val() || "").trim();
+
+        if (raceName === "") {
+            ShowToastError("Race name is required.");
+            $("#race_RaceName").focus();
+            return;
+        }
+
+        if (raceKhmer === "") {
+            ShowToastError("Race name Khmer is required.");
+            $("#race_RaceInKhmer").focus();
+            return;
+        }
+
+        const formData = $("#formRace").serialize();
+
+        $.ajax({
+            url: "/Race/SaveChange",
+            method: "POST",
+            data: formData,
+            success: function (response) {
+                if (response.code === "200" || response.status?.code === "200") {
+                    if (raceId && raceId !== "0") {
+                        ShowToastSuccess("Updated successfully!");
+                    } else {
+                        ShowToastSuccess("Saved successfully!");
+                    }
+
+                    clearRaceForm();
+                    $("#raceModal").modal("hide");
+                    $("#tblSchool").DataTable().ajax.reload(null, false);
+                } else {
+                    ShowToastError(response.message || response.status?.message || "Save failed.");
+                }
+            },
+            error: function (error) {
+                ShowToastError(error.responseJSON?.message || "Server error.");
+            }
+        });
+    });
 </script>

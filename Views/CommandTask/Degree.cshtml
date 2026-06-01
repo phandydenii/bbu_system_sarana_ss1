@@ -83,9 +83,9 @@
         tblDegree.on('click', '#btnEdit', function () {
             const $row = $(this).closest('tr');
             const selectedRow = tblDegree.DataTable().row($row).data();
-            console.log(selectedRow);
+            @* console.log(selectedRow); *@
             const degree = new Degree(selectedRow);
-            console.log(degree.degreeInKhmer);
+            @* console.log(degree.degreeInKhmer); *@
             $("#degree_DegreeId").val(degree.degreeId);
             $("#degree_DegreeName").val(degree.degreeName);
             $("#degree_DegreeInKhmer").val(degree.degreeInKhmer);

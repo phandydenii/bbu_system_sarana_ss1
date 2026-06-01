@@ -66,22 +66,114 @@ public class FieldController(ICampusDbContext campusDbContext, IMapper mapper, I
         {
             if (field == null)
                 return new ServerResponse().BadRequest();
+
             var db = campusDbContext.DbContext(_campus);
+
             var data = db.TblField.FirstOrDefault(x => x.FieldId == field.FieldId);
+            if (field == null)
+            {
+                return BadRequest(new
+                {
+                    code = "400",
+                    message = "Bad Request!"
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(field.FieldName))
+            {
+                return BadRequest(new
+                {
+                    code = "400",
+                    message = "Field name is required."
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(field.FieldNameInKhmer))
+            {
+                return BadRequest(new
+                {
+                    code = "400",
+                    message = "Field name in Khmer is required."
+                });
+            }
+
+            if (field.SchoolId <= 0)
+            {
+                return BadRequest(new
+                {
+                    code = "400",
+                    message = "School is required."
+                });
+            }
+
+            if (field.DegreeId <= 0)
+            {
+                return BadRequest(new
+                {
+                    code = "400",
+                    message = "Degree is required."
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(field.DegreeName))
+            {
+                return BadRequest(new
+                {
+                    code = "400",
+                    message = "Degree name is required."
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(field.DegreeNameInKhmer))
+            {
+                return BadRequest(new
+                {
+                    code = "400",
+                    message = "Degree name in Khmer is required."
+                });
+            }
+
             if (data != null)
             {
-                mapper.Map(field, data);
-                db.TblField.Update(data);
+                // UPDATE
+                data.FieldName = field.FieldName;
+                data.FieldNameInKhmer = field.FieldNameInKhmer;
+                data.SchoolId = field.SchoolId;
+                data.DegreeId = field.DegreeId;
+                data.DegreeName = field.DegreeName;
+                data.DegreeNameInKhmer = field.DegreeNameInKhmer;
+                data.Type = field.Type;
+
                 await db.SaveChangesAsync();
+
+                return new ServerResponse().Success(field, "Update success");
             }
-            var isExist = db.TblField.Any(x => x.FieldName == field.FieldName);
-            if (isExist)
+            else
             {
-                return new ServerResponse().BadRequest("Field with that name already exists!");
+                // INSERT
+                var isExist = db.TblField.Any(x => x.FieldName == field.FieldName);
+
+                if (isExist)
+                {
+                    return new ServerResponse().BadRequest("Field with that name already exists!");
+                }
+
+                var newField = new Field
+                {
+                    FieldName = field.FieldName,
+                    FieldNameInKhmer = field.FieldNameInKhmer,
+                    SchoolId = field.SchoolId,
+                    DegreeId = field.DegreeId,
+                    DegreeName = field.DegreeName,
+                    DegreeNameInKhmer = field.DegreeNameInKhmer,
+                    Type = field.Type
+                };
+
+                await db.TblField.AddAsync(newField);
+                await db.SaveChangesAsync();
+
+                return new ServerResponse().Success(field, "Save success");
             }
-            await db.TblField.AddAsync(mapper.Map<FieldDto, Field>(field));
-            await db.SaveChangesAsync();
-            return new ServerResponse().Success(field);
         }
         catch (Exception ex)
         {

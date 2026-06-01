@@ -680,7 +680,7 @@
                     return response.data;
                 }
             }catch(error) {
-                console.log(error.responseText);
+                @* console.log(error.responseText); *@
             }
         } 
         termAcademicYearStart.on("input", function (e) {
@@ -1094,7 +1094,7 @@
                     },
                     dataType: "json",
                     error: function (data) {
-                        console.log(data.responseText);
+                        @* console.log(data.responseText); *@
                     }
                 }); 
                  if (response.code === "200" && response.data !== "") {
@@ -1128,7 +1128,7 @@
                     },
                     dataType: "json",
                     error: function (data) {
-                        console.log(data.responseText);
+                         console.log(data.responseText); 
                     }
                 }); 
                 if (response.status.code === "200") {

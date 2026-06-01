@@ -7,9 +7,11 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Province</h3>
-                <button type="button" id="btnNewProvince" class="btn btn-primary float-right">
+                <button type="submit" id="btnNewProvince" class="btn btn-success btn-sm float-right">
+                    <i class="fas fa-plus"></i>
                     Add New
                 </button>
+                
             </div>
             <div class="card-body">
                 <table id="tblProvince" class="table table-sm table-bordered table-striped" style="width: 100%;">
@@ -37,6 +39,10 @@
     });
 
     function fetchProvince() {
+        if ($.fn.DataTable.isDataTable("#tblProvince")) {
+            $("#tblProvince").DataTable().clear().destroy();
+        }
+
         $("#tblProvince").DataTable({
             paging: true,
             lengthChange: true,
@@ -51,29 +57,151 @@
                 type: "POST"
             },
             columns: [
-                {data: "provinceId"},
-                {data: "provinceName"},
-                {data: "provinceInKhmer"},
-                {data: "isCity"},
+                { data: "provinceId" },
+                { data: "provinceName" },
+                { data: "provinceInKhmer" },
+                {
+                    data: "isCity",
+                    render: function (data) {
+                        return data === 1 || data === true ? "Yes" : "No";
+                    }
+                },
                 {
                     data: null,
-                    render: function (data, type, row) {
-                        const jsonData = JSON.stringify(row).replace(/"/g, '&quot;');
-                        return `<a onclick="OnEdit('${jsonData}')" class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</a>`;
+                    orderable: false,
+                    searchable: false,
+                    render: function () {
+                        return `
+                        <a href="javascript:void(0)" class="btnEdit btn btn-success btn-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    `;
                     }
-
                 }
-            ],
-            initComplete: function () {
-                MyApp.utils.dataTableDebounceSearch("#tblProvince", 500);
-            }
+            ]
         });
     }
+    function clearProvinceForm() {
+        $("#formProvince")[0].reset();
 
-    document.getElementById("btnNewProvince").addEventListener("click", function (e) {
+        $("#province_ProvinceId").val(0);
+        $("#province_ProvinceName").val("");
+        $("#province_ProvinceNameInKhmer").val("");
+        $("#province_IsCity").val(0);
+        $("#chkIsCity").prop("checked", false);
+    }
+    $(document).on("click", "#btnClose", function (e) {
         e.preventDefault();
 
-        $("#formProvince")[0].reset();
+        clearProvinceForm();
+        $("#provinceModal").modal("hide");
+    });
+
+    $("#btnNewProvince").on("click", function (e) {
+        e.preventDefault();
+
+        clearProvinceForm();
+
+        $("#provinceModal").find(".modal-title").text("Add Province");
         $("#provinceModal").modal("show");
-    })
+    });
+
+    $("#tblProvince").on("click", ".btnEdit", function () {
+        let row = $(this).closest("tr");
+
+        if (row.hasClass("child")) {
+            row = row.prev();
+        }
+
+        const selectedRow = $("#tblProvince").DataTable().row(row).data();
+
+        @* console.log("Selected Province:", selectedRow); *@
+
+        if (!selectedRow) {
+            ShowToastError("Cannot get selected province data.");
+            return;
+        }
+
+        $("#province_ProvinceId").val(selectedRow.provinceId);
+        $("#province_ProvinceName").val(selectedRow.provinceName);
+        $("#province_ProvinceInKhmer").val(selectedRow.provinceInKhmer);
+
+        const isCity = selectedRow.isCity === 1 || selectedRow.isCity === true;
+        $("#chkIsCity").prop("checked", isCity);
+        $("#province_IsCity").val(isCity ? 1 : 0);
+
+        $("#provinceModal").find(".modal-title").text("Edit Province");
+        $("#provinceModal").modal("show");
+    });
+
+    $("#formProvince").on("submit", function (e) {
+        e.preventDefault();
+
+        @* console.log("Save clicked"); *@
+
+        const provinceId = $("#province_ProvinceId").val() || "0";
+
+        const provinceName = (
+            $("#province_ProvinceName").val() ||
+            $("input[name='province.ProvinceName']").val() ||
+            $("input[name='ProvinceName']").val() ||
+            ""
+        ).trim();
+
+        const provinceKhmer = (
+            $("#province_ProvinceInKhmer").val() ||
+            $("#province_ProvinceNameInKhmer").val() ||
+            $("input[name='province.ProvinceInKhmer']").val() ||
+            $("input[name='province.ProvinceNameInKhmer']").val() ||
+            $("input[name='ProvinceInKhmer']").val() ||
+            $("input[name='ProvinceNameInKhmer']").val() ||
+            ""
+        ).trim();
+
+        @* console.log("Province Name:", provinceName); *@
+        @* console.log("Province Khmer:", provinceKhmer); *@
+
+        if (provinceName === "") {
+            ShowToastError("Province name is required.");
+            return;
+        }
+
+        if (provinceKhmer === "") {
+            ShowToastError("Province name Khmer is required.");
+            return;
+        }
+
+        $("#province_IsCity").val($("#chkIsCity").is(":checked") ? 1 : 0);
+
+        const formData = $("#formProvince").serialize();
+
+        @* console.log("Form Data:", formData); *@
+
+        $.ajax({
+            url: "/Province/SaveChange",
+            method: "POST",
+            data: formData,
+            success: function (response) {
+                @* console.log("Save Response:", response); *@
+
+                if (response.code === "200" || response.status?.code === "200") {
+                    if (provinceId && provinceId !== "0") {
+                        ShowToastSuccess("Updated successfully!");
+                    } else {
+                        ShowToastSuccess("Saved successfully!");
+                    }
+
+                    clearProvinceForm();
+                    $("#provinceModal").modal("hide");
+                    $("#tblProvince").DataTable().ajax.reload(null, false);
+                } else {
+                    ShowToastError(response.message || response.status?.message || "Save failed.");
+                }
+            },
+            error: function (error) {
+                @* console.log("Save Error:", error); *@
+                ShowToastError(error.responseJSON?.message || "Server error.");
+            }
+        });
+    });
 </script>

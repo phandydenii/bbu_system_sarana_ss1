@@ -66,44 +66,82 @@ public class DisabilityController(ICampusDbContext campusDbContext, IMapper mapp
         }
     }
 
-    [HttpPost("SaveChanage")]
-    public async Task<IActionResult> SaveChanage([FromForm] DisabilityDto? disabilityDto)
+    [HttpPost("SaveChange")]
+public async Task<IActionResult> SaveChange([FromForm] DisabilityDto? disabilityDto)
+{
+    try
     {
-        try
+        if (disabilityDto == null)
         {
-            if (disabilityDto == null)
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "Bad Request!"
-                });
-            var db = campusDbContext.DbContext(_campus);
-            var disability = db.TblDisability.FirstOrDefault(x => x.Id == disabilityDto.Id);
-            if (disability != null)
+            return BadRequest(new
             {
-                mapper.Map(disabilityDto, disability);
-                db.TblDisability.Update(disability);
-                await db.SaveChangesAsync();
-            }
-            else
+                code = "400",
+                message = "Bad Request!"
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(disabilityDto.DisabilityName))
+        {
+            return BadRequest(new
             {
-                await db.TblDisability.AddAsync(mapper.Map<DisabilityDto, Disability>(disabilityDto));
-                await db.SaveChangesAsync();
-            }
+                code = "400",
+                message = "Disability name is required."
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(disabilityDto.DisabilityNameKh))
+        {
+            return BadRequest(new
+            {
+                code = "400",
+                message = "Disability name Khmer is required."
+            });
+        }
+
+        var db = campusDbContext.DbContext(_campus);
+
+        var disability = db.TblDisability
+            .FirstOrDefault(x => x.Id == disabilityDto.Id);
+
+        if (disability != null)
+        {
+            disability.DisabilityName = disabilityDto.DisabilityName.Trim();
+            disability.DisabilityNameKh = disabilityDto.DisabilityNameKh.Trim();
+
+            db.TblDisability.Update(disability);
+            await db.SaveChangesAsync();
 
             return Ok(new
             {
                 code = "200",
-                message = "Succeded!"
+                message = "Updated successfully!"
             });
         }
-        catch (Exception ex)
+
+        var newDisability = new Disability
         {
-            return StatusCode(500, new
-            {
-                code = "500",
-                message = $"Internal Server Error:{ex.Message}"
-            });
-        }
+            DisabilityName = disabilityDto.DisabilityName.Trim(),
+            DisabilityNameKh = disabilityDto.DisabilityNameKh.Trim()
+        };
+
+        await db.TblDisability.AddAsync(newDisability);
+        await db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            code = "200",
+            message = "Saved successfully!"
+        });
     }
+    catch (Exception ex)
+    {
+        var realError = ex.InnerException?.Message ?? ex.Message;
+
+        return StatusCode(500, new
+        {
+            code = "500",
+            message = $"Internal Server Error: {realError}"
+        });
+    }
+}
 }
