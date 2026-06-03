@@ -14,6 +14,7 @@ public class AutoMapperConfiguration : Profile
         CreateMap<Faculty, FacultyDto>().ReverseMap();
         CreateMap<Field, FieldDto>().ReverseMap();
         CreateMap<Faculty, FacultyDto>().ReverseMap();
+        CreateMap<CourseDto, Course>().ReverseMap();
         CreateMap<Group, GroupDto>().ReverseMap();
         CreateMap<GroupRoom, GroupRoomDto>().ReverseMap();
         CreateMap<Promotion, PromotionDto>().ReverseMap();

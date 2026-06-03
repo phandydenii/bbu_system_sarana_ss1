@@ -73,13 +73,12 @@
                     `;
                         }
                     }
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblCourse",500);
+                } 
             })
         }
-        tblCourse.on("click","#btnEdit", function (event) {
-            event.preventDefault();
-            modalCourse.modal("show");
-        });
 
         formCourse.on("submit", function (event) {
             event.preventDefault();
@@ -93,20 +92,41 @@
                 success: function (response) {
                     if (response.status.code === "200") {
                         ShowToastSuccess("Saved successfully!");
-                        tblCourse.ajax.reload();
+                        tblCourse.DataTable().ajax.reload();
+                        formCourse[0].reset();
+                        modalCourse.modal("hide");
                     } else {
                         ShowToastError(response.message);
                     }
                 },
                 error: function (error) {
-                    if (error.responseJSON && error.responseJSON.message) {
-                        ShowToastError(error.responseJSON.message);
+                    if (xhr.responseJSON?.status?.message) {
+                        ShowToastError(xhr.responseJSON.status.message);
+                    } else if (xhr.responseJSON?.message) {
+                        ShowToastError(xhr.responseJSON.message);
+                    } else {
+                        ShowToastError(xhr.responseText || "Server error.");
                     }
+                },
+                complete: function () {
+                    hideLoading(2);
                 }
-            });
-            hideLoading(2);
+            }); 
         });
         $("#btnAddNew").click(function () {
+            modalCourse.modal("show");
+        })
+        tblCourse.on("click","#btnEdit", function (event) {
+            event.preventDefault();
+            const $row = $(this).closest("tr");
+            const data = tblCourse.DataTable().row($row).data(); 
+            $("#courseDto_CourseId").val(data.courseId);
+            $("#courseDto_CourseFullName").val(data.courseFullName);
+            $("#courseDto_CourseShortName").val(data.courseShortName);
+            $("#courseDto_CourseFullNameInKhmer").val(data.courseFullNameInKhmer);
+            $("#courseDto_CourseShortNameInKhmer").val(data.courseShortNameInKhmer);
+            $("#courseDto_Credit").val(data.credit);
+            $("#courseDto_NumberOfHours").val(data.numberOfHours); 
             modalCourse.modal("show");
         })
         $("#btnClose").click(function () {

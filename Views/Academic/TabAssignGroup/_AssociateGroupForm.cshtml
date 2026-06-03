@@ -3,7 +3,7 @@
     var req = new AssignGroupViewModel();
 }
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Filter Associate Group</h3>
@@ -11,7 +11,7 @@
             <div class="card-body" style="height: 500px;">
                 <form id="frmFilter">
                     @Html.AntiForgeryToken()
-                    @* <input asp-for="@req.IsAll" type="checkbox" checked="checked" hidden="hidden"/> *@
+                    <input asp-for="@req.IsAll" type="checkbox" checked="checked" hidden="hidden"/>
                     <div class="row">
                         <div class="col-12">
                             <label aria-required="true" class="required">Degree</label>
@@ -35,18 +35,20 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-6">
                             <label>Promotion</label>
                             <select id="cboPromotion" asp-for="@req.PromotionId"
                                     class="form-control select2">
                             </select>
                         </div>
-                        <div class="col-4">
+                        <div class="col-6">
                             <label>Stage</label>
                             <select id="cboStage" asp-for="@req.StageId" class="form-control select2">
                             </select>
                         </div>
-                        <div class="col-4">
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
                             <label>Study Time</label>
                             <select id="cboStudyTime" asp-for="@req.StudyTime"
                                     class="form-control select2">
@@ -57,14 +59,14 @@
                 </form>
             </div>
             <div class="card-footer">
-                <button class="btn btn-success float-right" id="btnFilter"><i
-                        class="fas fa-filter"></i>
+                <button class="btn btn-success float-right" id="btnFilter">
+                    <i class="fas fa-filter"></i>
                     Filter
                 </button>
             </div>
         </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-md-9">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Students List</h3>
@@ -75,11 +77,16 @@
                        class="table table-sm table-bordered table-striped table-head-fixed text-nowrap">
                     <thead>
                     <tr>
-                        <th>no</th>
-                        <th>student_id</th>
-                        <th>name</th>
-                        <th>gender</th>
-                        <th>dob</th>
+                        <th class="text-center" style="width:20px;">
+                            <button type="button" id="btnSelectAllStudent" class="btn btn-sm btn-light p-0" title="Select all students" style="width:26px;height:26px;">
+                                <i class="fas fa-check-double"></i>
+                            </button>
+                        </th>
+                        <th style="width: 120px; text-align: center;">student_id</th>
+                        <th style="width: auto;">name</th>
+                        <th style="width: auto;">name_in_khmer</th>
+                        <th style="width: 90px; text-align: center;">gender</th>
+                        <th style="width: 120px; text-align: center;">dob</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -88,17 +95,7 @@
             </div>
             <div class="card-footer">
                 <div class="row">
-                    <div class="col-sm-2">
-                        <div class="form-group">
-                            <div class="form-group clearfix">
-                                <div class="icheck-primary d-inline">
-                                    <input type="checkbox" id="allStudent" required>
-                                    <label for="allStudent">Select all</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-2">
+                    <div class="col-sm-3">
                         <div class="form-group clearfix">
                             <div class="icheck-primary d-inline">
                                 <input type="checkbox" id="chbGroupAllStage">
@@ -119,7 +116,7 @@
                             <option selected="selected" disabled value="-1">Assign to group</option>
                         </select>
                     </div>
-                    <button id="btnAssignGroup" class="btn btn-success btn-sm col-sm-1">
+                    <button id="btnAssignGroup" class="btn btn-success btn-sm col-sm-2">
                         <i class="fas fa-check"></i> Assign
                     </button>
                 </div>
@@ -143,6 +140,7 @@
         const btnFilter = $("#btnFilter");
         const chbGroupAllStage = $("#chbGroupAllStage");
         const chbGroupAllStudyTime = $("#chbGroupAllStudyTime");
+        const btnSelectAllStudent = $("#btnSelectAllStudent");
 
         // Initialize Select2 on static selects (first load)
         $(".select2").select2({width: "100%", placeholder: "Select an option"});
@@ -266,7 +264,6 @@
             cboTerm.empty();
             cboTerm.append("<option value='' disabled>Select Term</option>");
             if (!stageId) return;
-
             const terms = await Term.GetTerms();
             terms.forEach(item => {
                 if (item.stageId === parseInt(stageId)) {
@@ -332,16 +329,9 @@
             }
             hideLoading(1)
         });
-        $("#allStudent").on("change", function (event) {
-            if (event.target.checked) {
-                tblStudent.find('tbody tr').addClass('highlight');
-            } else {
-                tblStudent.find('tbody tr').removeClass('highlight');
-            }
-            let count = tblStudent.find('tbody tr.highlight').length;
-            $("#countStudent").text(count);
-        }); 
+        
         let dtStudent = null;
+        let isAllStudentSelected = false;
         function loadStudentTable() {
             if (dtStudent) {
                 dtStudent.ajax.reload(null, false);
@@ -383,28 +373,71 @@
                     {
                         data: null,
                         className: "text-center",
+                        orderable: false,
+                        width: 20,
+                        searchable: false,
                         render: function (data, type, row, meta) {
-                            return meta.row + 1;
+                            return `<input type="checkbox" class="chkStudentRow" value="${row.studentId}" style="width:16px;height:16px;cursor:pointer;">`;
                         }
                     },
-                    { data: "studentId", className: "text-center" },
+                    { data: "studentId", className: "text-center", width: 120 },
                     { data: "studentName" },
-                    { data: "sex", className: "text-center" },
+                    { data: "studentNameInKhmer" },
+                    { data: "sex", className: "text-center" , width: 90 },
                     {
                         data: "dateOfBirth",
                         className: "text-center",
+                        width: 120,
                         render: function (data) {
                             return formatDate(data);
                         }
                     }
-                ], 
+                ],
                 drawCallback: function () {
+                    isAllStudentSelected = false; 
                     $("#countStudent").text(0);
-                    $("#allStudent").prop("checked", false);
                     $("#btnAssignGroup").prop("disabled", true);
+                    btnSelectAllStudent.find("i").removeClass("fa-times").addClass("fa-check-double");
+                    btnSelectAllStudent.attr("title", "Select all students");
                 }
             });
         }
+        tblStudent.on("change", ".chkStudentRow", function () {
+            const row = $(this).closest("tr");
+            const selectedRows = tblStudent.find("tbody tr.highlight").length;
+            const totalRows = tblStudent.find("tbody tr").length;
+            const icon = btnSelectAllStudent.find("i");
+            row.toggleClass("highlight", $(this).is(":checked"));
+            $("#countStudent").text(selectedRows);
+            btnAssignGroup.prop("disabled", selectedRows === 0);
+            isAllStudentSelected = totalRows > 0 && totalRows === selectedRows;
+            if (isAllStudentSelected) {
+                icon.removeClass("fa-check-double").addClass("fa-times");
+                btnSelectAllStudent.attr("title", "Unselect all students");
+            } else {
+                icon.removeClass("fa-times").addClass("fa-check-double");
+                btnSelectAllStudent.attr("title", "Select all students");
+            }
+        });
+        btnSelectAllStudent.on("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            isAllStudentSelected = !isAllStudentSelected;
+            const rows = tblStudent.find("tbody tr");
+            rows.toggleClass("highlight", isAllStudentSelected);
+            rows.find(".chkStudentRow").prop("checked", isAllStudentSelected);
+            const count = tblStudent.find("tbody tr.highlight").length;
+            $("#countStudent").text(count);
+            btnAssignGroup.prop("disabled", count === 0);
+            const icon = $(this).find("i");
+            if (isAllStudentSelected) {
+                icon.removeClass("fa-check-double").addClass("fa-times");
+                $(this).attr("title", "Unselect all students");
+            } else {
+                icon.removeClass("fa-times").addClass("fa-check-double");
+                $(this).attr("title", "Select all students");
+            }
+        }); 
 
 
         btnAssignGroup.on("click", function (event) {
@@ -426,26 +459,6 @@
                 ShowToastSuccess(`Assigned ${total} student(s) to group ${groupName} (ID: ${groupId})`);
             } else {
                 console.log('Assignment canceled');
-            }
-        });
-
-
-        tblStudent.on('click', 'tbody tr', function () {
-            const row = $(this);
-            // If already highlighted → remove highlight and stop
-            if (row.hasClass('highlight')) {
-                row.removeClass('highlight');
-            } else {
-                // Add highlight to clicked row
-                row.addClass('highlight');
-            }
-            let count = tblStudent.find('tbody tr.highlight').length;
-            $("#countStudent").text(count);
-            console.log(count);
-            if(count ===0){
-                btnAssignGroup.prop("disabled", true);
-            }else{
-                btnAssignGroup.prop("disabled", false);
             }
         });
     });

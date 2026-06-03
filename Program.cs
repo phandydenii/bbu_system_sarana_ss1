@@ -14,7 +14,8 @@ builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 //======Add Scope=====
 builder.Services.AddSingleton<ICampusDbContext, CampusDbContextService>();
 //=====Add Automapper
-builder.Services.AddAutoMapper(typeof(AutoMapperConfiguration));
+// builder.Services.AddAutoMapper(typeof(AutoMapperConfiguration));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 //======New === Configure Cookie Authentication=======
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>

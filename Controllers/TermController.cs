@@ -19,7 +19,7 @@ public class TermController(ICampusDbContext campusDbContext, IMapper mapper, IH
     private readonly string _campus = context.HttpContext?.User?.FindFirst("CampusKey")?.Value ?? "pp";
 
     [HttpPost("get-terms")]
-    public IActionResult GetPromotions(int stageId, bool isAll = false)
+    public IActionResult GetPromotions(int stageId=0, bool isAll = false)
     {
         try
         {

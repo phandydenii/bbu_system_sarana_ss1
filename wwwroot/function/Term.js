@@ -98,12 +98,12 @@ class Term {
         return jsonArray.map(item => new Term(item));
     }
 
-    static async GetTerms() {
+    static async GetTerms({stageId=0}) {
         try {
             const response = await $.ajax({
                 url: "/term/get-terms",
                 method: 'POST',
-                data: {isAll: true}
+                data: {isAll: true,stageId}
             });
             if (response.status.code === "200" && response.data !== "") {
                 return Term.fromApiArray(response.data);
