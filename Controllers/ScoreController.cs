@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BBU_SYSTEM.Data;
 using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Repository;
 using BBU_SYSTEM.ViewModel;
@@ -55,32 +56,28 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
                         FinalScore = Convert.ToDecimal(sc.FinalScore ?? 0),
                         Type = ct.Type!.Trim(),
                         IsAllow = sc.IsAllow ?? false,
-                    }).AsQueryable();
-            var dddd = query.ToList();
-            if (type == "FINAL_FINAL_AND_STATE_PROJECT_PAPER")
+                    }).AsQueryable(); 
+            switch (type)
             {
-                query = query.Where(sc =>
-                    sc.Type == "FINAL" || sc.Type == "FINAL_AND_STATE" || sc.Type == "PROJECT_PAPER");
-            }
-            else if (type == "STATE_EXAM")
-            {
-                query = query.Where(sc => sc.Type == "STATE_EXAM");
-            }
-            else if (type == "PROJECT_PAPER")
-            {
-                query = query.Where(sc => sc.Type == "PROJECT_PAPER");
-            }
-            else if (type == "PRACTICUM")
-            {
-                query = query.Where(sc => sc.Type == "PRACTICUM");
-            }
-
-            var ddkdk = query.ToList();
+                case ScoreTypeConstant.FinalAndStateProjectPaper:
+                    query = query.Where(sc => sc.Type == ScoreTypeConstant.Final 
+                                              || sc.Type == ScoreTypeConstant.FinalAndState 
+                                              || sc.Type == ScoreTypeConstant.ProjectPaper);
+                    break;
+                case ScoreTypeConstant.StateExam:
+                    query = query.Where(sc => sc.Type == ScoreTypeConstant.StateExam);
+                    break;
+                case ScoreTypeConstant.ProjectPaper:
+                    query = query.Where(sc => sc.Type == ScoreTypeConstant.ProjectPaper);
+                    break;
+                case ScoreTypeConstant.Practicum:
+                    query = query.Where(sc => sc.Type == ScoreTypeConstant.Practicum);
+                    break;
+            }    
             if (!string.IsNullOrEmpty(searchValue))
             {
-                query = query.Where(x =>
-                    x.CourseId!.ToString()!.Contains(searchValue) ||
-                    x.CourseName!.Contains(searchValue));
+                query = query.Where(x =>  x.CourseId!.ToString()!.Contains(searchValue)  
+                                          || x.CourseName!.Contains(searchValue));
             }
 
             var recordsTotal = query.ToList().Count;
@@ -96,15 +93,7 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "500",
-                    message = e.Message
-                }
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 
@@ -342,15 +331,7 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
             var query = db.TblScoreHistory.Where(x => x.StudentId == studentId).AsQueryable();
             if (isAll)
             {
-                return Ok(new
-                {
-                    data = await query.ToListAsync(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded!"
-                    }
-                });
+                return new ServerResponse().Success(await query.ToListAsync());
             }
 
             var draw = Request.Form["draw"].FirstOrDefault();
@@ -373,15 +354,7 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "500",
-                    message = e.Message
-                }
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 
@@ -426,15 +399,7 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "500",
-                    message = e.Message
-                }
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 
@@ -460,19 +425,7 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
                     sh.Username,
                     sh.DateEdit
                 };
-            if (isAll)
-            {
-                return Ok(new
-                {
-                    data = await query.ToListAsync(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded!"
-                    }
-                });
-            }
-
+            if (isAll) return new ServerResponse().Success(await query.ToListAsync());  
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
@@ -493,15 +446,7 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "500",
-                    message = e.Message
-                }
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 
@@ -720,52 +665,19 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
     {
         try
         {
-            if (id == 0)
-            {
-                return BadRequest(new
-                {
-                    data = new { },
-                    status = new
-                    {
-                        code = "400",
-                        message = "Bad Request"
-                    }
-                });
-            }
-
+            if (id == 0) return new ServerResponse().BadRequest();  
             var db = campusDbContext.DbContext(_campus);
             var dataExist = await db.TblOtherBranchScores.Where(x => x.OtherBranchScoreId == id)!.FirstOrDefaultAsync();
-            if (dataExist == null)
-            {
-                return BadRequest(new
-                {
-                    data = new { },
-                    status = new
-                    {
-                        code = "400",
-                        message = "Other branch store not found!"
-                    }
-                });
-            }
-
+            if (dataExist == null) return new ServerResponse().BadRequest("Other branch store not found!");  
             dataExist.MidTermScore = midterm;
             dataExist.FinalScore = final;
             db.TblOtherBranchScores.Update(dataExist);
             await db.SaveChangesAsync();
-            return Ok(new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "200",
-                    message = "Update successfully!"
-                }
-            });
+            return new ServerResponse().Success(msg:"Update successfully!");
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            return new ServerResponse().ErrorInternal(e);  
         }
     }
 
@@ -774,52 +686,19 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
     {
         try
         {
-            if (id == 0)
-            {
-                return BadRequest(new
-                {
-                    data = new { },
-                    status = new
-                    {
-                        code = "400",
-                        message = "Bad Request"
-                    }
-                });
-            }
-
+            if (id == 0) return new ServerResponse().BadRequest(); 
             var db = campusDbContext.DbContext(_campus);
             var dataExist = await db.TblScore.Where(x => x.ScoreId == id)!.FirstOrDefaultAsync();
-            if (dataExist == null)
-            {
-                return BadRequest(new
-                {
-                    data = new { },
-                    status = new
-                    {
-                        code = "400",
-                        message = "Other branch store not found!"
-                    }
-                });
-            }
-
+            if (dataExist == null) return new ServerResponse().BadRequest("Other branch store not found!");  
             dataExist.MidTermScore = midterm;
             dataExist.FinalScore = final;
             db.TblScore.Update(dataExist);
             await db.SaveChangesAsync();
-            return Ok(new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "200",
-                    message = "Update successfully!"
-                }
-            });
+            return new ServerResponse().Success(msg : "Update successfully!");
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            return new ServerResponse().ErrorInternal(e); 
         }
     }
 }

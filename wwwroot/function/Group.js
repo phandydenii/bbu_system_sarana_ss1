@@ -79,12 +79,16 @@ class Group {
         return jsonArray.map(item => new Group(item));
     }
 
-    static async GetGroups() {
+    static async GetGroups({stageId=0, fieldId=0}) {
         try {
             const response = await $.ajax({
                 url: "/group/get-groups",
                 method: 'POST',
-                data: {isAll: true}
+                data: {
+                    isAll: true,
+                    stageId,
+                    fieldId
+                }
             });
             if (response.status.code === "200" && response.data !== "") {
                 return Group.fromApiArray(response.data);

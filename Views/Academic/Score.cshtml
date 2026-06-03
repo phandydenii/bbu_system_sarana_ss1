@@ -116,8 +116,7 @@
         const cboPromotion = $("#cboPromotion");
         const cboStage = $("#cboStage");
         const cboTerm = $("#cboTerm");
-        const cboGroup = $("#cboGroup");
-
+        const cboGroup = $("#cboGroup"); 
         const tblStudent = $("#tblStudent");
         const tblScore = $("#tblScore");
 
@@ -127,35 +126,26 @@
             });
             tblScore.DataTable({
                 responsive: true,
-            });
-
+            }); 
             GetDegree();
             GetSchool();
         });
-
         cboDegree.change(function () {
             GetField();
-            GetPromotion();
-            GetStage();
-            GetTerm();
-            GetGroup();
+            GetPromotion();  
         });
-
         cboSchool.change(function () {
             GetField();
             GetPromotion();
-        });
-
+        }); 
         cboPromotion.change(function () {
-            GetStage();
-            GetTerm();
-            GetGroup();
+            GetStage(); 
         });
         cboStage.change(function () {
             GetTerm();
             GetGroup();
         });
-        cboTerm.change(function () {
+        cboField.change(function () {
             GetGroup();
         });
 
@@ -226,11 +216,9 @@
             }
             cboStage.empty();
             cboStage.append("<option value='' disabled>Select Stage</option>");
-            const stages = await Stage.GetStages();
+            const stages = await Stage.GetStages({promotionId});
             stages.forEach(item => {
-                if (item.promotionId === parseInt(promotionId)) {
-                    cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
-                }
+                cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
             });
             cboStage.val('').trigger("change");
         }
@@ -252,19 +240,16 @@
 
         async function GetGroup() {
             const stageId = cboStage.val();
-            const fieldId = cboField.val();
-
+            const fieldId = cboField.val(); 
             cboGroup.empty();
             cboGroup.append("<option value='' disabled>Select Group</option>");
             if (!stageId || !fieldId) {
                 cboGroup.val('');
                 return;
             }
-            const groups = await Group.GetGroups();
+            const groups = await Group.GetGroups({stageId,fieldId});
             groups.forEach(item => {
-                if (item.stageId === parseInt(stageId) && item.fieldId === parseInt(fieldId)) {
-                    cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
-                }
+               cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`); 
             });
             cboGroup.val('').trigger("change");
         }
@@ -299,17 +284,23 @@
                             return `${formatDate(data)}`
                         }
                     }
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblStudent",500);
+                }
             });
             hideLoading(1);
         }
 
         tblStudent.on('click', 'tbody tr', function () {
+            const table = tblStudent.DataTable();
+            const data = table.row(this).data();  
+            console.log(this);
+            if ($(this).find('td').hasClass('dataTables_empty')) return;
+            if (!data) return;
             showLoading();
             tblStudent.find('tbody tr').removeClass('highlight');
             $(this).addClass('highlight');
-            const table = tblStudent.DataTable();
-            const data = table.row(this).data();
             GetScores(data.studentGroupId);
             hideLoading(1);
         });

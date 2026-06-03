@@ -12,10 +12,12 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="margin" id="rangeButtons">
-                            @foreach (var st in campuses)
+                            @foreach (var item in campuses.Select((st, index) => new { st, index }))
                             {
-                                <button type="button" class="btn btn-outline-primary btn-sm"
-                                        value="@st.Key">@st.Value</button>
+                                var btnClass = item.index == 0 ? "btn-primary active" : "btn-outline-primary";
+                                <button type="button" class="btn @btnClass btn-sm" value="@item.st.Key">
+                                    @item.st.Value
+                                </button>
                             }
                         </div>
                     </div>

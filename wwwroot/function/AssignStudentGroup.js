@@ -15,9 +15,13 @@ function renterForm(form) {
         });
     });
 }
-
-$("#rangeButtons").on("click", "button", function (e) {
-    $("#rangeButtons").find("button").removeClass("btn-primary").addClass("btn-outline-primary");
-    $(this).removeClass("btn-outline-primary").addClass("btn-primary");
-    renterForm(e.target.value);
+ 
+$("#rangeButtons").on("click", "button", function () {
+    $("#rangeButtons button")
+        .removeClass("btn-primary active")
+        .addClass("btn-outline-primary"); 
+    $(this)
+        .removeClass("btn-outline-primary")
+        .addClass("btn-primary active"); 
+    renterForm(this.value);
 });

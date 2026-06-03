@@ -35,10 +35,10 @@ public class StageController(ICampusDbContext campusDbContext, IMapper mapper, I
 
             var db = campusDbContext.DbContext(_campus);
             var query = db.TblStage.AsQueryable();
+            if (promotionId > 0) query = query.Where(x => x.PromotionId == promotionId).AsQueryable();
             if (isAll)
                 return new ServerResponse().Success(query.ToList());
 
-            if (promotionId > 0) query = query.Where(x => x.PromotionId == promotionId).AsQueryable();
             if (!string.IsNullOrEmpty(searchValue))
                 query = query.Where(d =>
                     d.StageNo == int.Parse(searchValue) ||

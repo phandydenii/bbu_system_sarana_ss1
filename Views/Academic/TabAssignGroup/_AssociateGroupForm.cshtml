@@ -248,13 +248,10 @@
             const promotionId = cboPromotion.val();
             cboStage.empty();
             cboStage.append("<option value='' disabled>Stage</option>");
-            if (!promotionId) return;
-
-            const stages = await Stage.GetStages();
+            if (!promotionId) return; 
+            const stages = await Stage.GetStages({promotionId});
             stages.forEach(item => {
-                if (item.promotionId === parseInt(promotionId)) {
-                    cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
-                }
+                cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
             });
             cboStage.val('').trigger("change");
             cboStage.select2({width: "100%"});

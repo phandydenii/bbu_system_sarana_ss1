@@ -55,12 +55,15 @@ class Stage {
     }
 
 
-    static async GetStages() {
+    static async GetStages({promotionId=0}) {
         try {
             const response = await $.ajax({
                 url: "/stage/get-stages",
                 method: 'POST',
-                data: {isAll: true}
+                data: {
+                    isAll: true,
+                    promotionId
+                }
             });
             if (response.status.code === "200" && response.data !== "") {
                 return Stage.fromApiArray(response.data);
