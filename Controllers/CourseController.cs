@@ -147,4 +147,40 @@ public class CourseController(ICampusDbContext campusDbContext,IMapper mapper, I
             return new ServerResponse().ErrorInternal(e);
         }
     }
+    
+    
+    [HttpPost("course-term/save-changes")]
+    public async Task<IActionResult> SaveCoursesTerm(CoursetermDto courseTerm)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+                return new ServerResponse().BadRequest(errors);
+            }
+            var db = campusDbContext.DbContext(_campus);
+            var data = await db.TblCourseTerms.FindAsync(courseTerm.CoursetermId);
+            if (courseTerm.CoursetermId > 0 && data != null)
+            {
+                mapper.Map(courseTerm, data);
+                db.TblCourseTerms.Update(data);
+                await db.SaveChangesAsync();
+                return new ServerResponse().Success("Update course term successfully!");
+            }
+            
+            var newData = mapper.Map<CoursetermDto, CourseTerm>(courseTerm);
+            await db.TblCourseTerms.AddAsync(newData);
+            await db.SaveChangesAsync();
+            return new ServerResponse().Success("Add Course term successfully!");
+        }
+        catch (Exception e)
+        {
+            return new ServerResponse().ErrorInternal(e);
+        }
+    }
 }

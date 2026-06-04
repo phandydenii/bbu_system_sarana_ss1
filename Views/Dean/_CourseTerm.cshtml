@@ -11,80 +11,82 @@
                 <h4 class="modal-title">Course</h4>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-6">
-                        <label>Course</label>
-                        <select id="cboAddCourse" class="form-control select2"></select>
+                <form id="courseTermForm">
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Course</label>
+                            <select id="cboAddCourse" class="form-control select2"></select>
+                        </div>
+                        <div class="col-3">
+                            <label>credit</label>
+                            <input type="number" asp-for="@courseTerm.CoursetermId" hidden/>
+                            <input type="number" min="1" class="form-control" asp-for="@courseTerm.Credit"/>
+                        </div>
+                        <div class="col-3">
+                            <label>houres</label>
+                            <input type="number" min="0" class="form-control" asp-for="@courseTerm.Hours"/>
+                        </div>
                     </div>
-                    <div class="col-3">
-                        <label>credit</label>
-                        <input type="number" asp-for="@courseTerm.CoursetermId" hidden/>
-                        <input type="number" min="1" class="form-control" asp-for="@courseTerm.Credit"/>
-                    </div>
-                    <div class="col-3">
-                        <label>houres</label>
-                        <input type="number" min="0" class="form-control" asp-for="@courseTerm.Hours"/>
-                    </div>
-                </div>
-                <br>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="form-group clearfix">
-                            <div class="icheck-primary d-inline">
-                                <input type="radio" id="rdoStateExam" name="r1" checked="">
-                                <label for="rdoStateExam">State Exam</label>
+                    <br>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="rdoStateExam" name="r1" checked="">
+                                    <label for="rdoStateExam">State Exam</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="rdoFinal" name="r1" checked="">
+                                    <label for="rdoFinal">Final Exam</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="form-group clearfix">
-                            <div class="icheck-primary d-inline">
-                                <input type="radio" id="rdoFinal" name="r1" checked="">
-                                <label for="rdoFinal">Final Exam</label>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="rdoFinalAndState" name="r1" checked="">
+                                    <label for="rdoFinalAndState">Final and State Exam</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="rdoProjectPaper" name="r1" checked="">
+                                    <label for="rdoProjectPaper">Project Paper</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="form-group clearfix">
-                            <div class="icheck-primary d-inline">
-                                <input type="radio" id="rdoFinalAndState" name="r1" checked="">
-                                <label for="rdoFinalAndState">Final and State Exam</label>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="rdoPracticum" name="r1" checked="">
+                                    <label for="rdoPracticum">Practicum</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group clearfix">
+                                <div class="icheck-primary d-inline">
+                                    <input type="radio" id="rdoPassingExam" name="r1" checked="">
+                                    <label for="rdoPassingExam">Passing Exam</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="form-group clearfix">
-                            <div class="icheck-primary d-inline">
-                                <input type="radio" id="rdoProjectPaper" name="r1" checked="">
-                                <label for="rdoProjectPaper">Project Paper</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="form-group clearfix">
-                            <div class="icheck-primary d-inline">
-                                <input type="radio" id="rdoPracticum" name="r1" checked="">
-                                <label for="rdoPracticum">Practicum</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group clearfix">
-                            <div class="icheck-primary d-inline">
-                                <input type="radio" id="rdoPassingExam" name="r1" checked="">
-                                <label for="rdoPassingExam">Passing Exam</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary"><i class="fas fa-save"></i> Save changes</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
+                <button type="button" class="btn btn-primary" id="btnSave"><i class="fas fa-save"></i> Save changes</button>
+                <button type="button" class="btn btn-danger" id="btnClose"><i class="fas fa-close"></i> Close
                 </button>
             </div>
         </div>

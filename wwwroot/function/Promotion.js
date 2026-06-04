@@ -108,8 +108,7 @@ class Promotion {
                     degreeId,
                     schoolId,
                 }
-            });
-            console.log(response);
+            }); 
             if (response.status.code === "200" && response.data !== "") {
                 return Promotion.fromApiArray(response.data);
             } else {

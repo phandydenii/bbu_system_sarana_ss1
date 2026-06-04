@@ -179,7 +179,7 @@
                 courseIds: selectedValues.map(x => parseInt(x))
             }; 
             $.ajax({
-                url: "/course-school/assig-course-to-school",
+                url: "/course-school/assign-course-to-school",
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify(req),

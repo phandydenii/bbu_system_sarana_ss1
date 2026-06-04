@@ -52,7 +52,7 @@ public class CourseSchoolController(ICampusDbContext campusDbContext, IHttpConte
         });
     }
 
-    [HttpPost("assig-course-to-school")]
+    [HttpPost("assign-course-to-school")]
     public async Task<IActionResult> AssignCourseToSchool([FromBody] AssignCourseToSchoolReq req)
     {
         try
