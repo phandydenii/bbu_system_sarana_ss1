@@ -15,7 +15,7 @@
                 <form id="degreeForm">
                     <input asp-for="@degree.DegreeId" hidden readonly class="form-control" value="0"/>
                     <div class="form-group">
-                        <label>Degree Name</label>
+                        <label class="required">Degree Name</label>
                         <input type="text" asp-for="@degree.DegreeName" class="form-control requ"
                                placeholder="Enter name" required>
                         <span asp-validation-for="@degree.DegreeName" class="text-danger"></span>

@@ -10,6 +10,7 @@ namespace BBU_SYSTEM.Controllers;
 
 [Authorize]
 [Route("Field")]
+
 public class FieldController(ICampusDbContext campusDbContext, IMapper mapper, IHttpContextAccessor context)
     : Controller
 {
@@ -34,7 +35,9 @@ public class FieldController(ICampusDbContext campusDbContext, IMapper mapper, I
             if (schoolId != 0) query = query.Where(x => x.SchoolId == schoolId).AsQueryable();
 
             if (isAll)
-                return new ServerResponse().Success(query.ToList());
+            {
+                return new ServerResponse().Success(query.ToList(), "Succeeded!");
+            }
 
             if (!string.IsNullOrEmpty(searchValue))
                 query = query.Where(d =>
@@ -53,9 +56,45 @@ public class FieldController(ICampusDbContext campusDbContext, IMapper mapper, I
                 data
             });
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return new ServerResponse().ErrorInternal(e);
+            return new ServerResponse().ErrorInternal(ex);
+        }
+    }
+    [HttpPost("get-field-page-data")]
+    public IActionResult GetFieldPageData()
+    {
+        try
+        {
+            var db = campusDbContext.DbContext(_campus);
+
+            var schools = db.TblSchool
+                .OrderBy(x => x.SchoolName)
+                .Select(x => new
+                {
+                    x.SchoolId,
+                    x.SchoolName
+                })
+                .ToList();
+
+            var degrees = db.TblDegree
+                .OrderBy(x => x.DegreeId)
+                .Select(x => new
+                {
+                    x.DegreeId,
+                    x.DegreeName
+                })
+                .ToList();
+
+            return new ServerResponse().Success(new
+            {
+                schools,
+                degrees
+            }, "Succeeded!");
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
 
@@ -70,72 +109,9 @@ public class FieldController(ICampusDbContext campusDbContext, IMapper mapper, I
             var db = campusDbContext.DbContext(_campus);
 
             var data = db.TblField.FirstOrDefault(x => x.FieldId == field.FieldId);
-            if (field == null)
-            {
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "Bad Request!"
-                });
-            }
-
-            if (string.IsNullOrWhiteSpace(field.FieldName))
-            {
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "Field name is required."
-                });
-            }
-
-            if (string.IsNullOrWhiteSpace(field.FieldNameInKhmer))
-            {
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "Field name in Khmer is required."
-                });
-            }
-
-            if (field.SchoolId <= 0)
-            {
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "School is required."
-                });
-            }
-
-            if (field.DegreeId <= 0)
-            {
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "Degree is required."
-                });
-            }
-
-            if (string.IsNullOrWhiteSpace(field.DegreeName))
-            {
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "Degree name is required."
-                });
-            }
-
-            if (string.IsNullOrWhiteSpace(field.DegreeNameInKhmer))
-            {
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "Degree name in Khmer is required."
-                });
-            }
-
+            
             if (data != null)
             {
-                // UPDATE
                 data.FieldName = field.FieldName;
                 data.FieldNameInKhmer = field.FieldNameInKhmer;
                 data.SchoolId = field.SchoolId;
@@ -150,7 +126,6 @@ public class FieldController(ICampusDbContext campusDbContext, IMapper mapper, I
             }
             else
             {
-                // INSERT
                 var isExist = db.TblField.Any(x => x.FieldName == field.FieldName);
 
                 if (isExist)

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BBU_SYSTEM.DTOs;
+using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -31,15 +32,9 @@ public class RaceController(ICampusDbContext campusDbContext, IMapper mapper, IH
             var query = db.TblRace.AsQueryable();
 
             if (isAll)
-                return Ok(new
-                {
-                    data = query.Select(x => new { x.RaceId, x.RaceName }).ToList(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded!"
-                    }
-                });
+            {
+                return new ServerResponse().Success(query.ToList(), "Succeeded!");
+            }
 
             if (!string.IsNullOrEmpty(searchValue))
                 query = query.Where(d =>
@@ -58,13 +53,9 @@ public class RaceController(ICampusDbContext campusDbContext, IMapper mapper, IH
                 data
             });
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return StatusCode(500, new
-            {
-                code = "500",
-                message = $"Internal Server Error:{e.Message}"
-            });
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
 
@@ -75,29 +66,7 @@ public class RaceController(ICampusDbContext campusDbContext, IMapper mapper, IH
     {
         if (raceDto == null)
         {
-            return BadRequest(new
-            {
-                code = "400",
-                message = "Bad Request!"
-            });
-        }
-
-        if (string.IsNullOrWhiteSpace(raceDto.RaceName))
-        {
-            return BadRequest(new
-            {
-                code = "400",
-                message = "Race name is required."
-            });
-        }
-
-        if (string.IsNullOrWhiteSpace(raceDto.RaceInKhmer))
-        {
-            return BadRequest(new
-            {
-                code = "400",
-                message = "Race name Khmer is required."
-            });
+            return new ServerResponse().BadRequest("Bad Request!");
         }
 
         var db = campusDbContext.DbContext(_campus);
@@ -110,14 +79,9 @@ public class RaceController(ICampusDbContext campusDbContext, IMapper mapper, IH
             race.RaceName = raceDto.RaceName.Trim();
             race.RaceInKhmer = raceDto.RaceInKhmer.Trim();
 
-            db.TblRace.Update(race);
             await db.SaveChangesAsync();
 
-            return Ok(new
-            {
-                code = "200",
-                message = "Updated successfully!"
-            });
+            return new ServerResponse().Success(race, "Updated successfully!");
         }
         else
         {
@@ -131,24 +95,12 @@ public class RaceController(ICampusDbContext campusDbContext, IMapper mapper, IH
             await db.TblRace.AddAsync(newRace);
             await db.SaveChangesAsync();
 
-            return Ok(new
-            {
-                code = "200",
-                message = "Saved successfully!"
-            });
+            return new ServerResponse().Success(newRace, "Saved successfully!");
         }
     }
     catch (Exception ex)
     {
-        var realError = ex.InnerException != null
-            ? ex.InnerException.Message
-            : ex.Message;
-
-        return StatusCode(500, new
-        {
-            code = "500",
-            message = $"Internal Server Error: {realError}"
-        });
+        return new ServerResponse().ErrorInternal(ex);
     }
 }
 }

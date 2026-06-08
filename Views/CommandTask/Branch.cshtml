@@ -164,20 +164,20 @@
             url: "/branch/delete/" + selectedRow["branchId"],
             method: "DELETE",
             success: function (response) {
-                const code = response["code"] || response["status"]?.["code"];
-                const message = response["message"] || response["status"]?.["message"];
+                const code =  response.status?.code;
+                const message = response.status?.message;
 
                 if (code === "200" || code === 200) {
                     ShowToastSuccess(message || "Delete successfully!");
-                    tblBranch.DataTable().ajax.reload(null, false);
+                    tblBranch.DataTable().ajax.reload();
                 } else {
                     ShowToastError(message || "Delete failed.");
                 }
             },
             error: function (xhr) {
                 const message =
-                    xhr["responseJSON"]?.["message"] ||
                     xhr["responseJSON"]?.["status"]?.["message"] ||
+                    xhr["responseJSON"]?.["message"] ||
                     "Delete failed.";
 
                 ShowToastError(message);
@@ -189,28 +189,14 @@
         event.preventDefault();
 
         const branchId = branchIdInput.val() || "0";
-        const branchName = (branchNameInput.val() || "").trim();
-        const branchNameKhmer = (branchNameKhmerInput.val() || "").trim();
-
-        if (branchName === "") {
-            ShowToastError("Branch name is required.");
-            branchNameInput.focus();
-            return;
-        }
-
-        if (branchNameKhmer === "") {
-            ShowToastError("Branch name Khmer is required.");
-            branchNameKhmerInput.focus();
-            return;
-        }
-
+    
         $.ajax({
             url: "/branch/save-branch",
             method: "POST",
             data: branchForm.serialize(),
             success: function (response) {
-                const code = response["code"] || response["status"]?.["code"];
-                const message = response["message"] || response["status"]?.["message"];
+                const code = response.status?.code;
+                const message = response.status?.message;
 
                 if (code === "200" || code === 200) {
                     if (branchId !== "0") {
@@ -221,15 +207,15 @@
 
                     clearBranchForm();
                     branchModal.modal("hide");
-                    tblBranch.DataTable().ajax.reload(null, false);
+                    tblBranch.DataTable().ajax.reload();
                 } else {
                     ShowToastError(message || "Save failed.");
                 }
             },
             error: function (xhr) {
                 const message =
-                    xhr["responseJSON"]?.["message"] ||
                     xhr["responseJSON"]?.["status"]?.["message"] ||
+                    xhr["responseJSON"]?.["message"] ||
                     "Server error.";
 
                 ShowToastError(message);

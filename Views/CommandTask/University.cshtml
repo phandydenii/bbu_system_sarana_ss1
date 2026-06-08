@@ -39,6 +39,12 @@
     <script>
     const tblUniversity = $("#tblUniversity");
     const universityModal = $("#universityModal");
+    const formUniversity = $("#formUniversity");
+
+    const universityIdInput = $("#university_UniversityId");
+    const universityNameInput = $("#university_UniversityName");
+    const universityNameKhmerInput = $("#university_UniversityNameInKhmer");
+    const abbreviationNameInput = $("#university_AbbreviationName");
 
     $(document).ready(function () {
         fetchUniversity();
@@ -48,13 +54,8 @@
 
             clearUniversityForm();
 
-            $("#universityModal").find(".modal-title").text("Add University");
-            $("#universityModal").modal("show");
-        });
-
-        $(document).on("click", ".btnCloseUniversity", function () {
-            clearUniversityForm();
-            universityModal.modal("hide");
+            universityModal.find(".modal-title").text("Add University");
+            universityModal.modal("show");
         });
     });
 
@@ -73,7 +74,7 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: "/University/get-universities",
+                url: "/university/get-universities",
                 type: "POST"
             },
             columns: [
@@ -98,15 +99,17 @@
     }
 
     function clearUniversityForm() {
-        $("#formUniversity")[0].reset();
+        formUniversity[0].reset();
 
-        $("#university_UniversityId").val(0);
-        $("#university_UniversityName").val("");
-        $("#university_UniversityNameInKhmer").val("");
-        $("#university_AbbreviationName").val("");
+        universityIdInput.val(0);
+        universityNameInput.val("");
+        universityNameKhmerInput.val("");
+        abbreviationNameInput.val("");
     }
 
-    $("#tblUniversity").on("click", ".btnEdit", function () {
+    tblUniversity.on("click", ".btnEdit", function (e) {
+        e.preventDefault();
+
         let row = $(this).closest("tr");
 
         if (row.hasClass("child")) {
@@ -120,10 +123,10 @@
             return;
         }
 
-        $("#university_UniversityId").val(selectedRow.universityId);
-        $("#university_UniversityName").val(selectedRow.universityName);
-        $("#university_UniversityNameInKhmer").val(selectedRow.universityNameInKhmer);
-        $("#university_AbbreviationName").val(selectedRow.abbreviationName);
+        universityIdInput.val(selectedRow["universityId"]);
+        universityNameInput.val(selectedRow["universityName"]);
+        universityNameKhmerInput.val(selectedRow["universityNameInKhmer"]);
+        abbreviationNameInput.val(selectedRow["abbreviationName"] || "");
 
         universityModal.find(".modal-title").text("Edit University");
         universityModal.modal("show");
@@ -133,31 +136,19 @@
         e.preventDefault();
 
         clearUniversityForm();
-        $("#universityModal").modal("hide");
+        universityModal.modal("hide");
     });
 
     $(document).on("submit", "#formUniversity", function (e) {
         e.preventDefault();
 
-        const universityId = $("#university_UniversityId").val() || "0";
-        const universityName = ($("#university_UniversityName").val() || "").trim();
-        const universityNameKhmer = ($("#university_UniversityNameInKhmer").val() || "").trim();
-        const abbreviationName = ($("#university_AbbreviationName").val() || "").trim();
-
-        if (universityName === "") {
-            ShowToastError("University name is required.");
-            $("#university_UniversityName").focus();
-            return;
-        }
-
-        if (universityNameKhmer === "") {
-            ShowToastError("University name Khmer is required.");
-            $("#university_UniversityNameInKhmer").focus();
-            return;
-        }
+        const universityId = universityIdInput.val() || "0";
+        const universityName = (universityNameInput.val() || "").trim();
+        const universityNameKhmer = (universityNameKhmerInput.val() || "").trim();
+        const abbreviationName = (abbreviationNameInput.val() || "").trim();
 
         $.ajax({
-            url: "/University/SaveChange",
+            url: "/university/SaveChange",
             method: "POST",
             data: {
                 UniversityId: universityId,
@@ -166,27 +157,29 @@
                 AbbreviationName: abbreviationName
             },
             success: function (response) {
-                const code = response.code || response.status?.code;
-                const message = response.message || response.status?.message;
+                const code = response.status?.code;
+                const message = response.status?.message;
 
                 if (code === "200" || code === 200) {
-                    ShowToastSuccess(message || (universityId !== "0"
-                        ? "Updated successfully!"
-                        : "Saved successfully!"));
+                    ShowToastSuccess(
+                        message ||
+                        (universityId !== "0" ? "Updated successfully!" : "Saved successfully!")
+                    );
 
                     clearUniversityForm();
-                    $("#universityModal").modal("hide");
-                    $("#tblUniversity").DataTable().ajax.reload(null, false);
+                    universityModal.modal("hide");
+                    tblUniversity.DataTable().ajax.reload();
                 } else {
                     ShowToastError(message || "Save failed.");
                 }
             },
-            error: function (error) {
-                ShowToastError(
-                    error.responseJSON?.message ||
-                    error.responseJSON?.status?.message ||
-                    "Server error."
-                );
+            error: function (xhr) {
+                const message =
+                    xhr["responseJSON"]?.["status"]?.["message"] ||
+                    xhr["responseJSON"]?.["message"] ||
+                    "Server error.";
+
+                ShowToastError(message);
             }
         });
     });

@@ -115,8 +115,6 @@
 
         const selectedRow = $("#tblProvince").DataTable().row(row).data();
 
-        @* console.log("Selected Province:", selectedRow); *@
-
         if (!selectedRow) {
             ShowToastError("Cannot get selected province data.");
             return;
@@ -137,70 +135,34 @@
     $("#formProvince").on("submit", function (e) {
         e.preventDefault();
 
-        @* console.log("Save clicked"); *@
-
-        const provinceId = $("#province_ProvinceId").val() || "0";
-
-        const provinceName = (
-            $("#province_ProvinceName").val() ||
-            $("input[name='province.ProvinceName']").val() ||
-            $("input[name='ProvinceName']").val() ||
-            ""
-        ).trim();
-
-        const provinceKhmer = (
-            $("#province_ProvinceInKhmer").val() ||
-            $("#province_ProvinceNameInKhmer").val() ||
-            $("input[name='province.ProvinceInKhmer']").val() ||
-            $("input[name='province.ProvinceNameInKhmer']").val() ||
-            $("input[name='ProvinceInKhmer']").val() ||
-            $("input[name='ProvinceNameInKhmer']").val() ||
-            ""
-        ).trim();
-
-        @* console.log("Province Name:", provinceName); *@
-        @* console.log("Province Khmer:", provinceKhmer); *@
-
-        if (provinceName === "") {
-            ShowToastError("Province name is required.");
-            return;
-        }
-
-        if (provinceKhmer === "") {
-            ShowToastError("Province name Khmer is required.");
-            return;
-        }
-
         $("#province_IsCity").val($("#chkIsCity").is(":checked") ? 1 : 0);
 
         const formData = $("#formProvince").serialize();
-
-        @* console.log("Form Data:", formData); *@
 
         $.ajax({
             url: "/Province/SaveChange",
             method: "POST",
             data: formData,
             success: function (response) {
-                @* console.log("Save Response:", response); *@
+                const code = response.status?.code;
+                const message = response.status?.message;
 
-                if (response.code === "200" || response.status?.code === "200") {
-                    if (provinceId && provinceId !== "0") {
-                        ShowToastSuccess("Updated successfully!");
-                    } else {
-                        ShowToastSuccess("Saved successfully!");
-                    }
-
+                if (code === "200" || code === 200) {
+                    ShowToastSuccess(message || "Saved successfully!");
                     clearProvinceForm();
                     $("#provinceModal").modal("hide");
-                    $("#tblProvince").DataTable().ajax.reload(null, false);
+                    $("#tblProvince").DataTable().ajax.reload();
                 } else {
-                    ShowToastError(response.message || response.status?.message || "Save failed.");
+                    ShowToastError(message || "Save failed.");
                 }
             },
-            error: function (error) {
-                @* console.log("Save Error:", error); *@
-                ShowToastError(error.responseJSON?.message || "Server error.");
+            error: function (xhr) {
+                const message =
+                    xhr["responseJSON"]?.["status"]?.["message"] ||
+                    xhr["responseJSON"]?.["message"] ||
+                    "Server error.";
+
+                ShowToastError(message);
             }
         });
     });

@@ -69,8 +69,6 @@
         let fieldList = [], degreeList = [];
         $(document).ready(async function () {
             fetchFieldCertificate();
-            // await GetDegree();
-            // await GetSchool();
         });
 
         async function GetDegree() {
@@ -127,7 +125,6 @@
                     type: "POST",
                     dataType: "json",
                     error: function (xhr, status, error) {
-                        @* console.log(xhr.responseText); *@
                     }
                 },
                 columns: [
@@ -245,9 +242,6 @@
             const degreeId = parseInt(cboDegree.val());
             const schoolId = parseInt(cboSchool.val());
 
-            @* console.log("Degree:", degreeId); *@
-            @* console.log("School:", schoolId); *@
-
             cboField.empty().append(`<option value="">Select Field</option>`);
             cboPromotion.empty().append(`<option value="">Select Promotion</option>`);
 
@@ -297,9 +291,6 @@
             const degree = degreeList.find(item => parseInt(item.degreeId) === parseInt(cboDegree.val()));
             const field = fieldList.find(item => parseInt(item.fieldId) === parseInt(cboField.val()));
 
-            @* console.log("Selected Degree:", degree); *@
-            @* console.log("Selected Field:", field); *@
-
             if (!degree || !field) return;
 
             txtDegreeName.val(`${degree.degreeName} of ${field.degreeName}`);
@@ -340,7 +331,6 @@
                 },
                 error: function (error) {
                     ShowToastError(error.responseJSON?.status?.message || error.responseText || "Server error.");
-                    @* console.log(error); *@
                 }
             });
         });
@@ -356,8 +346,6 @@
             }
 
             const data = tblFieldCertificate.DataTable().row($row).data();
-
-            @* console.log("Edit data:", data); *@
 
             if (!data) {
                 ShowToastError("Cannot get selected data.");

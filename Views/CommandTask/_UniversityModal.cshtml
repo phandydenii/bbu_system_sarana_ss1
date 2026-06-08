@@ -28,13 +28,13 @@
                         <input type="text"
                                asp-for="@university.UniversityNameInKhmer"
                                class="form-control"
-                               placeholder="Enter name khmer">
+                               placeholder="Enter name khmer" required>
                     </div>
-                    <label>Abbreviation Name</label>
+                    <label class="required">Abbreviation Name</label>
                     <input type="text"
                            asp-for="@university.AbbreviationName"
                            class="form-control"
-                           placeholder="Enter abbreviation" />
+                           placeholder="Enter abbreviation" required/>
                 </form>
             </div>
             <div class="modal-footer justify-content-between">

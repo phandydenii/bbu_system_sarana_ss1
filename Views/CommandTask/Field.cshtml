@@ -8,11 +8,20 @@
             <div class="card-header">
                 <div class="row">
                     <div class="col-6">
-                        <label>Degree</label>
+                        <label>Degrees</label>
                         <div class="margin" id="rangeButtons">
-                            <button type="button" class="btn btn-primary" onclick="setActive(this)" value="0">All
-                            </button> 
+                            <button type="button"
+                                    class="btn btn-primary"
+                                    onclick="setActive(this)"
+                                    value="0">
+                                All
+                            </button>
                         </div>
+                        @* <label>Degree</label> *@
+                        @* <div class="margin" id="rangeButtons"> *@
+                        @*     <button type="button" class="btn btn-primary" onclick="setActive(this)" value="0">All *@
+                        @*     </button> *@
+                        @* </div> *@
                     </div>
                     <div class="col-4">
                         <label>School</label>
@@ -57,189 +66,37 @@
     <script src="~/function/Stage.js"></script>
     <script src="~/function/Term.js"></script>
     <script src="~/function/Group.js"></script>
-    <script>
-        const tblField = $("#tblField");
-        const cboSchool = $("#cboSchool");
-        const modalField = $("#modalField");
-        const formField = $("#formField");
-        const degrees = [
-            {DegreeId: 1, DegreeName: "Associate"},
-            {DegreeId: 2, DegreeName: "Bachelor"},
-            {DegreeId: 3, DegreeName: "Diploma"},
-            {DegreeId: 4, DegreeName: "Master"},
-            {DegreeId: 5, DegreeName: "Doctor"},
-        ];
-        
-        $(document).ready(function () {
-            const container = document.getElementById("rangeButtons");
-            container.classList.add("margin");
-            degrees.forEach(function (degree) {
-                const btn = document.createElement("button");
-                btn.type = "button";
-                btn.className = "btn btn-outline-primary";
-                btn.value = degree.DegreeId;
-                btn.innerText = degree.DegreeName;
-                btn.onclick = function () {
-                    setActive(this);
-                };
-                container.appendChild(btn);
-            });
-            GetSchool();
-            fetchField(0,0);
+  <script>
+    const tblField = $("#tblField");
+    const cboSchool = $("#cboSchool");
+    const modalField = $("#modalField");
+    const formField = $("#formField");
 
-            GetDegree();
-            GetSchool1();
-        });
-        async function GetSchool() {
-            cboSchool.empty();
-            cboSchool.append("<option value='' disabled>Select School</option>");
-            const schools = await School.GetSchool()
-            schools.forEach(function (item) {
-                cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
-            });
-            cboSchool.val('').trigger("change");
-        }
-        function setActive(button) {
-            const buttons = document.querySelectorAll('#rangeButtons .btn-primary');
-            buttons.forEach(btn => btn.classList.remove('btn-primary'));
-            buttons.forEach(btn => btn.classList.add('btn-outline-primary'));
-            button.classList.remove("btn-outline-primary");
-            button.classList.add("btn-primary");
-            console.log(parseInt(button.value));
-            if (parseInt(button.value) === 0) {
-                cboSchool.val(0)
-                fetchField(button.value, 0);
-            } else {
-                const school_id = cboSchool.val();
-                fetchField(button.value, school_id);
-            }
-        }
+    let fieldTable = null;
+    let selectedDegreeId = 0;
+    let selectedSchoolId = 0;
 
-        cboSchool.on("change", function (event) {
-            const degree_id = $('#rangeButtons .btn-primary').val();
-            const school_id = cboSchool.val();
-            fetchField(degree_id, school_id);
-        });
+    let schoolList = [];
+    let degreeList = [];
 
-        function fetchField(degreeId, schoolId) {
-            tblField.DataTable().clear().destroy();
-            tblField.DataTable({
-                paging: true,
-                lengthChange: true,
-                searching: true,
-                ordering: true,
-                info: true,
-                responsive: true,
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "/Field/get-fields",
-                    type: "POST",
-                    data: function (d) {
-                        d.degreeId = degreeId;
-                        d.schoolId = schoolId;
-                    },
-                },
-                columns: [
-                    {data: "fieldId"},
-                    {data: "fieldName"},
-                    {data: "fieldNameInKhmer"},
-                    {data: "degreeName"},
-                    {data: "degreeNameInKhmer"},
-                    {
-                        data: "type",
-                        render: function (data, type, row) {
-                            return data ? `<span class="badge badge-info">ACADEMIC</span>` : `<span class="badge badge-warning">PROFESSIONAL</span>`;
-                        }
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) { 
-                            return `<a id="btnEdit" class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</a>`;
-                        }
-                    }
-                ]
-            });
-        }
+    $(document).ready(function () {
+        initFieldTable();
+        loadFieldPageData();
 
-        document.getElementById("btnAddNew").addEventListener("click", function (event) {
+        $("#btnAddNew").on("click", function (event) {
             event.preventDefault();
-
-            GetDegree();
-            GetSchool1();
-
-            modalField.find(".modal-title").text("Add Field");
-
-            formField[0].reset();
-
-            $("#field_FieldId").val(0);
-            $("#field_DegreeId").val("").trigger("change");
-            $("#field_SchoolId").val("").trigger("change");
-            $("#field_Type").prop("checked", false);
-            $("#rdoAcademic").prop("checked", false);
-            $("#rdoProffesional").prop("checked", true);
-
-            modalField.modal("show");
+            openAddField();
         });
 
-        tblField.on("click", "#btnEdit", function (event) {
+        cboSchool.on("change", function () {
+            selectedSchoolId = cboSchool.val() || 0;
+            reloadFieldTable();
+        });
+
+        tblField.on("click", ".btnEditField", function (event) {
             event.preventDefault();
-
-            let $row = $(this).closest("tr");
-
-            if ($row.hasClass("child")) {
-                $row = $row.prev();
-            }
-
-            const row = tblField.DataTable().row($row).data();
-
-            console.log("Selected Field:", row);
-
-            if (!row) {
-                ShowToastError("Cannot get selected field data.");
-                return;
-            }
-
-            $("#field_FieldId").val(row.fieldId);
-            $("#field_DegreeId").val(row.degreeId).trigger("change");
-            $("#field_SchoolId").val(row.schoolId).trigger("change");
-
-            $("#field_DegreeName").val(row.degreeName || "");
-            $("#field_DegreeNameInKhmer").val(row.degreeNameInKhmer || "");
-
-            $("#field_FieldName").val(row.fieldName || "");
-            $("#field_FieldNameInKhmer").val(row.fieldNameInKhmer || "");
-
-            const isAcademic = row.type === true || row.type === 1 || row.type === "true";
-
-            $("#field_Type").prop("checked", isAcademic);
-            $("#rdoAcademic").prop("checked", isAcademic);
-            $("#rdoProffesional").prop("checked", !isAcademic);
-
-            modalField.find(".modal-title").text("Edit Field");
-            modalField.modal("show");
+            openEditField(this);
         });
-        async function GetDegree() {
-            const cboDegree = $("#field_DegreeId")
-            cboDegree.empty();
-            cboDegree.append(`<option value='' disabled>Select Degree</option>`);
-            const degrees = await Degree.GetAllDegree();
-            degrees.forEach(item => {
-                cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
-            });
-            cboDegree.val('').trigger("change");
-        }
-
-        async function GetSchool1() {
-            const cboSchool = $("#field_SchoolId")
-            cboSchool.empty();
-            cboSchool.append("<option value='' disabled>Select School</option>");
-            const schools = await School.GetSchool()
-            schools.forEach(function (item) {
-                cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
-            });
-            cboSchool.val('').trigger("change");
-        }
 
         $("#rdoAcademic").on("change", function (event) {
             $("#field_Type").prop("checked", event.target.checked);
@@ -251,79 +108,280 @@
 
         $(document).on("submit", "#formField", function (event) {
             event.preventDefault();
+            saveField();
+        });
+    });
 
-            const degreeId = $("#field_DegreeId").val();
-            const schoolId = $("#field_SchoolId").val();
-            const fieldName = ($("#field_FieldName").val() || "").trim();
-            const fieldNameKhmer = ($("#field_FieldNameInKhmer").val() || "").trim();
-            const degreeName = ($("#field_DegreeName").val() || "").trim();
-            const degreeNameKhmer = ($("#field_DegreeNameInKhmer").val() || "").trim();
+    function loadFieldPageData() {
+        $.ajax({
+            url: "/Field/get-field-page-data",
+            type: "POST",
+            success: function (response) {
+                const data = response["data"];
 
-            if (!degreeId || degreeId === "") {
-                ShowToastError("Degree is required.");
-                return;
+                schoolList = data["schools"] || [];
+                degreeList = data["degrees"] || [];
+
+                bindDegreeButtons();
+                bindFilterSchoolDropdown();
+                bindModalSchoolDropdown();
+                bindModalDegreeDropdown();
+
+                setDefaultAllButton();
+            },
+            error: function () {
+                ShowToastError("Cannot load school and degree data.");
             }
+        });
+    }
 
-            if (!schoolId || schoolId === "") {
-                ShowToastError("School is required.");
-                return;
-            }
+    function bindDegreeButtons() {
+        const container = $("#rangeButtons");
 
-            if (fieldName === "") {
-                ShowToastError("Field name is required.");
-                return;
-            }
+        container.empty();
 
-            if (fieldNameKhmer === "") {
-                ShowToastError("Field name in Khmer is required.");
-                return;
-            }
+        container.append(
+            '<button type="button" ' +
+            'class="btn btn-primary" ' +
+            'onclick="setActive(this)" ' +
+            'value="0">All</button>'
+        );
 
-            if (degreeName === "") {
-                ShowToastError("Degree name is required.");
-                return;
-            }
+        degreeList.forEach(function (item) {
+            container.append(
+                '<button type="button" ' +
+                'class="btn btn-outline-primary" ' +
+                'onclick="setActive(this)" ' +
+                'value="' + item["degreeId"] + '">' +
+                item["degreeName"] +
+                '</button>'
+            );
+        });
+    }
 
-            if (degreeNameKhmer === "") {
-                ShowToastError("Degree name in Khmer is required.");
-                return;
-            }
+    function setDefaultAllButton() {
+        const allButton = $("#rangeButtons button[value='0']");
 
-            $("#field_Type").val($("#rdoAcademic").is(":checked") ? "true" : "false");
+        $("#rangeButtons button")
+            .removeClass("btn-primary")
+            .addClass("btn-outline-primary");
 
-            const formData = $(this).serialize();
-            const fieldId = $("#field_FieldId").val();
+        allButton
+            .removeClass("btn-outline-primary")
+            .addClass("btn-primary");
 
-            $.ajax({
-                url: "/Field/save-change",
-                method: "POST",
-                data: formData,
-                success: function (response) {
-                    const code = response.code || response.status?.code;
-                    const message = response.message || response.status?.message;
+        selectedDegreeId = 0;
+        selectedSchoolId = 0;
+    }
 
-                    if (code === "200" || code === 200) {
-                        ShowToastSuccess(message || (fieldId && fieldId !== "0"
-                            ? "Updated successfully!"
-                            : "Saved successfully!"));
+    function setActive(button) {
+        $("#rangeButtons button")
+            .removeClass("btn-primary")
+            .addClass("btn-outline-primary");
 
-                        $("#formField")[0].reset();
-                        $("#field_FieldId").val(0);
-                        $("#modalField").modal("hide");
-                        $("#tblField").DataTable().ajax.reload(null, false);
-                    } else {
-                        ShowToastError(message || "Save failed.");
+        $(button)
+            .removeClass("btn-outline-primary")
+            .addClass("btn-primary");
+
+        selectedDegreeId = parseInt($(button).val()) || 0;
+        selectedSchoolId = cboSchool.val() || 0;
+
+        reloadFieldTable();
+    }
+
+    function bindFilterSchoolDropdown() {
+        cboSchool.empty();
+        cboSchool.append("<option value=''>Select School</option>");
+
+        schoolList.forEach(function (item) {
+            cboSchool.append(
+                "<option value='" + item["schoolId"] + "'>" +
+                item["schoolName"] +
+                "</option>"
+            );
+        });
+
+        cboSchool.val("");
+    }
+
+    function bindModalSchoolDropdown() {
+        const cboSchoolModal = $("#field_SchoolId");
+
+        cboSchoolModal.empty();
+        cboSchoolModal.append("<option value=''>Select School</option>");
+
+        schoolList.forEach(function (item) {
+            cboSchoolModal.append(
+                "<option value='" + item["schoolId"] + "'>" +
+                item["schoolName"] +
+                "</option>"
+            );
+        });
+
+        cboSchoolModal.val("");
+    }
+
+    function bindModalDegreeDropdown() {
+        const cboDegree = $("#field_DegreeId");
+
+        cboDegree.empty();
+        cboDegree.append("<option value=''>Select Degree</option>");
+
+        degreeList.forEach(function (item) {
+            cboDegree.append(
+                "<option value='" + item["degreeId"] + "'>" +
+                item["degreeName"] +
+                "</option>"
+            );
+        });
+
+        cboDegree.val("");
+    }
+
+    function initFieldTable() {
+        fieldTable = tblField.DataTable({
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: true,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "/Field/get-fields",
+                type: "POST",
+                data: function (d) {
+                    d.degreeId = selectedDegreeId || 0;
+                    d.schoolId = selectedSchoolId || 0;
+                }
+            },
+            columns: [
+                { data: "fieldId" },
+                { data: "fieldName" },
+                { data: "fieldNameInKhmer" },
+                { data: "degreeName" },
+                { data: "degreeNameInKhmer" },
+                {
+                    data: "type",
+                    render: function (data) {
+                        return data
+                            ? '<span class="badge badge-info">ACADEMIC</span>'
+                            : '<span class="badge badge-warning">PROFESSIONAL</span>';
                     }
                 },
-                error: function (error) {
-                    ShowToastError(
-                        error.responseJSON?.message ||
-                        error.responseJSON?.status?.message ||
-                        error.responseText ||
-                        "Server error."
-                    );
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function () {
+                        return `
+                            <button type="button" class="btn btn-success btn-sm btnEditField">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        `;
+                    }
                 }
-            });
+            ]
         });
-    </script>
+    }
+
+    function reloadFieldTable() {
+        if (fieldTable) {
+            fieldTable.ajax.reload();
+        }
+    }
+
+    function openAddField() {
+        modalField.find(".modal-title").text("Add Field");
+
+        formField[0].reset();
+
+        bindModalDegreeDropdown();
+        bindModalSchoolDropdown();
+
+        $("#field_FieldId").val(0);
+        $("#field_DegreeId").val("");
+        $("#field_SchoolId").val("");
+        $("#field_Type").prop("checked", false);
+        $("#rdoAcademic").prop("checked", false);
+        $("#rdoProffesional").prop("checked", true);
+
+        modalField.modal("show");
+    }
+
+    function openEditField(button) {
+        let rowElement = $(button).closest("tr");
+
+        if (rowElement.hasClass("child")) {
+            rowElement = rowElement.prev();
+        }
+
+        const row = fieldTable.row(rowElement).data();
+
+        if (!row) {
+            ShowToastError("Cannot get selected field data.");
+            return;
+        }
+
+        bindModalDegreeDropdown();
+        bindModalSchoolDropdown();
+
+        $("#field_FieldId").val(row["fieldId"]);
+        $("#field_DegreeId").val(row["degreeId"]);
+        $("#field_SchoolId").val(row["schoolId"]);
+
+        $("#field_DegreeName").val(row["degreeName"] || "");
+        $("#field_DegreeNameInKhmer").val(row["degreeNameInKhmer"] || "");
+
+        $("#field_FieldName").val(row["fieldName"] || "");
+        $("#field_FieldNameInKhmer").val(row["fieldNameInKhmer"] || "");
+
+        const isAcademic = row["type"] === true || row["type"] === 1 || row["type"] === "true";
+
+        $("#field_Type").prop("checked", isAcademic);
+        $("#rdoAcademic").prop("checked", isAcademic);
+        $("#rdoProffesional").prop("checked", !isAcademic);
+
+        modalField.find(".modal-title").text("Edit Field");
+        modalField.modal("show");
+    }
+
+    function saveField() {
+        
+        $("#field_Type").val($("#rdoAcademic").is(":checked") ? "true" : "false");
+
+        const formData = formField.serialize();
+        const fieldId = $("#field_FieldId").val();
+
+        $.ajax({
+            url: "/Field/save-change",
+            type: "POST",
+            data: formData,
+            success: function (response) {
+                const code = response.status?.code;
+                const message = response.status?.message;
+
+                if (code === "200" || code === 200) {
+                    ShowToastSuccess(
+                        message ||
+                        (fieldId && fieldId !== "0"
+                            ? "Updated successfully!"
+                            : "Saved successfully!")
+                    );
+
+                    formField[0].reset();
+                    $("#field_FieldId").val(0);
+                    modalField.modal("hide");
+                    reloadFieldTable();
+                } else {
+                    ShowToastError(message || "Save failed.");
+                }
+            },
+            error: function () {
+                ShowToastError("Server error.");
+            }
+        });
+    }
+</script>
 }

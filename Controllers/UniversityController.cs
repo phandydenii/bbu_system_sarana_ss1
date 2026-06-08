@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BBU_SYSTEM.DTOs;
+using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -31,15 +32,9 @@ public class UniversityController(ICampusDbContext campusDbContext, IMapper mapp
             var query = db.TblUsersity.AsQueryable();
 
             if (isAll)
-                return Ok(new
-                {
-                    data = query.ToList(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded!"
-                    }
-                });
+            {
+                return new ServerResponse().Success(query.ToList(), "Succeeded!");
+            }
             if (!string.IsNullOrEmpty(searchValue))
                 query = query.Where(d =>
                     d.UniversityName!.Contains(searchValue) ||
@@ -57,13 +52,9 @@ public class UniversityController(ICampusDbContext campusDbContext, IMapper mapp
                 data
             });
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return StatusCode(500, new
-            {
-                code = "500",
-                message = $"Internal Server Error:{e.Message}"
-            });
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
 
@@ -74,29 +65,7 @@ public async Task<IActionResult> SaveChange([FromForm] UniversityDto? university
     {
         if (universityDto == null)
         {
-            return BadRequest(new
-            {
-                code = "400",
-                message = "Bad Request!"
-            });
-        }
-
-        if (string.IsNullOrWhiteSpace(universityDto.UniversityName))
-        {
-            return BadRequest(new
-            {
-                code = "400",
-                message = "University name is required."
-            });
-        }
-
-        if (string.IsNullOrWhiteSpace(universityDto.UniversityNameInKhmer))
-        {
-            return BadRequest(new
-            {
-                code = "400",
-                message = "University name Khmer is required."
-            });
+            return new ServerResponse().BadRequest("Bad Request!");
         }
 
         var db = campusDbContext.DbContext(_campus);
@@ -106,45 +75,31 @@ public async Task<IActionResult> SaveChange([FromForm] UniversityDto? university
 
         if (university != null)
         {
-            university.UniversityName = universityDto.UniversityName.Trim();
-            university.UniversityNameInKhmer = universityDto.UniversityNameInKhmer.Trim();
+            university.UniversityName = universityDto.UniversityName?.Trim();
+            university.UniversityNameInKhmer = universityDto.UniversityNameInKhmer?.Trim();
             university.AbbreviationName = universityDto.AbbreviationName?.Trim();
 
             db.TblUsersity.Update(university);
             await db.SaveChangesAsync();
 
-            return Ok(new
-            {
-                code = "200",
-                message = "Updated successfully!"
-            });
+            return new ServerResponse().Success(university, "Updated successfully!");
         }
 
         var newUniversity = new University
         {
-            UniversityName = universityDto.UniversityName.Trim(),
-            UniversityNameInKhmer = universityDto.UniversityNameInKhmer.Trim(),
+            UniversityName = universityDto.UniversityName?.Trim(),
+            UniversityNameInKhmer = universityDto.UniversityNameInKhmer?.Trim(),
             AbbreviationName = universityDto.AbbreviationName?.Trim()
         };
 
         await db.TblUsersity.AddAsync(newUniversity);
         await db.SaveChangesAsync();
 
-        return Ok(new
-        {
-            code = "200",
-            message = "Saved successfully!"
-        });
+        return new ServerResponse().Success(newUniversity, "Saved successfully!");
     }
     catch (Exception ex)
     {
-        var realError = ex.InnerException?.Message ?? ex.Message;
-
-        return StatusCode(500, new
-        {
-            code = "500",
-            message = $"Internal Server Error: {realError}"
-        });
+        return new ServerResponse().ErrorInternal(ex);
     }
 }
 [HttpDelete("delete/{universityId:int}")]
@@ -159,33 +114,17 @@ public async Task<IActionResult> Delete(int universityId)
 
         if (university == null)
         {
-            return BadRequest(new
-            {
-                code = "400",
-                message = "University not found!"
-            });
+            return new ServerResponse().BadRequest("University not found!");
         }
 
         db.TblUsersity.Remove(university);
         await db.SaveChangesAsync();
-
-        return Ok(new
-        {
-            code = "200",
-            message = "Deleted successfully!"
-        });
+        
+        return new ServerResponse().Success(university, "Deleted successfully!");
     }
     catch (Exception ex)
     {
-        var realError = ex.InnerException != null
-            ? ex.InnerException.Message
-            : ex.Message;
-
-        return StatusCode(500, new
-        {
-            code = "500",
-            message = $"Internal Server Error: {realError}"
-        });
+        return new ServerResponse().ErrorInternal(ex);
     }
 }
 }
