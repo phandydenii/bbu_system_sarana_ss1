@@ -29,8 +29,9 @@ public static class ScoreTypeConstant
 {
     public const string FinalAndStateProjectPaper = "FINAL_FINAL_AND_STATE_PROJECT_PAPER";
     public const string Final = "FINAL";
-    public const string FinalAndState = "FINAL_AND_STATE";
     public const string ProjectPaper = "PROJECT_PAPER";
     public const string StateExam = "STATE_EXAM";
     public const string Practicum = "PRACTICUM";
+    public const string FinalAndState = "FINAL_AND_STATE";
+    public const string PassingExam = "PASSING_EXAM";
 }

@@ -4,102 +4,102 @@
     ViewData["OpenMenu"] = "Dean";
     ViewData["Action"] = "Mark";
 }
+
+<style>
+    #tblStudent tbody tr {
+        cursor: pointer;
+    }
+    .table-responsive {
+        margin-top: 0.5rem;
+    }
+</style>
+
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                @*<h3 class="card-title">AssignStudentGroup</h3>*@
-                <div class="row">
-                    <div class="col-md-2">
-                        <label>Degree</label>
-                        <select id="cboDegree" class="form-control select2">
-                        </select>
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pt-3 pb-2">
+                <div class="row align-items-end">
+                    <div class="col-md-3 col-lg-2 mb-2">
+                        <label class="font-weight-600 small text-muted">Degree</label>
+                        <select id="cboDegree" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-2">
-                        <label>School</label>
-                        <select id="cboSchool" class="form-control select2">
-                        </select>
+                    <div class="col-md-3 col-lg-2 mb-2">
+                        <label class="font-weight-600 small text-muted">School</label>
+                        <select id="cboSchool" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-2">
-                        <label>Field</label>
-                        <select id="cboField" class="form-control select2">
-                        </select>
+                    <div class="col-md-3 col-lg-2 mb-2">
+                        <label class="font-weight-600 small text-muted">Field</label>
+                        <select id="cboField" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-1">
-                        <label>Promotion</label>
-                        <select id="cboPromotion" class="form-control select2">
-                        </select>
+                    <div class="col-md-3 col-lg-1 mb-2">
+                        <label class="font-weight-600 small text-muted">Promotion</label>
+                        <select id="cboPromotion" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-1">
-                        <label>Stage</label>
-                        <select id="cboStage" class="form-control select2">
-                        </select>
+                    <div class="col-md-3 col-lg-1 mb-2">
+                        <label class="font-weight-600 small text-muted">Stage</label>
+                        <select id="cboStage" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-1">
-                        <label>Term</label>
-                        <select id="cboTerm" class="form-control select2">
-                        </select>
+                    <div class="col-md-3 col-lg-1 mb-2">
+                        <label class="font-weight-600 small text-muted">Term</label>
+                        <select id="cboTerm" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-2">
-                        <label>Group</label>
-                        <select id="cboGroup" class="form-control select2">
-                        </select>
+                    <div class="col-md-3 col-lg-2 mb-2">
+                        <label class="font-weight-600 small text-muted">Group</label>
+                        <select id="cboGroup" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-1">
-                        <label>#</label>
-                        <button onclick="OnFilter()" class="form-control btn btn-success float-right"><i class="fas fa-filter"></i>
-                            Filter
-                        </button>
+                    <div class="col-md-3 col-lg-1 mb-2">
+                        <button onclick="OnFilter()" class="btn btn-success btn-block"><i class="fas fa-filter mr-1"></i> Filter</button>
                     </div>
                 </div>
-                <br>
             </div>
-            <div class="card-body">
+            
+            <div class="card-body bg-light/30">
                 <div class="row">
-                    <div class="col-md-5">
-                        <div class="card card-outline card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">Student List</h3>
+                    <div class="col-12 col-xl-5 mb-4">
+                        <div class="card card-outline card-primary h-100 shadow-sm border-top-3">
+                            <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                                <h3 class="card-title font-weight-bold text-primary m-0"><i class="fas fa-user-graduate mr-2"></i>Student List</h3>
                             </div>
-                            <div class="card-body">
-                                <table id="tblStudent" class="table table-bordered table-sm table-striped">
-                                    <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Gender</th>
-                                        <th>DOB</th>
-                                        <th>action</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                            <div class="card-body p-2">
+                                <div class="table-responsive w-100">
+                                    <table id="tblStudent" class="table table-hover table-bordered table-sm w-100 m-0">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th width="15%">ID</th>
+                                                <th>Name</th>
+                                                <th width="15%">Gender</th>
+                                                <th width="25%">DOB</th>
+                                                <th width="10%">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-7">
-                        <div class="card card-outline card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">Score List</h3>
-                                <a class="badge badge-info float-right" id="lblStudentName"></a>
+                    
+                    <div class="col-12 col-xl-7 mb-4">
+                        <div class="card card-outline card-success h-100 shadow-sm border-top-3">
+                            <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                                <h3 class="card-title font-weight-bold text-success m-0"><i class="fas fa-star mr-2"></i>Score Performance</h3>
+                                <span class="badge badge-pill badge-info px-3 py-2 font-weight-normal" id="lblStudentName" style="display:none;"></span>
                             </div>
-                            <div class="card-body">
-                                <table id="tblScore" class="table table-bordered table-sm table-striped">
-                                    <thead>
-                                    <tr>
-                                        <th class="hide-col">id</th>
-                                        <th class="hide-col">student_group_id</th>
-                                        <th>name</th>
-                                        <th>midterm</th>
-                                        <th>final</th>
-                                        <th>grade</th>
-                                        <th>action</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                            <div class="card-body p-2">
+                                <div class="table-responsive w-100">
+                                    <table id="tblScore" class="table table-hover table-bordered table-sm w-100 m-0">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Course Name</th>
+                                                <th width="20%">Midterm</th>
+                                                <th width="20%">Final</th>
+                                                <th width="15%">Grade</th>
+                                                <th width="12%">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -108,6 +108,7 @@
         </div>
     </div>
 </div>
+
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
 
 @section Scripts
@@ -133,51 +134,27 @@
         const tblScore = $("#tblScore");
 
         $(document).ready(function () {
+            // Added explicit autoWidth declarations to guarantee matching dimension allocations
             tblStudent.DataTable({
                 responsive: true,
+                autoWidth: false
             });
             tblScore.DataTable({
                 responsive: true,
+                autoWidth: false
             });
-
             GetDegree();
             GetSchool();
-            GetField();
-            GetPromotion();
-            GetStage();
-            GetTerm();
-            GetGroup();
         });
 
-        cboDegree.change(function () {
-            GetField();
-            GetPromotion();
-            GetStage();
-            GetTerm();
-            GetGroup();
-        });
-
-        cboSchool.change(function () {
-            GetField();
-            GetPromotion();
-        });
-
-        cboPromotion.change(function () {
-            GetStage();
-            GetTerm();
-            GetGroup();
-        });
-        cboStage.change(function () {
-            GetTerm();
-            GetGroup();
-        });
-        cboTerm.change(function () {
-            GetGroup();
-        });
+        cboDegree.change(function () { GetField(); GetPromotion(); });
+        cboSchool.change(function () { GetField(); GetPromotion(); });
+        cboPromotion.change(function () { GetStage(); GetTerm(); GetGroup(); });
+        cboStage.change(function () { GetTerm(); GetGroup(); });
+        cboTerm.change(function () { GetGroup(); });
 
         async function GetDegree() {
-            cboDegree.empty();
-            cboDegree.append(`<option value='' disabled>Select Degree</option>`);
+            cboDegree.empty().append(`<option value='' disabled>Select Degree</option>`);
             const degrees = await Degree.GetAllDegree();
             degrees.forEach(item => {
                 cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
@@ -186,25 +163,19 @@
         }
 
         async function GetSchool() {
-            cboSchool.empty();
-            cboSchool.append("<option value='' disabled>Select School</option>");
-            const schools = await School.GetSchool()
+            cboSchool.empty().append("<option value='' disabled>Select School</option>");
+            const schools = await School.GetSchool();
             schools.forEach(function (item) {
                 cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
             });
             cboSchool.val('').trigger("change");
         }
 
-
         async function GetField() {
             const degreeId = parseInt(cboDegree.val());
             const schoolId = parseInt(cboSchool.val());
-            cboField.empty();
-            cboField.append("<option value='' disabled>Select Field</option>");
-            if (!degreeId || !schoolId) {
-                cboField.val('');
-                return;
-            }
+            cboField.empty().append("<option value='' disabled>Select Field</option>");
+            if (!degreeId || !schoolId) { cboField.val(''); return; }
 
             const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
             fields.forEach(item => {
@@ -216,57 +187,41 @@
         async function GetPromotion() {
             const degreeId = cboDegree.val();
             const schoolId = cboSchool.val();
-            cboPromotion.empty();
-            cboPromotion.append("<option value='' disabled>Select Promotion</option>");
-            if (!degreeId || !schoolId) {
-                cboPromotion.val('');
-                return;
-            }
-            const promotions = await Promotion.GetPromotions();
+            cboPromotion.empty().append("<option value='' disabled>Select Promotion</option>");
+            if (!degreeId || !schoolId) { cboPromotion.val(''); return; }
+
+            const promotions = await Promotion.GetPromotions({isSelect2: true, degreeId, schoolId});
             let hasPromotion = false;
             promotions.forEach(item => {
-                if (item.degree === parseInt(degreeId) && item.school === parseInt(schoolId)) {
-                    cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`);
-                    hasPromotion = true;
-                }
+                cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`);
+                hasPromotion = true;
             });
             if (!hasPromotion) {
-                cboPromotion.empty();
-                cboPromotion.append("<option value='' disabled>No promotion available</option>");
+                cboPromotion.empty().append("<option value='' disabled>No promotion available</option>");
             }
             cboPromotion.val('').trigger("change");
         }
 
         async function GetStage() {
             const promotionId = cboPromotion.val();
-            cboStage.empty();
-            cboStage.append("<option value='' disabled>Select Stage</option>");
-            if (!promotionId) {
-                cboPromotion.val('');
-                return;
-            }
-            const stages = await Stage.GetStages();
+            cboStage.empty().append("<option value='' disabled>Select Stage</option>");
+            if (!promotionId) { cboPromotion.val(''); return; }
+
+            const stages = await Stage.GetStages({promotionId});
             stages.forEach(item => {
-                if (item.promotionId === parseInt(promotionId)) {
-                    cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
-                }
+                cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
             });
             cboStage.val('').trigger("change");
         }
 
         async function GetTerm() {
             const stageId = cboStage.val();
-            cboTerm.empty();
-            cboTerm.append("<option value='' disabled>Select Term</option>");
-            if (!stageId) {
-                cboTerm.val('');
-                return;
-            }
-            const terms = await Term.GetTerms();
+            cboTerm.empty().append("<option value='' disabled>Select Term</option>");
+            if (!stageId) { cboTerm.val(''); return; }
+
+            const terms = await Term.GetTerms({stageId});
             terms.forEach(item => {
-                if (item.stageId === parseInt(stageId)) {
-                    cboTerm.append(`<option value='${item.termNo}'>${item.termNo}</option>`);
-                }
+                cboTerm.append(`<option value='${item.termNo}'>${item.termNo}</option>`);
             });
             cboTerm.val('').trigger("change");
         }
@@ -274,18 +229,12 @@
         async function GetGroup() {
             const stageId = cboStage.val();
             const fieldId = cboField.val();
+            cboGroup.empty().append("<option value='' disabled>Select Group</option>");
+            if (!stageId || !fieldId) { cboGroup.val(''); return; }
 
-            cboGroup.empty();
-            cboGroup.append("<option value='' disabled>Select Group</option>");
-            if (!stageId || !fieldId) {
-                cboGroup.val('');
-                return;
-            }
-            const groups = await Group.GetGroups();
+            const groups = await Group.GetGroups({stageId, fieldId});
             groups.forEach(item => {
-                if (item.stageId === parseInt(stageId) && item.fieldId === parseInt(fieldId)) {
-                    cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
-                }
+               cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
             });
             cboGroup.val('').trigger("change");
         }
@@ -295,139 +244,144 @@
             const groupId = cboGroup.val();
             tblStudent.DataTable().clear().destroy();
             tblScore.DataTable().clear().destroy();
+            $("#lblStudentName").hide().text("");
+
             tblStudent.DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                autoWidth: false,
                 ajax: {
                     url: `/student/GetStudents`,
                     type: "POST",
-                    data: {
-                        groupid: groupId,
-                        termno: termNo,
-                    },
+                    data: { groupid: groupId, termno: termNo },
                 },
                 columns: [
-                    {data: "studentId"},
-                    {data: "studentName"},
-                    {data: "sex"},
+                    { data: "studentId" },
+                    { data: "studentName" },
+                    { data: "sex" },
                     {
                         data: "dateOfBirth",
-                        render: function (data, type, row) {
-                            return formatDate(data);
-                        }
+                        render: function (data) { return formatDate(data); }
                     },
                     {
                         data: null,
-                        render: function (data, type, row) {
-                            return ``;
-                        }
+                        defaultContent: `<button class="btn btn-xs btn-outline-primary py-0 px-1"><i class="fas fa-eye"></i></button>`
                     }
-                ]
-            })
+                ],
+                initComplete: function (){
+                    MyApp.utils.dataTableDebounceSearch("#tblStudent", 500);
+                }
+            });
         }
-
 
         $('#tblStudent tbody').on('click', 'tr', function () {
             $('#tblStudent tbody tr').removeClass('highlight');
             $(this).addClass('highlight');
-            const $row = $('#tblStudent tbody tr.highlight');
-            const selectedRow = $('#tblStudent').DataTable().row($row).data();
-            GetScores(selectedRow.studentGroupId);
+            
+            const selectedRow = $('#tblStudent').DataTable().row(this).data();
+            if(selectedRow) {
+                $("#lblStudentName").show().html(`<i class="fas fa-user mr-1"></i> ${selectedRow.studentName}`);
+                GetScores(selectedRow.studentGroupId);
+            }
         });
 
         function GetScores(student_group_id) {
             if (!student_group_id) return;
             tblScore.DataTable().clear().destroy();
-            tblScore
-                .DataTable({
+            tblScore.DataTable({
                     processing: true,
                     serverSide: true,
                     responsive: true,
+                    autoWidth: false,
                     ajax: {
                         url: `/scores/get-scores/${student_group_id}`,
                         type: "POST",
-                        data: {
-                            type: "FINAL_FINAL_AND_STATE_PROJECT_PAPER"
-                        },
-                        dataSrc: function (json) {
-                            return json.data;
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            console.log(jqXHR.responseText);
-                        }
+                        data: { type: "FINAL_FINAL_AND_STATE_PROJECT_PAPER" },
+                        dataSrc: function (json) { return json.data; },
+                        error: function (jqXHR) { console.log(jqXHR.responseText); }
                     },
                     columns: [
-                        {data: "scoreId", visible: false},
-                        {data: "studentGroupId", visible: false},
-                        {data: "courseName"},
+                        { data: "courseName" },
                         {
                             data: "midTermScore",
-                            render: function (data, type, row) {
-                                return `<input type="number" class="form-control form-control-sm is-warning" name="midterm" value="${data ? data.toFixed(2) : 0.00}" readonly/>`;
+                            render: function (data) {
+                                return `<input type="number" step="0.01" class="form-control form-control-sm text-center font-weight-bold border-warning" name="midterm" value="${data ? data.toFixed(2) : '0.00'}" readonly/>`;
                             }
                         },
                         {
                             data: "finalScore",
-                            render: function (data, type, row) {
-                                return `<input type="number" class="form-control form-control-sm is-warning" name="final" value="${data ? data.toFixed(2) : 0.00}" readonly/>`;
+                            render: function (data) {
+                                return `<input type="number" step="0.01" class="form-control form-control-sm text-center font-weight-bold border-warning" name="final" value="${data ? data.toFixed(2) : '0.00'}" readonly/>`;
                             }
                         },
                         {
                             data: null,
                             render: function (data, type, row) {
                                 const totalScore = (row.midTermScore || 0) + (row.finalScore || 0);
-                                if (totalScore >= 60) {
-                                    return `<badge class="badge badge-success">Pass</badge>`;
-                                } else {
-                                    return `<badge class="badge badge-danger">Fail</badge>`;
-                                }
+                                return totalScore >= 60 
+                                    ? `<span class="badge badge-success d-block py-1">Pass</span>` 
+                                    : `<span class="badge badge-danger d-block py-1">Fail</span>`;
                             }
                         },
                         {
                             data: null,
-                            render: function (data, type, row) {
-                                return `<button class="btn btn-warning btn-sm" id="btnEdit"><i class="fa-solid fa-pen-to-square"></i></button>`;
+                            render: function () {
+                                return `<div class="text-center"><button class="btn btn-warning btn-sm" id="btnEdit"><i class="fas fa-edit"></i></button></div>`;
                             }
                         }
-                    ]
+                    ],
+                    initComplete: function (){
+                        MyApp.utils.dataTableDebounceSearch("#tblScore", 500);
+                        // Fix columns mismatch issues on lazy layouts
+                        setTimeout(() => { $('#tblScore').DataTable().columns.adjust(); }, 150);
+                    }
                 });
         }
         
-        tblScore.on("click","#btnEdit", function (event) {
-            // Find the clicked row
+        tblScore.on("click", "#btnEdit", function (event) {
             const $row = $(this).closest('tr'); 
-            // Enable the input fields in this row
-            $row.find('input[name="midterm"]').prop('readonly', false);
-            $row.find('input[name="final"]').prop('readonly', false);
+            $row.find('input[name="midterm"]').prop('readonly', false).addClass('bg-white');
+            $row.find('input[name="final"]').prop('readonly', false).addClass('bg-white');
 
-            // Optionally change button to Save
             $(this)
                 .attr('id', 'btnSave')
                 .removeClass('btn-warning')
                 .addClass('btn-success')
-                .html('<i class="fas fa-check"></i>');
+                .html('<i class="fas fa-save"></i>');
         });
 
-        tblScore.on("click","#btnSave", function (event) {
-            // Find the clicked row
+        tblScore.on("click", "#btnSave", function (event) {
             const $row = $(this).closest('tr');
-            // Enable the input fields in this row
             const newMid = parseFloat($row.find('input[name="midterm"]').val()) || 0;
             const newFinal = parseFloat($row.find('input[name="final"]').val()) || 0;
             
-            console.log(newFinal,newMid); 
+            // Instantly recalculate dynamic Badge visual without needing a server trip
+            const total = newMid + newFinal;
+            const $badgeCell = $row.find('span.badge');
+            if(total >= 60) {
+                $badgeCell.removeClass('badge-danger').addClass('badge-success').text('Pass');
+            } else {
+                $badgeCell.removeClass('badge-success').addClass('badge-danger').text('Fail');
+            }
 
-            // Optionally change button to Save
             $(this)
                 .attr('id', 'btnEdit')
                 .removeClass('btn-success')
                 .addClass('btn-warning')
-                .html('<i class="fa-solid fa-pen-to-square"></i>');
+                .html('<i class="fas fa-edit"></i>');
 
-            // Enable the input fields in this row
-            $row.find('input[name="midterm"]').prop('readonly', true);
-            $row.find('input[name="final"]').prop('readonly', true);
+            $row.find('input[name="midterm"]').prop('readonly', true).removeClass('bg-white');
+            $row.find('input[name="final"]').prop('readonly', true).removeClass('bg-white');
+            
+            // Fetch internal row configuration object reference to commit inline data variables safely
+            const table = $('#tblScore').DataTable();
+            const rowData = table.row($row).data();
+            if(rowData) {
+                rowData.midTermScore = newMid;
+                rowData.finalScore = newFinal;
+                OnSave(rowData);
+            }
         });
 
         function OnSave(rowData) {
@@ -436,11 +390,6 @@
                 return data.scoreId === rowData.scoreId;
             });
             if (!row.node()) return;
-            const $row = $(row.node());
-            const newMid = parseFloat($row.find('td:eq(3) input').val()) || 0;
-            const newFinal = parseFloat($row.find('td:eq(4) input').val()) || 0;
-            rowData.midTermScore = newMid;
-            rowData.finalScore = newFinal;
             row.data(rowData).draw(false);
         }
     </script>

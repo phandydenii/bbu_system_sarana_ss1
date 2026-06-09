@@ -159,7 +159,7 @@
                     url: "/course/get-course-list",
                     type: "GET",
                     success: function (response) {
-                        const cboGroup = document.getElementById("cboAddCourse");
+                        const cboGroup = document.getElementById("courseTerm_CourseId");
                         cboGroup.innerText = "";
                         const option = document.createElement("option");
                         option.value = -1;
@@ -276,7 +276,7 @@
                 responsive: true,
                 orderings: true,
                 ajax: {
-                    url: `/course/get-course-terms/${termId}/${stageId}/${promotionId}/${fieldId}`,
+                    url: `/course-term/get-course-terms/${termId}/${stageId}/${promotionId}/${fieldId}`,
                     type: "POST",
                 },
                 columns: [
@@ -298,54 +298,83 @@
                             `;
                         }
                     },
-                ]
+                ],
+                initComplete: function (){
+                    MyApp.utils.dataTableDebounceSearch("#tblCourse",500);
+                } 
             })
         }
 
         tblCourse.on("click","#btnEdit", async function(e) {
             tblCourse.find("tr").removeClass("highlight");
-            const $row = $(this).closest("tr");
-            $row.addClass("highlight");
-            const data = tblCourse.DataTable().row($row).data();  
-            if (data) { 
-                const courseIdToSelect = data?.courseId; 
-                if (courseIdToSelect) {
-                    $("#cboAddCourse").val(courseIdToSelect).trigger("change");
-                } else { 
-                    $("#cboAddCourse").val("-1").trigger("change");
-                }
+            let $row = $(this).closest("tr");
+            if ($row.hasClass("child")) {
+                $row = $row.prev();
             }
-            modalCourseTerm.modal("show");
+            $row.addClass("highlight");
+            const data = tblCourse.DataTable().row($row).data(); 
+            if (data) {  
+                $("#courseTerm_CoursetermId").val(data.courseTermId);
+                $("#courseTerm_FieldId").val(cboField.find(":selected").val());
+                $("#courseTerm_TermId").val(cboTerm.find(":selected").val()); 
+                $("#courseTerm_CourseId").val(data.courseId).trigger("change");
+                $(`input[name="courseTerm.Type"][value="${data.type}"]`).prop("checked", true);
+                $("#courseTerm_Credit").val(data.credit);
+                $("#courseTerm_Hours").val(data.hours);
+                modalCourseTerm.modal("show");
+            }
         });
         
         tblCourse.on("click","#btnRemove", async function(e) {
-            const $row = $(this).closest("tr");
-            const data = tblCourse.DataTable().row($row).data(); 
-            modalCourseTerm.modal("show");
+            let $row = $(this).closest("tr");
+            if ($row.hasClass("child")) $row = $row.prev();
+            const data = tblCourse.DataTable().row($row).data();  
+            ShowBoxConfirm("Are you sure to remove this course?",function (){
+                $.ajax({
+                    url: "/course-term/delete/" + data.courseTermId,
+                    type: "DELETE", 
+                    success: function (response) {
+                        showLoading();
+                        if (response.code === "200" || response.status?.code === "200") {
+                            ShowToastSuccess(response.status.message);
+                            $("#tblCourse").DataTable().ajax.reload(null, false);
+                            hideLoading(1.5);
+                        } else {
+                            ShowToastError(response.message || response.status?.message || "Delete failed.");
+                        }
+                    },
+                    error: function (xhr) {
+                        ShowToastError(xhr.responseText);
+                    }
+                });
+            });
         });
 
         btnAddCourse.click(function () { 
+            $("#courseTerm_CoursetermId").val(0);
+            $("#courseTerm_FieldId").val(cboField.find(":selected").val());
+            $("#courseTerm_TermId").val(cboTerm.find(":selected").val());
             modalCourseTerm.modal("show");
         })
-        btnSave.click(function (e){
-           e.preventDefault();
-            const formData = $(this).serialize(); 
+        $(document).on("click", "#btnSave", function (e) {
+            e.preventDefault(); 
+            const formData = $("#courseTermForm").serialize(); 
             $.ajax({
-                url: "/course/course-term/save-changes",
-                method: "POST",
+                url: "/course-term/save-changes",
+                type: "POST",
                 data: formData,
                 success: function (response) {
                     if (response.code === "200" || response.status?.code === "200") {
-                        ShowToastSuccess("Updated successfully!");  
-                        $("#courseTermForm")[0].reset(); 
-                        tblCourse.modal("hide");
-                        tblCourse.DataTable().ajax.reload(null, false);
+                        ShowToastSuccess(response.status.message);
+                        $("#courseTermForm")[0].reset();
+                        $("#CourseTermModal").modal("hide");
+                        $("#tblCourse").DataTable().ajax.reload(null, false);
                     } else {
                         ShowToastError(response.message || response.status?.message || "Save failed.");
                     }
                 },
-                error: function (error) {
-                    ShowToastError(error.responseJSON?.message || "Server error.");
+                error: function (xhr) {
+                    ShowToastError(xhr.responseText);
                 }
             });
         });

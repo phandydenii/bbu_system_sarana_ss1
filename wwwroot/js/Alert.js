@@ -14,27 +14,24 @@ function ShowToastInfo(message = "Informatin") {
     toastr.info(message);
 }
 
-function ShowBoxConfirm(message = "Confirmation") {
-    let check = false;
+function ShowBoxConfirm(message = "Confirmation", onYes = null) {
     bootbox.confirm({
         title: "Confirm",
         message: message,
-        // size: "small",
         buttons: {
             confirm: {
-                label: 'Yes',
-                className: 'btn-success'
+                label: "Yes",
+                className: "btn-success"
             },
             cancel: {
-                label: 'No',
-                className: 'btn-danger'
+                label: "No",
+                className: "btn-danger"
             }
         },
         callback: function (result) {
-            if (result) {
-                check = true;
+            if (result && typeof onYes === "function") {
+                onYes();
             }
         }
     });
-    return check;
 }

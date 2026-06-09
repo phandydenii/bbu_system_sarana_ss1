@@ -1,5 +1,7 @@
 @model BBU_SYSTEM.ViewModel.LearnerViewModel
+@using BBU_SYSTEM.Data
 @using BBU_SYSTEM.DTOs
+@using BBU_SYSTEM.Modelsss
 @{
     var courseTerm = new CoursetermDto();
 }
@@ -9,17 +11,22 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Course</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="courseTermForm">
+                    <input type="hidden" asp-for="@courseTerm.CoursetermId" />
+                    <input type="hidden" asp-for="@courseTerm.FieldId" />
+                    <input type="hidden" asp-for="@courseTerm.TermId" />
                     <div class="row">
                         <div class="col-6">
                             <label>Course</label>
-                            <select id="cboAddCourse" class="form-control select2"></select>
+                            <select asp-for="@courseTerm.CourseId" class="form-control select2"></select>
                         </div>
                         <div class="col-3">
                             <label>credit</label>
-                            <input type="number" asp-for="@courseTerm.CoursetermId" hidden/>
                             <input type="number" min="1" class="form-control" asp-for="@courseTerm.Credit"/>
                         </div>
                         <div class="col-3">
@@ -32,7 +39,7 @@
                         <div class="col-6">
                             <div class="form-group clearfix">
                                 <div class="icheck-primary d-inline">
-                                    <input type="radio" id="rdoStateExam" name="r1" checked="">
+                                    <input type="radio" id="rdoStateExam" asp-for="@courseTerm.Type" value="@ScoreTypeConstant.StateExam">
                                     <label for="rdoStateExam">State Exam</label>
                                 </div>
                             </div>
@@ -40,7 +47,7 @@
                         <div class="col-6">
                             <div class="form-group clearfix">
                                 <div class="icheck-primary d-inline">
-                                    <input type="radio" id="rdoFinal" name="r1" checked="">
+                                    <input type="radio" id="rdoFinal" asp-for="@courseTerm.Type" value="@ScoreTypeConstant.Final">
                                     <label for="rdoFinal">Final Exam</label>
                                 </div>
                             </div>
@@ -50,7 +57,7 @@
                         <div class="col-6">
                             <div class="form-group clearfix">
                                 <div class="icheck-primary d-inline">
-                                    <input type="radio" id="rdoFinalAndState" name="r1" checked="">
+                                    <input type="radio" id="rdoFinalAndState" asp-for="@courseTerm.Type" value="@ScoreTypeConstant.FinalAndState">
                                     <label for="rdoFinalAndState">Final and State Exam</label>
                                 </div>
                             </div>
@@ -58,7 +65,7 @@
                         <div class="col-6">
                             <div class="form-group clearfix">
                                 <div class="icheck-primary d-inline">
-                                    <input type="radio" id="rdoProjectPaper" name="r1" checked="">
+                                    <input type="radio" id="rdoProjectPaper" asp-for="@courseTerm.Type" value="@ScoreTypeConstant.ProjectPaper">
                                     <label for="rdoProjectPaper">Project Paper</label>
                                 </div>
                             </div>
@@ -68,7 +75,7 @@
                         <div class="col-6">
                             <div class="form-group clearfix">
                                 <div class="icheck-primary d-inline">
-                                    <input type="radio" id="rdoPracticum" name="r1" checked="">
+                                    <input type="radio" id="rdoPracticum" asp-for="@courseTerm.Type" value="@ScoreTypeConstant.Practicum">
                                     <label for="rdoPracticum">Practicum</label>
                                 </div>
                             </div>
@@ -76,7 +83,7 @@
                         <div class="col-6">
                             <div class="form-group clearfix">
                                 <div class="icheck-primary d-inline">
-                                    <input type="radio" id="rdoPassingExam" name="r1" checked="">
+                                    <input type="radio" id="rdoPassingExam" asp-for="@courseTerm.Type" value="@ScoreTypeConstant.PassingExam">
                                     <label for="rdoPassingExam">Passing Exam</label>
                                 </div>
                             </div>
@@ -86,8 +93,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="btnSave"><i class="fas fa-save"></i> Save changes</button>
-                <button type="button" class="btn btn-danger" id="btnClose"><i class="fas fa-close"></i> Close
-                </button>
+                <button type="button" class="btn btn-danger" id="btnClose"><i class="fas fa-close"></i> Close </button>
             </div>
         </div>
     </div>

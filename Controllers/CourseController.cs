@@ -54,65 +54,6 @@ public class CourseController(ICampusDbContext campusDbContext,IMapper mapper, I
         });
     }
 
-    [HttpPost("get-course-terms/{termId:int}/{stageId:int}/{promotionId:int}/{fieldId:int}")]
-    public IActionResult GetCourseTerms(int termId, int stageId, int promotionId, int fieldId)
-    {
-        var draw = Request.Form["draw"].FirstOrDefault();
-        var start = Request.Form["start"].FirstOrDefault();
-        var length = Request.Form["length"].FirstOrDefault();
-        var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-        var pageSize = length != null ? Convert.ToInt32(length) : 0;
-        var skip = start != null ? Convert.ToInt32(start) : 0;
-
-        var db = campusDbContext.DbContext(_campus);
-        var query =
-            (from term in db.TblTerm
-                join stage in db.TblStage
-                    on term.StageId equals stage.StageId
-                join promotion in db.TblPromotion
-                    on stage.PromotionId equals promotion.PromotionId
-                join courseTerm in db.TblCourseTerms
-                    on term.TermId equals courseTerm.TermId
-                join course in db.TblCourses
-                    on courseTerm.CourseId equals course.CourseId
-                join courseCode in db.TblCourseCodes
-                    on new { course.CourseId, promotion.SchoolId, courseTerm.FieldId, promotion.DegreeId }
-                    equals new { courseCode.CourseId, courseCode.SchoolId, courseCode.FieldId, courseCode.DegreeId }
-                    into courseCodeGroup
-                from courseCode in courseCodeGroup.DefaultIfEmpty()
-                where term.TermId == termId && stage.StageId == stageId && promotion.PromotionId == promotionId &&
-                      courseTerm.FieldId == fieldId
-                select new
-                {
-                    courseTerm.CourseTermId,
-                    course.CourseId,
-                    course.CourseFullName,
-                    course.CourseShortName,
-                    stage.StageId,
-                    term.TermId,
-                    promotion.PromotionId,
-                    courseTerm.Credit,
-                    courseTerm.FieldId,
-                    term.TermNo,
-                    code = courseCode.Code,
-                    promotion.SchoolId,
-                    courseTerm.Type,
-                    courseTerm.Hours
-                }).Distinct().AsQueryable();
-        if (!string.IsNullOrEmpty(searchValue)) query = query.Where(c => c.CourseFullName!.Contains(searchValue));
-        var recordsTotal = query.Count();
-        var data = query.Skip(skip).Take(pageSize).ToList();
-
-        return Json(new
-        {
-            draw,
-            recordsFiltered = recordsTotal,
-            recordsTotal,
-            data
-        });
-    }
-
     [HttpPost("save-changes")]
     public async Task<IActionResult> SaveCourses(CourseDto courseDto)
     {
@@ -141,42 +82,6 @@ public class CourseController(ICampusDbContext campusDbContext,IMapper mapper, I
             await db.TblCourses.AddAsync(newData);
             await db.SaveChangesAsync();
             return new ServerResponse().Success("Add Course success");
-        }
-        catch (Exception e)
-        {
-            return new ServerResponse().ErrorInternal(e);
-        }
-    }
-    
-    
-    [HttpPost("course-term/save-changes")]
-    public async Task<IActionResult> SaveCoursesTerm(CoursetermDto courseTerm)
-    {
-        try
-        {
-            if (!ModelState.IsValid)
-            {
-                var errors = ModelState
-                    .Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
-                return new ServerResponse().BadRequest(errors);
-            }
-            var db = campusDbContext.DbContext(_campus);
-            var data = await db.TblCourseTerms.FindAsync(courseTerm.CoursetermId);
-            if (courseTerm.CoursetermId > 0 && data != null)
-            {
-                mapper.Map(courseTerm, data);
-                db.TblCourseTerms.Update(data);
-                await db.SaveChangesAsync();
-                return new ServerResponse().Success("Update course term successfully!");
-            }
-            
-            var newData = mapper.Map<CoursetermDto, CourseTerm>(courseTerm);
-            await db.TblCourseTerms.AddAsync(newData);
-            await db.SaveChangesAsync();
-            return new ServerResponse().Success("Add Course term successfully!");
         }
         catch (Exception e)
         {

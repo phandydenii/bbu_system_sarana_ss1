@@ -448,15 +448,11 @@
                 const id = $(this).find('td:eq(1)').text();
                 const name = $(this).find('td:eq(2)').text();
                 students.push(`${name} (ID: ${id})`);
-            });
-            console.log(students);
-            // Build dynamic confirmation message
+            }); 
             const message = `<h5>Are you sure you want to assign <strong>${total}</strong> student(s) to the group "<strong>${groupId}:${groupName}</strong>"?</h5>`;
-            if (ShowBoxConfirm(message)) {
+            ShowBoxConfirm(message,function (){
                 ShowToastSuccess(`Assigned ${total} student(s) to group ${groupName} (ID: ${groupId})`);
-            } else {
-                console.log('Assignment canceled');
-            }
+            });
         });
     });
 </script>

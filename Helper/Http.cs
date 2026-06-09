@@ -44,13 +44,14 @@ public class ServerResponse : ControllerBase
     
     public IActionResult ErrorInternal(Exception e)
     {
+        var message = e.InnerException?.Message ?? e.Message;
         return StatusCode(500, new
         {
             data = new { },
             status = new
             {
                 code = "500",
-                message = $"Internal Server Error:{e.Message}"
+                message = $"Internal Server Error:{message}"
             }
         });
     }
