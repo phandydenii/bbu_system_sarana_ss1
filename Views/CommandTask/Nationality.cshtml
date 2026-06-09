@@ -126,18 +126,6 @@
         const nationalityName = ($("#nationality_NationalityName").val() || "").trim();
         const nationalityKhmer = ($("#nationality_NationalityInKhmer").val() || "").trim();
 
-        if (nationalityName === "") {
-            ShowToastError("Nationality name is required.");
-            $("#nationality_NationalityName").focus();
-            return;
-        }
-
-        if (nationalityKhmer === "") {
-            ShowToastError("Nationality name Khmer is required.");
-            $("#nationality_NationalityInKhmer").focus();
-            return;
-        }
-
         $.ajax({
             url: "/Nationality/SaveChange",
             method: "POST",
@@ -147,22 +135,30 @@
                 NationalityInKhmer: nationalityKhmer
             },
             success: function (response) {
-                if (response.code === "200" || response.status?.code === "200") {
+                const code = response["status"]?.["code"] || response["code"];
+                const message = response["status"]?.["message"] || response["message"];
+
+                if (code === "200" || code === 200) {
                     if (nationalityId !== "0") {
-                        ShowToastSuccess("Updated successfully!");
+                        ShowToastSuccess(message || "Updated successfully!");
                     } else {
-                        ShowToastSuccess("Saved successfully!");
+                        ShowToastSuccess(message || "Saved successfully!");
                     }
 
                     clearNationalityForm();
                     $("#nationalityModal").modal("hide");
-                    $("#tblNationality").DataTable().ajax.reload(null, false);
+                    $("#tblNationality").DataTable().ajax.reload();
                 } else {
-                    ShowToastError(response.message || response.status?.message || "Save failed.");
+                    ShowToastError(message || "Save failed.");
                 }
             },
-            error: function (error) {
-                ShowToastError(error.responseJSON?.message || "Server error.");
+            error: function (xhr) {
+                const message =
+                    xhr["responseJSON"]?.["status"]?.["message"] ||
+                    xhr["responseJSON"]?.["message"] ||
+                    "Server error.";
+
+                ShowToastError(message);
             }
         });
     });

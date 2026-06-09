@@ -32,8 +32,9 @@ public class DegreeController(ICampusDbContext campusDbContext, IMapper mapper, 
             var db = campusDbContext.DbContext(_campus);
             var query = db.TblDegree.AsQueryable();
             if (isAll)
+            {
                 return new ServerResponse().Success(query.ToList());
-
+            }
             if (!string.IsNullOrEmpty(searchValue))
                 query = query.Where(d =>
                     d.DegreeName!.Contains(searchValue) ||
@@ -57,41 +58,42 @@ public class DegreeController(ICampusDbContext campusDbContext, IMapper mapper, 
         }
     }
 
-    [HttpGet("get-degree/{degreeId:int}")]
-    public async Task<IActionResult> GetDegree(int degreeId)
-    {
-        var db = campusDbContext.DbContext(_campus);
-        var data = await db.TblDegree.Where(x => x.DegreeId == degreeId).FirstOrDefaultAsync();
-        if (data == null)
-        {
-            return new ServerResponse().NotFound("Degree not found");
-        };
-        return new ServerResponse().Success(data);
-    }
-
     [HttpPost("SaveChange")]
     public async Task<IActionResult> SaveChange([FromForm] DegreeDto? degree)
     {
         try
         {
             if (degree == null)
-                return new ServerResponse().BadRequest();
+            {
+                return new ServerResponse().BadRequest("Bad Request!");
+            }
 
             var db = campusDbContext.DbContext(_campus);
+
             if (degree.DegreeId == 0)
             {
-                var data = mapper.Map<DegreeDto, Degree>(degree);
-                await db.TblDegree.AddAsync(data);
+                var newDegree = mapper.Map<DegreeDto, Degree>(degree);
+
+                await db.TblDegree.AddAsync(newDegree);
                 await db.SaveChangesAsync();
-                return new ServerResponse().Success(degree);
+
+                return new ServerResponse().Success(newDegree, "Saved successfully!");
             }
-            var oldData = await db.TblDegree.Where(x => x.DegreeId == degree.DegreeId).FirstOrDefaultAsync();
+
+            var oldData = await db.TblDegree
+                .FirstOrDefaultAsync(x => x.DegreeId == degree.DegreeId);
+
             if (oldData == null)
-                return new ServerResponse().BadRequest();
+            {
+                return new ServerResponse().BadRequest("Degree not found!");
+            }
+
             mapper.Map(degree, oldData);
+
             db.TblDegree.Update(oldData);
             await db.SaveChangesAsync();
-            return new ServerResponse().Success(degree);
+
+            return new ServerResponse().Success(oldData, "Updated successfully!");
         }
         catch (Exception ex)
         {
@@ -107,10 +109,10 @@ public class DegreeController(ICampusDbContext campusDbContext, IMapper mapper, 
             var db = campusDbContext.DbContext(_campus);
             var degree = await db.TblDegree.Where(x => x.DegreeId == degreeId).FirstOrDefaultAsync();
             if (degree == null)
-                return new ServerResponse().BadRequest();
+                return new ServerResponse().BadRequest("Bad Request!");
             db.TblDegree.Remove(degree);
             await db.SaveChangesAsync();
-            return new ServerResponse().Success(null);
+            return new ServerResponse().Success(null, "Deleted successfully!");
         }
         catch (Exception ex)
         {

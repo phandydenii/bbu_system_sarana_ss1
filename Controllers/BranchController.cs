@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BBU_SYSTEM.DTOs;
+using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -35,12 +36,9 @@ public class BranchController(ICampusDbContext campusDbContext, IMapper mapper, 
             var db = campusDbContext.DbContext(_campus);
             var query = db.TblBranch.AsQueryable();
             if (isAll)
-                return Ok(new
-                {
-                    data = query.ToList(),
-                    code = "200",
-                    message = "Succeeded!"
-                });
+            {
+                return new ServerResponse().Success(query.ToList(), "Succeeded!");
+            }
 
             if (!string.IsNullOrEmpty(searchValue))
                 query = query.Where(d =>
@@ -59,90 +57,46 @@ public class BranchController(ICampusDbContext campusDbContext, IMapper mapper, 
                 data
             });
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return StatusCode(500, new
-            {
-                code = "500",
-                message = $"Internal Server Error:{e.Message}"
-            });
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
 
     [HttpPost("save-branch")]
-public async Task<IActionResult> Save([FromForm] BranchDto? branch)
-{
-    try
+    public async Task<IActionResult> Save([FromForm] BranchDto? branch)
     {
-        if (branch == null)
+        try
         {
-            return BadRequest(new
+            if (branch == null)
             {
-                code = "400",
-                message = "Bad Request!"
-            });
+                return new ServerResponse().BadRequest("Bad Request!");
+            }
+            var db = campusDbContext.DbContext(_campus);
+
+            var branchEntity = db.TblBranch.FirstOrDefault(x => x.BranchId == branch.BranchId);
+
+            if (branchEntity != null)
+            {
+                mapper.Map(branch, branchEntity);
+                db.TblBranch.Update(branchEntity);
+                await db.SaveChangesAsync();
+                return new ServerResponse().Success(branchEntity, "Updated successfully!");
+            }
+            else
+            {
+                var newBranch = mapper.Map<BranchDto, Branch>(branch);
+                await db.TblBranch.AddAsync(newBranch);
+                await db.SaveChangesAsync();
+
+                return new ServerResponse().Success(newBranch, "Saved successfully!");
+            }
         }
-
-        if (string.IsNullOrWhiteSpace(branch.BranchName))
+        catch (Exception ex)
         {
-            return BadRequest(new
-            {
-                code = "400",
-                message = "Branch name is required."
-            });
-        }
-
-        if (string.IsNullOrWhiteSpace(branch.BranchNameInKhmer))
-        {
-            return BadRequest(new
-            {
-                code = "400",
-                message = "Branch name Khmer is required."
-            });
-        }
-
-        var db = campusDbContext.DbContext(_campus);
-
-        var branchEntity = db.TblBranch.FirstOrDefault(x => x.BranchId == branch.BranchId);
-
-        if (branchEntity != null)
-        {
-            mapper.Map(branch, branchEntity);
-            db.TblBranch.Update(branchEntity);
-            await db.SaveChangesAsync();
-
-            return Ok(new
-            {
-                code = "200",
-                message = "Updated successfully!"
-            });
-        }
-        else
-        {
-            var newBranch = mapper.Map<BranchDto, Branch>(branch);
-            await db.TblBranch.AddAsync(newBranch);
-            await db.SaveChangesAsync();
-
-            return Ok(new
-            {
-                code = "200",
-                message = "Saved successfully!"
-            });
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
-    catch (Exception ex)
-    {
-        var realError = ex.InnerException != null
-            ? ex.InnerException.Message
-            : ex.Message;
-
-        return StatusCode(500, new
-        {
-            code = "500",
-            message = $"Internal Server Error: {realError}"
-        });
-    }
-}
     [HttpDelete("delete/{branchId:int}")]
     public async Task<IActionResult> Delete(int branchId)
     {
@@ -154,29 +108,16 @@ public async Task<IActionResult> Save([FromForm] BranchDto? branch)
 
             if (branch == null)
             {
-                return BadRequest(new
-                {
-                    code = "400",
-                    message = "Branch not found!"
-                });
+                return new ServerResponse().BadRequest("Branch not found!");
             }
 
             db.TblBranch.Remove(branch);
             await db.SaveChangesAsync();
-
-            return Ok(new
-            {
-                code = "200",
-                message = "Deleted successfully!"
-            });
+            return new ServerResponse().Success(branch, "Deleted successfully!");
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new
-            {
-                code = "500",
-                message = ex.Message
-            });
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
 }

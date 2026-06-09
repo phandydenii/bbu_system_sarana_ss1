@@ -13,21 +13,21 @@
                 <form id="formRace">
                     <input type="hidden" asp-for="@race.RaceId" name="RaceId" value="0" />
                     <div class="form-group">
-                        <label>Name</label>
+                        <label class="required">Name</label>
                         <input type="text"
                                asp-for="@race.RaceName"
                                name="RaceName"
                                class="form-control"
-                               placeholder="Enter name" />
+                               placeholder="Enter name" required/>
                     </div>
 
                     <div class="form-group">
-                        <label>Name Khmer</label>
+                        <label class="required">Name Khmer</label>
                         <input type="text"
                                asp-for="@race.RaceInKhmer"
                                name="RaceInKhmer"
                                class="form-control"
-                               placeholder="Enter name khmer" />
+                               placeholder="Enter name khmer" required/>
                     </div>
                 </form>
             </div>

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BBU_SYSTEM.DTOs;
+using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -30,15 +31,9 @@ public class ProvinceController(ICampusDbContext campusDbContext, IMapper mapper
             var db = campusDbContext.DbContext(_campus);
             var query = db.TblProvince.AsQueryable();
             if (isAll)
-                return Ok(new
-                {
-                    data = query.Select(x => new { x.ProvinceId, x.ProvinceName }).ToList(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded!"
-                    }
-                });
+            {
+                return new ServerResponse().Success(query.ToList(), "Succeeded!");
+            }
 
             if (!string.IsNullOrEmpty(searchValue))
                 query = query.Where(d =>
@@ -57,100 +52,56 @@ public class ProvinceController(ICampusDbContext campusDbContext, IMapper mapper
                 data
             });
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return StatusCode(500, new
-            {
-                code = "500",
-                message = $"Internal Server Error:{e.Message}"
-            });
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
 
 
     [HttpPost("SaveChange")]
-public async Task<IActionResult> SaveChange([FromForm] ProvinceDto? province)
-{
-    try
+    public async Task<IActionResult> SaveChange([FromForm] ProvinceDto? province)
     {
-        if (province == null)
+        try
         {
-            return BadRequest(new
+            if (province == null)
             {
-                code = "400",
-                message = "Bad Request!"
-            });
+                return new ServerResponse().BadRequest("Bad Request!");
+            }
+            
+            var db = campusDbContext.DbContext(_campus);
+
+            var provinceEntity = db.TblProvince
+                .FirstOrDefault(x => x.ProvinceId == province.ProvinceId);
+
+            if (provinceEntity != null)
+            {
+                provinceEntity.ProvinceName = province.ProvinceName?.Trim();
+                provinceEntity.ProvinceInKhmer = province.ProvinceInKhmer?.Trim();
+                provinceEntity.IsCity = province.IsCity;
+
+                await db.SaveChangesAsync();
+
+                return new ServerResponse().Success(provinceEntity, "Updated successfully!");
+            }
+            else
+            {
+                var newProvince = new Province
+                {
+                    ProvinceName = province.ProvinceName?.Trim(),
+                    ProvinceInKhmer = province.ProvinceInKhmer?.Trim(),
+                    IsCity = province.IsCity
+                };
+
+                await db.TblProvince.AddAsync(newProvince);
+                await db.SaveChangesAsync();
+
+                return new ServerResponse().Success(newProvince, "Saved successfully!");
+            }
         }
-
-        if (string.IsNullOrWhiteSpace(province.ProvinceName))
+        catch (Exception ex)
         {
-            return BadRequest(new
-            {
-                code = "400",
-                message = "Province name is required."
-            });
-        }
-
-        if (string.IsNullOrWhiteSpace(province.ProvinceInKhmer))
-        {
-            return BadRequest(new
-            {
-                code = "400",
-                message = "Province name Khmer is required."
-            });
-        }
-
-        var db = campusDbContext.DbContext(_campus);
-
-        var provinceEntity = db.TblProvince
-            .FirstOrDefault(x => x.ProvinceId == province.ProvinceId);
-
-        if (provinceEntity != null)
-        {
-            // Update
-            provinceEntity.ProvinceName = province.ProvinceName.Trim();
-            provinceEntity.ProvinceInKhmer = province.ProvinceInKhmer.Trim();
-            provinceEntity.IsCity = province.IsCity;
-
-            await db.SaveChangesAsync();
-
-            return Ok(new
-            {
-                code = "200",
-                message = "Updated successfully!"
-            });
-        }
-        else
-        {
-            // Insert
-            var newProvince = new Province
-            {
-                ProvinceName = province.ProvinceName.Trim(),
-                ProvinceInKhmer = province.ProvinceInKhmer.Trim(),
-                IsCity = province.IsCity
-            };
-
-            await db.TblProvince.AddAsync(newProvince);
-            await db.SaveChangesAsync();
-
-            return Ok(new
-            {
-                code = "200",
-                message = "Saved successfully!"
-            });
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
-    catch (Exception ex)
-    {
-        var realError = ex.InnerException != null
-            ? ex.InnerException.Message
-            : ex.Message;
-
-        return StatusCode(500, new
-        {
-            code = "500",
-            message = $"Internal Server Error: {realError}"
-        });
-    }
-}
 }

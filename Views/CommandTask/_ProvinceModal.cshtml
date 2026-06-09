@@ -22,10 +22,12 @@
                         <input type="text" asp-for="@province.ProvinceInKhmer" class="form-control"
                                placeholder="Enter name khmer" required>
                     </div>
+                    <input type="hidden" asp-for="@province.IsCity" value="0" />
+
                     <div class="form-group clearfix">
                         <div class="icheck-primary d-inline">
-                            <input type="radio" id="rdoProjectPaper" value="0">
-                            <label for="rdoProjectPaper">Is City</label>
+                            <input type="checkbox" id="chkIsCity">
+                            <label for="chkIsCity">Is City</label>
                         </div>
                     </div>
                 </form>

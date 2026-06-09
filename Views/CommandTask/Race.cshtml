@@ -122,20 +122,6 @@
         e.preventDefault();
 
         const raceId = $("#race_RaceId").val() || "0";
-        const raceName = ($("#race_RaceName").val() || "").trim();
-        const raceKhmer = ($("#race_RaceInKhmer").val() || "").trim();
-
-        if (raceName === "") {
-            ShowToastError("Race name is required.");
-            $("#race_RaceName").focus();
-            return;
-        }
-
-        if (raceKhmer === "") {
-            ShowToastError("Race name Khmer is required.");
-            $("#race_RaceInKhmer").focus();
-            return;
-        }
 
         const formData = $("#formRace").serialize();
 
@@ -144,22 +130,30 @@
             method: "POST",
             data: formData,
             success: function (response) {
-                if (response.code === "200" || response.status?.code === "200") {
-                    if (raceId && raceId !== "0") {
-                        ShowToastSuccess("Updated successfully!");
+                const code = response.status?.code;
+                const message = response.status?.message;
+
+                if (code === "200" || code === 200) {
+                    if (raceId !== "0") {
+                        ShowToastSuccess(message || "Updated successfully!");
                     } else {
-                        ShowToastSuccess("Saved successfully!");
+                        ShowToastSuccess(message || "Saved successfully!");
                     }
 
                     clearRaceForm();
                     $("#raceModal").modal("hide");
-                    $("#tblSchool").DataTable().ajax.reload(null, false);
+                    $("#tblSchool").DataTable().ajax.reload();
                 } else {
-                    ShowToastError(response.message || response.status?.message || "Save failed.");
+                    ShowToastError(message || "Save failed.");
                 }
             },
-            error: function (error) {
-                ShowToastError(error.responseJSON?.message || "Server error.");
+            error: function (xhr) {
+                const message =
+                    xhr["responseJSON"]?.["status"]?.["message"] ||
+                    xhr["responseJSON"]?.["message"] ||
+                    "Server error.";
+
+                ShowToastError(message);
             }
         });
     });
