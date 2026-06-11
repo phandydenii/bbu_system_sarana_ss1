@@ -332,8 +332,7 @@
                         }
                     ],
                     initComplete: function (){
-                        MyApp.utils.dataTableDebounceSearch("#tblScore", 500);
-                        // Fix columns mismatch issues on lazy layouts
+                        MyApp.utils.dataTableDebounceSearch("#tblScore", 500); 
                         setTimeout(() => { $('#tblScore').DataTable().columns.adjust(); }, 150);
                     }
                 });

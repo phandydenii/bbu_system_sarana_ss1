@@ -1,5 +1,4 @@
-﻿using System.Data.SqlClient;
-using BBU_SYSTEM.DTOs;
+﻿using BBU_SYSTEM.DTOs;
 using BBU_SYSTEM.Models.Req;
 using Microsoft.AspNetCore.Mvc;
 using BBU_SYSTEM.Service;
@@ -10,8 +9,6 @@ namespace BBU_SYSTEM.Controllers;
 public class AccountController(IHttpContextAccessor context,IConfiguration configuration, AuthService authService) : Controller
 {
     private readonly string _campus = context.HttpContext?.User.FindFirst("CampusKey")?.Value ?? "pp";
-
-    // GET: AccountController
     public ActionResult Login()
     {
         return View();
@@ -19,8 +16,7 @@ public class AccountController(IHttpContextAccessor context,IConfiguration confi
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult>
-        Login(AuthenticationReq req, string? returnUrl = null) // In a real app, use a ViewModel
+    public async Task<IActionResult> Login(AuthenticationReq req, string? returnUrl = null) 
     {
         returnUrl ??= Url.Content("~/");
         if (string.IsNullOrEmpty(req.Username) || string.IsNullOrEmpty(req.Password) ||
@@ -49,25 +45,18 @@ public class AccountController(IHttpContextAccessor context,IConfiguration confi
         }
     }
 
-    [Authorize] // Requires authentication to access this action
-    //[HttpPost]
+    [Authorize]  
     public async Task<IActionResult> Logout(string? returnUrl = null)
     {
         await authService.Logout();
         if (returnUrl != null)
         {
             return LocalRedirect(returnUrl);
-        }
-        else
-        {
-            // This needs to be a redirect so that the browser performs a new
-            // request and the identity for the user gets updated.
-            return RedirectToPage("/Account/Login");
-        }
+        } 
+        return RedirectToPage("/Account/Login"); 
     }
 
-    [Authorize] // Requires authentication to access this action
-    //[HttpPost]
+    [Authorize] 
     public async Task<IActionResult> ResetPassword(ResetPasswordDto model)
     {
         if (!ModelState.IsValid)
