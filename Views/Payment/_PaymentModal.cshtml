@@ -1,17 +1,157 @@
 ﻿@using BBU_SYSTEM.DTOs
 @{
     var invoice = new InvoiceDto();
-}
+} 
+<style>
+    #PaymentModal.fullscreen-modal .modal-dialog {
+        max-width: 100%;
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+    } 
+    #PaymentModal.fullscreen-modal .modal-content {
+        height: 100vh;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+    } 
+    #PaymentModal.fullscreen-modal .modal-header,
+    #PaymentModal.fullscreen-modal .modal-footer {
+        flex: 0 0 auto;
+    } 
+    #PaymentModal.fullscreen-modal .modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+    } 
+    /* Form fills modal body */
+    #PaymentModal.fullscreen-modal #PaymentForm {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    } 
+    /* Table area gets all remaining space */
+    #PaymentModal.fullscreen-modal .payment-table-area {
+        flex: 1 1 auto;
+        min-height: 0;
+    } 
+    /* Important: col-12 also needs full height */
+    #PaymentModal.fullscreen-modal .payment-table-area > .col-12 {
+        height: 100%;
+        min-height: 0;
+    } 
+    /* Only table wrapper scrolls */
+    #PaymentModal.fullscreen-modal .invoice-detail-scroll {
+        height: 100%;
+        max-height: none;
+        overflow-y: auto;
+        overflow-x: auto;
+        border: 1px solid #dee2e6;
+    } 
+    /* normal modal fallback */
+    #PaymentModal .modal-body {
+        overflow: hidden;
+    } 
+    .invoice-detail-scroll {
+        max-height: 50vh;
+        overflow-y: auto;
+        overflow-x: auto;
+        border: 1px solid #dee2e6;
+    }
+    /* table style */
+    #tblInvoiceDetail {
+        margin-bottom: 0;
+        white-space: nowrap;
+    } 
+    #tblInvoiceDetail thead th {
+        position: sticky;
+        top: -1px;
+        background: #f8f9fa;
+        z-index: 2;
+    } 
+    /* summary area */ 
+    #PaymentModal.fullscreen-modal .payment-summary-area { /* stays under table */
+        flex: 0 0 auto;
+    }
+    #PaymentModal .payment-summary-area label {
+        font-size: 12px;
+        margin-bottom: 2px;
+    } 
+    #PaymentModal .payment-summary-area .form-control {
+        height: 30px;
+        padding: 3px 6px;
+        font-size: 13px;
+    } 
+    #PaymentModal .payment-summary-area .row {
+        margin-bottom: 4px;
+    } 
+    /* Exchange rate box */
+    .rate-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 10px;
+        border: 1px solid #d6e4f0;
+        border-radius: 6px;
+        background: #f8fbff;
+        color: #2c3e50;
+        font-size: 12px;
+        line-height: 1.2;
+    } 
+    .rate-icon {
+        font-size: 14px;
+        color: #007bff;
+    } 
+    .rate-content {
+        display: flex;
+        flex-direction: column;
+    } 
+    .rate-label {
+        font-size: 12px;
+        color: #6c757d;
+        margin-bottom: 2px;
+    } 
+    .rate-values {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    } 
+    .rate-values strong {
+        font-weight: 700;
+        color: #212529;
+    } 
+    .rate-divider {
+        color: #adb5bd;
+    }
+</style>
 <div class="modal fade" id="PaymentModal" data-backdrop="static">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Payment Detail</h4>
-                <div class="float-right">
-                    <strong id="txtRateIn" class="badge badge-info"></strong>
-                    <strong id="txtRateOut" class="badge badge-warning"></strong>
-                    <button id="btnSelectItem" type="button" class="btn btn-primary btn-sm">
+                <div class="float-right d-flex align-items-center">
+                    <div class="rate-box mr-2">
+                        <i class="fas fa-exchange-alt rate-icon"></i> 
+                        <div class="rate-content">
+                            <span class="rate-label">Exchange Rate</span> 
+                            <div class="rate-values">
+                                <span>
+                                    In: <strong id="txtRateIn"></strong>
+                                </span>
+                                <span class="rate-divider">|</span>
+                                <span>
+                                    Out: <strong id="txtRateOut"></strong>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="btnSelectItem" type="button" class="btn btn-primary btn-sm p-2 mr-2">
                         <i class="fa-solid fa-sitemap"></i> Select Item
+                    </button>
+                    <button type="button" id="btnTogglePaymentFullscreen" class="btn btn-tool btn-outline-info py-2 px-2" title="Fullscreen">
+                        <i id="paymentFullscreenIcon" class="fas fa-expand"></i>
                     </button>
                 </div>
             </div>
@@ -27,50 +167,51 @@
                     <input type="hidden" asp-for="@invoice.TermNo"/>
                     <input type="hidden" asp-for="@invoice.GroupId"/>
                     <input type="hidden" asp-for="@invoice.ExchangeRateId"/>
-                    <div class="row">
+                    <div class="row payment-table-area">
                         <div class="col-12">
-                            <table id="tblInvoiceDetail" class="table table-sm table-bordered table-striped"
-                                   style="width: 100%;">
-                                <thead>
-                                <tr>
-                                    <th class="hide-col">invoice_detail_id</th>
-                                    <th class="hide-col">invoice_id</th>
-                                    <th class="hide-col">product_id</th>
-                                    <th>product_name</th>
-                                    <th class="hide-col">product_name_khmer</th>
-                                    <th>quantity</th>
-                                    <th>product_price</th>
-                                    @* <th>price_usd</th> *@
-                                    <th class="hide-col">total_khr</th>
-                                    <th class="hide-col">total_usd</th>
-                                    <th class="hide-col">type</th>
-                                    <th class="hide-col">vat</th>
-                                    <th>discount</th>
-                                    <th class="hide-col">discount_khr</th>
-                                    <th class="hide-col">discount_usd</th>
-                                    <th>owe_price</th>
-                                    @* <th>owe_as_usd</th> *@
-                                    <th>other_price</th>
-                                    @* <th>other_as_usd</th> *@
-                                    <th class="hide-col">grand_total_khr</th>
-                                    <th class="hide-col">grand_total_usd</th>
-                                    <th class="hide-col">pay_as_khr</th>
-                                    <th class="hide-col">pay_as_usd</th>
-                                    <th class="hide-col">pay_bath</th>
-                                    <th class="hide-col">tuition_fees</th>
-                                    <th class="hide-col">card_certificate</th>
-                                    <th class="hide-col">category_id</th>
-                                    <th class="hide-col">category_id</th>
-                                    <th>action</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
+                            <div class="invoice-detail-scroll">
+                                <table id="tblInvoiceDetail" class="table table-sm table-bordered table-striped"
+                                       style="width: 100%;">
+                                    <thead>
+                                    <tr>
+                                        <th class="hide-col">invoice_detail_id</th>
+                                        <th class="hide-col">invoice_id</th>
+                                        <th class="hide-col">product_id</th>
+                                        <th>product_name</th>
+                                        <th class="hide-col">product_name_khmer</th>
+                                        <th>quantity</th>
+                                        <th>product_price</th>
+                                        @* <th>price_usd</th> *@
+                                        <th class="hide-col">total_khr</th>
+                                        <th class="hide-col">total_usd</th>
+                                        <th class="hide-col">type</th>
+                                        <th class="hide-col">vat</th>
+                                        <th>discount</th>
+                                        <th class="hide-col">discount_khr</th>
+                                        <th class="hide-col">discount_usd</th>
+                                        <th>owe_price</th>
+                                        @* <th>owe_as_usd</th> *@
+                                        <th>other_price</th>
+                                        @* <th>other_as_usd</th> *@
+                                        <th class="hide-col">grand_total_khr</th>
+                                        <th class="hide-col">grand_total_usd</th>
+                                        <th class="hide-col">pay_as_khr</th>
+                                        <th class="hide-col">pay_as_usd</th>
+                                        <th class="hide-col">pay_bath</th>
+                                        <th class="hide-col">tuition_fees</th>
+                                        <th class="hide-col">card_certificate</th>
+                                        <th class="hide-col">category_id</th>
+                                        <th class="hide-col">category_id</th>
+                                        <th class="text-center">action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table></div>
                         </div>
                     </div>
                     <hr>
-                    <div class="row">
+                    <div class="row payment-summary-area">
                         <div class="col-12">
                             <div class="row">
                                 <div class="col-2">
@@ -158,3 +299,28 @@
     </div>
 </div>
 <partial name="_ProductModal"/>
+<script>  
+    $("#btnTogglePaymentFullscreen").on("click", function () {
+        const modal = $("#PaymentModal");
+        setPaymentFullscreen(!modal.hasClass("fullscreen-modal"));
+    });
+ 
+    function setPaymentFullscreen(isFullscreen) {
+        const modal = $("#PaymentModal");
+        const icon = $("#paymentFullscreenIcon"); 
+        if (isFullscreen) {
+            modal.addClass("fullscreen-modal");
+            icon.removeClass("fa-expand").addClass("fa-compress");
+            $("#btnTogglePaymentFullscreen").attr("title", "Restore");
+        } else {
+            modal.removeClass("fullscreen-modal");
+            icon.removeClass("fa-compress").addClass("fa-expand");
+            $("#btnTogglePaymentFullscreen").attr("title", "Fullscreen");
+        } 
+        setTimeout(function () {
+            if ($.fn.DataTable && $.fn.DataTable.isDataTable("#tblInvoiceDetail")) {
+                $("#tblInvoiceDetail").DataTable().columns.adjust().draw(false);
+            }
+        }, 200);
+    }
+</script>

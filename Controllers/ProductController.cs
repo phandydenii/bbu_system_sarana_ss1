@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BBU_SYSTEM.DTOs;
+using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -79,16 +80,7 @@ public class ProductController(ICampusDbContext campusDbContext, IMapper mapper,
         {
             var db = campusDbContext.DbContext(_campus);
             var query = db.TblProduct.Where(x => x.Status == "ACTIVE").AsQueryable();
-            if (isAll)
-                return Ok(new
-                {
-                    data = query.ToList(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded!"
-                    }
-                });
+            if (isAll) return new ServerResponse().Success(query);
             
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();

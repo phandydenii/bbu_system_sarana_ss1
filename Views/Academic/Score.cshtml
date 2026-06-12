@@ -255,11 +255,15 @@
         }
 
         function OnFilter() {
-            showLoading();
             const term_no = cboTerm.find('option:selected').text();
             const group_id = cboGroup.val(); 
+            const degree_id = cboDegree.val();
+            const school_id = cboSchool.val();
+            const promotion_id = cboPromotion.val();
+            const field_id = cboField.val();
+            const stage_id = cboStage.val();
             if (!group_id || !term_no) return;
-            tblStudent.DataTable().clear().destroy();
+            showLoading(); 
             tblScore.DataTable().clear().destroy();
             tblStudent.DataTable({
                 processing: true,
@@ -269,6 +273,11 @@
                     url: `/student/GetStudents`,
                     type: "POST",
                     data: {
+                        degreeId:degree_id,
+                        schoolId:school_id,
+                        promotionId:promotion_id,
+                        fieldId:field_id,
+                        stageId:stage_id,
                         groupid: group_id,
                         termno: term_no
                     },

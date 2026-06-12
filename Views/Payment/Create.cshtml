@@ -175,11 +175,12 @@
         $(document).ready(function () {
             document.getElementById("btnCreateNewPayment").disabled = true;
             tblInvoice.DataTable();
+            GetExchangeRate();
         });
 
         //1=====Search Student====
-        btnSearchStudent.on("click", function () {
-            showLoading();
+        btnSearchStudent.on("click", function (e) {
+            e.preventDefault();
             tblSearchStudent.DataTable().clear().destroy();
             tblSearchStudent.DataTable({
                 processing: true,
@@ -229,24 +230,19 @@
                     MyApp.utils.dataTableDebounceSearch("#tblSearchStudent", 500);
                 }
             });
-            modalStudent.modal("show");
-            hideLoading(1);
+            modalStudent.modal("show"); 
         })
 
         //2====Select Student====
-        tblSearchStudent.on("click", "#btnSelectStudent", function () {
-            showLoading();
-            const $row = $(this).closest('tr');
-            
-            const selectedRow = tblSearchStudent.DataTable().row($row).data();
-            console.log(selectedRow);
+        tblSearchStudent.on("click", "#btnSelectStudent", function () { 
+            const $row = $(this).closest('tr'); 
+            const selectedRow = tblSearchStudent.DataTable().row($row).data(); 
             if (selectedRow) {
                 document.getElementById("btnCreateNewPayment").disabled = false;
                 getStudent(selectedRow.studentId);
                 getInvoice(selectedRow.studentId);
                 modalStudent.modal("hide");
-            }
-            hideLoading(1);
+            } 
         });
 
         function getStudent(student_id) {
@@ -428,12 +424,25 @@
             modalPayment.modal("show");
             formPayment[0].reset();
             tblInvoiceDetail.DataTable().clear().destroy();
+            showEmptyInvoiceDetail();
             btnSavePayment.prop("disabled", true);
-            GetExchangeRate();
+            setPaymentFullscreen(true); 
         })
-
-        async function GetExchangeRate() {
-            showLoading();
+        function showEmptyInvoiceDetail() {
+            const totalColumns = $("#tblInvoiceDetail thead th").length; 
+            $("#tblInvoiceDetail tbody").html(`
+                <tr id="emptyInvoiceDetailRow">
+                    <td colspan="${totalColumns}" class="text-center text-muted py-4">
+                        <i class="fa-solid fa-circle-info mr-1"></i>
+                        No item selected. Click <strong>Select Item</strong> to add payment item.
+                    </td>
+                </tr>
+            `);
+        }
+        function removeEmptyInvoiceDetail() {
+            $("#emptyInvoiceDetailRow").remove();
+        }
+        async function GetExchangeRate() { 
             try {
                 const response = await $.ajax({
                     url: `/exchange-rates/get-exchange-rates`,
@@ -443,13 +452,12 @@
                 if (response.status.code === "200") {
                     const data = response.data;
                     $("#invoice_ExchangeRateId").val(data.exchangeRateId);
-                    txtRateIn.text("Rate In : "+data.rateIn);
-                    txtRateOut.text("Rate Out : "+data.rateOut)
+                    txtRateIn.text(data.rateIn);
+                    txtRateOut.text(data.rateOut)
                 } 
             } catch (error) {
                 console.log(error.responseText);
-            }
-            hideLoading(1);
+            } 
         }
 
         function GetInvoiceDetail(invoice_id) {
@@ -528,6 +536,7 @@
 
         //========Payment Modal=====
         btnSelectItem.on("click", function (e) {
+            e.preventDefault();
             tblProduct.DataTable().clear().destroy();
             tblProduct.DataTable({
                 processing: true,
@@ -555,12 +564,15 @@
                             return `<a class="btn btn-primary btn-xs btn-block" id="btnSelect">Select</a>`;
                         }
                     }
-                ]
+                ],
+                initComplete:function (){
+                    MyApp.utils.dataTableDebounceSearch("#tblProduct",500);
+                }
             });
             modalProduct.modal("show");
         })
 
-        //=select product payment
+        //select product payment
         tblProduct.on("click", "#btnSelect", function () {
             const $row = $(this).closest('tr');
             const data = tblProduct.DataTable().row($row).data();
@@ -574,9 +586,8 @@
         });
 
         //====Assign Product===
-        btnAssignProduct.on("click", async function () {
-            showLoading();
-            const ids = stateSelect.val(); // array of selected product IDs
+        btnAssignProduct.on("click", async function () { 
+            const ids = stateSelect.val(); 
             if (!ids || ids.length === 0) return;
             try {
                 const response = await $.ajax({
@@ -585,13 +596,11 @@
                     data: {isAll: true}
                 });
                 if (response.status.code === "200" && response.data && response.data.length > 0) {
-                    const data = await response.data;
-                    // console.log(data);
+                    const data = await response.data; 
                     ids.forEach(productIdStr => {
                         const productId = parseInt(productIdStr);
                         const row = data.find(item => item.productId === productId); // get single product object
-                        // console.log(row);
-                        if (!row) return; // skip if not found
+                        if (!row) return;
 
                         const isPayKhr = row.paymentType ?? false;
                         const isPayUsd = !isPayKhr;
@@ -629,12 +638,11 @@
             stateSelect.innerHTML = "";
             stateSelect.val('').trigger('change');
             modalProduct.modal("hide");
-            btnSavePayment.prop("disabled", false);
-            hideLoading();
+            btnSavePayment.prop("disabled", false); 
         })
 
         function AddItemPayment(params) {
-            // console.log(params);
+            removeEmptyInvoiceDetail();
             const tableBody = document.querySelector('#tblInvoiceDetail tbody');
             let i = document.querySelectorAll('#tblInvoiceDetail tbody tr').length;
             const row = document.createElement('tr');
@@ -729,13 +737,12 @@
                 <td  class="hide-col"> 
                     <input type="text" name="invoiceDetails[${i}].PaymentType" value="${params[27]}" class="form-control form-control-sm" readonly/>
                 </td>
-                <td> 
+                <td class="text-center"> 
                     <button type="button" class="btn btn-warning btn-sm" id="btnEdit"><i class="fa-solid fa-pen-to-square"></i></button>
                 </td>
             `;
             tableBody.appendChild(row);
-            i += 1;
-            // CalculateGrandTotal();
+            i += 1; 
             calculateInvoiceTotals();
         }
 
