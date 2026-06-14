@@ -237,17 +237,44 @@
 
         cboDegree.val("");
     }
+    function truncateText(data, maxLength = 30) {
+        if (data === null || data === undefined) return "";
+
+        let text = data.toString();
+
+        return text.length > maxLength
+            ? text.substring(0, maxLength) + "..."
+            : text;
+    }
+
+    function renderTruncate(data) {
+        if (data === null || data === undefined) return "";
+
+        let text = data.toString();
+
+        return `<span title="${text}">${truncateText(text, 30)}</span>`;
+    }
 
     function initFieldTable() {
+        if ($.fn.DataTable.isDataTable("#tblField")) {
+            tblField.DataTable().clear().destroy();
+            tblField.empty();
+        }
+
         fieldTable = tblField.DataTable({
+            destroy: true,
             paging: true,
             lengthChange: true,
             searching: true,
             ordering: true,
             info: true,
-            responsive: true,
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
             processing: true,
             serverSide: true,
+
             ajax: {
                 url: "/Field/get-fields",
                 type: "POST",
@@ -256,14 +283,49 @@
                     d.schoolId = selectedSchoolId || 0;
                 }
             },
+
             columns: [
-                { data: "fieldId" },
-                { data: "fieldName" },
-                { data: "fieldNameInKhmer" },
-                { data: "degreeName" },
-                { data: "degreeNameInKhmer" },
                 {
+                    title: "Id",
+                    data: "fieldId",
+                    width: "70px"
+                },
+                {
+                    title: "Name",
+                    data: "fieldName",
+                    width: "280px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Name Khmer",
+                    data: "fieldNameInKhmer",
+                    width: "320px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Degree Name",
+                    data: "degreeName",
+                    width: "220px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Degree Name Khmer",
+                    data: "degreeNameInKhmer",
+                    width: "320px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Type",
                     data: "type",
+                    width: "130px",
                     render: function (data) {
                         return data
                             ? '<span class="badge badge-info">ACADEMIC</span>'
@@ -271,19 +333,39 @@
                     }
                 },
                 {
+                    title: "Action",
                     data: null,
+                    width: "180px",
+                    className: "dt-action",
                     orderable: false,
                     searchable: false,
                     render: function () {
                         return `
-                            <button type="button" class="btn btn-success btn-sm btnEditField">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                        `;
+                        <button type="button" class="btn btn-warning btn-sm btnEditField">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    `;
                     }
                 }
-            ]
+            ],
+
+            initComplete: function () {
+                let api = this.api();
+                MyApp.utils.dataTableDebounceSearch("#tblField", 500);
+
+                setTimeout(function () {
+                    api.columns.adjust();
+                }, 500);
+            },
+
+            drawCallback: function () {
+                this.api().columns.adjust();
+            }
         });
+
+        setTimeout(function () {
+            fieldTable.columns.adjust();
+        }, 1000);
     }
 
     function reloadFieldTable() {

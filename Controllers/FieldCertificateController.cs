@@ -25,31 +25,68 @@ public class FieldCertificateController(ICampusDbContext campusDbContext, IMappe
             var length = Request.Form["length"].FirstOrDefault();
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
 
-            var pageSize = length != null ? Convert.ToInt32(length) : 0;
-            var skip = start != null ? Convert.ToInt32(start) : 0;
+            var pageSize = !string.IsNullOrEmpty(length) ? Convert.ToInt32(length) : 10;
+            var skip = !string.IsNullOrEmpty(start) ? Convert.ToInt32(start) : 0;
+
             var db = campusDbContext.DbContext(_campus);
+
             var query = db.TblFieldCertificate.AsQueryable();
 
-            if (!string.IsNullOrEmpty(searchValue))
-                query = query.Where(d =>
-                    d.FieldName!.Contains(searchValue) ||
-                    d.FieldNameKhmer!.Contains(searchValue));
-
             var recordsTotal = query.Count();
-            query = query.OrderByDescending(d => d.FieldId);
-            var data = query.Skip(skip).Take(pageSize).ToList();
+
+            if (!string.IsNullOrWhiteSpace(searchValue))
+            {
+                query = query.Where(d =>
+                    (d.FieldName ?? "").Contains(searchValue) ||
+                    (d.FieldNameKhmer ?? "").Contains(searchValue) ||
+                    (d.DegreeName ?? "").Contains(searchValue) ||
+                    (d.DegreeNameKhmer ?? "").Contains(searchValue) ||
+                    (d.Type ?? "").Contains(searchValue) ||
+                    (d.TypeKhmer ?? "").Contains(searchValue)
+                );
+            }
+
+            var recordsFiltered = query.Count();
+
+            var data = query
+                .OrderByDescending(d => d.Id)
+                .Skip(skip)
+                .Take(pageSize)
+                .Select(d => new
+                {
+                    id = d.Id,
+
+                    degreeId = d.DegreeId,
+                    degreeName = d.DegreeName,
+                    degreeNameKhmer = d.DegreeNameKhmer,
+
+                    schoolId = d.SchoolId,
+                    schoolName = d.SchoolName,
+                    schoolNameKhmer = d.SchoolNameKhmer,
+
+                    fieldId = d.FieldId,
+                    fieldName = d.FieldName,
+                    fieldNameKhmer = d.FieldNameKhmer,
+
+                    promotionNo = d.PromotionNo,
+
+                    status = d.Status,
+                    type = d.Type,
+                    typeKhmer = d.TypeKhmer
+                })
+                .ToList();
 
             return Json(new
             {
                 draw,
-                recordsFiltered = recordsTotal,
                 recordsTotal,
+                recordsFiltered,
                 data
             });
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            throw new Exception($"Error: {e.Message}");
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
     

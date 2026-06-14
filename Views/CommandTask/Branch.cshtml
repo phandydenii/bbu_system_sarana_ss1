@@ -55,45 +55,121 @@
     function fetchBranch() {
         if ($.fn.DataTable.isDataTable("#tblBranch")) {
             tblBranch.DataTable().clear().destroy();
+            tblBranch.empty();
         }
 
-        tblBranch.DataTable({
+        branchTable = tblBranch.DataTable({
+            destroy: true,
             paging: true,
             lengthChange: true,
             searching: true,
             ordering: true,
             info: true,
-            responsive: true,
+
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+
             processing: true,
             serverSide: true,
+            order: [[0, "desc"]],
+
             ajax: {
                 url: "/branch/get-branch",
-                type: "POST"
+                type: "POST",
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    ShowToastError("Cannot load branch data.");
+                }
             },
+
             columns: [
-                { data: "branchId" },
-                { data: "branchName" },
-                { data: "branchNameInKhmer" },
-                { data: "shortName" },
-                { data: "address" },
-                { data: "phone" },
                 {
+                    title: "ID",
+                    data: "branchId",
+                    width: "70px"
+                },
+                {
+                    title: "Branch Name",
+                    data: "branchName",
+                    width: "250px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Branch Name Khmer",
+                    data: "branchNameInKhmer",
+                    width: "300px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Short Name",
+                    data: "shortName",
+                    width: "130px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Address",
+                    data: "address",
+                    width: "300px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Phone",
+                    data: "phone",
+                    width: "150px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+
+                    title: "Action",
                     data: null,
+                    width: "180px",
+                    className: "dt-action",
                     orderable: false,
                     searchable: false,
                     render: function () {
                         return `
-                            <a href="javascript:void(0)" class="btnEdit btn btn-success btn-sm">
+                        <div class="text-nowrap text-center">
+                            <a href="javascript:void(0)" class="btnEdit btn btn-warning btn-sm">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <a href="javascript:void(0)" class="btnDelete btn btn-danger btn-sm">
                                 <i class="fa-solid fa-trash"></i> Delete
                             </a>
-                        `;
+                        </div>
+                    `;
                     }
                 }
-            ]
+            ],
+
+            initComplete: function () {
+                let api = this.api();
+                MyApp.utils.dataTableDebounceSearch("#tblBranch", 500);
+
+                setTimeout(function () {
+                    api.columns.adjust();
+                }, 500);
+            },
+
+            drawCallback: function () {
+                this.api().columns.adjust();
+            }
         });
+
+        setTimeout(function () {
+            branchTable.columns.adjust();
+        }, 1000);
     }
 
     function clearBranchForm() {

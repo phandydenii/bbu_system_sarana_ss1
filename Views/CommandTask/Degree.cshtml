@@ -68,15 +68,23 @@
                     {data: "degreeName"},
                     {data: "degreeInKhmer"},
                     {
+                        title: "Action",
                         data: null,
-                        render: function (data, type, row) {
+                        width: "180px",
+                        className: "dt-action",
+                        orderable: false,
+                        searchable: false,
+                        render: function () {
                             return `
-                        <a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i> Edit</a>
+                        <a id="btnEdit" class="btn btn-warning btn-sm"><i class='fas fa-edit'></i> Edit</a>
                         <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
                     `;
                         }
                     }
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblDegree", 500);
+                }
             });
         }
 

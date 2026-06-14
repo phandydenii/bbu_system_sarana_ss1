@@ -64,52 +64,114 @@
 
         if ($.fn.DataTable.isDataTable("#tblSchool")) {
             tblSchool.DataTable().clear().destroy();
+            tblSchool.empty();
         }
 
         schoolTable = tblSchool.DataTable({
+            destroy: true,
             paging: true,
             lengthChange: true,
             searching: true,
             ordering: true,
             info: true,
-            responsive: true,
+
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+
             processing: true,
             serverSide: true,
+            order: [[0, "desc"]],
+
             ajax: {
                 url: "/School/get-schools",
-                type: "POST"
+                type: "POST",
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    ShowToastError("Cannot load school data.");
+                }
             },
+
             columns: [
-                { data: "schoolId" },
-                { data: "schoolName" },
-                { data: "schoolNameInKhmer" },
-                { data: "schoolCode" },
-                { data: "facultyId" },
                 {
+                    title: "ID",
+                    data: "schoolId",
+                    width: "70px"
+                },
+                {
+                    title: "School Name",
+                    data: "schoolName",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "School Name Khmer",
+                    data: "schoolNameInKhmer",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "School Code",
+                    data: "schoolCode",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Faculty ID",
+                    data: "facultyId",
+                    width: "100px"
+                },
+                {
+                    title: "Foundation School",
                     data: "isFoundationSchool",
+                    width: "160px",
                     render: function (data) {
                         return Number(data) === 1 ? "Yes" : "No";
                     }
                 },
                 {
+                    title: "Action",
                     data: null,
+                    width: "180px",
+                    className: "dt-action",
                     orderable: false,
                     searchable: false,
                     render: function () {
                         return `
-                            <div class="text-center">
-                                <button type="button" class="btn btn-success btn-sm btnEditSchool">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm btnDeleteSchool">
-                                    <i class="fa-solid fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        `;
+                        <div class="dt-action">
+                            <button type="button" class="btn btn-warning btn-sm btnEditSchool">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm btnDeleteSchool">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    `;
                     }
                 }
-            ]
+            ],
+
+            initComplete: function () {
+                let api = this.api();
+                MyApp.utils.dataTableDebounceSearch("#tblSchool", 500);
+
+                setTimeout(function () {
+                    api.columns.adjust();
+                }, 500);
+            },
+
+            drawCallback: function () {
+                this.api().columns.adjust();
+            }
         });
+
+        setTimeout(function () {
+            schoolTable.columns.adjust();
+        }, 1000);
     }
 
     function clearSchoolForm() {

@@ -67,18 +67,24 @@
                     }
                 },
                 {
+                    title: "Action",
                     data: null,
+                    width: "180px",
+                    className: "dt-action",
                     orderable: false,
                     searchable: false,
                     render: function () {
                         return `
-                        <a href="javascript:void(0)" class="btnEdit btn btn-success btn-sm">
+                        <a href="javascript:void(0)" class="btnEdit btn btn-warning btn-sm">
                             <i class="fas fa-edit"></i> Edit
                         </a>
                     `;
                     }
                 }
-            ]
+            ],
+            initComplete: function () {
+                MyApp.utils.dataTableDebounceSearch("#tblProvince", 500);
+            }
         });
     }
     function clearProvinceForm() {

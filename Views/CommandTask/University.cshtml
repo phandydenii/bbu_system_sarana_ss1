@@ -59,44 +59,134 @@
         });
     });
 
+    function truncateText(data, maxLength = 30) {
+        if (data === null || data === undefined) return "";
+
+        let text = data.toString();
+
+        return text.length > maxLength
+            ? text.substring(0, maxLength) + "..."
+            : text;
+    }
+
+    function renderTruncate(data) {
+        if (data === null || data === undefined) return "";
+
+        let text = data.toString();
+
+        return `<span title="${text}">${truncateText(text, 30)}</span>`;
+    }
+
     function fetchUniversity() {
         if ($.fn.DataTable.isDataTable("#tblUniversity")) {
             tblUniversity.DataTable().clear().destroy();
+            tblUniversity.empty();
         }
 
-        tblUniversity.DataTable({
+        universityTable = tblUniversity.DataTable({
+            destroy: true,
             paging: true,
             lengthChange: true,
             searching: true,
             ordering: true,
             info: true,
-            responsive: true,
+
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+
             processing: true,
             serverSide: true,
             ajax: {
                 url: "/university/get-universities",
-                type: "POST"
+                type: "POST",
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    ShowToastError("Cannot load university data.");
+                }
             },
+
             columns: [
-                { data: "universityId" },
-                { data: "universityName" },
-                { data: "universityNameInKhmer" },
-                { data: "abbreviationName" },
                 {
+                    title: "ID",
+                    data: "universityId",
+                    width: "70px"
+                },
+                {
+                    title: "University Name",
+                    data: "universityName",
+                    width: "300px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "University Name Khmer",
+                    data: "universityNameInKhmer",
+                    width: "320px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Abbreviation",
+                    data: "abbreviationName",
+                    width: "150px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Action",
                     data: null,
+                    width: "100px",
+                    className: "text-center",
                     orderable: false,
                     searchable: false,
                     render: function () {
                         return `
-                            <a href="javascript:void(0)" class="btnEdit btn btn-success btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                        `;
+                        <a href="javascript:void(0)" class="btnEdit btn btn-success btn-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    `;
                     }
                 }
-            ]
+            ],
+
+            initComplete: function () {
+                let api = this.api();
+                MyApp.utils.dataTableDebounceSearch("#tblUniversity", 500);
+
+                setTimeout(function () {
+                    api.columns.adjust();
+                }, 500);
+            },
+
+            drawCallback: function () {
+                this.api().columns.adjust();
+            }
         });
+
+        setTimeout(function () {
+            universityTable.columns.adjust();
+        }, 1000);
     }
+
+    function adjustDataTables() {
+        setTimeout(function () {
+            $.fn.dataTable
+                .tables({ visible: true, api: true })
+                .columns.adjust();
+        }, 300);
+
+        setTimeout(function () {
+            $.fn.dataTable
+                .tables({ visible: true, api: true })
+                .columns.adjust();
+        }, 700);
+    }
+    
 
     function clearUniversityForm() {
         formUniversity[0].reset();

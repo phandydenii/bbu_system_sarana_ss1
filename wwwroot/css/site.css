@@ -22,6 +22,59 @@ body {
 }
 */
 
+/* ================================
+   Global DataTable Fix
+   Use for all DataTables with scrollX
+================================ */
+
+table.dataTable {
+    margin: 0 !important;
+}
+
+table.dataTable th,
+table.dataTable td {
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+}
+
+.dataTables_wrapper {
+    width: 100% !important;
+}
+
+.dataTables_scroll {
+    width: 100% !important;
+}
+
+.dataTables_scrollHead {
+    overflow: hidden !important;
+}
+
+.dataTables_scrollBody {
+    overflow-x: auto !important;
+}
+
+.dataTables_scrollHead table,
+.dataTables_scrollBody table {
+    margin: 0 !important;
+}
+
+/* Text truncate with ... */
+.dt-truncate {
+    display: inline-block;
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+/* Action button column */
+.dt-action {
+    white-space: nowrap !important;
+    text-align: center;
+    align-items: center;
+}
+/*============================================*/
 .modal-backdrop {
     background-color: rgba(0, 0, 0, 0.7); /* Blue with opacity */
 }

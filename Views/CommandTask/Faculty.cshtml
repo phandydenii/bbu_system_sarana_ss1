@@ -50,42 +50,96 @@
     function fetchFaculty() {
         if ($.fn.DataTable.isDataTable("#tblFaculty")) {
             tblFaculty.DataTable().clear().destroy();
+            tblFaculty.empty();
         }
 
-        tblFaculty.DataTable({
+        facultyTable = tblFaculty.DataTable({
+            destroy: true,
             paging: true,
             lengthChange: true,
             searching: true,
             ordering: true,
             info: true,
-            responsive: true,
+
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+
             processing: true,
             serverSide: true,
+            order: [[0, "desc"]],
+
             ajax: {
                 url: "/Faculty/get-faculties",
-                type: "POST"
+                type: "POST",
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    ShowToastError("Cannot load faculty data.");
+                }
             },
+
             columns: [
-                { data: "facultyId" },
-                { data: "facultyName" },
-                { data: "facultyNameInKhmer" },
                 {
+                    title: "ID",
+                    data: "facultyId",
+                    width: "70px"
+                },
+                {
+                    title: "Faculty Name",
+                    data: "facultyName",
+                    width: "300px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Faculty Name Khmer",
+                    data: "facultyNameInKhmer",
+                    width: "320px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Action",
                     data: null,
+                    width: "180px",
+                    className: "dt-action",
                     orderable: false,
                     searchable: false,
                     render: function () {
                         return `
-                            <a href="javascript:void(0)" class="btnEdit btn btn-success btn-sm">
+                        <div class="dt-action">
+                            <a href="javascript:void(0)" class="btnEdit btn btn-warning btn-sm">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <a href="javascript:void(0)" class="btnDelete btn btn-danger btn-sm">
                                 <i class="fa-solid fa-trash"></i> Delete
                             </a>
-                        `;
+                        </div>
+                    `;
                     }
                 }
-            ]
+            ],
+
+            initComplete: function () {
+                let api = this.api();
+                MyApp.utils.dataTableDebounceSearch("#tblFaculty", 500);
+
+                setTimeout(function () {
+                    api.columns.adjust();
+                }, 500);
+            },
+
+            drawCallback: function () {
+                this.api().columns.adjust();
+            }
         });
+
+        setTimeout(function () {
+            facultyTable.columns.adjust();
+        }, 1000);
     }
 
     function clearFacultyForm() {
