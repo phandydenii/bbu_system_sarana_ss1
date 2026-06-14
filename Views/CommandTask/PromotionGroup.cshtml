@@ -836,16 +836,6 @@
             });
         });
         // transfer section
-        $("#btnToggleTransferFullScreen").on("click", function () {
-            const dialog = $("#TransferModal .transfer-modal-dialog");
-            const icon = $(this).find("i");
-            dialog.toggleClass("modal-fullscreen-custom");
-            if (dialog.hasClass("modal-fullscreen-custom")) {
-                icon.removeClass("fa-expand").addClass("fa-compress");
-            } else {
-                icon.removeClass("fa-compress").addClass("fa-expand");
-            }
-        });
         function OnTransfer() {
             const degreeId = $('#rangeButtons button.btn-primary').val();
             const schoolId = cboSchool.val();
@@ -863,6 +853,7 @@
                 ordering: false,
                 info: false,
                 responsive: true,
+                pageLength: 15,
                 autoWidth: true,
                 processing: true,
                 serverSide: true,
@@ -945,6 +936,7 @@
                     $("#countStudent").text(0);
                 }
             });
+            SetTransferFullScreen(true);
             modalTransfer.modal("show");
         }
         // select group for transfer

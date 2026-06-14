@@ -127,14 +127,8 @@
             $("#tblScore").DataTable({
                 responsive: true,
             });
-
             GetDegree();
             GetSchool();
-            GetField();
-            GetPromotion();
-            GetStage();
-            GetTerm();
-            GetGroup();
         });
 
         cboDegree.change(function () {
@@ -193,7 +187,6 @@
                 cboField.val('');
                 return;
             }
-
             const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
             fields.forEach(item => {
                 cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
@@ -210,13 +203,11 @@
                 cboPromotion.val('');
                 return;
             }
-            const promotions = await Promotion.GetPromotions();
+            const promotions = await Promotion.GetPromotions({schoolId,degreeId});
             let hasPromotion = false;
             promotions.forEach(item => {
-                if (item.degree === parseInt(degreeId) && item.school === parseInt(schoolId)) {
-                    cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`);
-                    hasPromotion = true;
-                }
+                cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`);
+                hasPromotion = true;
             });
             if (!hasPromotion) {
                 cboPromotion.empty();
@@ -233,11 +224,9 @@
                 cboPromotion.val('');
                 return;
             }
-            const stages = await Stage.GetStages();
+            const stages = await Stage.GetStages({promotionId});
             stages.forEach(item => {
-                if (item.promotionId === parseInt(promotionId)) {
-                    cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
-                }
+                cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
             });
             cboStage.val('').trigger("change");
         }
@@ -250,11 +239,9 @@
                 cboTerm.val('');
                 return;
             }
-            const terms = await Term.GetTerms();
+            const terms = await Term.GetTerms({stageId});
             terms.forEach(item => {
-                if (item.stageId === parseInt(stageId)) {
-                    cboTerm.append(`<option value='${item.termNo}'>${item.termNo}</option>`);
-                }
+                cboTerm.append(`<option value='${item.termNo}'>${item.termNo}</option>`);
             });
             cboTerm.val('').trigger("change");
         }
@@ -269,11 +256,9 @@
                 cboGroup.val('');
                 return;
             }
-            const groups = await Group.GetGroups();
+            const groups = await Group.GetGroups({fieldId,stageId});
             groups.forEach(item => {
-                if (item.stageId === parseInt(stageId) && item.fieldId === parseInt(fieldId)) {
-                    cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
-                }
+                cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
             });
             cboGroup.val('').trigger("change");
         }

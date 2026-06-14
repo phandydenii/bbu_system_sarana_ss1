@@ -59,11 +59,12 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
                     }).AsQueryable(); 
             switch (type)
             {
-                case ScoreTypeConstant.FinalAndStateProjectPaper:
-                    query = query.Where(sc => sc.Type == ScoreTypeConstant.Final 
-                                              || sc.Type == ScoreTypeConstant.FinalAndState 
-                                              || sc.Type == ScoreTypeConstant.ProjectPaper);
+                case ScoreTypeConstant.Final:
+                    query = query.Where(sc => sc.Type == ScoreTypeConstant.Final);
                     break;
+                case ScoreTypeConstant.FinalAndState:
+                    query = query.Where(sc => sc.Type == ScoreTypeConstant.FinalAndState);
+                    break; 
                 case ScoreTypeConstant.StateExam:
                     query = query.Where(sc => sc.Type == ScoreTypeConstant.StateExam);
                     break;

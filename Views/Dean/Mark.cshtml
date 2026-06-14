@@ -297,7 +297,7 @@
                     ajax: {
                         url: `/scores/get-scores/${student_group_id}`,
                         type: "POST",
-                        data: { type: "FINAL_FINAL_AND_STATE_PROJECT_PAPER" },
+                        data: { type: "FINAL" },
                         dataSrc: function (json) { return json.data; },
                         error: function (jqXHR) { console.log(jqXHR.responseText); }
                     },
