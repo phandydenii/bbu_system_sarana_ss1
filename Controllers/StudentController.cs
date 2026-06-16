@@ -3,6 +3,7 @@ using BBU_SYSTEM.Data;
 using BBU_SYSTEM.DTOs;
 using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
+using BBU_SYSTEM.Models.Req;
 using BBU_SYSTEM.Repository;
 using BBU_SYSTEM.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -158,8 +159,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     }
 
     [HttpPost("GetStudents")]
-    public IActionResult GetStudents(int degreeId = 0, int schoolid = 0, int fieldid = 0, int proid = 0,
-        int stageid = 0, int stageno = 0, int termno = 0, int termid = 0, int groupid = 0, string filter = "")
+    public IActionResult GetStudents(StudentFilterReq req)
     {
         var draw = Request.Form["draw"].FirstOrDefault();
         var start = Request.Form["start"].FirstOrDefault();
@@ -218,18 +218,16 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                 gr.RoomName,
                 gr.StartPayment
             }).AsQueryable();
-        if (degreeId > 0) query = query.Where(x => x.DegreeId == degreeId).AsQueryable();
-        if (schoolid != 0) query = query.Where(x => x.SchoolId == schoolid).AsQueryable();
-        if (fieldid != 0) query = query.Where(x => x.FieldId == fieldid).AsQueryable();
-        if (proid != 0) query = query.Where(x => x.PromotionId == proid).AsQueryable();
-        if (stageid != 0) query = query.Where(x => x.StageId == stageid).AsQueryable();
-        if (stageno != 0) query = query.Where(x => x.StageNo == stageno).AsQueryable();
-        if (groupid != 0) query = query.Where(x => x.GroupId == groupid).AsQueryable();
-        if (termid != 0) query = query.Where(x => x.TermId == termid).AsQueryable();
-        if (termno != 0) query = query.Where(x => x.TermNo == termno).AsQueryable();
-        if (!string.IsNullOrEmpty(filter))
+        if (req.DegreeId > 0) query = query.Where(x => x.DegreeId == req.DegreeId).AsQueryable();
+        if (req.SchoolId != 0) query = query.Where(x => x.SchoolId == req.SchoolId).AsQueryable();
+        if (req.FieldId != 0) query = query.Where(x => x.FieldId == req.FieldId).AsQueryable();
+        if (req.PromotionId != 0) query = query.Where(x => x.PromotionId == req.PromotionId).AsQueryable();
+        if (req.StageId != 0) query = query.Where(x => x.StageId == req.StageId).AsQueryable(); 
+        if (req.GroupId != 0) query = query.Where(x => x.GroupId == req.GroupId).AsQueryable();
+        if (req.TermId != 0) query = query.Where(x => x.TermId == req.TermId).AsQueryable(); 
+        if (!string.IsNullOrEmpty(req.Filter))
         {
-            query = filter switch
+            query = req.Filter switch
             {
                 "document_in" => query.Where(x => x.documentin != "").AsQueryable(),
                 "document_out" => query.Where(x => x.documentout != "").AsQueryable(),

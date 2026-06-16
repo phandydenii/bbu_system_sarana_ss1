@@ -118,6 +118,8 @@ app.Use(async (context, next) =>
     await next();
 });
 app.UseStaticFiles();
+// map for testing api
+app.MapControllers();
 // app.UseMiddleware<UserActivityMiddleware>();
 app.MapControllerRoute(
     "default",

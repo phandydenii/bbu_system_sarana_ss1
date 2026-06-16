@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using BBU_SYSTEM.Data;
 using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Repository;
@@ -294,9 +295,7 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
 
         var pageSize = length != null ? Convert.ToInt32(length) : 0;
         var skip = start != null ? Convert.ToInt32(start) : 0;
-        var db = campusDbContext.DbContext(_campus);
-
-        // var query = db.TblComplementFailedCourseScores.Where(x => x.StudentId == studentId).AsQueryable();
+        var db = campusDbContext.DbContext(_campus); 
         var query = (from css in db.TblComplementFailedCourseScores
             join c in db.TblCourses on css.CourseId equals c.CourseId
             where css.StudentId == studentId
@@ -687,11 +686,14 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
     {
         try
         {
+            var username = User.FindFirst(ClaimTypes.Name)?.Value;
             if (id == 0) return new ServerResponse().BadRequest(); 
             var db = campusDbContext.DbContext(_campus);
             var dataExist = await db.TblScore.Where(x => x.ScoreId == id)!.FirstOrDefaultAsync();
             if (dataExist == null) return new ServerResponse().BadRequest("Other branch store not found!");  
             dataExist.MidTermScore = midterm;
+            dataExist.Username = username;
+            dataExist.DateEdit = DateTime.Now;
             dataExist.FinalScore = final;
             db.TblScore.Update(dataExist);
             await db.SaveChangesAsync();
