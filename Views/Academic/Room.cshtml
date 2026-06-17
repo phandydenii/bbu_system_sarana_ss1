@@ -7,15 +7,14 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Student</h3>
-                <button type="submit" class="btn btn-success btn-sm float-right" data-toggle="modal"
-                        data-target="#BranchModal">
+                <h3 class="card-title">Room List</h3>
+                <button type="button" class="btn btn-success btn-sm float-right" onclick="openAddRoom()">
                     <i class="fas fa-plus"></i>
                     Add New
                 </button>
             </div>
             <div class="card-body">
-                <table id="tblStudent" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                <table id="tblRoom" class="table table-sm table-bordered table-striped" style="width: 100%;">
                     <thead>
                     <tr>
                         <th>Room Id</th>
@@ -33,34 +32,255 @@
     </div>
 </div>
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<partial name="_Room"/>
 <script>
+    let roomTable = null;
+
     $(document).ready(function () {
         fetchRoom();
+
+        $("#btnCloseRoom").on("click", function (e) {
+            e.preventDefault();
+            clearRoomForm();
+            $("#RoomModal").modal("hide");
+        });
     });
 
+    function reloadRoomTable() {
+        if (roomTable) {
+            roomTable.ajax.reload(null, false);
+        }
+    }
+
     function fetchRoom() {
-        $("#tblStudent").DataTable({
+        const tblRoom = $("#tblRoom");
+
+        if ($.fn.DataTable.isDataTable("#tblRoom")) {
+            tblRoom.DataTable().clear().destroy();
+            tblRoom.empty();
+        }
+
+        roomTable = tblRoom.DataTable({
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+
             processing: true,
             serverSide: true,
+            order: [[0, "desc"]],
+
             ajax: {
-                url: "/room/get-rooms", // Endpoint to fetch paginated data
-                type: "POST"
+                url: "/room/get-rooms",
+                type: "POST",
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    ShowToastError("Cannot load room data.");
+                }
             },
+
             columns: [
-                {data: "roomId"},
-                {data: "roomName"},
-                {data: "capacity"},
-                {data: "roomType"},
                 {
+                    title: "Id",
+                    data: "roomId",
+                    width: "40px"
+                },
+                {
+                    title: "Room Name",
+                    data: "roomName",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Capacity",
+                    data: "capacity",
+                    width: "120px"
+                },
+                {
+                    title: "Type",
+                    data: "roomType",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Action",
                     data: null,
-                    render: function (data, type, row) {
+                    width: "180px",
+                    className: "dt-action text-center",
+                    orderable: false,
+                    searchable: false,
+                    render: function () {
                         return `
-                        <a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i> Edit</a>
-                        <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
+                        <div class="dt-action">
+                            <button type="button" class="btn btn-warning btn-sm btnEditRoom">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm btnDeleteRoom">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                        </div>
                     `;
                     }
                 }
-            ]
+            ],
+
+            initComplete: function () {
+                let api = this.api();
+
+                MyApp.utils.dataTableDebounceSearch("#tblRoom", 500);
+
+                setTimeout(function () {
+                    api.columns.adjust();
+                }, 500);
+            },
+
+            drawCallback: function () {
+                this.api().columns.adjust();
+            }
         });
+
+        setTimeout(function () {
+            if (roomTable) {
+                roomTable.columns.adjust();
+            }
+        }, 1000);
     }
+
+    function clearRoomForm() {
+        const formElement = $("#roomForm")[0];
+
+        if (formElement) {
+            formElement.reset();
+        }
+
+        $("#room_RoomId").val(0);
+        $("#room_RoomName").val("");
+        $("#room_Capacity").val("");
+        $("#room_RoomType").val("");
+    }
+
+    function openAddRoom() {
+        clearRoomForm();
+
+        $("#RoomModal").find(".modal-title").text("Add New");
+        $("#RoomModal").modal("show");
+    }
+
+    $("#btnAddRoom").on("click", function () {
+        openAddRoom();
+    });
+
+    $("#tblRoom").on("click", ".btnEditRoom", function () {
+        let rowElement = $(this).closest("tr");
+
+        if (rowElement.hasClass("child")) {
+            rowElement = rowElement.prev();
+        }
+
+        const selectedRow = roomTable.row(rowElement).data();
+
+        if (!selectedRow) {
+            ShowToastError("Cannot get selected room data.");
+            return;
+        }
+
+        $("#RoomModal").find(".modal-title").text("Update");
+
+        $("#room_RoomId").val(selectedRow.roomId);
+        $("#room_RoomName").val(selectedRow.roomName);
+        $("#room_Capacity").val(selectedRow.capacity);
+        $("#room_RoomType").val(selectedRow.roomType);
+
+        $("#RoomModal").modal("show");
+    });
+
+    $("#tblRoom").on("click", ".btnDeleteRoom", function () {
+        let rowElement = $(this).closest("tr");
+
+        if (rowElement.hasClass("child")) {
+            rowElement = rowElement.prev();
+        }
+
+        const selectedRow = roomTable.row(rowElement).data();
+
+        if (!selectedRow) {
+            ShowToastError("Cannot get selected room data.");
+            return;
+        }
+
+        if (!confirm("Are you sure you want to delete this room?")) {
+            return;
+        }
+
+        $.ajax({
+            url: "/room/delete/" + selectedRow.roomId,
+            type: "DELETE",
+            success: function (response) {
+                const code = response.status?.code;
+                const message = response.status?.message;
+
+                if (code === "200" || code === 200) {
+                    ShowToastSuccess(message || "Deleted successfully!");
+                    reloadRoomTable();
+                } else {
+                    ShowToastError(message || "Delete failed.");
+                }
+            },
+            error: function () {
+                ShowToastError("Delete failed.");
+            }
+        });
+    });
+
+    $("#roomForm").on("submit", function (e) {
+        e.preventDefault();
+
+        const roomId = $("#room_RoomId").val() || "0";
+        const formData = $("#roomForm").serialize();
+
+        $.ajax({
+            url: "/room/save-change",
+            type: "POST",
+            data: formData,
+            success: function (response) {
+                const code = response.status?.code;
+                const message = response.status?.message;
+
+                if (code === "200" || code === 200) {
+                    if (roomId !== "0") {
+                        ShowToastSuccess(message || "Updated successfully!");
+                    } else {
+                        ShowToastSuccess(message || "Saved successfully!");
+                    }
+
+                    clearRoomForm();
+                    $("#RoomModal").modal("hide");
+                    reloadRoomTable();
+                } else {
+                    ShowToastError(message || "Save failed.");
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    ShowToastError("Unauthorized. Please login again.");
+                    return;
+                }
+
+                const message =
+                    xhr["responseJSON"]?.["status"]?.["message"] ||
+                    xhr["responseJSON"]?.["message"] ||
+                    "Server error.";
+
+                ShowToastError(message);
+            }
+        });
+    });
 </script>
