@@ -450,63 +450,6 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
         }
     }
 
-    [HttpPost("GetAllFailedStudents")]
-    public IActionResult GetAllFailedStudents()
-    {
-        var draw = Request.Form["draw"].FirstOrDefault();
-        var start = Request.Form["start"].FirstOrDefault();
-        var length = Request.Form["length"].FirstOrDefault();
-        var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-        var pageSize = length != null ? Convert.ToInt32(length) : 0;
-        var skip = start != null ? Convert.ToInt32(start) : 0;
-        var db = campusDbContext.DbContext(_campus);
-
-        var query = (from student in db.TblStudent
-                join sg in db.TblStudentGroup on student.StudentId equals sg.StudentId
-                join g in db.TblGroup on sg.GroupId equals g.GroupId
-                join stg in db.TblStage on g.StageId equals stg.StageId
-                join pr in db.TblPromotion on stg.PromotionId equals pr.PromotionId
-                join d in db.TblDegree on pr.DegreeId equals d.DegreeId
-                join t in db.TblTerm on new { stg.StageId, sg.TermNo }
-                    equals new { t.StageId, t.TermNo }
-                where db.TblStudentGroup
-                    .Where(x => db.TblScore.Any(s =>
-                        s.StudentGroupId == x.StudentGroupId &&
-                        s.MidTermScore + s.FinalScore <
-                        (d.DegreeName == "Doctor" ? 70 :
-                            d.DegreeName == "Master" ? 65 : 60)))
-                    .Select(x => x.StudentId)
-                    .Distinct()
-                    .Contains(student.StudentId)
-                select new
-                {
-                    student.StudentId,
-                    student.StudentName,
-                    student.StudentNameInKhmer,
-                    student.Sex,
-                    student.DateOfBirth
-                })
-            .Distinct()
-            .AsQueryable();
-        if (!string.IsNullOrEmpty(searchValue))
-            query = query.Where(d =>
-                d.StudentName!.Contains(searchValue) ||
-                d.StudentId!.Contains(searchValue) ||
-                d.StudentNameInKhmer!.Contains(searchValue)).AsQueryable();
-        query = query.OrderBy(x => x.StudentName).AsQueryable();
-        var recordsTotal = query.Count();
-        var data = query.Skip(skip).Take(pageSize).ToList();
-
-        return Json(new
-        {
-            draw,
-            recordsFiltered = recordsTotal,
-            recordsTotal,
-            data
-        });
-    }
-
     [HttpPost("get-student-score/{studentId}")]
     public IActionResult GetStudentAResult(string studentId)
     {
@@ -665,12 +608,15 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
     {
         try
         {
+            var username = User.FindFirst(ClaimTypes.Name)?.Value;
             if (id == 0) return new ServerResponse().BadRequest();  
             var db = campusDbContext.DbContext(_campus);
             var dataExist = await db.TblOtherBranchScores.Where(x => x.OtherBranchScoreId == id)!.FirstOrDefaultAsync();
             if (dataExist == null) return new ServerResponse().BadRequest("Other branch store not found!");  
             dataExist.MidTermScore = midterm;
             dataExist.FinalScore = final;
+            dataExist.Username = username;
+            dataExist.DateEdit =  DateTime.Now;
             db.TblOtherBranchScores.Update(dataExist);
             await db.SaveChangesAsync();
             return new ServerResponse().Success(msg:"Update successfully!");

@@ -1136,6 +1136,62 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         return new ServerResponse().Success(studentView);
     }
 
+    [HttpPost("GetAllFailedStudents")]
+    public IActionResult GetAllFailedStudents()
+    {
+        var draw = Request.Form["draw"].FirstOrDefault();
+        var start = Request.Form["start"].FirstOrDefault();
+        var length = Request.Form["length"].FirstOrDefault();
+        var searchValue = Request.Form["search[value]"].FirstOrDefault();
+
+        var pageSize = length != null ? Convert.ToInt32(length) : 0;
+        var skip = start != null ? Convert.ToInt32(start) : 0;
+        var db = campusDbContext.DbContext(_campus);
+
+        var query = (from student in db.TblStudent
+                join sg in db.TblStudentGroup on student.StudentId equals sg.StudentId
+                join g in db.TblGroup on sg.GroupId equals g.GroupId
+                join stg in db.TblStage on g.StageId equals stg.StageId
+                join pr in db.TblPromotion on stg.PromotionId equals pr.PromotionId
+                join d in db.TblDegree on pr.DegreeId equals d.DegreeId
+                join t in db.TblTerm on new { stg.StageId, sg.TermNo }
+                    equals new { t.StageId, t.TermNo }
+                where db.TblStudentGroup
+                    .Where(x => db.TblScore.Any(s =>
+                        s.StudentGroupId == x.StudentGroupId &&
+                        s.MidTermScore + s.FinalScore <
+                        (d.DegreeName == "Doctor" ? 70 :
+                            d.DegreeName == "Master" ? 65 : 60)))
+                    .Select(x => x.StudentId)
+                    .Distinct()
+                    .Contains(student.StudentId)
+                select new
+                {
+                    student.StudentId,
+                    student.StudentName,
+                    student.StudentNameInKhmer,
+                    student.Sex,
+                    student.DateOfBirth
+                })
+            .Distinct()
+            .AsQueryable();
+        if (!string.IsNullOrEmpty(searchValue))
+            query = query.Where(d =>
+                d.StudentName!.Contains(searchValue) ||
+                d.StudentId!.Contains(searchValue) ||
+                d.StudentNameInKhmer!.Contains(searchValue)).AsQueryable();
+        query = query.OrderBy(x => x.StudentName).AsQueryable();
+        var recordsTotal = query.Count();
+        var data = query.Skip(skip).Take(pageSize).ToList();
+
+        return Json(new
+        {
+            draw,
+            recordsFiltered = recordsTotal,
+            recordsTotal,
+            data
+        });
+    }
 
     [HttpPost("academic/student-list/{status}")]
     public IActionResult GetStudentList(string status = "all")

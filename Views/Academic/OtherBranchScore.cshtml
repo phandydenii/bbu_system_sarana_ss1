@@ -6,7 +6,6 @@
 
     var student = new StudentDto();
     var extend = new ExtendDto();
-    var otherBranchScore = new OtherBranchScoreDto();
 }
 <div class="row">
     <div class="col-12">
@@ -58,17 +57,19 @@
                                 <input type="text" class="form-control form-control-sm" asp-for="@extend.ExtendFrom" readonly>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-2">
-                                <label>receive_certificate</label>
-                                <input type="checkbox" class="form-control form-control-sm" asp-for="@extend.IsCerti" disabled>
-                            </div>
-                            <div class="col-2">
-                                <label>receive_transcript</label>
-                                <input type="checkbox" class="form-control form-control-sm" asp-for="@extend.IsTran" disabled>
-                            </div>
+                        <div class="row align-items-center">
+                            <div class="col-md-4 col-4">
+                                <div class="checkbox-container-modern mb-2">
+                                    <input type="checkbox" class="checkbox-modern" asp-for="@extend.IsCerti" disabled>
+                                    <label class="form-label-modern m-0">receive_certificate</label>
+                                </div>
 
-                            <div class="col-8">
+                                <div class="checkbox-container-modern">
+                                    <input type="checkbox" class="checkbox-modern" asp-for="@extend.IsTran" disabled>
+                                    <label class="form-label-modern m-0">receive_transcript</label>
+                                </div>
+                            </div>
+                            <div class="col-md-8 col-8">
                                 <label>from</label>
                                 <input type="text" id="txtFrom" class="form-control form-control-sm" readonly>
                             </div>
@@ -80,8 +81,9 @@
                 <div class="row">
                     <div class="col-md-5">
                         <div class="card card-outline card-primary">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title">Extend Student List</h3>
+                                <h4 id="studentCountText" class="text-muted mb-0 ml-auto text-end" style="font-size: 18px;font-weight: 500;"></h4>
                             </div>
                             <div class="card-body">
                                 <table id="tblStudent" class="table table-bordered table-sm table-striped" style="width: 100%;">
@@ -139,7 +141,6 @@
         const tblStudent = $("#tblStudent");
         $(document).ready(function () {
             fetchStudent();
-            tblOtherBranchScore.DataTable();
         });
 
         function fetchStudent() {
@@ -148,6 +149,7 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                info: false,
                 ajax: {
                     url: `/extend/students`,
                     type: "POST",
@@ -162,20 +164,26 @@
                             return `${formatDate(data)}`
                         }
                     }
-                ]
+                ],
+                drawCallback: function () {
+                    const info = this.api().page.info(); 
+                    $("#studentCountText").text(
+                        `Showing ${info.start + 1} to ${info.end} of ${info.recordsDisplay}`
+                    );
+                },
+                initComplete: function (){
+                    MyApp.utils.dataTableDebounceSearch("#tblStudent",500);
+                }
             })
         }
 
         tblStudent.on('click', 'tbody tr', function () {
-            showLoading();
             tblStudent.find('tbody tr').removeClass('highlight');
             $(this).addClass('highlight');
             const $row = $(this).closest('tr');
             const data = tblStudent.DataTable().row($row).data();
-            // console.log(data);
             GetOtherBranchScore(data.studentId);
             getStudent(data)
-            hideLoading(1);
         });
 
         function GetOtherBranchScore(studentId) {
@@ -184,13 +192,10 @@
             tblOtherBranchScore.DataTable({
                 processing: true,
                 serverSide: true,
-                responsive: true,
+                responsive: false,
                 ajax: {
                     url: `/scores/get-other-brand-score/${studentId}`,
-                    type: "POST",
-                    dataSrc: function (json) {
-                        return json.data;
-                    }
+                    type: "POST"
                 },
                 columns: [
                     {data: "otherBranchScoreId"},
@@ -200,13 +205,13 @@
                     {
                         data: "midTermScore",
                         render: function (data, type, row) {
-                            return data ? `<input type="number" class="form-control form-control-sm is-warning" name="otherBranchScore_MidTermScore" value="${data.toFixed(2)}" readonly/>` : 'N/A';
+                            return `<input type="number" class="form-control form-control-sm is-warning" name="otherBranchScore_MidTermScore" value="${data?.toFixed(2)}" readonly/>`;
                         }
                     },
                     {
                         data: "finalScore",
                         render: function (data, type, row) {
-                            return data ? `<input type="number" class="form-control form-control-sm form-control is-warning" name="otherBranchScore_FinalScore" value="${data.toFixed(2)}" readonly/>` : 'N/A';
+                            return `<input type="number" class="form-control form-control-sm form-control is-warning" name="otherBranchScore_FinalScore" value="${data?.toFixed(2)}" readonly/>`;
                         }
                     },
                     {
@@ -227,7 +232,10 @@
                             return `<button id="btnEdit" class="btn btn-warning btn-xs"><i class="fa-solid fa-pen-to-square"></i></button>`;
                         }
                     }
-                ]
+                ],
+                initComplete: function (){
+                    MyApp.utils.dataTableDebounceSearch("#tblOtherBranchScore",500);
+                }
             });
         }
 
@@ -249,17 +257,12 @@
 
         tblOtherBranchScore.on("click", "#btnSave",async function (e) {
             e.preventDefault();
-           
-            // Find the clicked row 
             const $row = $(this).closest('tr');
             const table = tblOtherBranchScore.DataTable();
             const rowData = table.row($row).data();
-
             if(e.target){
-                // Get edited values
                 const updatedMid = parseFloat($row.find('input[name="otherBranchScore_MidTermScore"]').val());
                 const updatedFinal = parseFloat($row.find('input[name="otherBranchScore_FinalScore"]').val());
-
                 try {
                     const response = await $.ajax({
                         url: "/scores/update-other-brand-score",
@@ -272,6 +275,7 @@
                     });
                     if (response.status.code === "200") {
                         ShowToastSuccess(response.status.message);
+                        tblOtherBranchScore.DataTable().ajax.reload(null, false); 
                     }else{
                         ShowToastError(response.status.message);
                     }
