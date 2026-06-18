@@ -237,6 +237,15 @@
                 dtStudent.ajax.reload();
                 return;
             }
+            const req = {
+                // DegreeId: cboDegree.val(),
+                // SchoolId: cboSchool.val(),
+                // PromotionId: cboPromotion.val(),
+                // FieldId: cboField.val(),
+                // StageId: cboStage.val(),
+                TermNo: termNo,
+                GroupId: groupId
+            }
             dtStudent = tblStudent.DataTable({
                 processing: true,
                 serverSide: true,
@@ -247,13 +256,7 @@
                     url: `/student/GetStudents`,
                     type: "POST",
                     data: {
-                        DegreeId: cboDegree.val(),
-                        SchoolId: cboSchool.val(),
-                        PromotionId: cboPromotion.val(),
-                        FieldId: cboField.val(),
-                        StageId: cboStage.val(),
-                        TermId: cboTerm.val(),
-                        GroupId: cboGroup.val()
+                        req: req
                     }
                 },
                 drawCallback: function () {
@@ -303,12 +306,17 @@
                     ajax: {
                         url: `/scores/get-scores/${student_group_id}`,
                         type: "POST",
-                        data: { type: "FINAL" },
+                        // data: { type: "FINAL" },
                         dataSrc: function (json) { return json.data; },
                         error: function (jqXHR) { console.log(jqXHR.responseText); }
                     },
                     columns: [
-                        { data: "courseName" },
+                        { 
+                            data: null,
+                            render: function (data, type, row) {
+                                return `${data.courseName} <badge class="badge badge-warning">${data.type}</badge>`;
+                            }
+                        },
                         {
                             data: "midTermScore", 
                             render: function (data) {

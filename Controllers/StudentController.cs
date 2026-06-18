@@ -225,6 +225,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         if (req.StageId != 0) query = query.Where(x => x.StageId == req.StageId).AsQueryable(); 
         if (req.GroupId != 0) query = query.Where(x => x.GroupId == req.GroupId).AsQueryable();
         if (req.TermId != 0) query = query.Where(x => x.TermId == req.TermId).AsQueryable(); 
+        if (req.TermNo != 0) query = query.Where(x => x.TermNo == req.TermNo).AsQueryable(); 
         if (!string.IsNullOrEmpty(req.Filter))
         {
             query = req.Filter switch

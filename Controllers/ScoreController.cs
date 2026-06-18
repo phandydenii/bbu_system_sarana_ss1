@@ -57,25 +57,29 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
                         FinalScore = Convert.ToDecimal(sc.FinalScore ?? 0),
                         Type = ct.Type!.Trim(),
                         IsAllow = sc.IsAllow ?? false,
-                    }).AsQueryable(); 
-            switch (type)
+                    }).AsQueryable();
+            if (string.IsNullOrEmpty(type))
             {
-                case ScoreTypeConstant.Final:
-                    query = query.Where(sc => sc.Type == ScoreTypeConstant.Final);
-                    break;
-                case ScoreTypeConstant.FinalAndState:
-                    query = query.Where(sc => sc.Type == ScoreTypeConstant.FinalAndState);
-                    break; 
-                case ScoreTypeConstant.StateExam:
-                    query = query.Where(sc => sc.Type == ScoreTypeConstant.StateExam);
-                    break;
-                case ScoreTypeConstant.ProjectPaper:
-                    query = query.Where(sc => sc.Type == ScoreTypeConstant.ProjectPaper);
-                    break;
-                case ScoreTypeConstant.Practicum:
-                    query = query.Where(sc => sc.Type == ScoreTypeConstant.Practicum);
-                    break;
-            }    
+                switch (type)
+                {
+                    case ScoreTypeConstant.Final:
+                        query = query.Where(sc => sc.Type == ScoreTypeConstant.Final);
+                        break;
+                    case ScoreTypeConstant.FinalAndState:
+                        query = query.Where(sc => sc.Type == ScoreTypeConstant.FinalAndState);
+                        break; 
+                    case ScoreTypeConstant.StateExam:
+                        query = query.Where(sc => sc.Type == ScoreTypeConstant.StateExam);
+                        break;
+                    case ScoreTypeConstant.ProjectPaper:
+                        query = query.Where(sc => sc.Type == ScoreTypeConstant.ProjectPaper);
+                        break;
+                    case ScoreTypeConstant.Practicum:
+                        query = query.Where(sc => sc.Type == ScoreTypeConstant.Practicum);
+                        break;
+                } 
+            }
+               
             if (!string.IsNullOrEmpty(searchValue))
             {
                 query = query.Where(x =>  x.CourseId!.ToString()!.Contains(searchValue)  

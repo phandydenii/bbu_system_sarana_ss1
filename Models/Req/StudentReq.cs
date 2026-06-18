@@ -8,6 +8,7 @@ public class StudentFilterReq
     public int FieldId { get; set; } = 0;
     public int StageId { get; set; } = 0; 
     public int TermId { get; set; } = 0;
+    public int TermNo { get; set; } = 0;
     public int GroupId { get; set; } = 0;
     public string Filter { get; set; } = "";
 }
