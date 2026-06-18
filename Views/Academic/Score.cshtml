@@ -119,14 +119,10 @@
         const cboGroup = $("#cboGroup"); 
         const tblStudent = $("#tblStudent");
         const tblScore = $("#tblScore");
-
-        $(document).ready(function () {
-            tblStudent.DataTable({
-                responsive: true,
-            });
-            tblScore.DataTable({
-                responsive: true,
-            }); 
+        let dtStudent = null;
+        let dtScore = null;
+        
+        $(document).ready(function () {  
             GetDegree();
             GetSchool();
         });
@@ -211,7 +207,7 @@
         async function GetStage() {
             const promotionId = cboPromotion.val();
             if (!promotionId) {
-                cboPromotion.val('');
+                cboPromotion.val(0);
                 return;
             }
             cboStage.empty();
@@ -226,14 +222,14 @@
         async function GetTerm() {
             const stageId = cboStage.val();
             if (!stageId) {
-                cboTerm.val('');
+                cboTerm.val(0);
                 return;
             }
             cboTerm.empty();
             cboTerm.append("<option value='' disabled>Select Term</option>");
             const terms = await Term.GetTerms({stageId});
             terms.forEach(item => {
-                cboTerm.append(`<option value='${item.termNo}'>${item.termNo}</option>`);
+                cboTerm.append(`<option value='${item.termId}'>${item.termNo}</option>`);
             });
             cboTerm.val('').trigger("change");
         }
@@ -257,15 +253,12 @@
         function OnFilter() {
             const term_no = cboTerm.find('option:selected').text();
             const group_id = cboGroup.val(); 
-            const degree_id = cboDegree.val();
-            const school_id = cboSchool.val();
-            const promotion_id = cboPromotion.val();
-            const field_id = cboField.val();
-            const stage_id = cboStage.val();
-            if (!group_id || !term_no) return;
-            showLoading(); 
-            tblScore.DataTable().clear().destroy();
-            tblStudent.DataTable({
+            if (!group_id || !term_no) return; 
+            if (dtStudent) {
+                dtStudent.ajax.reload();
+                return;
+            } 
+            dtStudent = tblStudent.DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
@@ -273,38 +266,35 @@
                     url: `/student/GetStudents`,
                     type: "POST",
                     data: {
-                        degreeId:degree_id,
-                        schoolId:school_id,
-                        promotionId:promotion_id,
-                        fieldId:field_id,
-                        stageId:stage_id,
-                        groupid: group_id,
-                        termno: term_no
-                    },
+                        DegreeId: cboDegree.val(),
+                        SchoolId: cboSchool.val(),
+                        PromotionId: cboPromotion.val(),
+                        FieldId: cboField.val(),
+                        StageId: cboStage.val(),
+                        TermId: cboTerm.val(),
+                        GroupId: cboGroup.val()
+                    }
                 },
                 columns: [
-                    {data: "studentGroupId",visible: false},
-                    {data: "studentId"},
-                    {data: "studentName"},
-                    {data: "sex"},
+                    { data: "studentGroupId", visible: false },
+                    { data: "studentId" },
+                    { data: "studentName" },
+                    { data: "sex" },
                     {
                         data: "dateOfBirth",
-                        render: function (data, type, row) {
-                            return `${formatDate(data)}`
+                        render: function (data) {
+                            return formatDate(data);
                         }
                     }
                 ],
-                initComplete: function () {
+                initComplete:function (){
                     MyApp.utils.dataTableDebounceSearch("#tblStudent",500);
                 }
             });
-            hideLoading(1);
         }
-
         tblStudent.on('click', 'tbody tr', function () {
             const table = tblStudent.DataTable();
-            const data = table.row(this).data();  
-            console.log(this);
+            const data = table.row(this).data();   
             if ($(this).find('td').hasClass('dataTables_empty')) return;
             if (!data) return;
             showLoading();
@@ -316,24 +306,19 @@
 
         function GetScores(student_group_id) {
             if (!student_group_id) return;
-            tblScore.DataTable().clear().destroy();
-            tblScore
-                .DataTable({
+            const url = `/scores/get-scores/${student_group_id}`; 
+            if (dtScore) {
+                dtScore.ajax.url(url).load();
+                return;
+            }
+            dtScore = tblScore.DataTable({
                     processing: true,
                     serverSide: true,
                     responsive: true,
                     order: [[0, 'desc']],
                     ajax: {
-                        url: `/scores/get-scores/${student_group_id}`,
-                        type: "POST",
-                        data: {
-                            groupid: cboGroup.val(),
-                            termno: cboTerm.text()
-                        },
-                        dataSrc: function (json) {
-                            console.log(json);
-                            return json.data;
-                        }
+                        url: url,
+                        type: "POST", 
                     },
                     columns: [
                         {data: "scoreId", visible: false},
@@ -368,7 +353,10 @@
                                 return `<button class="btn btn-warning btn-sm" id="btnEdit"><i class="fa-solid fa-pen-to-square"></i></button>`;
                             }
                         }
-                    ]
+                    ],
+                    initComplete:function (){
+                        MyApp.utils.dataTableDebounceSearch("#tblScore",500);
+                    }
                 });
         }
 
@@ -392,9 +380,7 @@
         });
 
         tblScore.on("click", "#btnSave",async function (e) {
-            e.preventDefault();
-            
-            // console.log(oldMidTermScore,oldFinalScore);
+            e.preventDefault(); 
             // Find the clicked row 
             const $row = $(this).closest('tr');
             const table = tblScore.DataTable();
@@ -403,10 +389,7 @@
             const updatedMid = parseFloat($row.find('input[name="midterm"]').val());
             const updatedFinal = parseFloat($row.find('input[name="final"]').val());
             
-            let isUpdate = true;
-            // if(oldMidTermScore === updatedMid || oldFinalScore === updatedFinal){
-            //     isUpdate = false;
-            // }
+            let isUpdate = true; 
             if(isUpdate){
                 if(e.target){
                     try {

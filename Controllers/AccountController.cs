@@ -13,7 +13,38 @@ public class AccountController(IHttpContextAccessor context,IConfiguration confi
     {
         return View();
     }
-
+    // api login purpose testing with postman
+    [AllowAnonymous]
+    [HttpPost("api/login")]
+    public async Task<IActionResult> ApiLogin([FromBody] AuthenticationReq req)
+    {  
+        try
+        {
+            var isAuthenticated = await authService.Login(req); 
+            if (!isAuthenticated)
+            {
+                return Unauthorized(new
+                {
+                    code = 1,
+                    message = "Invalid username or password."
+                });
+            } 
+            return Ok(new
+            {
+                code = 0,
+                message = "Login success"
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new
+            {
+                code = 1,
+                message = ex.Message
+            });
+        }
+    }
+    
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(AuthenticationReq req, string? returnUrl = null) 

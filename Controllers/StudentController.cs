@@ -3,6 +3,7 @@ using BBU_SYSTEM.Data;
 using BBU_SYSTEM.DTOs;
 using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
+using BBU_SYSTEM.Models.Req;
 using BBU_SYSTEM.Repository;
 using BBU_SYSTEM.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -158,8 +159,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     }
 
     [HttpPost("GetStudents")]
-    public IActionResult GetStudents(int degreeId = 0, int schoolid = 0, int fieldid = 0, int proid = 0,
-        int stageid = 0, int stageno = 0, int termno = 0, int termid = 0, int groupid = 0, string filter = "")
+    public IActionResult GetStudents(StudentFilterReq req)
     {
         var draw = Request.Form["draw"].FirstOrDefault();
         var start = Request.Form["start"].FirstOrDefault();
@@ -218,18 +218,16 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                 gr.RoomName,
                 gr.StartPayment
             }).AsQueryable();
-        if (degreeId > 0) query = query.Where(x => x.DegreeId == degreeId).AsQueryable();
-        if (schoolid != 0) query = query.Where(x => x.SchoolId == schoolid).AsQueryable();
-        if (fieldid != 0) query = query.Where(x => x.FieldId == fieldid).AsQueryable();
-        if (proid != 0) query = query.Where(x => x.PromotionId == proid).AsQueryable();
-        if (stageid != 0) query = query.Where(x => x.StageId == stageid).AsQueryable();
-        if (stageno != 0) query = query.Where(x => x.StageNo == stageno).AsQueryable();
-        if (groupid != 0) query = query.Where(x => x.GroupId == groupid).AsQueryable();
-        if (termid != 0) query = query.Where(x => x.TermId == termid).AsQueryable();
-        if (termno != 0) query = query.Where(x => x.TermNo == termno).AsQueryable();
-        if (!string.IsNullOrEmpty(filter))
+        if (req.DegreeId > 0) query = query.Where(x => x.DegreeId == req.DegreeId).AsQueryable();
+        if (req.SchoolId != 0) query = query.Where(x => x.SchoolId == req.SchoolId).AsQueryable();
+        if (req.FieldId != 0) query = query.Where(x => x.FieldId == req.FieldId).AsQueryable();
+        if (req.PromotionId != 0) query = query.Where(x => x.PromotionId == req.PromotionId).AsQueryable();
+        if (req.StageId != 0) query = query.Where(x => x.StageId == req.StageId).AsQueryable(); 
+        if (req.GroupId != 0) query = query.Where(x => x.GroupId == req.GroupId).AsQueryable();
+        if (req.TermId != 0) query = query.Where(x => x.TermId == req.TermId).AsQueryable(); 
+        if (!string.IsNullOrEmpty(req.Filter))
         {
-            query = filter switch
+            query = req.Filter switch
             {
                 "document_in" => query.Where(x => x.documentin != "").AsQueryable(),
                 "document_out" => query.Where(x => x.documentout != "").AsQueryable(),
@@ -1138,6 +1136,62 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         return new ServerResponse().Success(studentView);
     }
 
+    [HttpPost("GetAllFailedStudents")]
+    public IActionResult GetAllFailedStudents()
+    {
+        var draw = Request.Form["draw"].FirstOrDefault();
+        var start = Request.Form["start"].FirstOrDefault();
+        var length = Request.Form["length"].FirstOrDefault();
+        var searchValue = Request.Form["search[value]"].FirstOrDefault();
+
+        var pageSize = length != null ? Convert.ToInt32(length) : 0;
+        var skip = start != null ? Convert.ToInt32(start) : 0;
+        var db = campusDbContext.DbContext(_campus);
+
+        var query = (from student in db.TblStudent
+                join sg in db.TblStudentGroup on student.StudentId equals sg.StudentId
+                join g in db.TblGroup on sg.GroupId equals g.GroupId
+                join stg in db.TblStage on g.StageId equals stg.StageId
+                join pr in db.TblPromotion on stg.PromotionId equals pr.PromotionId
+                join d in db.TblDegree on pr.DegreeId equals d.DegreeId
+                join t in db.TblTerm on new { stg.StageId, sg.TermNo }
+                    equals new { t.StageId, t.TermNo }
+                where db.TblStudentGroup
+                    .Where(x => db.TblScore.Any(s =>
+                        s.StudentGroupId == x.StudentGroupId &&
+                        s.MidTermScore + s.FinalScore <
+                        (d.DegreeName == "Doctor" ? 70 :
+                            d.DegreeName == "Master" ? 65 : 60)))
+                    .Select(x => x.StudentId)
+                    .Distinct()
+                    .Contains(student.StudentId)
+                select new
+                {
+                    student.StudentId,
+                    student.StudentName,
+                    student.StudentNameInKhmer,
+                    student.Sex,
+                    student.DateOfBirth
+                })
+            .Distinct()
+            .AsQueryable();
+        if (!string.IsNullOrEmpty(searchValue))
+            query = query.Where(d =>
+                d.StudentName!.Contains(searchValue) ||
+                d.StudentId!.Contains(searchValue) ||
+                d.StudentNameInKhmer!.Contains(searchValue)).AsQueryable();
+        query = query.OrderBy(x => x.StudentName).AsQueryable();
+        var recordsTotal = query.Count();
+        var data = query.Skip(skip).Take(pageSize).ToList();
+
+        return Json(new
+        {
+            draw,
+            recordsFiltered = recordsTotal,
+            recordsTotal,
+            data
+        });
+    }
 
     [HttpPost("academic/student-list/{status}")]
     public IActionResult GetStudentList(string status = "all")
