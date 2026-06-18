@@ -33,3 +33,23 @@ public static class ScoreTypeConstant
     public const string Practicum = "PRACTICUM";
     public const string FinalAndState = "FINAL_AND_STATE";
 }
+
+public static class StudentStatusConstant
+{
+    public const string Register = "REGISTER";
+    public const string Active = "ACTIVE";
+    public const string Quit = "QUIT";
+    public const string Graduated = "GRADUATED";
+    public const string Completed = "COMPLETED";
+
+    public static readonly Dictionary<string, string> BadgeClasses = new()
+    {
+        { Register, "badge-warning" },
+        { Active, "badge-success" },
+        { Quit, "badge-danger" },
+        { Graduated, "badge-fuchsia" },
+        { Completed, "badge-pink" }
+    };
+
+    public const string DefaultBadgeClass = "badge-default";
+}

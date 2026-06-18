@@ -1,7 +1,8 @@
+@using System.Text.Json
 @{
     ViewData["OpenMenu"] = "AcademicTask";
     ViewData["Action"] = "ManageStudent"; 
-}
+} 
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -30,106 +31,129 @@
     </div>
 </div>
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
-<script>
-    $(document).ready(function () { 
-        fetchStudent();
-    });
+<partial name="_Details"/>
+@section Scripts
+{
+    <script src="~/js/Components.js"></script>
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Term.js"></script>
+    <script src="~/function/Group.js"></script>
+    <script src="~/function/AcademicStudentDetail.js"></script>
+    <script>
+        let dtStudent = null;
+        $(document).ready(function () {
+            fetchStudent();
+            $("#btnToggleStudentFullscreen").on("click", function () {
+                const modal = $("#studentDetailModal");
+                setStudentFullscreen(!modal.hasClass("fullscreen-modal"));
+            });
+            $("#studentDetailModal").on("hidden.bs.modal", function () {
+                setStudentFullscreen(false);
+            });
+        });
+        
+        const StudentStatusBadgeClasses = @Html.Raw(JsonSerializer.Serialize(ViewData["StudentStatusBadgeClasses"])); 
+        const StudentStatusDefaultBadgeClass = "@ViewData["StudentStatusDefaultBadgeClass"]"; 
+        function renderStudentStatusBadge(status) {
+            const badgeClass = StudentStatusBadgeClasses[status] || StudentStatusDefaultBadgeClass;
+            return `<span class="badge ${badgeClass}">${status || ""}</span>`;
+        }
 
-    function fetchStudent() {
-        const currentStatus = "@ViewData["status"]";
-        let tblStudent = $("#tblStudent");
-        tblStudent.DataTable().clear().destroy();
-        tblStudent.DataTable({
-            processing: true,
-            serverSide: true,
-            responsive: true,
-            ajax: {
-                url: `/student/academic/student-list/${currentStatus}`,
-                type: "POST",
-                // data: {
-                //     status: "all"
-                // },
-                // success: function (data) {
-                //     // console.log(data.data);
-                //     return data.data;
-                // },
-                error: function (xhr, status, error) {
-                    ShowToastError(xhr.responseText);
-                }
-            },
-            columns: [
-                {data: "studentId"},
-                {data: "studentName"},
-                {data: "studentNameInKhmer"},
-                {data: "sex"},
-                {
-                    data: "dateOfBirth",
-                    render: function (data, type, row) {
-                        const dt = formatDate(data);
-                        return `${dt}`
+        function fetchStudent() {
+            const currentStatus = "@ViewData["status"]"; 
+            if (dtStudent !== null) {
+                return;
+            } 
+            dtStudent = $("#tblStudent").DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                ajax: {
+                    url: `/student/academic/student-list/${currentStatus}`,
+                    type: "POST",
+                    error: function (xhr) {
+                        ShowToastError(xhr.responseText);
                     }
                 },
-                {data: "phone"},
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        if (row.status === "REGISTER") {
-                            return ` <span class="badge badge-warning">${row.status}</span>`;
-                        } else if (row.status === "ACTIVE") {
-                            return ` <span class="badge badge-success">${row.status}</span>`;
-                        } else if (row.status === "QUIT") {
-                            return ` <span class="badge badge-danger">${row.status}</span>`;
-                        }else if (row.status === "GRADUATED") {
-                            return ` <span class="badge badge-fuchsia">${row.status}</span>`;
-                        }else if (row.status === "COMPLETED") {
-                            return ` <span class="badge badge-pink">${row.status}</span>`;
-                        }else {
-                            return `<span class="badge badge-default">${row.status}</span>`;
+                columns: [
+                    { data: "studentId" },
+                    { data: "studentName" },
+                    { data: "studentNameInKhmer" },
+                    { data: "sex" },
+                    {
+                        data: "dateOfBirth",
+                        render: function (data) {
+                            return formatDate(data);
+                        }
+                    },
+                    { data: "phone" },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return renderStudentStatusBadge(row.status);
+                        }
+                    },
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row) {
+                            const studId = String(row.studentId).replace(/'/g, "\\'"); 
+                            return `
+                                <button type="button"
+                                        class="btn btn-warning btn-sm"
+                                        onclick="OnView('${studId}')">
+                                    <i class="fas fa-gear"></i> View
+                                </button>
+                            `;
                         }
                     }
-                },
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        return `<a href="/student/details/${row.studentId}" class="btn btn-warning btn-sm"><i class="fas fa-gear"></i> View</a> `;
-                    }
+                ],
+                initComplete: function (){
+                    MyApp.utils.dataTableDebounceSearch("#tblStudent",500);
                 }
-            ]
-        });
-    }
+            });
+        }
 
-    // Function to handle Edit
-    function OnEdit(id) {
-        $("#editModal").modal("show");
-        $.get(`/api/mis/${campus()}/students/academics/${id}`, function (result) {
-            const data = result["data"];
-            const student = data["student"];
-            const nationality = data["nationality"];
-            const province = data["province"];
-            const race = data["race"];
-            const degree = data["degree"];
-            const school = data["school"];
-            const field = data["field"];
-            const promotion = data["promotion"];
-            const stage = data["stage"];
-            const term = data["term"];
-            const group = data["group"];
-            const group_room = data["group_room"];
-            $("#txtStudentId").val(student["student_id"]);
-            $("#txtStudentName").val(student["student_name"]);
-            $("#txtStudentNameKhmer").val(student["student_name_in_khmer"]);
+        function OnView(id) { 
+            $("#txtStudentId").val(id); 
+            LoadStudentDetail(id); 
+            setStudentFullscreen(true); 
+            $("#studentDetailModal").modal("show"); 
+            if ($.fn.select2) {
+                $("#studentDetailModal .select2").select2({
+                    dropdownParent: $("#studentDetailModal")
+                });
+            }
+        }
 
-            $("#txtSex").val(student["sex"]);
-            const dob = moment(student["date_of_birth"]).format("YYYY-MM-DD");
-            $("#txtDOB").val(dob);
-            $("#txtPOB").val(province["province"]);
-            //$("#txtStatus").val(data["status"]);
-        });
+        function setStudentFullscreen(isFullscreen) {
+            const modal = $("#studentDetailModal");
+            const icon = $("#studentFullscreenIcon"); 
+            if (isFullscreen) {
+                modal.addClass("fullscreen-modal");
+                icon.removeClass("fa-expand").addClass("fa-compress");
+                $("#btnToggleStudentFullscreen").attr("title", "Restore");
+            } else {
+                modal.removeClass("fullscreen-modal");
+                icon.removeClass("fa-compress").addClass("fa-expand");
+                $("#btnToggleStudentFullscreen").attr("title", "Fullscreen");
+            } 
+            setTimeout(function () {
+                adjustOnlyStudentModalTables();
+            }, 200);
+        }
 
-        //window.location.href = `/student/details/${data}`;
-    }
-
-    function OnView(id) {
-        window.location.href = `student/details/${id}`;
-    }
-</script>
+        function adjustOnlyStudentModalTables() {
+            $("#studentDetailModal table.dataTable").each(function () {
+                if ($.fn.DataTable.isDataTable(this)) {
+                    $(this).DataTable().columns.adjust();
+                }
+            });
+        }
+    </script>
+}

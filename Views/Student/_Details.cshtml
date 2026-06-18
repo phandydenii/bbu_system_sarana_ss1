@@ -1,0 +1,489 @@
+﻿
+@using BBU_SYSTEM.DTOs
+@using BBU_SYSTEM.ViewModel
+
+@{
+    var studentViewModel = new StudentViewModel();
+    var student = new StudentDto();
+    var registry = new RegistryDto();
+
+    var privileges = User.FindAll("Privilege").Select(p => p.Value).ToList();
+
+    var isFull = privileges.Contains("MSFullControl");
+    var isUpdate = privileges.Contains("MSUpdate");
+    var isSuppress = privileges.Contains("MSSuppress");
+    var isChangeBranch = privileges.Contains("MSChangeBranch");
+    var isChangeSchool = privileges.Contains("MSChangeSchool");
+    var isQuit = privileges.Contains("MSQuit");
+    var isSuspend = privileges.Contains("MSSuspend");
+    var isAdjustGroup = privileges.Contains("ASAdjustGroup");
+}
+<style>
+    #studentDetailModal.fullscreen-modal {
+        padding: 0 !important;
+    } 
+    #studentDetailModal.fullscreen-modal .modal-dialog {
+        max-width: none !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    } 
+    #studentDetailModal.fullscreen-modal .modal-content {
+        width: 100vw !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        border: 0 !important;
+        display: flex;
+        flex-direction: column;
+    } 
+    #studentDetailModal.fullscreen-modal .modal-header {
+        flex: 0 0 auto;
+    } 
+    #studentDetailModal.fullscreen-modal .modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        height: calc(100vh - 57px);
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding: 8px;
+    } 
+    #studentDetailModal.fullscreen-modal.modal {
+        overflow: hidden !important;
+    } 
+    body.modal-open {
+        overflow: hidden !important;
+    }
+</style>
+<div class="modal fade" id="studentDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" id="studentDetailDialog" role="document">
+        <div class="modal-content"> 
+            <div class="modal-header">
+                <h4 class="modal-title">Student Information</h4> 
+                <div class="float-right d-flex align-items-center">
+                    <button type="button"
+                            id="btnToggleStudentFullscreen"
+                            class="btn btn-tool btn-outline-info py-2 px-2"
+                            title="Fullscreen">
+                        <i id="studentFullscreenIcon" class="fas fa-expand"></i>
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-tool btn-outline-danger py-2 px-2 ml-2"
+                            data-dismiss="modal"
+                            title="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-body p-2">
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-outline card-success">
+                            <div class="card-header">
+                                <h3 class="card-title">Student Information</h3>
+
+                                <div class="card-tools">
+                                    <div id="actionButtons">
+                                        @if (isFull
+                                             || isUpdate
+                                             || isSuppress
+                                             || isChangeBranch
+                                             || isChangeSchool
+                                             || isQuit
+                                             || isAdjustGroup
+                                             || isSuspend)
+                                        {
+                                            <button id="btnEdit" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
+                                        }
+
+                                        @if (isFull || isUpdate)
+                                        {
+                                            <button id="btnUpdate" class="btn btn-pink btn-sm d-none" form="frmStudent">
+                                                <i class="fas fa-wrench"></i> Update
+                                            </button>
+                                        }
+
+                                        @if (isFull || isSuppress)
+                                        {
+                                            <button class="btn btn-primary btn-sm d-none" id="btnSuppress" data-action="suppress">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                                <span id="lblSuppress">Suppress</span>
+                                            </button>
+                                        }
+
+                                        @if (isFull || isChangeBranch)
+                                        {
+                                            <button class="btn btn-default btn-sm d-none" id="btnChangeBranch" data-action="changeBranch">
+                                                <i class="fas fa-sync-alt"></i>
+                                                <span id="lblChangeBranch">Change Branch</span>
+                                            </button>
+                                        }
+
+                                        @if (isFull || isChangeSchool)
+                                        {
+                                            <button class="btn btn-warning btn-sm d-none" id="btnChangeSchool" data-action="changeSchool">
+                                                <i class="fas fa-retweet"></i>
+                                                <span id="lblChangeSchool">Change School</span>
+                                            </button>
+                                        }
+
+                                        @if (isFull || isQuit)
+                                        {
+                                            <button class="btn btn-secondary btn-sm d-none" id="btnQuit" data-action="quit">
+                                                <i class="fas fa-ban"></i>
+                                                <span id="lblQuit">Quit</span>
+                                            </button>
+                                        }
+
+                                        @if (isFull || isSuspend)
+                                        {
+                                            <button class="btn btn-success btn-sm d-none" id="btnSuspend" data-action="suspend">
+                                                <i class="fas fa-stop-circle"></i>
+                                                <span id="lblSuspend">Suspend</span>
+                                            </button>
+                                        }
+
+                                        @if (isFull || isAdjustGroup)
+                                        {
+                                            <button class="btn btn-info btn-sm d-none" id="btnAdjust" data-action="adjust">
+                                                <i class="fas fa-sliders-h"></i> Adjust
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <input type="hidden" id="txtStudentId">
+
+                                <form id="frmStudent">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <div class="card card-primary card-outline card-outline-tabs">
+                                                <div class="card-header p-0 border-bottom-0">
+                                                    <ul class="nav nav-tabs" role="tablist">
+                                                        <li class="nav-item">
+                                                            <a class="nav-link active" id="personal-tab" data-toggle="pill"
+                                                               href="#personal" role="tab" aria-controls="personal">
+                                                                Personal
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="personal-contact-tab" data-toggle="pill"
+                                                               href="#personal-contact" role="tab" aria-controls="personal-contact">
+                                                                Personal Contact
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="relative-contact-tab" data-toggle="pill"
+                                                               href="#relative-contact" role="tab" aria-controls="relative-contact">
+                                                                Relative Contact
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="parent-tab" data-toggle="pill"
+                                                               href="#parent" role="tab" aria-controls="parent">
+                                                                Parent
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+                                                <div class="card-body">
+                                                    <div class="tab-content">
+                                                        <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                                                            <partial name="_Personal" />
+                                                        </div>
+
+                                                        <div class="tab-pane fade" id="personal-contact" role="tabpanel">
+                                                            <partial name="_PersonalContact" />
+                                                        </div>
+
+                                                        <div class="tab-pane fade" id="relative-contact" role="tabpanel">
+                                                            <partial name="_RelativeContact" />
+                                                        </div>
+
+                                                        <div class="tab-pane fade" id="parent" role="tabpanel">
+                                                            <partial name="_Parent" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-5">
+                                            <div class="card card-outline card-primary">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-3">
+                                                            <label>Degree</label>
+                                                            <input type="text" class="form-control" id="txtDegree" readonly />
+                                                        </div>
+
+                                                        <div class="col-9">
+                                                            <label>School</label>
+                                                            <input type="text" class="form-control" id="txtSchool" readonly />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-3">
+                                                            <label>Promotion</label>
+                                                            <input type="text" class="form-control" id="txtPromotion" readonly />
+                                                        </div>
+
+                                                        <div class="col-9">
+                                                            <label>Field Group</label>
+                                                            <input type="text" class="form-control" id="txtFieldGroup" readonly />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-3">
+                                                            <label>Stage</label>
+                                                            <input type="text" class="form-control" id="txtStage" readonly />
+                                                        </div>
+
+                                                        <div class="col-9">
+                                                            <label>Field Student</label>
+                                                            <select asp-for="@student.FieldId" class="form-control select2"></select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-3">
+                                                            <label>Term</label>
+                                                            <input type="text" class="form-control" id="txtTerm" readonly>
+                                                        </div>
+
+                                                        <div class="col-3">
+                                                            <label>Study Time</label>
+                                                            <input type="text" class="form-control" id="txtStudyTime" readonly>
+                                                        </div>
+
+                                                        <div class="col-3">
+                                                            <label>Room</label>
+                                                            <input type="text" class="form-control" id="txtRoom" readonly>
+                                                        </div>
+
+                                                        <div class="col-3">
+                                                            <label>Group</label>
+                                                            <select id="cboGroup" class="form-control select2"></select>
+                                                        </div>
+                                                    </div>
+
+                                                    <hr>
+
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input class="custom-control-input" type="checkbox"
+                                                                       asp-for="@student.IsContinuedStudent">
+                                                                <label for="@student.IsContinuedStudent" class="custom-control-label">
+                                                                    Continued Student
+                                                                </label>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-5">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input class="custom-control-input" type="checkbox"
+                                                                       asp-for="@student.AssociateToBachelor">
+                                                                <label for="@student.AssociateToBachelor" class="custom-control-label">
+                                                                    Associate to Bachelor
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <div class="card card-outline card-indigo">
+                            <div class="card-header">
+                                <h3 class="card-title">History</h3> 
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div> 
+                            <div class="card-body">
+                                <div class="card card-primary card-outline card-outline-tabs">
+                                    <div class="card-header p-0 border-bottom-0">
+                                        <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="scholarship-tab" data-toggle="pill"
+                                                   href="#scholarship" role="tab">
+                                                    អាហារូបករណ៍
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="issue-letter-tab" data-toggle="pill"
+                                                   href="#issue-letter" role="tab">
+                                                    លិខិត
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="certificate-tab" data-toggle="pill"
+                                                   href="#certificate" role="tab">
+                                                    សញ្ញាបត្របាក់ឌុប
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="branch-history-tab" data-toggle="pill"
+                                                   href="#branch-history" role="tab">
+                                                    ប្រវត្តដូរសាខា
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="suppress-history-tab" data-toggle="pill"
+                                                   href="#suppress-history" role="tab">
+                                                    ព្យួរបណ្តោះអាសន្ន
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="payment-tab" data-toggle="pill"
+                                                   href="#payment" role="tab">
+                                                    បង់ថ្លៃសិក្សា
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="suspend-tab" data-toggle="pill"
+                                                   href="#suspend" role="tab">
+                                                    ព្យួរការសិក្សា
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="group-history-tab" data-toggle="pill"
+                                                   href="#group-history" role="tab">
+                                                    ប្រវត្តក្រុមសិក្សា
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="extend-from-tab" data-toggle="pill"
+                                                   href="#extend-from" role="tab">
+                                                    ផ្ទេរសាខា
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="complementation-tab" data-toggle="pill"
+                                                   href="#complementation" role="tab">
+                                                    ការបំពេញបន្ថែម
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="quit-tab" data-toggle="pill"
+                                                   href="#quit" role="tab">
+                                                    បោះបង់ការសិក្សា
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="continue-education-tab" data-toggle="pill"
+                                                   href="#continue-education" role="tab">
+                                                    បន្តការសិក្សា
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="note-tab" data-toggle="pill"
+                                                   href="#note" role="tab">
+                                                    ចំណាំ
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="tab-content">
+                                            <div class="tab-pane fade" id="scholarship" role="tabpanel">
+                                                <partial name="_TabScholarship" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="issue-letter" role="tabpanel">
+                                                <partial name="_TabIssueLetter" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="certificate" role="tabpanel">
+                                                <partial name="_TabCertificate" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="branch-history" role="tabpanel">
+                                                <partial name="_TabBranchHistory" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="suppress-history" role="tabpanel">
+                                                <partial name="_TabSuppressHistory" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="payment" role="tabpanel">
+                                                <partial name="_TabPayment" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="suspend" role="tabpanel">
+                                                <partial name="_TabSuspend" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="group-history" role="tabpanel">
+                                                <partial name="_TabGroupHistory" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="extend-from" role="tabpanel">
+                                                <partial name="_TabExtendFrom" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="complementation" role="tabpanel">
+                                                <partial name="_TabComplement" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="quit" role="tabpanel">
+                                                <partial name="_TabQuit" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="continue-education" role="tabpanel">
+                                                <partial name="_TabContinueEducation" />
+                                            </div>
+
+                                            <div class="tab-pane fade" id="note" role="tabpanel">
+                                                <partial name="_TabNote" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

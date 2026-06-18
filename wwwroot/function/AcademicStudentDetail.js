@@ -12,11 +12,16 @@ async function BindData() {
     await BindSelectOptions("/disability/get-disabilities", "student_DisabilityId", "disabilityId", "disabilityName");
     await BindSelectOptions("/race/get-races", "student_RaceId", "raceId", "raceName");
 }
+async function LoadStudentDetail(studId) {
+    if (!studId) {
+        console.warn("studId is empty. Skip loading student detail.");
+        return;
+    }
 
-$(document).ready(async function () {
-    frmStudent.prop("readonly", true);
-    await BindData();
+    $("#txtStudentId").val(studId);
+
     await getStudent(studId);
+
     await fetchStudentScholarship(studId);
     await fetchStudentGroup(studId);
     await fetchStudentExtend(studId);
@@ -31,10 +36,15 @@ $(document).ready(async function () {
 
     $('#custom-tabs-four-tab a:first').tab('show');
     $('#frmStudent :input').prop('disabled', true);
+}
+$(document).ready(async function () {
+    frmStudent.prop("readonly", true);
+    await BindData(); 
+    $('#custom-tabs-four-tab a:first').tab('show');
+    $('#frmStudent :input').prop('disabled', true);
  });
 
-function checkPrivileges() {
-    console.log(privileges);
+function checkPrivileges() { 
     if(!privileges.includes('SUPPRESS')) {
         actionButtons.find('#btnSuppress').remove();
     }

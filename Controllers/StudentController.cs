@@ -30,6 +30,8 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     public ActionResult Status(string status)
     {
         ViewData["status"] = status;
+        ViewData["StudentStatusBadgeClasses"] = StudentStatusConstant.BadgeClasses;
+        ViewData["StudentStatusDefaultBadgeClass"] = StudentStatusConstant.DefaultBadgeClass;
         return View();
     }
 
