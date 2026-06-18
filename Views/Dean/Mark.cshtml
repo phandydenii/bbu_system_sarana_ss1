@@ -55,10 +55,11 @@
             
             <div class="card-body bg-light/30">
                 <div class="row">
-                    <div class="col-12 col-xl-5 mb-4">
+                    <div class="col-12 col-xl-5 mb-2">
                         <div class="card card-outline card-primary h-100 shadow-sm border-top-3">
                             <div class="card-header bg-white d-flex align-items-center justify-content-between">
                                 <h3 class="card-title font-weight-bold text-primary m-0"><i class="fas fa-user-graduate mr-2"></i>Student List</h3>
+                                <h4 id="studentCountText" class="text-muted mb-0 ml-auto text-end" style="font-size: 18px;font-weight: 500;"></h4>
                             </div>
                             <div class="card-body p-2">
                                 <div class="table-responsive w-100">
@@ -67,8 +68,8 @@
                                             <tr>
                                                 <th width="15%">ID</th>
                                                 <th>Name</th>
-                                                <th width="15%">Gender</th>
-                                                <th width="25%">DOB</th>
+                                                <th width="10%">Gender</th>
+                                                <th width="20%">DOB</th>
                                                 <th width="10%">Action</th>
                                             </tr>
                                         </thead>
@@ -79,10 +80,10 @@
                         </div>
                     </div>
                     
-                    <div class="col-12 col-xl-7 mb-4">
+                    <div class="col-12 col-xl-7 mb-2">
                         <div class="card card-outline card-success h-100 shadow-sm border-top-3">
                             <div class="card-header bg-white d-flex align-items-center justify-content-between">
-                                <h3 class="card-title font-weight-bold text-success m-0"><i class="fas fa-star mr-2"></i>Score Performance</h3>
+                                <h3 class="card-title font-weight-bold text-primary m-0"><i class="fas fa-star mr-2"></i>Score Performance</h3>
                                 <span class="badge badge-pill badge-info px-3 py-2 font-weight-normal" id="lblStudentName" style="display:none;"></span>
                             </div>
                             <div class="card-body p-2">
@@ -91,10 +92,10 @@
                                         <thead class="thead-light">
                                             <tr>
                                                 <th>Course Name</th>
-                                                <th width="20%">Midterm</th>
-                                                <th width="20%">Final</th>
-                                                <th width="15%">Grade</th>
-                                                <th width="12%">Action</th>
+                                                <th width="25%">Midterm</th>
+                                                <th width="25%">Final</th>
+                                                <th width="10%">Grade</th>
+                                                <th width="10%">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody></tbody>
@@ -128,21 +129,13 @@
         const cboPromotion = $("#cboPromotion");
         const cboStage = $("#cboStage");
         const cboTerm = $("#cboTerm");
-        const cboGroup = $("#cboGroup");
-
+        const cboGroup = $("#cboGroup"); 
         const tblStudent = $("#tblStudent");
         const tblScore = $("#tblScore");
+        let dtStudent = null;
+        let dtScore = null;
 
         $(document).ready(function () {
-            // Added explicit autoWidth declarations to guarantee matching dimension allocations
-            tblStudent.DataTable({
-                responsive: true,
-                autoWidth: false
-            });
-            tblScore.DataTable({
-                responsive: true,
-                autoWidth: false
-            });
             GetDegree();
             GetSchool();
         });
@@ -173,10 +166,8 @@
 
         async function GetField() {
             const degreeId = parseInt(cboDegree.val());
-            const schoolId = parseInt(cboSchool.val());
-            cboField.empty().append("<option value='' disabled>Select Field</option>");
-            if (!degreeId || !schoolId) { cboField.val(''); return; }
-
+            const schoolId = parseInt(cboSchool.val()); 
+            if (!degreeId || !schoolId) return;
             const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
             fields.forEach(item => {
                 cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
@@ -186,10 +177,8 @@
 
         async function GetPromotion() {
             const degreeId = cboDegree.val();
-            const schoolId = cboSchool.val();
-            cboPromotion.empty().append("<option value='' disabled>Select Promotion</option>");
-            if (!degreeId || !schoolId) { cboPromotion.val(''); return; }
-
+            const schoolId = cboSchool.val(); 
+            if (!degreeId || !schoolId) return; 
             const promotions = await Promotion.GetPromotions({isSelect2: true, degreeId, schoolId});
             let hasPromotion = false;
             promotions.forEach(item => {
@@ -242,19 +231,36 @@
         function OnFilter() {
             const termNo = cboTerm.find("option:selected").text();
             const groupId = cboGroup.val();
-            tblStudent.DataTable().clear().destroy();
-            tblScore.DataTable().clear().destroy();
+            if (!groupId || !termNo) return;  
             $("#lblStudentName").hide().text("");
-
-            tblStudent.DataTable({
+            if (dtStudent) {
+                dtStudent.ajax.reload();
+                return;
+            }
+            dtStudent = tblStudent.DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
                 autoWidth: false,
+                info:false,
                 ajax: {
                     url: `/student/GetStudents`,
                     type: "POST",
-                    data: { groupid: groupId, termno: termNo },
+                    data: {
+                        DegreeId: cboDegree.val(),
+                        SchoolId: cboSchool.val(),
+                        PromotionId: cboPromotion.val(),
+                        FieldId: cboField.val(),
+                        StageId: cboStage.val(),
+                        TermId: cboTerm.val(),
+                        GroupId: cboGroup.val()
+                    }
+                },
+                drawCallback: function () {
+                    const info = this.api().page.info();
+                    $("#studentCountText").text(
+                        `Showing ${info.start + 1} to ${info.end} of ${info.recordsDisplay}`
+                    );
                 },
                 columns: [
                     { data: "studentId" },
@@ -292,7 +298,7 @@
             tblScore.DataTable({
                     processing: true,
                     serverSide: true,
-                    responsive: true,
+                    responsive: false,
                     autoWidth: false,
                     ajax: {
                         url: `/scores/get-scores/${student_group_id}`,
@@ -304,13 +310,13 @@
                     columns: [
                         { data: "courseName" },
                         {
-                            data: "midTermScore",
+                            data: "midTermScore", 
                             render: function (data) {
                                 return `<input type="number" step="0.01" class="form-control form-control-sm text-center font-weight-bold border-warning" name="midterm" value="${data ? data.toFixed(2) : '0.00'}" readonly/>`;
                             }
                         },
                         {
-                            data: "finalScore",
+                            data: "finalScore", 
                             render: function (data) {
                                 return `<input type="number" step="0.01" class="form-control form-control-sm text-center font-weight-bold border-warning" name="final" value="${data ? data.toFixed(2) : '0.00'}" readonly/>`;
                             }
@@ -338,7 +344,8 @@
                 });
         }
         
-        tblScore.on("click", "#btnEdit", function (event) {
+        tblScore.on("click", "#btnEdit", function (e) {
+            e.preventDefault();
             const $row = $(this).closest('tr'); 
             $row.find('input[name="midterm"]').prop('readonly', false).addClass('bg-white');
             $row.find('input[name="final"]').prop('readonly', false).addClass('bg-white');
@@ -350,7 +357,8 @@
                 .html('<i class="fas fa-save"></i>');
         });
 
-        tblScore.on("click", "#btnSave", function (event) {
+        tblScore.on("click", "#btnSave", async function (e) {
+            e.preventDefault();
             const $row = $(this).closest('tr');
             const newMid = parseFloat($row.find('input[name="midterm"]').val()) || 0;
             const newFinal = parseFloat($row.find('input[name="final"]').val()) || 0;
@@ -368,28 +376,34 @@
                 .attr('id', 'btnEdit')
                 .removeClass('btn-success')
                 .addClass('btn-warning')
-                .html('<i class="fas fa-edit"></i>');
-
+                .html('<i class="fas fa-edit"></i>'); 
             $row.find('input[name="midterm"]').prop('readonly', true).removeClass('bg-white');
-            $row.find('input[name="final"]').prop('readonly', true).removeClass('bg-white');
-            
-            // Fetch internal row configuration object reference to commit inline data variables safely
+            $row.find('input[name="final"]').prop('readonly', true).removeClass('bg-white'); 
             const table = $('#tblScore').DataTable();
-            const rowData = table.row($row).data();
-            if(rowData) {
-                rowData.midTermScore = newMid;
-                rowData.finalScore = newFinal;
-                OnSave(rowData);
+            const rowData = table.row($row).data(); 
+            if(e.target){
+                const updatedMid = parseFloat($row.find('input[name="midterm"]').val());
+                const updatedFinal = parseFloat($row.find('input[name="final"]').val());
+                try {
+                    const response = await $.ajax({
+                        url: "/scores/update-score",
+                        method: 'PUT',
+                        data: {
+                            id: rowData.scoreId,
+                            midterm: updatedMid,
+                            final: updatedFinal,
+                        },
+                    });
+                    if (response.status.code === "200") {
+                        ShowToastSuccess(response.status.message);
+                        tblScore.DataTable().ajax.reload(null, false);
+                    }else{
+                        ShowToastError(response.status.message);
+                    }
+                }catch(err) {
+                    ShowToastError(err);
+                }
             }
         });
-
-        function OnSave(rowData) {
-            const table = $('#tblScore').DataTable();
-            const row = table.row(function (idx, data) {
-                return data.scoreId === rowData.scoreId;
-            });
-            if (!row.node()) return;
-            row.data(rowData).draw(false);
-        }
     </script>
 }
