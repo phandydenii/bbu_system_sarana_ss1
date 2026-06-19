@@ -229,22 +229,14 @@
         }
 
         function OnFilter() {
-            const termNo = cboTerm.find("option:selected").text();
-            const groupId = cboGroup.val();
-            if (!groupId || !termNo) return;  
-            $("#lblStudentName").hide().text("");
-            if (dtStudent) {
-                dtStudent.ajax.reload();
+            if (!cboGroup.val() || !cboTerm.val()) {
+                ShowToastError("Please select Term and Group.");
                 return;
             }
-            const req = {
-                // DegreeId: cboDegree.val(),
-                // SchoolId: cboSchool.val(),
-                // PromotionId: cboPromotion.val(),
-                // FieldId: cboField.val(),
-                // StageId: cboStage.val(),
-                TermNo: termNo,
-                GroupId: groupId
+            $("#lblStudentName").hide().text("");  
+            if (dtStudent) { 
+                dtStudent.ajax.reload();
+                return;
             }
             dtStudent = tblStudent.DataTable({
                 processing: true,
@@ -255,8 +247,9 @@
                 ajax: {
                     url: `/student/GetStudents`,
                     type: "POST",
-                    data: {
-                        req: req
+                    data: function (d){
+                        d.TermNo = cboTerm.val();
+                        d.GroupId = cboGroup.val();
                     }
                 },
                 drawCallback: function () {
