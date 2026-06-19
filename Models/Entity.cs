@@ -2545,7 +2545,7 @@ public class Province
     [Column("PROVINCE", TypeName = "varchar(30)")]
     public string? ProvinceName { get; set; }
 
-    [Column("PROVINCE_IN_KHMER", TypeName = "varchar(30)")]
+    [Column("PROVINCE_IN_KHMER", TypeName = "nvarchar(100)")]
     public string? ProvinceInKhmer { get; set; }
 
     [Column("IS_CITY", TypeName = "int")] public int IsCity { get; set; }
@@ -2788,12 +2788,14 @@ public class Quit
 [Table("RACE")]
 public class Race
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column("RACE_ID", TypeName = "int")] public int? RaceId { get; set; }
 
     [Column("RACE", TypeName = "varchar(30)")]
     public string? RaceName { get; set; }
 
-    [Column("RACE_IN_KHMER", TypeName = "varchar(30)")]
+    [Column("RACE_IN_KHMER", TypeName = "nvarchar(100)")]
     public string? RaceInKhmer { get; set; }
 }
 

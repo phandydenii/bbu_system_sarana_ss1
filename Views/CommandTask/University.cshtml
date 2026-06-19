@@ -8,7 +8,7 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">University</h3>
-                <button type="button" id="btnNewUniversity" class="btn btn-success btn-sm float-right" >
+                <button type="button" class="btn btn-success btn-sm float-right" data-toggle="modal" data-target="#UniversityModal">
                     <i class="fas fa-plus"></i>
                     Add New
                 </button>
@@ -35,243 +35,111 @@
 <partial name="_UniversityModal"/>
 
 @section Scripts{
-
+    <script src="~/function/University.js"></script>
     <script>
     const tblUniversity = $("#tblUniversity");
-    const universityModal = $("#universityModal");
-    const formUniversity = $("#formUniversity");
-
-    const universityIdInput = $("#university_UniversityId");
-    const universityNameInput = $("#university_UniversityName");
-    const universityNameKhmerInput = $("#university_UniversityNameInKhmer");
-    const abbreviationNameInput = $("#university_AbbreviationName");
-
-    $(document).ready(function () {
+    const btnClose = $("#btnClose");
+    
+    $(document).ready(async function () {
         fetchUniversity();
-
-        $("#btnNewUniversity").on("click", function (e) {
-            e.preventDefault();
-
-            clearUniversityForm();
-
-            universityModal.find(".modal-title").text("Add University");
-            universityModal.modal("show");
-        });
     });
 
-    function truncateText(data, maxLength = 30) {
-        if (data === null || data === undefined) return "";
-
-        let text = data.toString();
-
-        return text.length > maxLength
-            ? text.substring(0, maxLength) + "..."
-            : text;
-    }
-
-    function renderTruncate(data) {
-        if (data === null || data === undefined) return "";
-
-        let text = data.toString();
-
-        return `<span title="${text}">${truncateText(text, 30)}</span>`;
-    }
-
     function fetchUniversity() {
-        if ($.fn.DataTable.isDataTable("#tblUniversity")) {
-            tblUniversity.DataTable().clear().destroy();
-            tblUniversity.empty();
-        }
-
-        universityTable = tblUniversity.DataTable({
-            destroy: true,
+        tblUniversity.DataTable().clear().destroy();
+        tblUniversity.DataTable({
             paging: true,
             lengthChange: true,
             searching: true,
             ordering: true,
             info: true,
-
-            responsive: false,
-            autoWidth: false,
-            scrollX: true,
-            scrollCollapse: true,
-
+            responsive: true,
             processing: true,
             serverSide: true,
+            order: [[0, "desc"]],
             ajax: {
                 url: "/university/get-universities",
-                type: "POST",
-                error: function (xhr) {
-                    console.log(xhr.responseText);
-                    ShowToastError("Cannot load university data.");
-                }
+                type: "POST"
             },
-
             columns: [
+                { data: "universityId" },
+                { data: "universityName" },
+                { data: "universityNameInKhmer" },
+                { data: "abbreviationName" },
                 {
-                    title: "ID",
-                    data: "universityId",
-                    width: "70px"
-                },
-                {
-                    title: "University Name",
-                    data: "universityName",
-                    width: "300px",
-                    render: function (data) {
-                        return renderTruncate(data);
-                    }
-                },
-                {
-                    title: "University Name Khmer",
-                    data: "universityNameInKhmer",
-                    width: "320px",
-                    render: function (data) {
-                        return renderTruncate(data);
-                    }
-                },
-                {
-                    title: "Abbreviation",
-                    data: "abbreviationName",
-                    width: "150px",
-                    render: function (data) {
-                        return renderTruncate(data);
-                    }
-                },
-                {
-                    title: "Action",
                     data: null,
-                    width: "100px",
-                    className: "text-center",
-                    orderable: false,
-                    searchable: false,
                     render: function () {
                         return `
-                        <a href="javascript:void(0)" class="btnEdit btn btn-success btn-sm">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                    `;
+                            <a id="btnEdit" class="btn btn-success btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        `;
                     }
                 }
             ],
-
-            initComplete: function () {
-                let api = this.api();
+            initComplete: function(){
                 MyApp.utils.dataTableDebounceSearch("#tblUniversity", 500);
-
-                setTimeout(function () {
-                    api.columns.adjust();
-                }, 500);
-            },
-
-            drawCallback: function () {
-                this.api().columns.adjust();
             }
         });
-
-        setTimeout(function () {
-            universityTable.columns.adjust();
-        }, 1000);
-    }
-
-    function adjustDataTables() {
-        setTimeout(function () {
-            $.fn.dataTable
-                .tables({ visible: true, api: true })
-                .columns.adjust();
-        }, 300);
-
-        setTimeout(function () {
-            $.fn.dataTable
-                .tables({ visible: true, api: true })
-                .columns.adjust();
-        }, 700);
     }
     
-
-    function clearUniversityForm() {
-        formUniversity[0].reset();
-
-        universityIdInput.val(0);
-        universityNameInput.val("");
-        universityNameKhmerInput.val("");
-        abbreviationNameInput.val("");
-    }
-
-    tblUniversity.on("click", ".btnEdit", function (e) {
+    tblUniversity.on("click", "#btnEdit", function (e) {
         e.preventDefault();
 
-        let row = $(this).closest("tr");
-
-        if (row.hasClass("child")) {
-            row = row.prev();
+        let $row = $(this).closest('tr');
+        if($row.hasClass('child')){
+            $row = $row.prev();
         }
+        const selectedRow = tblUniversity.DataTable().row($row).data();
+        console.log(selectedRow);
+        
+        const university = new University(selectedRow);
+        $("#university_UniversityId").val(university.universityId);
+        $("#university_UniversityName").val(university.universityName);
+        $("#university_UniversityNameInKhmer").val(university.universityNameInKhmer);
+        $("#university_AbbreviationName").val(university.abbreviationName);
+        
+        $("#UniversityModal").modal("show");
+      
+    });
 
-        const selectedRow = tblUniversity.DataTable().row(row).data();
+    
+    $(document).on("click", "#btnClose", function (e) {
+        e.preventDefault();
+        $("#universityForm")[0].reset();
+        $("#UniversityModal").modal("hide");
+    });
 
-        if (!selectedRow) {
-            ShowToastError("Cannot get selected university data.");
+    $(document).on("submit", "#universityForm", function (event) {
+        event.preventDefault();
+
+        if (!this.checkValidity()) {
+            this.reportValidity();
             return;
         }
-
-        universityIdInput.val(selectedRow["universityId"]);
-        universityNameInput.val(selectedRow["universityName"]);
-        universityNameKhmerInput.val(selectedRow["universityNameInKhmer"]);
-        abbreviationNameInput.val(selectedRow["abbreviationName"] || "");
-
-        universityModal.find(".modal-title").text("Edit University");
-        universityModal.modal("show");
-    });
-
-    $(document).on("click", ".btnCloseUniversity", function (e) {
-        e.preventDefault();
-
-        clearUniversityForm();
-        universityModal.modal("hide");
-    });
-
-    $(document).on("submit", "#formUniversity", function (e) {
-        e.preventDefault();
-
-        const universityId = universityIdInput.val() || "0";
-        const universityName = (universityNameInput.val() || "").trim();
-        const universityNameKhmer = (universityNameKhmerInput.val() || "").trim();
-        const abbreviationName = (abbreviationNameInput.val() || "").trim();
-
+        const form = $(this);
+        const formData = $(form).serialize();
+        $("#university_id").val();
         $.ajax({
             url: "/university/SaveChange",
             method: "POST",
-            data: {
-                UniversityId: universityId,
-                UniversityName: universityName,
-                UniversityNameInKhmer: universityNameKhmer,
-                AbbreviationName: abbreviationName
-            },
+            data: formData,
             success: function (response) {
-                const code = response.status?.code;
-                const message = response.status?.message;
-
-                if (code === "200" || code === 200) {
-                    ShowToastSuccess(
-                        message ||
-                        (universityId !== "0" ? "Updated successfully!" : "Saved successfully!")
-                    );
-
-                    clearUniversityForm();
-                    universityModal.modal("hide");
-                    tblUniversity.DataTable().ajax.reload();
+                if(response.status.code === "200"){
+                    ShowToastSuccess("Saved successfully!");
+                    $("#universityForm")[0].reset();
+                    $("#UniversityModal").modal("hide");
+                    $("#tblUniversity").DataTable().ajax.reload();
                 } else {
-                    ShowToastError(message || "Save failed.");
+                    ShowToastError(response.message);
                 }
             },
-            error: function (xhr) {
-                const message =
-                    xhr["responseJSON"]?.["status"]?.["message"] ||
-                    xhr["responseJSON"]?.["message"] ||
-                    "Server error.";
-
-                ShowToastError(message);
+            error: function (error) {
+                if (error.responseJSON && error.responseJSON.message) {
+                    ShowToastError(error.responseJSON.message);
+                }
             }
         });
     });
-</script>
+
+    </script>
 }

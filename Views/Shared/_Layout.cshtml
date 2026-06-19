@@ -54,6 +54,13 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <style>
+        .paginate_button.previous.disabled,
+        .paginate_button.next.disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
         .sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active {
             background-color: #18196c !important;
             color: #fff;

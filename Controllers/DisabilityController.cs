@@ -25,6 +25,10 @@ public class DisabilityController(ICampusDbContext campusDbContext, IMapper mapp
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
+            
+            var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
+            var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var sortColumn = Request.Form[$"columns[{sortColumnIndex}][data]"].FirstOrDefault();
 
             var pageSize = length != null ? Convert.ToInt32(length) : 0;
             var skip = start != null ? Convert.ToInt32(start) : 0;
@@ -41,7 +45,22 @@ public class DisabilityController(ICampusDbContext campusDbContext, IMapper mapp
                     d.DisabilityNameKh!.Contains(searchValue));
 
             var recordsTotal = query.Count();
-            query = query.OrderByDescending(d => d.Id);
+            //query = query.OrderByDescending(d => d.Id);
+            switch (sortColumn)
+            {
+                case "disabilityName":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.DisabilityName):
+                        query.OrderByDescending(x => x.DisabilityName);
+                    break;
+                case "disabilityNameKh":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.DisabilityNameKh):
+                        query.OrderByDescending(x => x.DisabilityNameKh);
+                    break;
+                default:
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.Id):
+                        query.OrderByDescending(x => x.Id);
+                    break;
+            }
             var data = query.Skip(skip).Take(pageSize).ToList();
 
             return Json(new
@@ -92,7 +111,6 @@ public class DisabilityController(ICampusDbContext campusDbContext, IMapper mapp
 
             db.TblDisability.Update(oldData);
             await db.SaveChangesAsync();
-
             return new ServerResponse().Success(oldData, "Updated successfully!");
         }
         catch (Exception ex)

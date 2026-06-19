@@ -14,12 +14,15 @@ public class AutoMapperConfiguration : Profile
         CreateMap<Faculty, FacultyDto>().ReverseMap();
         CreateMap<Field, FieldDto>().ReverseMap();
         CreateMap<Faculty, FacultyDto>().ReverseMap();
+        CreateMap<Nationality, NationalityDto>().ReverseMap();
+        CreateMap<Race, RaceDto>().ReverseMap();
         CreateMap<CourseDto, Course>().ReverseMap();
         CreateMap<CoursetermDto, CourseTerm>().ReverseMap();
         CreateMap<Group, GroupDto>().ReverseMap();
         CreateMap<GroupRoom, GroupRoomDto>().ReverseMap();
         CreateMap<Promotion, PromotionDto>().ReverseMap();
         CreateMap<School, SchoolDto>().ReverseMap();
+        CreateMap<Province, ProvinceDto>().ReverseMap();
         CreateMap<Stage, StageDto>().ReverseMap();
         CreateMap<Term, TermDto>().ReverseMap();
         CreateMap<User, UserDto>().ReverseMap();

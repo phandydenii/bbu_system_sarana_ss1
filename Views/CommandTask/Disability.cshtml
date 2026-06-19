@@ -7,7 +7,8 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Disability</h3>
-                <button type="button" id="btnNewDisability" class="btn btn-success btn-sm float-right">
+                <button type="button" class="btn btn-success btn-sm float-right" data-toggle="modal"
+                        data-target="#disabilityModal">
                     <i class="fas fa-plus"></i>
                     Add New
                 </button>
@@ -31,147 +32,100 @@
 </div>
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <partial name="_DisabilityModal"/>
-<script>
-    $(document).ready(function () {
-        fetchDisability();
 
-        $("#btnNewDisability").on("click", function (e) {
-            e.preventDefault();
+@section Scripts
+{
+    <script src="~/function/Disability.js"></script>
+    <script>
+        const tblDisability = $("#tblDisability");
+        const btnClose = $("#btnClose");
+        $(document).ready(function () {
+            fetchDisability();
 
-            clearDisabilityForm();
-
-            $("#disabilityModal").find(".modal-title").text("Add Disability");
-            $("#disabilityModal").modal("show");
-        });
-
-        $(document).on("click", ".btnCloseDisability", function () {
-            clearDisabilityForm();
-            $("#disabilityModal").modal("hide");
-        });
-    });
-
-    function fetchDisability() {
-        if ($.fn.DataTable.isDataTable("#tblDisability")) {
-            $("#tblDisability").DataTable().clear().destroy();
-        }
-
-        $("#tblDisability").DataTable({
-            paging: true,
-            lengthChange: true,
-            searching: true,
-            ordering: true,
-            info: true,
-            responsive: true,
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "/Disability/get-disabilities",
-                type: "POST"
-            },
-            columns: [
-                { data: "id" },
-                { data: "disabilityName" },
-                { data: "disabilityNameKh" },
-                {
-                    title: "Action",
-                    data: null,
-                    width: "180px",
-                    className: "dt-action",
-                    orderable: false,
-                    searchable: false,
-                    render: function () {
-                        return `
-                        <a href="javascript:void(0)" class="btnEdit btn btn-warning btn-sm">
+            function fetchDisability() {
+                tblDisability.DataTable().clear().destroy();
+                tblDisability.DataTable({
+                    paging: true,
+                    lengthChange: true,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    responsive: true,
+                    processing: true,
+                    serverSide: true,
+                    order: [[0, "desc"]],
+                    ajax: {
+                        url: "/Disability/get-disabilities",
+                        type: "POST"
+                    },
+                    columns: [
+                        {data: "id"},
+                        {data: "disabilityName"},
+                        {data: "disabilityNameKh"},
+                        {
+                            data: null,
+                            render: function () {
+                                return `
+                        <a id="btnEdit" class="btn btn-success btn-sm">
                             <i class="fas fa-edit"></i> Edit
                         </a>
                     `;
+                            }
+                        }
+                    ],
+                    initComplete: function () {
+                        MyApp.utils.dataTableDebounceSearch("#tblDisability", 500);
                     }
-                }
-            ],
-            initComplete: function () {
-                MyApp.utils.dataTableDebounceSearch("#tblDisability", 500);
+                });
             }
-        });
-    }
 
-    function clearDisabilityForm() {
-        $("#formDisability")[0].reset();
+            tblDisability.on("click", "#btnEdit", function () {
+                let row = $(this).closest("tr");
+                if (row.hasClass("child")) {
+                    row = row.prev();
+                }
+                const selectedRow = tblDisability.DataTable().row(row).data();
+                const disability = new Disability(selectedRow);
+                
+                $("#Id").val(disability.id);
+                $("#DisabilityName").val(disability.disabilityName);
+                $("#DisabilityNameKh").val(disability.disabilityNameKh);
+                $("#disabilityModal").modal("show");
+            });
 
-        $("#disability_Id").val(0);
-        $("#disability_DisabilityName").val("");
-        $("#disability_DisabilityNameKh").val("");
-    }
-
-    $("#tblDisability").on("click", ".btnEdit", function () {
-        let row = $(this).closest("tr");
-
-        if (row.hasClass("child")) {
-            row = row.prev();
-        }
-
-        const selectedRow = $("#tblDisability").DataTable().row(row).data();
-
-        $("#disability_Id").val(selectedRow.id);
-        $("#disability_DisabilityName").val(selectedRow.disabilityName);
-        $("#disability_DisabilityNameKh").val(selectedRow.disabilityNameKh);
-
-        $("#disabilityModal").find(".modal-title").text("Edit Disability");
-        $("#disabilityModal").modal("show");
-    });
-
-    $("#formDisability").on("submit", function (e) {
-        e.preventDefault();
-
-        const id = $("#disability_Id").val() || "0";
-        const disabilityName = ($("#disability_DisabilityName").val() || "").trim();
-        const disabilityNameKh = ($("#disability_DisabilityNameKh").val() || "").trim();
-
-        if (disabilityName === "") {
-            ShowToastError("Disability name is required.");
-            $("#disability_DisabilityName").focus();
-            return;
-        }
-
-        if (disabilityNameKh === "") {
-            ShowToastError("Disability name Khmer is required.");
-            $("#disability_DisabilityNameKh").focus();
-            return;
-        }
-
-        $.ajax({
-            url: "/Disability/SaveChange",
-            method: "POST",
-            data: {
-                Id: id,
-                DisabilityName: disabilityName,
-                DisabilityNameKh: disabilityNameKh
-            },
-            success: function (response) {
-                const code = response.status?.code;
-                const message = response.status?.message;
-
-                if (code === "200" || code === 200) {
-                    if (id !== "0") {
-                        ShowToastSuccess(message || "Updated successfully!");
-                    } else {
-                        ShowToastSuccess(message || "Saved successfully!");
+            $("#disabilityForm").on("submit", function (e) {
+                e.preventDefault();
+                const form = $(this);
+                const formData = $(form).serialize();
+                console.log(formData);
+                $.ajax({
+                    url: "/Disability/SaveChange",
+                    method: "POST",
+                    data: formData,
+                    success: function (response) {
+                        if (response.status.code === "200") {
+                            ShowToastSuccess("Saved successfully!");
+                            $("#disabilityForm")[0].reset();
+                            $("#disabilityModal").modal("hide");
+                            $("#tblDisability").DataTable().ajax.reload();
+                        } else {
+                            ShowToastError(response.message);
+                        }
+                    },
+                    error: function (error) {
+                        if (error.responseJSON && error.responseJSON.message) {
+                            ShowToastError(error.responseJSON.message);
+                        }
                     }
-
-                    clearDisabilityForm();
-                    $("#disabilityModal").modal("hide");
-                    $("#tblDisability").DataTable().ajax.reload();
-                } else {
-                    ShowToastError(message || "Save failed.");
-                }
-            },
-            error: function (xhr) {
-                const message =
-                    xhr["responseJSON"]?.["status"]?.["message"] ||
-                    xhr["responseJSON"]?.["message"] ||
-                    "Server error.";
-
-                ShowToastError(message);
-            }
+                });
+            });
         });
-    });
-</script>
+
+
+        btnClose.on("click", function (e) {
+            e.preventDefault();
+            $("#disabilityForm")[0].reset();
+            $("#disabilityModal").modal("hide");
+        });
+    </script>
+}

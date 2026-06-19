@@ -1,39 +1,37 @@
 @using BBU_SYSTEM.DTOs
 @using Province = BBU_SYSTEM.Modelsss.Province
 @{
-    var province = new ProvinceDto();
+    @model ProvinceDto;
+    //var province = new ProvinceDto();
 }
-<div class="modal fade" id="provinceModal" data-backdrop="static">
+<div class="modal fade" id="ProvinceModal" data-backdrop="static">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Province</h4>
             </div>
             <div class="modal-body">
-                <form id="formProvince">
-                    <input asp-for="@province.ProvinceId" hidden readonly class="form-control" value="0"/>
+                <form id="provinceForm">
+                    <input asp-for="ProvinceId" hidden readonly class="form-control" value="0"/>
                     <div class="form-group">
-                        <label class="required">Name</label>
-                        <input type="text" asp-for="@province.ProvinceName" class="form-control"
+                        <label>Name</label>
+                        <input type="text" asp-for="ProvinceName" class="form-control"
                                placeholder="Enter name" required>
                     </div>
                     <div class="form-group">
-                        <label class="required">Name Khmer</label>
-                        <input type="text" asp-for="@province.ProvinceInKhmer" class="form-control"
+                        <label>Name Khmer</label>
+                        <input type="text" asp-for="ProvinceInKhmer" class="form-control"
                                placeholder="Enter name khmer" required>
                     </div>
-                    <input type="hidden" asp-for="@province.IsCity" value="0" />
-
-                    <div class="form-group clearfix">
-                        <div class="icheck-primary d-inline">
-                            <input type="checkbox" id="chkIsCity">
-                            <label for="chkIsCity">Is City</label>
-                        </div>
+                    <div class="form-group">
+                        <input type="checkbox" id="chkIsCity"/>
+                        <label for="chkIsCity"> City</label>
+                        <input hidden id="isCity" name="isCity" value="0" />
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" form="formProvince" class="btn btn-success">
+                <button type="submit" form="provinceForm" class="btn btn-success">
                     <i class="fas fa-save"></i> Save
                 </button>
                 <button type="button" id="btnClose" class="btn btn-danger">

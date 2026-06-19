@@ -15,16 +15,14 @@
                 <form id="degreeForm">
                     <input asp-for="@degree.DegreeId" hidden readonly class="form-control" value="0"/>
                     <div class="form-group">
-                        <label class="required">Degree Name</label>
-                        <input type="text" asp-for="@degree.DegreeName" class="form-control requ"
+                        <label>Degree Name</label>
+                        <input type="text" asp-for="@degree.DegreeName" class="form-control"
                                placeholder="Enter name" required>
-                        <span asp-validation-for="@degree.DegreeName" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label>Degree Name Khmer</label>
                         <input type="text" asp-for="@degree.DegreeInKhmer" class="form-control"
-                               placeholder="Enter name khmer">
-                        <span asp-validation-for="@degree.DegreeInKhmer" class="text-danger"></span>
+                               placeholder="Enter name khmer" required>
                     </div>
                 </form>
             </div>

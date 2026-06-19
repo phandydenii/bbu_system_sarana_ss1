@@ -25,6 +25,10 @@ public class FieldController(ICampusDbContext campusDbContext, IMapper mapper, I
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
+            
+            var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
+            var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var sortColumn = Request.Form[$"columns[{sortColumnIndex}][data]"].FirstOrDefault();
 
             var pageSize = length != null ? Convert.ToInt32(length) : 0;
             var skip = start != null ? Convert.ToInt32(start) : 0; 
@@ -45,7 +49,30 @@ public class FieldController(ICampusDbContext campusDbContext, IMapper mapper, I
                     d.FieldNameInKhmer!.Contains(searchValue));
 
             var recordsTotal = query.Count();
-            query = query.OrderByDescending(d => d.FieldId);
+            // query = query.OrderByDescending(d => d.FieldId);
+            switch (sortColumn)
+            {
+                case "fieldName":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.FieldName):
+                        query.OrderByDescending(x => x.FieldName);
+                    break;
+                case "fieldNameInKhmer":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.FieldNameInKhmer):
+                        query.OrderByDescending(x => x.FieldNameInKhmer);
+                    break;
+                case "degreeName":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.DegreeName):
+                        query.OrderByDescending(x => x.DegreeName);
+                    break;
+                case "degreeNameInKhmer":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.DegreeNameInKhmer):
+                        query.OrderByDescending(x => x.DegreeNameInKhmer);
+                    break;
+                default:
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.FieldId):
+                        query.OrderByDescending(x => x.FieldId);
+                    break;
+            }
             var data = query.Skip(skip).Take(pageSize).ToList();
 
             return Json(new

@@ -25,6 +25,10 @@ public class DegreeController(ICampusDbContext campusDbContext, IMapper mapper, 
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
+            
+            var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
+            var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var sortColumn = Request.Form[$"columns[{sortColumnIndex}][data]"].FirstOrDefault();
 
             var pageSize = length != null ? Convert.ToInt32(length) : 0;
             var skip = start != null ? Convert.ToInt32(start) : 0;
@@ -41,7 +45,20 @@ public class DegreeController(ICampusDbContext campusDbContext, IMapper mapper, 
                     d.DegreeInKhmer!.Contains(searchValue));
 
             var recordsTotal = query.Count();
-            query = query.OrderByDescending(d => d.DegreeId);
+            //query = query.OrderByDescending(d => d.DegreeId);
+            switch(sortColumn)
+            {
+                case "degreeName":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.DegreeName) : query.OrderByDescending(x => x.DegreeName);
+                    break;
+                case "degreeInKhmer":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.DegreeInKhmer) : query.OrderByDescending(x => x.DegreeInKhmer);
+                    break;
+                default:
+                    query = sortDirection == "asc"? query.OrderBy(x => x.DegreeId): query.OrderByDescending(x => x.DegreeId);
+                    break;
+            }
+                
             var data = query.Skip(skip).Take(pageSize).ToList();
 
             return Json(new

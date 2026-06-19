@@ -8,7 +8,8 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">School</h3>
-                <button type="button" class="btn btn-success btn-sm float-right" onclick="openAddSchool()">
+                <button type="button" class="btn btn-success btn-sm float-right" data-toggle="modal"
+                        data-target="#SchoolModal">
                     <i class="fas fa-plus"></i>
                     Add New
                 </button>
@@ -22,7 +23,7 @@
                         <th>Name Khmer</th>
                         <th>Code</th>
                         <th>Faculty</th>
-                        <th>Is Foundation</th>
+                        <th>Foundation</th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -35,336 +36,173 @@
 </div>
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <partial name="_SchoolModal"/>
-<script>
-    let schoolTable = null;
-    let facultyDropdownRequest = null;
+@section Scripts{
+    <script src="~/function/School.js"></script>
+    <script>
+        const tblSchool = $("#tblSchool");
+        const schoolForm = $("#schoolForm");
+        const facultyId = $("#FacultyId");
 
-    $(document).ready(function () {
-        fetchSchool();
+        $(document).ready(function () {
+            fetchSchool();
+            fetchFaculties();
+        });
+
+        function fetchSchool() {
+            if ($.fn.DataTable.isDataTable("#tblSchool")) {
+                tblSchool.DataTable().clear().destroy();
+            }
+            tblSchool.DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                order: [[0, "desc"]],
+                ajax: {
+                    url: "/School/get-schools",
+                    type: "POST",
+                },
+                columns: [
+                    {data: "schoolId"},
+                    {data: "schoolName"},
+                    {data: "schoolNameInKhmer"},
+                    {data: "schoolCode"},
+                    {data: "facultyId"},
+                    {
+                        data: "isFoundationSchool",
+                        render: function (data) {
+                            return data === 1 ? "Yes" : "No";
+                        }
+
+                    },
+                    {
+                        data: null,
+                        render: function () {
+                            return `
+                            <div class="text-center">
+                                <button id="btnEdit" type="button" class="btn btn-success btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button id="btnDelete" type="button" class="btn btn-danger btn-sm btnDeleteSchool">
+                                    <i class="fa-solid fa-trash"></i> Delete
+                                </button>
+                            </div>
+                            `;
+                        }
+                    }
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblSchool", 500);
+                }
+            });
+        }
+
+        function fetchFaculties(selectedId = null) {
+            $.ajax({
+                url: "/school/get-faculties",
+                type: "GET",
+                success: function (response) {
+                    facultyId.empty();
+                    facultyId.append('<option value="">Select Faculty</option>');
+
+                    $.each(response.data, function (i, item) {
+                        let selected = item.id === selectedId ? 'selected' : '';
+                        $("#FacultyId").append(
+                            `<option value="${item.id}" ${selected}> ${item.name}</option>
+                            `
+                        );
+                    });
+                },
+                error: function (error) {
+                    if(error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    }
+                }
+            });
+        }
         
-        facultyDropdownRequest = fetchFacultyDropdown();
+        tblSchool.on("click", "#btnEdit", function () {
+            let $row = $(this).closest('tr');
+            if ($row.hasClass('child')) {
+                $row = $row.prev();
+            }
+            const selectedRow = tblSchool.DataTable().row($row).data();
+            console.log(selectedRow);
+            
+            const school = new School(selectedRow);
+            $("#SchoolId").val(school.schoolId);
+            $("#SchoolName").val(school.schoolName);
+            $("#SchoolNameInKhmer").val(school.schoolNameInKhmer);
+            $("#SchoolCode").val(school.schoolCode);
+            $("#FacultyId").val(school.facultyId);
+            $("#chkFoundation").prop("checked", school.isFoundationSchool === 1);
+            $("#IsFoundationSchool").val(school.isFoundationSchool);
 
-        $("#btnCloseSchool").on("click", function (e) {
+            $("#SchoolModal").modal("show");
+        });
+
+        tblSchool.on("click", "#btnDelete", function () {
+            const $row = $(this).closest('tr');
+            const selectedRow = tblSchool.DataTable().row($row).data();
+            if (!confirm("Are you sure you want to delete this school?")) return;
+
+            $.ajax({
+                url: "/School/delete/" + selectedRow.schoolId,
+                type: "DELETE",
+                success: function (response) {
+                    if (response.status.code === "200") {
+                        ShowToastSuccess("Delete successfully!");
+                        $("#tblSchool").DataTable().ajax.reload();
+                    } else {
+                        ShowToastError(response.message);
+                    }
+                },
+                error: function (error) {
+                    if (error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    }
+                }
+
+            });
+        });
+
+        schoolForm.on("submit", function (e) {
             e.preventDefault();
-            clearSchoolForm();
+            
+            $("#IsFoundationSchool").val($("#chkFoundation").is(":checked")?1:0);
+            const form = $(this);
+            const formData = $(form).serialize();
+
+            $.ajax({
+                url: "/School/SaveChange",
+                type: "POST",
+                data: formData,
+                success: function (response) {
+                    if (response.status.code === "200") {
+                        ShowToastSuccess("Saved successfully!");
+                        $("#schoolForm")[0].reset();
+                        $("#SchoolModal").modal("hide");
+                        $("#tblSchool").DataTable().ajax.reload();
+                    } else {
+                        ShowToastError(response.message);
+                    }
+                },
+                error: function (error) {
+                    if (error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    }
+                }
+            });
+        });
+
+        $(document).on("click", "#btnClose", function () {
+            $("#schoolForm")[0].reset();
             $("#SchoolModal").modal("hide");
         });
-        
-    });
+    </script>
+}
     
-
-    function reloadSchoolTable() {
-        if (schoolTable) {
-            schoolTable.ajax.reload();
-        }
-    }
-
-    function fetchSchool() {
-        const tblSchool = $("#tblSchool");
-
-        if ($.fn.DataTable.isDataTable("#tblSchool")) {
-            tblSchool.DataTable().clear().destroy();
-            tblSchool.empty();
-        }
-
-        schoolTable = tblSchool.DataTable({
-            destroy: true,
-            paging: true,
-            lengthChange: true,
-            searching: true,
-            ordering: true,
-            info: true,
-
-            responsive: false,
-            autoWidth: false,
-            scrollX: true,
-            scrollCollapse: true,
-
-            processing: true,
-            serverSide: true,
-            order: [[0, "desc"]],
-
-            ajax: {
-                url: "/School/get-schools",
-                type: "POST",
-                error: function (xhr) {
-                    console.log(xhr.responseText);
-                    ShowToastError("Cannot load school data.");
-                }
-            },
-
-            columns: [
-                {
-                    title: "ID",
-                    data: "schoolId",
-                    width: "70px"
-                },
-                {
-                    title: "School Name",
-                    data: "schoolName",
-                    render: function (data) {
-                        return renderTruncate(data);
-                    }
-                },
-                {
-                    title: "School Name Khmer",
-                    data: "schoolNameInKhmer",
-                    render: function (data) {
-                        return renderTruncate(data);
-                    }
-                },
-                {
-                    title: "School Code",
-                    data: "schoolCode",
-                    render: function (data) {
-                        return renderTruncate(data);
-                    }
-                },
-                {
-                    title: "Faculty ID",
-                    data: "facultyId",
-                    width: "100px"
-                },
-                {
-                    title: "Foundation School",
-                    data: "isFoundationSchool",
-                    width: "160px",
-                    render: function (data) {
-                        return Number(data) === 1 ? "Yes" : "No";
-                    }
-                },
-                {
-                    title: "Action",
-                    data: null,
-                    width: "180px",
-                    className: "dt-action",
-                    orderable: false,
-                    searchable: false,
-                    render: function () {
-                        return `
-                        <div class="dt-action">
-                            <button type="button" class="btn btn-warning btn-sm btnEditSchool">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button type="button" class="btn btn-danger btn-sm btnDeleteSchool">
-                                <i class="fa-solid fa-trash"></i> Delete
-                            </button>
-                        </div>
-                    `;
-                    }
-                }
-            ],
-
-            initComplete: function () {
-                let api = this.api();
-                MyApp.utils.dataTableDebounceSearch("#tblSchool", 500);
-
-                setTimeout(function () {
-                    api.columns.adjust();
-                }, 500);
-            },
-
-            drawCallback: function () {
-                this.api().columns.adjust();
-            }
-        });
-
-        setTimeout(function () {
-            schoolTable.columns.adjust();
-        }, 1000);
-    }
-
-    function clearSchoolForm() {
-        const formElement = $("#schoolForm")[0];
-
-        if (formElement) {
-            formElement.reset();
-        }
-
-        $("#school_SchoolId").val(0);
-        $("#school_SchoolName").val("");
-        $("#school_SchoolNameInKhmer").val("");
-        $("#school_SchoolCode").val("");
-        $("#school_FacultyId").val("").trigger("change");
-        $("#school_IsFoundationSchool").val(0);
-        $("#chkFoundation").prop("checked", false);
-    }
-
-    function openAddSchool() {
-        clearSchoolForm();
-
-        if (facultyDropdownRequest) {
-            facultyDropdownRequest.done(function () {
-                $("#school_FacultyId").val("").trigger("change");
-            });
-        }
-
-        $("#SchoolModal").modal("show");
-    }
-
-    $("#tblSchool").on("click", ".btnEditSchool", function () {
-        let rowElement = $(this).closest("tr");
-
-        if (rowElement.hasClass("child")) {
-            rowElement = rowElement.prev();
-        }
-
-        const selectedRow = schoolTable.row(rowElement).data();
-
-        if (!selectedRow) {
-            ShowToastError("Cannot get selected school data.");
-            return;
-        }
-
-        $("#school_SchoolId").val(selectedRow["schoolId"]);
-        $("#school_SchoolName").val(selectedRow["schoolName"]);
-        $("#school_SchoolNameInKhmer").val(selectedRow["schoolNameInKhmer"]);
-        $("#school_SchoolCode").val(selectedRow["schoolCode"]);
-
-        const isFoundation = Number(selectedRow["isFoundationSchool"]) === 1;
-
-        $("#school_IsFoundationSchool").val(isFoundation ? 1 : 0);
-        $("#chkFoundation").prop("checked", isFoundation);
-
-        const selectedFacultyId = selectedRow["facultyId"];
-
-        if (facultyDropdownRequest) {
-            facultyDropdownRequest.done(function () {
-                setSelectedFaculty(selectedFacultyId);
-            });
-        } else {
-            setSelectedFaculty(selectedFacultyId);
-        }
-
-        $("#SchoolModal").modal("show");
-    });
-
-    function setSelectedFaculty(facultyId) {
-        const facultySelect = $("#school_FacultyId");
-
-        if (facultyId === null || facultyId === undefined || facultyId === "") {
-            facultySelect.val("").trigger("change");
-            return;
-        }
-
-        const value = String(facultyId);
-
-        facultySelect.val(value).trigger("change");
-
-    }
-
-    $("#tblSchool").on("click", ".btnDeleteSchool", function () {
-        let rowElement = $(this).closest("tr");
-
-        if (rowElement.hasClass("child")) {
-            rowElement = rowElement.prev();
-        }
-
-        const selectedRow = schoolTable.row(rowElement).data();
-
-        if (!selectedRow) {
-            ShowToastError("Cannot get selected school data.");
-            return;
-        }
-
-        if (!confirm("Are you sure you want to delete this school?")) {
-            return;
-        }
-
-        $.ajax({
-            url: "/School/delete/" + selectedRow["schoolId"],
-            type: "DELETE",
-            success: function (response) {
-                const code = response.status?.code;
-                const message = response.status?.message;
-
-                if (code === "200" || code === 200) {
-                    ShowToastSuccess(message || "Deleted successfully!");
-                    reloadSchoolTable();
-                } else {
-                    ShowToastError(message || "Delete failed.");
-                }
-            },
-            error: function () {
-                ShowToastError("Delete failed.");
-            }
-        });
-    });
-
-    function fetchFacultyDropdown() {
-        return $.ajax({
-            url: "/Faculty/get-faculties?isAll=true",
-            type: "POST",
-            success: function (response) {
-                const facultySelect = $("#school_FacultyId");
-
-                facultySelect.empty();
-                facultySelect.append('<option value="">Select Faculty</option>');
-
-                const faculties = response && response["data"] ? response["data"] : [];
-
-                faculties.forEach(function (faculty) {
-                    const facultyId = faculty["facultyId"];
-                    const facultyName = faculty["facultyName"];
-
-                    facultySelect.append(
-                        '<option value="' + facultyId + '">' + facultyName + '</option>'
-                    );
-                });
-
-                console.log("Faculty dropdown loaded.");
-            },
-            error: function () {
-                ShowToastError("Cannot load faculty dropdown.");
-            }
-        });
-    }
-
-    $("#schoolForm").on("submit", function (e) {
-        e.preventDefault();
-
-        const schoolId = $("#school_SchoolId").val() || "0";
-        const isFoundation = $("#chkFoundation").is(":checked") ? 1 : 0;
-
-        $("#school_IsFoundationSchool").val(isFoundation);
-
-        const formData = $("#schoolForm").serialize();
-
-        $.ajax({
-            url: "/School/SaveChange",
-            type: "POST",
-            data: formData,
-            success: function (response) {
-                const code = response.status?.code;
-                const message = response.status?.message;
-
-                if (code === "200" || code === 200) {
-                    if (schoolId !== "0") {
-                        ShowToastSuccess(message || "Updated successfully!");
-                    } else {
-                        ShowToastSuccess(message || "Saved successfully!");
-                    }
-
-                    clearSchoolForm();
-                    $("#SchoolModal").modal("hide");
-                    reloadSchoolTable();
-                } else {
-                    ShowToastError(message || "Save failed.");
-                }
-            },
-            error: function (xhr) {
-                if (xhr.status === 401) {
-                    ShowToastError("Unauthorized. Please login again.");
-                    return;
-                }
-
-                const message =
-                    xhr["responseJSON"]?.["status"]?.["message"] ||
-                    xhr["responseJSON"]?.["message"] ||
-                    "Server error.";
-
-                ShowToastError(message);
-            }
-        });
-    });
-</script>
