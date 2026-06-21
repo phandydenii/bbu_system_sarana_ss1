@@ -118,18 +118,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     {
         try
         {
-            if (idList.Count == 0)
-            {
-                return BadRequest(new
-                {
-                    data = new { },
-                    status = new
-                    {
-                        code = "400",
-                        message = "No students selected."
-                    }
-                });
-            } 
+            if (idList.Count == 0) return new ServerResponse().BadRequest("No students selected.");
             var db = campusDbContext.DbContext(_campus); 
             foreach (var id in idList)
             {
@@ -148,15 +137,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "500",
-                    message = e.Message
-                }
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 
@@ -291,20 +272,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                     s.Email,
                     s.Status
                 };
-
-            if (isAll)
-            {
-                return Ok(new
-                {
-                    data = await query.ToListAsync(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded"
-                    }
-                });
-            }
-
+            if (isAll) return new ServerResponse().Success(await query.ToListAsync());
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
@@ -364,19 +332,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                     s.Email,
                     s.Status
                 }).AsQueryable();
-            if (req.IsAll)
-            {
-                return Ok(new
-                {
-                    data = await query.ToListAsync(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded"
-                    }
-                });
-            }
-
+            if (req.IsAll) return new ServerResponse().Success(await query.ToListAsync());
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
@@ -454,21 +410,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                     s.FieldId,
                     s.Status
                 }).AsQueryable();
-            
-            if (req.IsAll)
-            {
-                var dataAll = await query.ToListAsync();
-                return Ok(new
-                {
-                    data=dataAll,
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded"
-                    }
-                });
-            }
-
+            if (req.IsAll) new ServerResponse().Success(await query.ToListAsync());
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
@@ -602,19 +544,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                     s.Status
                 }).AsQueryable();
 
-            if (req.IsAll)
-            {
-                return Ok(new
-                {
-                    data = await query.ToListAsync(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded"
-                    }
-                });
-            }
-
+            if (req.IsAll) new ServerResponse().Success(await query.ToListAsync());
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
@@ -675,18 +605,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                     s.Status
                 }).AsQueryable();
 
-            if (req.IsAll)
-            {
-                return Ok(new
-                {
-                    data = await query.ToListAsync(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded"
-                    }
-                });
-            }
+            if (req.IsAll) return new ServerResponse().Success(await query.ToListAsync());
 
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
@@ -1070,7 +989,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     [HttpGet]
     public IActionResult GetStudentDetail(string? studentId)
     {
-        if (studentId == null) return NotFound(new { message = "Student not found" });
+        if (studentId == null) return new ServerResponse().NotFound("Student not found");
         var db = campusDbContext.DbContext(_campus);
         var registry = (from r in db.TblRegistry
             join d in db.TblDegree on r.DegreeId equals d.DegreeId
@@ -1234,11 +1153,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                code = "500",
-                message = $"Internal Server Error: {e.Message}"
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 
@@ -1250,46 +1165,18 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         {
             var db = campusDbContext.DbContext(_campus);
             var data = await db.TblStudent.FindAsync(studentId);
-            if (data == null)
-            {
-                return NotFound(new
-                {
-                    data = new { },
-                    status = new
-                    {
-                        code = "404",
-                        message = "Student not found"
-                    }
-                });
-            }
-
+            if (data == null) return new ServerResponse().NotFound(); 
             data.IsAcceptCertificate = student.IsAcceptCertificate;
             data.AcceptDate = student.AcceptDate;
             data.CertificateNo = student.CertificateNo;
             data.CertificateOut = student.CertificateOut;
             data.NoteTicket = student.NoteTicket;
             await db.SaveChangesAsync();
-            return Ok(new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "200",
-                    message = "Student accepted"
-                }
-            });
+            return new ServerResponse().Success(msg: "Student accepted");
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "500",
-                    message = "Internal Server Error: " + e.Message
-                }
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 
@@ -1347,7 +1234,6 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             {
                 await db.SaveChangesAsync();
             }
-
             await db.Database.CommitTransactionAsync();
             return new ServerResponse().Success("Student and related data updated successfully");
         }
@@ -1359,6 +1245,62 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         finally
         {
             await db.DisposeAsync();
+        }
+    }
+
+    [HttpPost("change-branch")]
+    public async Task<IActionResult> ChangeBranch(ChangeBranchDto dto)
+    {
+        var db = campusDbContext.DbContext(_campus);
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        try
+        {
+            var student = await db.TblStudent.FirstOrDefaultAsync(x => x.StudentId == dto.StudentId);
+            if (student == null) return new ServerResponse().NotFound("Student not found.");
+            student.Status = StudentStatusConstant.ChangeBranch;
+            if (dto.ChangeBranchId == 0)
+            {
+                var data = mapper.Map<ChangeBranch>(dto);
+                await db.TblChangeBranch.AddAsync(data);
+                await db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return new ServerResponse().Success(data);
+            }
+            var oldData = await db.TblChangeBranch.FirstOrDefaultAsync(x => x.ChangeBranchId == dto.ChangeBranchId);
+            if (oldData == null) return new ServerResponse().NotFound("Change branch record not found.");
+            mapper.Map(dto, oldData);
+            await db.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return new ServerResponse().Success(oldData);
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            return new ServerResponse().ErrorInternal(e);
+        }
+    }
+    [HttpPost("quit")]
+    public async Task<IActionResult> Quit(QuitDto dto)
+    {
+        var db = campusDbContext.DbContext(_campus);
+        try
+        { 
+            if (dto.QuitId == 0)
+            {
+                var data = mapper.Map<Quit>(dto);
+                await db.TblQuit.AddAsync(data);
+                await db.SaveChangesAsync(); 
+                return new ServerResponse().Success(data);
+            }
+            var oldData = await db.TblQuit.FirstOrDefaultAsync(x => x.QuitId == dto.QuitId);
+            if (oldData == null) return new ServerResponse().NotFound("Record found.");
+            mapper.Map(dto, oldData);
+            await db.SaveChangesAsync(); 
+            return new ServerResponse().Success(oldData);
+        }
+        catch (Exception e)
+        { 
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 }

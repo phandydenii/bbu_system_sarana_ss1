@@ -1,7 +1,5 @@
-﻿
-@using BBU_SYSTEM.DTOs
+﻿@using BBU_SYSTEM.DTOs
 @using BBU_SYSTEM.ViewModel
-
 @{
     var studentViewModel = new StudentViewModel();
     var student = new StudentDto();
@@ -63,41 +61,31 @@
         <div class="modal-content"> 
             <div class="modal-header">
                 <h4 class="modal-title">Student Information</h4> 
-                <div class="float-right d-flex align-items-center">
+                <div class="float-right d-flex align-items-center mt-2">
                     <button type="button"
                             id="btnToggleStudentFullscreen"
-                            class="btn btn-tool btn-outline-info py-2 px-2"
+                            class="btn btn-tool"
                             title="Fullscreen">
                         <i id="studentFullscreenIcon" class="fas fa-expand"></i>
                     </button>
 
                     <button type="button"
-                            class="btn btn-tool btn-outline-danger py-2 px-2 ml-2"
+                            class="btn btn-tool ml-2"
                             data-dismiss="modal"
                             title="Close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
-
             <div class="modal-body p-2">
-
                 <div class="row">
                     <div class="col-12">
                         <div class="card card-outline card-success">
                             <div class="card-header">
                                 <h3 class="card-title">Student Information</h3>
-
                                 <div class="card-tools">
                                     <div id="actionButtons">
-                                        @if (isFull
-                                             || isUpdate
-                                             || isSuppress
-                                             || isChangeBranch
-                                             || isChangeSchool
-                                             || isQuit
-                                             || isAdjustGroup
-                                             || isSuspend)
+                                        @if (isFull || isUpdate || isSuppress || isChangeBranch || isChangeSchool || isQuit || isAdjustGroup || isSuspend)
                                         {
                                             <button id="btnEdit" class="btn btn-outline-primary btn-sm">
                                                 <i class="fas fa-pen"></i>
@@ -160,10 +148,8 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="card-body">
                                 <input type="hidden" id="txtStudentId">
-
                                 <form id="frmStudent">
                                     <div class="row">
                                         <div class="col-md-7">
@@ -303,7 +289,6 @@
                                                             </div>
                                                         </div>
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
@@ -481,9 +466,14 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </div>
     </div>
 </div>
+<partial name="_AdjustGroup"/>
+<partial name="_ChangeBranch"/>
+<partial name="_ChangeSchool"/>
+<partial name="_Quit"/>
+<partial name="_Suppress"/>
+<partial name="_Suspend"/>
+

@@ -36,11 +36,12 @@ public static class ScoreTypeConstant
 
 public static class StudentStatusConstant
 {
-    public const string Register = "REGISTER";
-    public const string Active = "ACTIVE";
-    public const string Quit = "QUIT";
-    public const string Graduated = "GRADUATED";
-    public const string Completed = "COMPLETED";
+    private const string Register = "REGISTER";
+    private const string Active = "ACTIVE";
+    private const string Quit = "QUIT";
+    private const string Graduated = "GRADUATED";
+    private const string Completed = "COMPLETED";
+    public const string ChangeBranch = "CHANGE BRANCH";
 
     public static readonly Dictionary<string, string> BadgeClasses = new()
     {

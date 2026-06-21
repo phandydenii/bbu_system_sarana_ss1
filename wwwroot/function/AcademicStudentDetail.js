@@ -1,7 +1,15 @@
-const studId = $("#txtStudentId").val();
 const frmStudent = $("#frmStudent");
 const actionButtons = $("#actionButtons");
 const btnEdit = $("#btnEdit");
+let currentStudentInfo = {
+    studentId: "",
+    termNo: "",
+    stageId: "",
+    fieldId: "",
+    groupId: "",
+    promotionId:"",
+    todayDate: ""
+};
 
 async function BindData() {
     await BindSelectOptions("/Province/get-provinces", "student_PlaceOfBirthId", "provinceId", "provinceName");
@@ -10,30 +18,24 @@ async function BindData() {
     await BindSelectOptions("/high-school/get-high-school", "student_FromHighSchoolNameInKhmer", "highSchoolNameInKhmer", "highSchoolNameInKhmer");
     await BindSelectOptions("/student-job/get-student-jobs", "student_JobId", "jobId", "jobName");
     await BindSelectOptions("/disability/get-disabilities", "student_DisabilityId", "disabilityId", "disabilityName");
-    await BindSelectOptions("/race/get-races", "student_RaceId", "raceId", "raceName");
+    await BindSelectOptions("/race/get-races", "student_RaceId", "raceId", "raceName"); 
+    
 }
 async function LoadStudentDetail(studId) {
-    if (!studId) {
-        console.warn("studId is empty. Skip loading student detail.");
-        return;
-    }
-
+    if (!studId) return;
     $("#txtStudentId").val(studId);
-
     await getStudent(studId);
-
-    await fetchStudentScholarship(studId);
-    await fetchStudentGroup(studId);
-    await fetchStudentExtend(studId);
-    await fetchStudentPayment(studId);
-    await fetchStudentBranchHistory(studId);
-    await fetchStudentIssueLetter(studId);
-    await fetchStudentCertificate(studId);
-    await fetchSuppress(studId);
-    await fetchSuspend(studId);
-    await fetchQuit(studId);
-    await fetchComplement(studId);
-
+    fetchStudentScholarship(studId);
+    fetchStudentGroup(studId);
+    fetchStudentExtend(studId);
+    fetchStudentPayment(studId);
+    fetchStudentBranchHistory(studId);
+    fetchStudentIssueLetter(studId);
+    fetchStudentCertificate(studId);
+    fetchSuppress(studId);
+    fetchSuspend(studId);
+    fetchQuit(studId);
+    fetchComplement(studId); 
     $('#custom-tabs-four-tab a:first').tab('show');
     $('#frmStudent :input').prop('disabled', true);
 }
@@ -43,17 +45,40 @@ $(document).ready(async function () {
     $('#custom-tabs-four-tab a:first').tab('show');
     $('#frmStudent :input').prop('disabled', true);
  });
-
 function checkPrivileges() { 
     if(!privileges.includes('SUPPRESS')) {
         actionButtons.find('#btnSuppress').remove();
     }
 }
 btnEdit.on("click", function (e) {
-    $(this).html('<i class="fas fa-check"></i>');
-    actionButtons.find("button").removeClass("d-none");
-    $('#frmStudent :input').prop('disabled', false);
+    e.preventDefault();
+    const isEditing = $(this).data("editing") === true;
+    if (isEditing) { 
+        $(this).data("editing", false);
+        $(this).html('<i class="fas fa-pen"></i>'); 
+        actionButtons.find("button").not("#btnEdit").addClass("d-none"); 
+        $('#frmStudent :input').prop('disabled', true);
+    } else { 
+        $(this).data("editing", true);
+        $(this).html('<i class="fas fa-check"></i>'); 
+        actionButtons.find("button").removeClass("d-none"); 
+        $('#frmStudent :input').prop('disabled', false);
+    }
 });
+function setStudentStatus(status) {
+    const studentStatus = $("#student_Status");
+    const badgeClass = StudentStatusBadgeClasses[status] || StudentStatusDefaultBadgeClass;
+    const bgClass = badgeClass.replace("badge-", "bg-");
+    const allBgClasses = Object.values(StudentStatusBadgeClasses)
+        .map(x => x.replace("badge-", "bg-"))
+        .join(" ");
+    const defaultBgClass = StudentStatusDefaultBadgeClass.replace("badge-", "bg-");
+    studentStatus
+        .removeClass(allBgClasses)
+        .removeClass(defaultBgClass)
+        .addClass(bgClass)
+        .val(status || "");
+}
 
 async function getStudent(student_id) {
     $.ajax({
@@ -75,10 +100,18 @@ async function getStudent(student_id) {
                 const groupRoom = data["groupRoom"];
                 const registry = data["registry"];
                 const fieldGroup = data["fieldGroup"];
-                // console.log(data);
-                $("#txtDegree").val(degree.degreeName);
-               
+                currentStudentInfo = {
+                    studentId: student.studentId,
+                    termNo: term.termNo,
+                    stageId: stage.stageId,
+                    fieldId: field.fieldId,
+                    groupId: group.groupId,
+                    promotionId: promotion.promotionId,
+                    todayDate: new Date().toISOString().split("T")[0]
+                };
+                $("#txtDegree").val(degree.degreeName); 
                 GetField(degree.degreeId, school.schoolId);
+                setStudentStatus(student.status);
                 $("#student_FieldId").val(student.fieldId).trigger("change");
                 if(school.isFoundationSchool ===1){
                     $("#txtSchool").val(`${school.schoolName} (${registry.schoolName})`); 
@@ -87,15 +120,12 @@ async function getStudent(student_id) {
                     $("#txtSchool").val(school.schoolName);
                     $("#txtFieldGroup").val(fieldGroup.fieldName);
                 }
-                
                 $("#txtPromotion").val(promotion.promotionNo);
                 $("#txtStage").val(stage.stageNo);
                 $("#txtTerm").val(term.termNo);
                 $("#txtStudyTime").val(group.studyTime);
                 $("#txtRoom").val(groupRoom.roomName);
                 $("#txtGroup").val(group.groupName);
-                
-                
                 $("#student_StudentId").val(student.studentId);
                 $("#student_StudentName").val(`${student.studentName}`);
                 $("#student_StudentNameInKhmer").val(`${student.studentNameInKhmer}`);
@@ -104,22 +134,6 @@ async function getStudent(student_id) {
                 $("#student_Email").val(student.email).trigger("change");
                 $("#student_Address").val(student.address).trigger("change");
                 $("#student_AddressInKhmer").val(student.addressInKhmer).trigger("change");
-                const student_Status = $("#student_Status");
-                if(student.status === "ACTIVE"){
-                    student_Status.addClass("bg-success");
-                }else if(student.status === "REGISTER"){
-                    student_Status.addClass("bg-warning");
-                }else if(student.status === "QUIT"){
-                    student_Status.addClass("bg-danger");
-                }else if(student.status === "GRADUATED"){
-                    student_Status.addClass("bg-fuchsia");
-                }else if(student.status === "COMPLETED"){
-                    student_Status.addClass("bg-pink");
-                }else {
-                    student_Status.addClass("bg-default");
-                }
-
-                student_Status.val(student.status);
                 $("#student_Note").val(student.note);
                 $("#student_CheckCompleteTerm").val(student.checkCompleteTerm);
                 $("#student_CheckComplete").val(student.checkComplete);
@@ -128,7 +142,6 @@ async function getStudent(student_id) {
                 $("#student_MaritalStatus").val(student.maritalStatus);
                 $("#student_HighSchoolGraduatedYear").val(student.highSchoolGraduatedYear);
                 $("#student_FromHighSchoolNameInKhmer").val(student.fromHighSchoolNameInKhmer).trigger("change");
-
                 $("#student_PlaceOfBirthId").val(student.placeOfBirthId).trigger("change");
                 $("#student_NationalityId").val(student.nationalityId).trigger("change");
                 $("#student_FromProvinceId").val(student.fromProvinceId).trigger("change");
@@ -138,12 +151,10 @@ async function getStudent(student_id) {
                 $("#registry_RegistrationId").val(registry.registrationId);
                 $("#registry_HighSchoolTableNo").val(registry.highSchoolTableNo).trigger("change");
                 $("#registry_HighSchoolResult").val(registry.highSchoolResult).trigger("change");
-
                 $("#contactPerson_ContactPersonName").val(contactPerson.contactPersonName).trigger("change");
                 $("#contactPerson_Job").val(contactPerson.job).trigger("change");
                 $("#contactPerson_Phone").val(contactPerson.phone).trigger("change");
                 $("#contactPerson_Address").val(contactPerson.address).trigger("change");
-
                 $("#student_FatherNameInKhmer").val(student.fatherNameInKhmer);
                 $("#student_FatherOccupationInKhmer").val(student.fatherOccupationInKhmer).trigger("change");
                 $("#student_MotherNameInKhmer").val(student.motherNameInKhmer).trigger("change");
@@ -162,6 +173,156 @@ async function getStudent(student_id) {
         }
     });
 }
+
+// region "Sub Modal of Student Detail Modal handling"
+// 1. suppress
+$(document).on("click", "#btnSuppress", function (e) {
+    e.preventDefault();
+    $("#frmSuppress")[0].reset();
+    $("#suppressStudentId").val(currentStudentInfo.studentId);
+    $("#suppressTermNo").val(currentStudentInfo.termNo);
+    $("#suppressFromDate").val(currentStudentInfo.todayDate);
+    $("#modalSuppress").modal("show");
+});
+// 2. suspend
+$(document).on("click", "#btnSuspend", function (e) {
+    e.preventDefault();
+    $("#frmSuspend")[0].reset();
+    $("#suspendStudentId").val(currentStudentInfo.studentId);
+    $("#suspendTermNo").val(currentStudentInfo.termNo);
+    $("#suspendFromDate").val(currentStudentInfo.todayDate);
+    $('#suspendToDate').val(currentStudentInfo.todayDate);
+    $("#modalSuspend").modal("show");
+});
+// 3. quit
+$(document).on("click", "#btnQuit", function (e) {
+    e.preventDefault();
+    $("#frmQuit")[0].reset();
+    $("#quitStudentId").val(currentStudentInfo.studentId);
+    $("#quitTermNo").val(currentStudentInfo.termNo);
+    $("#quitFromDate").val(currentStudentInfo.todayDate);
+    $("#quitGroupId").val(currentStudentInfo.groupId);
+    $("#quitPromotionId").val(currentStudentInfo.promotionId);
+    $("#modalQuit").modal("show");
+});
+
+$(document).on("submit", "#frmQuit", async function (e) {
+    e.preventDefault();
+    const studentId = $("#quitStudentId").val();
+    if (!studentId) return ShowToastInfo("Please select student.");
+    const btnSubmit = $("#frmQuit button[type='submit']");
+    btnSubmit.prop("disabled", true);
+    try {
+        const response = await $.ajax({
+            url: "/student/quit",
+            method: "POST",
+            data: $("#frmQuit").serialize()
+        });
+        if (response.status.code === "200") {  
+            ShowToastSuccess("Quit saved successfully.");
+            $("#modalQuit").modal("hide");
+        } else {
+            ShowToastError(response.status?.message || response.message || "Save failed.");
+        }
+    } catch (err) {
+        ShowToastError(err.responseText || "Error saving change branch.");
+    } finally {
+        btnSubmit.prop("disabled", false);
+    }
+});
+// 4. change branch
+$(document).on("click", "#btnChangeBranch", async function (e) {
+    e.preventDefault();
+    $("#frmChangeBranch")[0].reset();
+    $("#changeBranchStudentId").val(currentStudentInfo.studentId);
+    $("#changeBranchTermNo").val(currentStudentInfo.termNo);
+    $("#changeBranchFromDate").val(currentStudentInfo.todayDate);
+    await BindSelectOptions("/branch/get-branch","cboChangeBranchId","branchId","branchName",{isAll:true},"Select Branch");
+    $("#modalChangeBranch").modal("show");
+});
+$(document).on("submit", "#frmChangeBranch", async function (e) {
+    e.preventDefault();
+    const branchId = $("#cboChangeBranchId").val();
+    const fromDate = $("#changeBranchFromDate").val();
+    const studentId = $("#changeBranchStudentId").val();
+    if (!branchId) return ShowToastInfo("Please select branch.");
+    if (!fromDate) return ShowToastInfo("Please select from date.");
+    if (!studentId) return ShowToastInfo("Please select student.");
+    const btnSubmit = $("#frmChangeBranch button[type='submit']");
+    btnSubmit.prop("disabled", true);
+    try {
+        const response = await $.ajax({
+            url: "/student/change-branch",
+            method: "POST",
+            data: $("#frmChangeBranch").serialize()
+        });
+        if (response.status.code === "200") {
+            setStudentStatus("CHANGE BRANCH");
+            fetchStudentBranchHistory(studentId);
+            ShowToastSuccess("Change branch saved successfully.");
+            $("#modalChangeBranch").modal("hide");
+        } else {
+            ShowToastError(response.status?.message || response.message || "Save failed.");
+        }
+    } catch (err) {
+        ShowToastError(err.responseText || "Error saving change branch.");
+    } finally {
+        btnSubmit.prop("disabled", false);
+    }
+});
+// 5. adjust
+$(document).on("click", "#btnAdjust", async function (e) {
+    e.preventDefault();
+    $("#frmAdjustGroup")[0].reset();
+    $("#adjustStudentId").val(currentStudentInfo.studentId);
+    $("#adjustTermNo").val(currentStudentInfo.termNo);
+    await BindSelectOptions("/group/get-groups","cboAdjustGroupId","groupId","groupName",{isAll:true},"Select Group");
+    $("#modalAdjustGroup").modal("show");
+});
+// 6. change school
+$(document).on("click", "#btnChangeSchool", async function (e) {
+    e.preventDefault();
+    $("#frmChangeSchool")[0].reset();
+    $("#changeSchoolStudentId").val(currentStudentInfo.studentId);
+    $("#changeSchoolTermNo").val(currentStudentInfo.termNo);
+    await BindSelectOptions("/degree/get-degrees", "cboChangeDegreeId", "degreeId", "degreeName",{isAll: true},"Select Degree");
+    await BindSelectOptions("/school/get-schools", "cboChangeSchoolId", "schoolId", "schoolName",{isAll: true},"Select School");
+    $("#modalChangeSchool").modal("show");
+});
+$(document).on("change", "#cboChangeSchoolId, #cboChangeDegreeId", async function () {
+    const degreeId = $("#cboChangeDegreeId").val();
+    const schoolId = $("#cboChangeSchoolId").val();
+    if (!degreeId || !schoolId) return;
+    await BindSelectOptions(
+        "/Field/get-fields",
+        "cboChangeFieldId",
+        "fieldId",
+        "fieldName",
+        {
+            isAll: true,
+            degreeId: degreeId,
+            schoolId: schoolId
+        },
+        "Select Field"
+    );
+});
+$(document).on("change", "#cboChangeFieldId", async function () {
+    const fieldId = $("#cboChangeFieldId").val();
+    if (!fieldId) return;
+    await BindSelectOptions(
+        "/group/get-groups",
+        "cboChangeGroupId",
+        "groupId",
+        "groupName",
+        {
+            isAll: true,
+            fieldId: fieldId,
+        },
+        "Select Group"
+    );
+});
+
+// endregion
 
 async function GetField(degreeId, schoolId) {
     const cboField = $("#student_FieldId");
@@ -186,7 +347,7 @@ async function GetGroup(promotionId, termNo) {
         cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
     });
 }
-
+// region "Tab History"
 //=====1-_TabScholarship
 function fetchStudentScholarship(studentId) {
     const tblStudentScholarship = $("#tblStudentScholarship");
@@ -199,7 +360,6 @@ function fetchStudentScholarship(studentId) {
             url: "/student-scholarship/get-student-scholarship/" + studentId,
             type: "POST",
             dataSrc: function (json) {
-                // console.log(json.data.length);
                 if (!json.data || json.data.length === 0) {
                     $("#scholarship-tab").closest("li").remove();
                     $("#scholarship").remove();
@@ -331,9 +491,19 @@ function fetchStudentBranchHistory(studentId) {
             {data: "changeBranchId"},
             {data: "studentId"},
             {data: "toBranchId"},
-            {data: "termNo"},
-            {data: "fromDate"},
-            {data: "returnDate"},
+            {data: "termNo"}, 
+            {
+                data: "fromDate",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            },
+            {
+                data: "returnDate",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            }, 
             {data: "degreeId"},
             {data: "schoolId"},
             {data: "fieldId"},
@@ -361,7 +531,7 @@ function fetchSuppress(studentId) {
                     $("#suppress-history").remove();
                     $("#btnSuppress").data("action","suppress");
                     $("#lblSuppress").text("Suppress");
-                }else{ 
+                }else{
                     $("#btnSuppress").data("action","express");
                     $("#lblSuppress").text("Express");
                 }
@@ -606,10 +776,10 @@ function fetchQuit(studentId) {
             dataSrc: function (json) {
                 if (!json.data || json.data.length === 0) {
                     $("#quit-tab").closest("li").remove();
-                    $("#quit").remove(); 
+                    $("#quit").remove();
                     $("#btnQuit").data("action","quit");
                     $("#lblQuit").text("Quit");
-                }else{ 
+                }else{
                     $("#btnQuit").data("action","resume");
                     $("#lblQuit").text("Resume");
                 }
@@ -635,6 +805,7 @@ function fetchQuit(studentId) {
         ]
     });
 }
+// endregion
 
 frmStudent.on("submit", function (event) {
     event.preventDefault();

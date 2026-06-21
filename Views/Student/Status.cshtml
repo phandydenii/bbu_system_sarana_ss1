@@ -42,6 +42,15 @@
     <script src="~/function/Stage.js"></script>
     <script src="~/function/Term.js"></script>
     <script src="~/function/Group.js"></script>
+    <script>
+        const StudentStatusBadgeClasses = @Html.Raw(JsonSerializer.Serialize(ViewData["StudentStatusBadgeClasses"]));
+        const StudentStatusDefaultBadgeClass = "@ViewData["StudentStatusDefaultBadgeClass"]";
+        function renderStudentStatusBadge(status) {
+            const badgeClass = StudentStatusBadgeClasses[status] || StudentStatusDefaultBadgeClass;
+            return `<span class="badge ${badgeClass}">${status || ""}</span>`;
+        }
+    </script>
+
     <script src="~/function/AcademicStudentDetail.js"></script>
     <script>
         let dtStudent = null;
@@ -55,13 +64,6 @@
                 setStudentFullscreen(false);
             });
         });
-        
-        const StudentStatusBadgeClasses = @Html.Raw(JsonSerializer.Serialize(ViewData["StudentStatusBadgeClasses"])); 
-        const StudentStatusDefaultBadgeClass = "@ViewData["StudentStatusDefaultBadgeClass"]"; 
-        function renderStudentStatusBadge(status) {
-            const badgeClass = StudentStatusBadgeClasses[status] || StudentStatusDefaultBadgeClass;
-            return `<span class="badge ${badgeClass}">${status || ""}</span>`;
-        }
 
         function fetchStudent() {
             const currentStatus = "@ViewData["status"]"; 
