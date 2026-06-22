@@ -42,6 +42,7 @@ public static class StudentStatusConstant
     private const string Graduated = "GRADUATED";
     private const string Completed = "COMPLETED";
     public const string ChangeBranch = "CHANGE BRANCH";
+    public const string Suspend = "SUSPEND";
 
     public static readonly Dictionary<string, string> BadgeClasses = new()
     {

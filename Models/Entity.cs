@@ -4330,9 +4330,9 @@ public class StudentStatisticByAcademicYear2Type2
 public class Suppress
 {
     [Key]
-    [Column("SUPPRESS_ID", TypeName = "int")]
+    [Column("SUPPRESS_ID")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int? SuppressId { get; set; }
+    public int SuppressId { get; set; }
 
     [Column("STUDENT_ID", TypeName = "varchar(10)")]
     public string? StudentId { get; set; }
@@ -4378,11 +4378,11 @@ public class SuppressNew
 
 [Table("SUSPEND")]
 public class Suspend
-{
+{ 
     [Key]
-    [Column("SUSPEND_ID", TypeName = "int")]
+    [Column("SUSPEND_ID")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int? SuspendId { get; set; }
+    public int SuspendId { get; set; }
 
     [Column("STUDENT_ID", TypeName = "varchar(10)")]
     public string? StudentId { get; set; }

@@ -184,15 +184,66 @@ $(document).on("click", "#btnSuppress", function (e) {
     $("#suppressFromDate").val(currentStudentInfo.todayDate);
     $("#modalSuppress").modal("show");
 });
+$(document).on("submit", "#modalSuppress", async function (e) {
+    e.preventDefault();
+    const studentId = $("#suppressStudentId").val();
+    if (!studentId) return ShowToastInfo("Please select student.");
+    const btnSubmit = $("#modalSuppress button[type='submit']");
+    btnSubmit.prop("disabled", true);
+    try {
+        const response = await $.ajax({
+            url: "/student/suppress",
+            method: "POST",
+            data: $("#frmSuppress").serialize()
+        });
+        if (response.status.code === "200") {
+            ShowToastSuccess("Suppress saved successfully.");
+            $("#modalSuppress").modal("hide");
+        } else {
+            ShowToastError(response.status?.message || response.message || "Save failed.");
+        }
+    } catch (err) {
+        ShowToastError(err.responseText || "Error saving change suppress.");
+    } finally {
+        btnSubmit.prop("disabled", false);
+    }
+});
 // 2. suspend
 $(document).on("click", "#btnSuspend", function (e) {
     e.preventDefault();
     $("#frmSuspend")[0].reset();
     $("#suspendStudentId").val(currentStudentInfo.studentId);
+    $("#suspendPromotionId").val(currentStudentInfo.promotionId);
+    $("#suspendGroupId").val(currentStudentInfo.groupId);
     $("#suspendTermNo").val(currentStudentInfo.termNo);
     $("#suspendFromDate").val(currentStudentInfo.todayDate);
     $('#suspendToDate').val(currentStudentInfo.todayDate);
     $("#modalSuspend").modal("show");
+});
+$(document).on("submit", "#modalSuspend", async function (e) {
+    e.preventDefault();
+    const studentId = $("#suspendStudentId").val();
+    if (!studentId) return ShowToastInfo("Please select student.");
+    const btnSubmit = $("#modalSuspend button[type='submit']");
+    btnSubmit.prop("disabled", true);
+    try {
+        const response = await $.ajax({
+            url: "/student/suspend",
+            method: "POST",
+            data: $("#frmSuspend").serialize()
+        });
+        if (response.status.code === "200") {
+            ShowToastSuccess("Suspend saved successfully.");
+            setStudentStatus("SUSPEND");
+            $("#modalSuspend").modal("hide");
+        } else {
+            ShowToastError(response.status?.message || response.message || "Save failed.");
+        }
+    } catch (err) {
+        ShowToastError(err.responseText || "Error saving change suspend.");
+    } finally {
+        btnSubmit.prop("disabled", false);
+    }
 });
 // 3. quit
 $(document).on("click", "#btnQuit", function (e) {
@@ -205,7 +256,6 @@ $(document).on("click", "#btnQuit", function (e) {
     $("#quitPromotionId").val(currentStudentInfo.promotionId);
     $("#modalQuit").modal("show");
 });
-
 $(document).on("submit", "#frmQuit", async function (e) {
     e.preventDefault();
     const studentId = $("#quitStudentId").val();
@@ -225,7 +275,7 @@ $(document).on("submit", "#frmQuit", async function (e) {
             ShowToastError(response.status?.message || response.message || "Save failed.");
         }
     } catch (err) {
-        ShowToastError(err.responseText || "Error saving change branch.");
+        ShowToastError(err.responseText || "Error saving change quit.");
     } finally {
         btnSubmit.prop("disabled", false);
     }
@@ -279,6 +329,30 @@ $(document).on("click", "#btnAdjust", async function (e) {
     await BindSelectOptions("/group/get-groups","cboAdjustGroupId","groupId","groupName",{isAll:true},"Select Group");
     $("#modalAdjustGroup").modal("show");
 });
+$(document).on("submit", "#modalAdjustGroup", async function (e) {
+    e.preventDefault();
+    const studentId = $("#suppressStudentId").val();
+    if (!studentId) return ShowToastInfo("Please select student.");
+    const btnSubmit = $("#modalAdjustGroup button[type='submit']");
+    btnSubmit.prop("disabled", true);
+    try {
+        const response = await $.ajax({
+            url: "/student/adjust",
+            method: "POST",
+            data: $("#frmAdjustGroup").serialize()
+        });
+        if (response.status.code === "200") {
+            ShowToastSuccess("Adjust saved successfully.");
+            $("#modalAdjustGroup").modal("hide");
+        } else {
+            ShowToastError(response.status?.message || response.message || "Save failed.");
+        }
+    } catch (err) {
+        ShowToastError(err.responseText || "Error saving change adjust.");
+    } finally {
+        btnSubmit.prop("disabled", false);
+    }
+});
 // 6. change school
 $(document).on("click", "#btnChangeSchool", async function (e) {
     e.preventDefault();
@@ -321,7 +395,6 @@ $(document).on("change", "#cboChangeFieldId", async function () {
         "Select Group"
     );
 });
-
 // endregion
 
 async function GetField(degreeId, schoolId) {
@@ -419,8 +492,13 @@ function fetchStudentIssueLetter(studentId) {
                     return formatDate(data);
                 }
             },
-            {data: "issuedNo"},
-            {data: "issuedDate"},
+            {data: "issuedNo"}, 
+            {
+                data: "issuedDate",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            },
             {data: "author"},
         ]
     });
@@ -534,8 +612,7 @@ function fetchSuppress(studentId) {
                 }else{
                     $("#btnSuppress").data("action","express");
                     $("#lblSuppress").text("Express");
-                }
-                console.log(json.data);
+                } 
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -546,8 +623,18 @@ function fetchSuppress(studentId) {
             {data: "suppressId"},
             {data: "studentId"},
             {data: "termNo"},
-            {data: "suppressDate"},
-            {data: "expressDate"},
+            {
+                data: "suppressDate",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            },
+            {
+                data: "expressDate",
+                render: function (data) {
+                    return formatDate(data);
+                }
+            }, 
             {data: "reasonOfSuppress"},
         ]
     });
@@ -809,9 +896,12 @@ function fetchQuit(studentId) {
 
 frmStudent.on("submit", function (event) {
     event.preventDefault();
-    showLoading();
     const form = $(this);
     const formData = form.serialize();
+    const btnUpdate = $("#btnUpdate"); 
+    if (btnUpdate.prop("disabled")) return;
+    btnUpdate.prop("disabled", true);
+    showLoading();
     $.ajax({
         url: '/student/update-student',
         method: 'PATCH',
@@ -822,13 +912,19 @@ frmStudent.on("submit", function (event) {
                 window.location.reload();
             } else {
                 ShowToastError(response.message);
+                btnUpdate.prop("disabled", false);
             }
-        },
+        }, 
         error: function (error) {
             if (error.responseJSON && error.responseJSON.message) {
                 ShowToastError(error.responseJSON.message);
-            }
+            } else {
+                ShowToastError("Something went wrong.");
+            } 
+            btnUpdate.prop("disabled", false);
+        },
+        complete: function () {
+            hideLoading(2);
         }
-    });
-    hideLoading(2);
+    }); 
 });

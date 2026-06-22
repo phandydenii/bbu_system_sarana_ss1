@@ -1303,4 +1303,57 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             return new ServerResponse().ErrorInternal(e);
         }
     }
+    [HttpPost("suppress")]
+    public async Task<IActionResult> Suppress(SuppressDto dto)
+    {
+        var db = campusDbContext.DbContext(_campus);
+        try
+        { 
+            if (dto.SuppressId == 0)
+            {
+                var data = mapper.Map<Suppress>(dto); 
+                await db.TblSuppress.AddAsync(data);
+                await db.SaveChangesAsync(); 
+                return new ServerResponse().Success(data);
+            }
+            var oldData = await db.TblSuppress.FirstOrDefaultAsync(x => x.SuppressId == dto.SuppressId);
+            if (oldData == null) return new ServerResponse().NotFound("Record found.");
+            mapper.Map(dto, oldData);
+            await db.SaveChangesAsync(); 
+            return new ServerResponse().Success(oldData);
+        }
+        catch (Exception e)
+        { 
+            return new ServerResponse().ErrorInternal(e);
+        }
+    } [HttpPost("suspend")]
+    public async Task<IActionResult> Suspend(SuspendDto dto)
+    {
+        var db = campusDbContext.DbContext(_campus); 
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        try
+        {
+            var student = await db.TblStudent.FirstOrDefaultAsync(x => x.StudentId == dto.StudentId);
+            if (student == null) return new ServerResponse().NotFound("Student not found.");
+            student.Status = StudentStatusConstant.Suspend;
+            if (dto.SuspendId == 0)
+            {
+                var data = mapper.Map<Suspend>(dto); 
+                await db.TblSuspend.AddAsync(data);
+                await db.SaveChangesAsync(); 
+                return new ServerResponse().Success(data);
+            }
+            var oldData = await db.TblSuspend.FirstOrDefaultAsync(x => x.SuspendId == dto.SuspendId);
+            if (oldData == null) return new ServerResponse().NotFound("Record found.");
+            mapper.Map(dto, oldData);
+            await db.SaveChangesAsync();  
+            await transaction.CommitAsync();
+            return new ServerResponse().Success(oldData);
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            return new ServerResponse().ErrorInternal(e);
+        }
+    } 
 }

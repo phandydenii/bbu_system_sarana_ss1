@@ -48,5 +48,7 @@ public class AutoMapperConfiguration : Profile
         CreateMap<University, UniversityDto>().ReverseMap();
         CreateMap<ChangeBranch, ChangeBranchDto>().ReverseMap();
         CreateMap<Quit, QuitDto>().ReverseMap();
+        CreateMap<Suppress, SuppressDto>().ReverseMap(); 
+        CreateMap<Suspend, SuspendDto>().ReverseMap(); 
     }
 }
