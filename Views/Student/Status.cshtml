@@ -95,6 +95,9 @@
                     { data: "phone" },
                     {
                         data: null,
+                        orderable: false,
+                        searchable: false,
+                        className: "text-center",
                         render: function (data, type, row) {
                             return renderStudentStatusBadge(row.status);
                         }
@@ -103,13 +106,14 @@
                         data: null,
                         orderable: false,
                         searchable: false,
+                        className: "text-center", 
                         render: function (data, type, row) {
                             const studId = String(row.studentId).replace(/'/g, "\\'"); 
                             return `
                                 <button type="button"
                                         class="btn btn-warning btn-sm"
                                         onclick="OnView('${studId}')">
-                                    <i class="fas fa-gear"></i> View
+                                    <i class="fas fa-eye"></i> View
                                 </button>
                             `;
                         }

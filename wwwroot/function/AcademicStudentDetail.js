@@ -44,26 +44,34 @@ $(document).ready(async function () {
     await BindData(); 
     $('#custom-tabs-four-tab a:first').tab('show');
     $('#frmStudent :input').prop('disabled', true);
- });
-function checkPrivileges() { 
-    if(!privileges.includes('SUPPRESS')) {
-        actionButtons.find('#btnSuppress').remove();
-    }
-}
+ }); 
 btnEdit.on("click", function (e) {
-    e.preventDefault();
-    const isEditing = $(this).data("editing") === true;
-    if (isEditing) { 
+    e.preventDefault(); 
+    const isEditing = $(this).data("editing") === true; 
+    if (isEditing) {
         $(this).data("editing", false);
         $(this).html('<i class="fas fa-pen"></i>'); 
-        actionButtons.find("button").not("#btnEdit").addClass("d-none"); 
+        actionButtons.find("button").not("#btnEdit").addClass("d-none");  
         $('#frmStudent :input').prop('disabled', true);
-    } else { 
+    } else {
         $(this).data("editing", true);
-        $(this).html('<i class="fas fa-check"></i>'); 
-        actionButtons.find("button").removeClass("d-none"); 
+        $(this).html('<i class="fas fa-check"></i>');  
+        const status = $("#student_Status").val(); 
+        if (status === "CHANGE BRANCH") {
+            actionButtons.find("button").addClass("d-none"); 
+            $("#btnEdit").removeClass("d-none");
+            $("#btnUpdate").removeClass("d-none");
+        } else {
+            actionButtons.find("button").removeClass("d-none");
+        } 
         $('#frmStudent :input').prop('disabled', false);
     }
+});
+$("#studentDetailModal").on("hidden.bs.modal", function () {
+    btnEdit.data("editing", false);
+    btnEdit.html('<i class="fas fa-pen"></i>');
+    actionButtons.find("button").not("#btnEdit").addClass("d-none");
+    $("#frmStudent :input").prop("disabled", true);
 });
 function setStudentStatus(status) {
     const studentStatus = $("#student_Status");
@@ -181,26 +189,59 @@ $(document).on("click", "#btnSuppress", function (e) {
     $("#frmSuppress")[0].reset();
     $("#suppressStudentId").val(currentStudentInfo.studentId);
     $("#suppressTermNo").val(currentStudentInfo.termNo);
-    $("#suppressFromDate").val(currentStudentInfo.todayDate);
+    $("#suppressFromDate").val(currentStudentInfo.todayDate); 
+    $("#expressDateGroup").hide();
+    $("#expressDate").val(""); 
+    $("#modalSuppress .modal-title").html(`<i class="fas fa-exclamation-triangle mr-1"></i> Suppress`);  
+    $("#modalSuppress button[type='submit']").html(`<i class="fas fa-check"></i> OK`);
     $("#modalSuppress").modal("show");
 });
-$(document).on("submit", "#modalSuppress", async function (e) {
-    e.preventDefault();
-    const studentId = $("#suppressStudentId").val();
-    if (!studentId) return ShowToastInfo("Please select student.");
-    const btnSubmit = $("#modalSuppress button[type='submit']");
-    btnSubmit.prop("disabled", true);
+$(document).on("click", ".btn-edit-suppress", function (e) {
+    e.preventDefault(); 
+    const table = $("#tblSuppress").DataTable();
+    const row = table.row($(this).closest("tr")).data();  
+    if (!row) return ShowToastError("Cannot get suppress data.");  
+    const suppressId = parseInt(row.suppressId || 0); 
+    $("#frmSuppress")[0].reset();  
+    $("#SuppressId").val(suppressId);
+    $("#suppressStudentId").val(row.studentId);
+    $("#suppressTermNo").val(row.termNo);
+    $("#suppressFromDate").val(formatDateForInput(row.suppressDate));
+    $("#suppressReason").val(row.reasonOfSuppress); 
+    if (suppressId > 0) {
+        $("#expressDateGroup").show(); 
+        $("#expressDate").val(formatDateForInput(row.expressDate) || currentStudentInfo.todayDate);
+        $("#modalSuppress .modal-title").html(`<i class="fas fa-check-circle mr-1"></i> Express`); 
+        $("#modalSuppress button[type='submit']").html(`<i class="fas fa-check"></i> Express`);
+    } else {
+        $("#expressDateGroup").hide();
+        $("#expressDate").val(""); 
+        $("#modalSuppress .modal-title").html(`<i class="fas fa-exclamation-triangle mr-1"></i> Suppress`); 
+        $("#modalSuppress button[type='submit']").html(`<i class="fas fa-check"></i> OK`);
+    } 
+    $("#modalSuppress").modal("show");
+});
+$(document).on("submit", "#frmSuppress", async function (e) {
+    e.preventDefault(); 
+    const studentId = $("#suppressStudentId").val(); 
+    if (!studentId) return ShowToastInfo("Please select student."); 
+    const suppressId = parseInt($("#SuppressId").val() || 0); 
+    const btnSubmit = $("#modalSuppress button[type='submit']"); 
+    btnSubmit.prop("disabled", true); 
     try {
         const response = await $.ajax({
             url: "/student/suppress",
             method: "POST",
             data: $("#frmSuppress").serialize()
-        });
+        }); 
         if (response.status.code === "200") {
-            ShowToastSuccess("Suppress saved successfully.");
-            $("#modalSuppress").modal("hide");
+            ShowToastSuccess(suppressId > 0 ? "Express saved successfully." : "Suppress saved successfully."); 
+            $("#modalSuppress").modal("hide"); 
+            if ($.fn.DataTable.isDataTable("#tblSuppress")) {
+                $("#tblSuppress").DataTable().ajax.reload(null, false);
+            }
         } else {
-            ShowToastError(response.status?.message || response.message || "Save failed.");
+            ShowToastError(response.status?.message || "Save failed.");
         }
     } catch (err) {
         ShowToastError(err.responseText || "Error saving change suppress.");
@@ -308,6 +349,9 @@ $(document).on("submit", "#frmChangeBranch", async function (e) {
         });
         if (response.status.code === "200") {
             setStudentStatus("CHANGE BRANCH");
+            actionButtons.find("button").addClass("d-none");
+            $("#btnEdit").removeClass("d-none");
+            $("#btnUpdate").removeClass("d-none");
             fetchStudentBranchHistory(studentId);
             ShowToastSuccess("Change branch saved successfully.");
             $("#modalChangeBranch").modal("hide");
@@ -537,7 +581,6 @@ function fetchStudentCertificate(studentId) {
     });
 }
 
-
 //====4-_TabBranchHistory
 function fetchStudentBranchHistory(studentId) {
     const tblBranchHistory = $("#tblBranchHistory");
@@ -609,9 +652,6 @@ function fetchSuppress(studentId) {
                     $("#suppress-history").remove();
                     $("#btnSuppress").data("action","suppress");
                     $("#lblSuppress").text("Suppress");
-                }else{
-                    $("#btnSuppress").data("action","express");
-                    $("#lblSuppress").text("Express");
                 } 
                 return json.data;
             },
@@ -636,6 +676,19 @@ function fetchSuppress(studentId) {
                 }
             }, 
             {data: "reasonOfSuppress"},
+            {
+                data: null, 
+                className: "text-center",
+                render: function () {
+                    return `
+                        <button type="button"
+                                class="btn btn-sm btn-primary btn-edit-suppress"
+                                title="Edit">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                    `;
+                }
+            }
         ]
     });
 }
