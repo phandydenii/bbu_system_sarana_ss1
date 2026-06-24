@@ -13,6 +13,7 @@
             <form id="frmChangeBranch">
                 <div class="modal-body bg-light">
                     <input type="hidden" id="changeBranchStudentId" name="StudentId" />
+                    <input type="hidden" id="changeBranchId" name="ChangeBranchId" />
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label font-weight-bold">Term</label>
                         <div class="col-sm-8">
@@ -30,6 +31,12 @@
                         <label class="col-sm-4 col-form-label font-weight-bold">From Date</label>
                         <div class="col-sm-8">
                             <input type="date" id="changeBranchFromDate" name="FromDate" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row" id="changeBranchReturnDateGroup" style="display:none;">
+                        <label class="col-sm-4 col-form-label font-weight-bold">Return Date</label>
+                        <div class="col-sm-8">
+                            <input type="date" id="returnDate" name="ReturnDate" class="form-control" />
                         </div>
                     </div>
                 </div>

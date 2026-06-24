@@ -38,7 +38,7 @@ public static class StudentStatusConstant
 {
     private const string Register = "REGISTER";
     private const string Active = "ACTIVE";
-    private const string Quit = "QUIT";
+    public const string Quit = "QUIT";
     private const string Graduated = "GRADUATED";
     private const string Completed = "COMPLETED";
     public const string ChangeBranch = "CHANGE BRANCH";

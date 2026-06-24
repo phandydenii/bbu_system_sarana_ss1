@@ -18,8 +18,7 @@ async function BindData() {
     await BindSelectOptions("/high-school/get-high-school", "student_FromHighSchoolNameInKhmer", "highSchoolNameInKhmer", "highSchoolNameInKhmer");
     await BindSelectOptions("/student-job/get-student-jobs", "student_JobId", "jobId", "jobName");
     await BindSelectOptions("/disability/get-disabilities", "student_DisabilityId", "disabilityId", "disabilityName");
-    await BindSelectOptions("/race/get-races", "student_RaceId", "raceId", "raceName"); 
-    
+    await BindSelectOptions("/race/get-races", "student_RaceId", "raceId", "raceName");
 }
 async function LoadStudentDetail(studId) {
     if (!studId) return;
@@ -72,6 +71,7 @@ $("#studentDetailModal").on("hidden.bs.modal", function () {
     btnEdit.html('<i class="fas fa-pen"></i>');
     actionButtons.find("button").not("#btnEdit").addClass("d-none");
     $("#frmStudent :input").prop("disabled", true);
+    fetchStudent();
 });
 function setStudentStatus(status) {
     const studentStatus = $("#student_Status");
@@ -310,6 +310,7 @@ $(document).on("submit", "#frmQuit", async function (e) {
             data: $("#frmQuit").serialize()
         });
         if (response.status.code === "200") {  
+            setStudentStatus("QUIT");
             ShowToastSuccess("Quit saved successfully.");
             $("#modalQuit").modal("hide");
         } else {
@@ -331,8 +332,35 @@ $(document).on("click", "#btnChangeBranch", async function (e) {
     await BindSelectOptions("/branch/get-branch","cboChangeBranchId","branchId","branchName",{isAll:true},"Select Branch");
     $("#modalChangeBranch").modal("show");
 });
+$(document).on("click", ".btn-edit-change-branch", async function (e) {
+    e.preventDefault();
+    await BindSelectOptions(
+        "/branch/get-branch",
+        "cboChangeBranchId",
+        "branchId",
+        "branchName",
+        { isAll: true },
+        "Select Branch"
+    );
+    const table = $("#tblBranchHistory").DataTable();
+    const row = table.row($(this).closest("tr")).data();
+    if (!row) return ShowToastError("Cannot get change branch data.");
+    const changeBranchId = parseInt(row.changeBranchId || 0);
+    $("#frmChangeBranch")[0].reset();
+    $("#changeBranchId").val(changeBranchId);
+    $("#changeBranchStudentId").val(row.studentId);
+    $("#cboChangeBranchId").val(String(row.toBranchId || "")).trigger("change");
+    $("#changeBranchTermNo").val(row.termNo);
+    $("#changeBranchFromDate").val(formatDateForInput(row.fromDate));
+    $("#changeBranchReturnDateGroup").hide();
+    $("#returnDate").val("");
+    $("#modalChangeBranch .modal-title").html(`<i class="fas fa-undo-alt-circle mr-1"></i> Return Change Branch`);
+    $("#modalChangeBranch button[type='submit']").html(`<i class="fas fa-save"></i> Return`);
+    $("#modalChangeBranch").modal("show");
+});
 $(document).on("submit", "#frmChangeBranch", async function (e) {
     e.preventDefault();
+    const changeBranchId = $("#changeBranchId").val();
     const branchId = $("#cboChangeBranchId").val();
     const fromDate = $("#changeBranchFromDate").val();
     const studentId = $("#changeBranchStudentId").val();
@@ -348,16 +376,23 @@ $(document).on("submit", "#frmChangeBranch", async function (e) {
             data: $("#frmChangeBranch").serialize()
         });
         if (response.status.code === "200") {
-            setStudentStatus("CHANGE BRANCH");
-            actionButtons.find("button").addClass("d-none");
-            $("#btnEdit").removeClass("d-none");
-            $("#btnUpdate").removeClass("d-none");
+            if (changeBranchId > 0){
+                ShowToastSuccess("Return change branch saved successfully.");  
+            }else {
+                setStudentStatus("CHANGE BRANCH");
+                actionButtons.find("button").addClass("d-none");
+                $("#btnEdit").removeClass("d-none");
+                $("#btnUpdate").removeClass("d-none");
+                ShowToastSuccess("Change branch saved successfully.");
+            }
+            if ($.fn.DataTable.isDataTable("#tblBranchHistory")) {
+                $("#tblBranchHistory").DataTable().ajax.reload(null, false);
+            } 
             fetchStudentBranchHistory(studentId);
-            ShowToastSuccess("Change branch saved successfully.");
             $("#modalChangeBranch").modal("hide");
         } else {
-            ShowToastError(response.status?.message || response.message || "Save failed.");
-        }
+            ShowToastError(response.status?.message || "Save failed.");
+        } 
     } catch (err) {
         ShowToastError(err.responseText || "Error saving change branch.");
     } finally {
@@ -598,10 +633,7 @@ function fetchStudentBranchHistory(studentId) {
                     $("#branch-history").remove();
                     $("#btnChangeBranch").data("action","changeBranch");
                     $("#lblChangeBranch").text("Change Branch");
-                }else{
-                    $("#btnChangeBranch").data("action","return");
-                    $("#lblChangeBranch").text("Return");
-                }
+                } 
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -631,6 +663,19 @@ function fetchStudentBranchHistory(studentId) {
             {data: "promotionId"},
             {data: "stageId"},
             {data: "groupId"},
+            {
+                data: null,
+                className: "text-center",
+                render: function () {
+                    return `
+                        <button type="button"
+                                class="btn btn-sm btn-primary btn-edit-change-branch"
+                                title="Edit">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                    `;
+                }
+            }
         ]
     });
 }
@@ -919,9 +964,6 @@ function fetchQuit(studentId) {
                     $("#quit").remove();
                     $("#btnQuit").data("action","quit");
                     $("#lblQuit").text("Quit");
-                }else{
-                    $("#btnQuit").data("action","resume");
-                    $("#lblQuit").text("Resume");
                 }
                 return json.data;
             },
@@ -962,7 +1004,7 @@ frmStudent.on("submit", function (event) {
         success: function (response) {
             if (response.status.code === "200") {
                 ShowToastSuccess("Saved successfully!"); 
-                window.location.reload();
+                $("#studentDetailModal").modal("hide");
             } else {
                 ShowToastError(response.message);
                 btnUpdate.prop("disabled", false);

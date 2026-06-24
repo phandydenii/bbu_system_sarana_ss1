@@ -1283,23 +1283,30 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     public async Task<IActionResult> Quit(QuitDto dto)
     {
         var db = campusDbContext.DbContext(_campus);
+        await using var transaction = await db.Database.BeginTransactionAsync();
         try
         { 
+            var student = await db.TblStudent.FirstOrDefaultAsync(x => x.StudentId == dto.StudentId);
+            if (student == null) return new ServerResponse().NotFound("Student not found.");
+            student.Status = StudentStatusConstant.Quit;
             if (dto.QuitId == 0)
             {
                 var data = mapper.Map<Quit>(dto);
                 await db.TblQuit.AddAsync(data);
                 await db.SaveChangesAsync(); 
+                await transaction.CommitAsync();
                 return new ServerResponse().Success(data);
             }
             var oldData = await db.TblQuit.FirstOrDefaultAsync(x => x.QuitId == dto.QuitId);
             if (oldData == null) return new ServerResponse().NotFound("Record found.");
             mapper.Map(dto, oldData);
             await db.SaveChangesAsync(); 
+            await transaction.CommitAsync(); 
             return new ServerResponse().Success(oldData);
         }
         catch (Exception e)
         { 
+            await transaction.RollbackAsync(); 
             return new ServerResponse().ErrorInternal(e);
         }
     }
@@ -1326,7 +1333,8 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         { 
             return new ServerResponse().ErrorInternal(e);
         }
-    } [HttpPost("suspend")]
+    } 
+    [HttpPost("suspend")]
     public async Task<IActionResult> Suspend(SuspendDto dto)
     {
         var db = campusDbContext.DbContext(_campus); 
@@ -1341,6 +1349,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                 var data = mapper.Map<Suspend>(dto); 
                 await db.TblSuspend.AddAsync(data);
                 await db.SaveChangesAsync(); 
+                await transaction.CommitAsync();
                 return new ServerResponse().Success(data);
             }
             var oldData = await db.TblSuspend.FirstOrDefaultAsync(x => x.SuspendId == dto.SuspendId);

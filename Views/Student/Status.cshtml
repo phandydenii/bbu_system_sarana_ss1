@@ -51,7 +51,6 @@
         }
     </script>
 
-    <script src="~/function/AcademicStudentDetail.js"></script>
     <script>
         let dtStudent = null;
         $(document).ready(function () {
@@ -66,10 +65,11 @@
         });
 
         function fetchStudent() {
-            const currentStatus = "@ViewData["status"]"; 
+            const currentStatus = "@ViewData["status"]";
             if (dtStudent !== null) {
+                dtStudent.ajax.reload(null, false);
                 return;
-            } 
+            }
             dtStudent = $("#tblStudent").DataTable({
                 processing: true,
                 serverSide: true,
@@ -162,4 +162,6 @@
             });
         }
     </script>
+    <script src="~/function/AcademicStudentDetail.js"></script>
+    
 }
