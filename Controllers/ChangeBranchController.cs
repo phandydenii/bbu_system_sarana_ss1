@@ -26,7 +26,26 @@ public class ChangeBranchController(ICampusDbContext campusDbContext, IMapper ma
             var pageSize = length != null ? Convert.ToInt32(length) : 0;
             var skip = start != null ? Convert.ToInt32(start) : 0; 
             var db = campusDbContext.DbContext(_campus);
-            var query = db.TblChangeBranch.Where(x=>x.StudentId == studentId).AsQueryable();  
+            var query =  from cb in db.TblChangeBranch
+                join b in db.TblBranch on cb.ToBranchId equals b.BranchId
+                where cb.StudentId == studentId
+                select new
+                {
+                    cb.ChangeBranchId,
+                    cb.StudentId,
+                    cb.ToBranchId,
+                    BranchName = b.BranchName,
+                    BranchNameInKhmer = b.BranchNameInKhmer,
+                    cb.TermNo,
+                    cb.FromDate,
+                    cb.ReturnDate,
+                    cb.DegreeId,
+                    cb.SchoolId,
+                    cb.FieldId,
+                    cb.PromotionId,
+                    cb.StageId,
+                    cb.GroupId
+                };
             var recordsTotal = query.Count();
             var data = query.Skip(skip).Take(pageSize).ToList();
             return Json(new

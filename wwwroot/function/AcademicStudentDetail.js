@@ -20,30 +20,31 @@ async function BindData() {
     await BindSelectOptions("/disability/get-disabilities", "student_DisabilityId", "disabilityId", "disabilityName");
     await BindSelectOptions("/race/get-races", "student_RaceId", "raceId", "raceName");
 }
+let isStudentDropdownLoaded = false;
 async function LoadStudentDetail(studId) {
     if (!studId) return;
-    $("#txtStudentId").val(studId);
+    $("#txtStudentId").val(studId); 
+    if (!isStudentDropdownLoaded) {
+        await BindData();
+        isStudentDropdownLoaded = true;
+    }
     await getStudent(studId);
-    fetchStudentScholarship(studId);
-    fetchStudentGroup(studId);
-    fetchStudentExtend(studId);
-    fetchStudentPayment(studId);
-    fetchStudentBranchHistory(studId);
-    fetchStudentIssueLetter(studId);
-    fetchStudentCertificate(studId);
-    fetchSuppress(studId);
-    fetchSuspend(studId);
-    fetchQuit(studId);
-    fetchComplement(studId); 
+    await Promise.all([
+        fetchStudentScholarship(studId),
+        fetchStudentGroup(studId),
+        fetchStudentExtend(studId),
+        fetchStudentPayment(studId),
+        fetchStudentBranchHistory(studId),
+        fetchStudentIssueLetter(studId),
+        fetchStudentCertificate(studId),
+        fetchSuppress(studId),
+        fetchSuspend(studId),
+        fetchQuit(studId),
+        fetchComplement(studId)
+    ]);
     $('#custom-tabs-four-tab a:first').tab('show');
     $('#frmStudent :input').prop('disabled', true);
-}
-$(document).ready(async function () {
-    frmStudent.prop("readonly", true);
-    await BindData(); 
-    $('#custom-tabs-four-tab a:first').tab('show');
-    $('#frmStudent :input').prop('disabled', true);
- }); 
+} 
 btnEdit.on("click", function (e) {
     e.preventDefault(); 
     const isEditing = $(this).data("editing") === true; 
@@ -89,7 +90,7 @@ function setStudentStatus(status) {
 }
 
 async function getStudent(student_id) {
-    $.ajax({
+    return $.ajax({
         url: "/student/academic/student-id/" + student_id,
         type: "GET",
         data: {student_id: student_id},
@@ -117,8 +118,7 @@ async function getStudent(student_id) {
                     promotionId: promotion.promotionId,
                     todayDate: new Date().toISOString().split("T")[0]
                 };
-                $("#txtDegree").val(degree.degreeName); 
-                GetField(degree.degreeId, school.schoolId);
+                $("#txtDegree").val(degree.degreeName);
                 setStudentStatus(student.status);
                 $("#student_FieldId").val(student.fieldId).trigger("change");
                 if(school.isFoundationSchool ===1){
@@ -170,7 +170,8 @@ async function getStudent(student_id) {
                 $("#student_IsContinuedStudent").prop("checked",student.isContinuedStudent===1);
                 $("#student_AssociateToBachelor").prop("checked",student.associateToBachelor===1);
                 $("#student_IsReceivePhoto").prop("checked",student.isPhotoReceived === 1);
-                GetGroup(promotion.promotionId, term.termNo);
+                GetGroup(stage.stageId, field.fieldId)
+                GetField(degree.degreeId, school.schoolId); 
                 $("#cboGroup").val(group.groupId).trigger("change");
             } else {
                 ShowToastError("Student not found.");
@@ -486,22 +487,16 @@ async function GetField(degreeId, schoolId) {
     });
 }
 
-async function GetGroup(promotionId, termNo) {
+async function GetGroup(stageId, fieldId) {
     const cboGroup = $("#cboGroup");
-    const groups = await Group.GetGroups();
-    const stages = await Stage.GetStages();
-    const terms = await Term.GetTerms();
-    const filteredGroups = groups.filter(g =>
-        stages.some(s => s.stageId === g.stageId && s.promotionId === promotionId) &&
-        terms.some(t => t.stageId === g.stageId && t.termNo === termNo)
-    );
-    filteredGroups.forEach(item => {
+    const groups = await Group.GetGroups({stageId,fieldId}); 
+    groups.forEach(item => {
         cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
     });
 }
 // region "Tab History"
 //=====1-_TabScholarship
-function fetchStudentScholarship(studentId) {
+async function fetchStudentScholarship(studentId) { 
     const tblStudentScholarship = $("#tblStudentScholarship");
     tblStudentScholarship.DataTable().clear().destroy();
     tblStudentScholarship.DataTable({
@@ -534,7 +529,7 @@ function fetchStudentScholarship(studentId) {
 }
 
 //====2-_TabIssueLetter
-function fetchStudentIssueLetter(studentId) {
+async function fetchStudentIssueLetter(studentId) { 
     const tblStudentIssueLetter = $("#tblStudentIssueLetter");
     tblStudentIssueLetter.DataTable().clear().destroy();
     tblStudentIssueLetter.DataTable({
@@ -584,7 +579,7 @@ function fetchStudentIssueLetter(studentId) {
 }
 
 //====3-_TabCertificate
-function fetchStudentCertificate(studentId) {
+async function fetchStudentCertificate(studentId) { 
     const tblStudentCertificate = $("#tblStudentCertificate");
     tblStudentCertificate.DataTable().clear().destroy();
     tblStudentCertificate.DataTable({
@@ -617,7 +612,7 @@ function fetchStudentCertificate(studentId) {
 }
 
 //====4-_TabBranchHistory
-function fetchStudentBranchHistory(studentId) {
+async function fetchStudentBranchHistory(studentId) { 
     const tblBranchHistory = $("#tblBranchHistory");
     tblBranchHistory.DataTable().clear().destroy();
     tblBranchHistory.DataTable({
@@ -644,6 +639,7 @@ function fetchStudentBranchHistory(studentId) {
             {data: "changeBranchId"},
             {data: "studentId"},
             {data: "toBranchId"},
+            {data: "branchName"},
             {data: "termNo"}, 
             {
                 data: "fromDate",
@@ -681,7 +677,7 @@ function fetchStudentBranchHistory(studentId) {
 }
 
 //===5-TabSuppressHistory
-function fetchSuppress(studentId) {
+async function fetchSuppress(studentId) { 
     const tblSuppress = $("#tblSuppress");
     tblSuppress.DataTable().clear().destroy();
     tblSuppress.DataTable({
@@ -741,7 +737,7 @@ function fetchSuppress(studentId) {
 //==6-TabAbsence
 
 //====7-_TabPayment
-function fetchStudentPayment(studentId) {
+async function fetchStudentPayment(studentId) {  
     const tblStudentPayment = $("#tblStudentPayment");
     tblStudentPayment.DataTable().clear().destroy();
     tblStudentPayment.DataTable({
@@ -783,7 +779,7 @@ function fetchStudentPayment(studentId) {
 }
 
 //====8-_TabSuspend
-function fetchSuspend(studentId) {
+async function fetchSuspend(studentId) { 
     const tblSuspend = $("#tblSuspend");
     tblSuspend.DataTable().clear().destroy();
     tblSuspend.DataTable({
@@ -799,9 +795,6 @@ function fetchSuspend(studentId) {
                     $("#suspend").remove();
                     $("#btnSuspend").data("action","suspend");
                     $("#lblSuspend").text("Suspend");
-                }else{
-                    $("#btnSuspend").data("action","resume");
-                    $("#lblSuspend").text("Resume");
                 }
                 return json.data;
             },
@@ -833,7 +826,7 @@ function fetchSuspend(studentId) {
 }
 
 //===9_TabGroupHistory
-function fetchStudentGroup(studentId) {
+async function fetchStudentGroup(studentId) { 
     const tblStudentGroup = $("#tblStudentGroup");
     tblStudentGroup.DataTable().clear().destroy();
     tblStudentGroup.DataTable({
@@ -865,7 +858,7 @@ function fetchStudentGroup(studentId) {
 
 
 //====10-_TabExtendFrom
-function fetchStudentExtend(studentId) {
+async function fetchStudentExtend(studentId) { 
     const tblStudentExtend = $("#tblStudentExtend");
     tblStudentExtend.DataTable().clear().destroy();
     tblStudentExtend.DataTable({
@@ -875,8 +868,7 @@ function fetchStudentExtend(studentId) {
         ajax: {
             url: "/extend/get-student-extend/" + studentId,
             type: "POST",
-            dataSrc: function (json) {
-                // console.log(json.data);
+            dataSrc: function (json) { 
                 if (!json.data || json.data.length === 0) {
                     $("#extend-from-tab").closest("li").remove();
                     $("#extend-from").remove();
@@ -906,7 +898,7 @@ function fetchStudentExtend(studentId) {
 }
 
 //====11-_TabComplement
-function fetchComplement(studentId) {
+async function fetchComplement(studentId) { 
     const tblComplement = $("#tblComplement");
     tblComplement.DataTable().clear().destroy();
     tblComplement.DataTable({
@@ -948,7 +940,7 @@ function fetchComplement(studentId) {
 }
 
 //====12-_TabQuit
-function fetchQuit(studentId) {
+async function fetchQuit(studentId) { 
     const tblQuit = $("#tblQuit");
     tblQuit.DataTable().clear().destroy();
     tblQuit.DataTable({

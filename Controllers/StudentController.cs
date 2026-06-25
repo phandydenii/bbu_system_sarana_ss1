@@ -14,14 +14,12 @@ namespace BBU_SYSTEM.Controllers;
 
 [Authorize]
 [Route("student")]
-public class StudentController(ICampusDbContext campusDbContext, IMapper mapper, IHttpContextAccessor context)
-    : Controller
+public class StudentController(ICampusDbContext campusDbContext, IMapper mapper, IHttpContextAccessor context) : Controller
 {
     private readonly string _campus = context.HttpContext?.User?.FindFirst("CampusKey")?.Value ?? "pp";
-
-
+    
     [Route("all-students")]
-    public ActionResult Index()
+    public ActionResult Index() 
     {
         return View();
     }
@@ -35,7 +33,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         return View();
     }
 
-    [Route("details/{studentId}")]
+    /*[Route("details/{studentId}")]
     public ActionResult Details(string? studentId)
     {
         if (studentId == null) return NotFound(new { message = "Student not found" });
@@ -105,13 +103,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             StudentJobs = db.TblStudentJob.ToList()
         };
         return View();
-    }
-
-    [HttpPost]
-    public IActionResult GetStudents()
-    {
-        return View();
-    }
+    }*/
 
     [HttpPost("transfer/{groupId:int}/{fromGroupId:int}/{termNo:int}")]
     public async Task<IActionResult> TransferStudents([FromBody] List<string> idList, int groupId, int fromGroupId,int termNo)
@@ -1279,6 +1271,28 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             return new ServerResponse().ErrorInternal(e);
         }
     }
+    
+    [HttpPost("change-school")]
+    public async Task<IActionResult> ChangeBranch(ChangeSchoolReq req)
+    {
+        var db = campusDbContext.DbContext(_campus);
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        try
+        {
+            var student = await db.TblStudent.FirstOrDefaultAsync(x => x.StudentId == req.StudentId);
+            if (student == null) return new ServerResponse().NotFound("Student not found.");
+            student.Status = StudentStatusConstant.ChangeBranch;  
+            await db.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return new ServerResponse().Success();
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            return new ServerResponse().ErrorInternal(e);
+        }
+    }
+    
     [HttpPost("quit")]
     public async Task<IActionResult> Quit(QuitDto dto)
     {
@@ -1310,6 +1324,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             return new ServerResponse().ErrorInternal(e);
         }
     }
+    
     [HttpPost("suppress")]
     public async Task<IActionResult> Suppress(SuppressDto dto)
     {
@@ -1334,6 +1349,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             return new ServerResponse().ErrorInternal(e);
         }
     } 
+    
     [HttpPost("suspend")]
     public async Task<IActionResult> Suspend(SuspendDto dto)
     {
