@@ -10,6 +10,8 @@ let currentStudentInfo = {
     promotionId:"",
     todayDate: ""
 };
+let isStudentDropdownDoneLoaded = false;
+let needReloadStudentList = false;
 
 async function BindData() {
     await BindSelectOptions("/Province/get-provinces", "student_PlaceOfBirthId", "provinceId", "provinceName");
@@ -20,13 +22,12 @@ async function BindData() {
     await BindSelectOptions("/disability/get-disabilities", "student_DisabilityId", "disabilityId", "disabilityName");
     await BindSelectOptions("/race/get-races", "student_RaceId", "raceId", "raceName");
 }
-let isStudentDropdownLoaded = false;
 async function LoadStudentDetail(studId) {
     if (!studId) return;
     $("#txtStudentId").val(studId); 
-    if (!isStudentDropdownLoaded) {
+    if (!isStudentDropdownDoneLoaded) {
         await BindData();
-        isStudentDropdownLoaded = true;
+        isStudentDropdownDoneLoaded = true;
     }
     await getStudent(studId);
     await Promise.all([
@@ -72,7 +73,10 @@ $("#studentDetailModal").on("hidden.bs.modal", function () {
     btnEdit.html('<i class="fas fa-pen"></i>');
     actionButtons.find("button").not("#btnEdit").addClass("d-none");
     $("#frmStudent :input").prop("disabled", true);
-    fetchStudent();
+    if (needReloadStudentList) {
+        fetchStudent();
+        needReloadStudentList = false;
+    }
 });
 function setStudentStatus(status) {
     const studentStatus = $("#student_Status");
@@ -184,7 +188,7 @@ async function getStudent(student_id) {
 }
 
 // region "Sub Modal of Student Detail Modal handling"
-// 1. suppress
+// =====1. suppress
 $(document).on("click", "#btnSuppress", function (e) {
     e.preventDefault();
     $("#frmSuppress")[0].reset();
@@ -236,11 +240,10 @@ $(document).on("submit", "#frmSuppress", async function (e) {
             data: $("#frmSuppress").serialize()
         }); 
         if (response.status.code === "200") {
+            needReloadStudentList = true;
             ShowToastSuccess(suppressId > 0 ? "Express saved successfully." : "Suppress saved successfully."); 
-            $("#modalSuppress").modal("hide"); 
-            if ($.fn.DataTable.isDataTable("#tblSuppress")) {
-                $("#tblSuppress").DataTable().ajax.reload(null, false);
-            }
+            $("#tblSuppress").DataTable().ajax.reload();
+            $("#modalSuppress").modal("hide");
         } else {
             ShowToastError(response.status?.message || "Save failed.");
         }
@@ -250,7 +253,7 @@ $(document).on("submit", "#frmSuppress", async function (e) {
         btnSubmit.prop("disabled", false);
     }
 });
-// 2. suspend
+// =====2. suspend
 $(document).on("click", "#btnSuspend", function (e) {
     e.preventDefault();
     $("#frmSuspend")[0].reset();
@@ -275,8 +278,10 @@ $(document).on("submit", "#modalSuspend", async function (e) {
             data: $("#frmSuspend").serialize()
         });
         if (response.status.code === "200") {
+            needReloadStudentList = true;
             ShowToastSuccess("Suspend saved successfully.");
-            setStudentStatus("SUSPEND");
+            setStudentStatus("SUSPEND"); 
+            $("#tblSuspend").DataTable().ajax.reload();
             $("#modalSuspend").modal("hide");
         } else {
             ShowToastError(response.status?.message || response.message || "Save failed.");
@@ -287,7 +292,7 @@ $(document).on("submit", "#modalSuspend", async function (e) {
         btnSubmit.prop("disabled", false);
     }
 });
-// 3. quit
+// =====3. quit
 $(document).on("click", "#btnQuit", function (e) {
     e.preventDefault();
     $("#frmQuit")[0].reset();
@@ -310,9 +315,11 @@ $(document).on("submit", "#frmQuit", async function (e) {
             method: "POST",
             data: $("#frmQuit").serialize()
         });
-        if (response.status.code === "200") {  
+        if (response.status.code === "200") {
+            needReloadStudentList = true;
             setStudentStatus("QUIT");
-            ShowToastSuccess("Quit saved successfully.");
+            ShowToastSuccess("Quit saved successfully."); 
+            $("#tblQuit").DataTable().ajax.reload();
             $("#modalQuit").modal("hide");
         } else {
             ShowToastError(response.status?.message || response.message || "Save failed.");
@@ -323,7 +330,7 @@ $(document).on("submit", "#frmQuit", async function (e) {
         btnSubmit.prop("disabled", false);
     }
 });
-// 4. change branch
+// =====4. change branch
 $(document).on("click", "#btnChangeBranch", async function (e) {
     e.preventDefault();
     $("#frmChangeBranch")[0].reset();
@@ -377,6 +384,7 @@ $(document).on("submit", "#frmChangeBranch", async function (e) {
             data: $("#frmChangeBranch").serialize()
         });
         if (response.status.code === "200") {
+            needReloadStudentList = true;
             if (changeBranchId > 0){
                 ShowToastSuccess("Return change branch saved successfully.");  
             }else {
@@ -385,11 +393,8 @@ $(document).on("submit", "#frmChangeBranch", async function (e) {
                 $("#btnEdit").removeClass("d-none");
                 $("#btnUpdate").removeClass("d-none");
                 ShowToastSuccess("Change branch saved successfully.");
-            }
-            if ($.fn.DataTable.isDataTable("#tblBranchHistory")) {
-                $("#tblBranchHistory").DataTable().ajax.reload(null, false);
             } 
-            fetchStudentBranchHistory(studentId);
+            $("#tblBranchHistory").DataTable().ajax.reload();
             $("#modalChangeBranch").modal("hide");
         } else {
             ShowToastError(response.status?.message || "Save failed.");
@@ -400,7 +405,7 @@ $(document).on("submit", "#frmChangeBranch", async function (e) {
         btnSubmit.prop("disabled", false);
     }
 });
-// 5. adjust
+// =====5. adjust
 $(document).on("click", "#btnAdjust", async function (e) {
     e.preventDefault();
     $("#frmAdjustGroup")[0].reset();
@@ -433,7 +438,7 @@ $(document).on("submit", "#modalAdjustGroup", async function (e) {
         btnSubmit.prop("disabled", false);
     }
 });
-// 6. change school
+// =====6. change school
 $(document).on("click", "#btnChangeSchool", async function (e) {
     e.preventDefault();
     $("#frmChangeSchool")[0].reset();
@@ -479,14 +484,11 @@ $(document).on("change", "#cboChangeFieldId", async function () {
 
 async function GetField(degreeId, schoolId) {
     const cboField = $("#student_FieldId");
-    cboField.empty();
-    cboField.append("<option value='' disabled>Select</option>");
     const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
     fields.forEach(item => {
         cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
     });
 }
-
 async function GetGroup(stageId, fieldId) {
     const cboGroup = $("#cboGroup");
     const groups = await Group.GetGroups({stageId,fieldId}); 
@@ -494,6 +496,7 @@ async function GetGroup(stageId, fieldId) {
         cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
     });
 }
+
 // region "Tab History"
 //=====1-_TabScholarship
 async function fetchStudentScholarship(studentId) { 
@@ -527,7 +530,6 @@ async function fetchStudentScholarship(studentId) {
         ]
     });
 }
-
 //====2-_TabIssueLetter
 async function fetchStudentIssueLetter(studentId) { 
     const tblStudentIssueLetter = $("#tblStudentIssueLetter");
@@ -577,7 +579,6 @@ async function fetchStudentIssueLetter(studentId) {
         ]
     });
 }
-
 //====3-_TabCertificate
 async function fetchStudentCertificate(studentId) { 
     const tblStudentCertificate = $("#tblStudentCertificate");
@@ -610,7 +611,6 @@ async function fetchStudentCertificate(studentId) {
         ]
     });
 }
-
 //====4-_TabBranchHistory
 async function fetchStudentBranchHistory(studentId) { 
     const tblBranchHistory = $("#tblBranchHistory");
@@ -675,7 +675,6 @@ async function fetchStudentBranchHistory(studentId) {
         ]
     });
 }
-
 //===5-TabSuppressHistory
 async function fetchSuppress(studentId) { 
     const tblSuppress = $("#tblSuppress");
@@ -733,9 +732,7 @@ async function fetchSuppress(studentId) {
         ]
     });
 }
-
 //==6-TabAbsence
-
 //====7-_TabPayment
 async function fetchStudentPayment(studentId) {  
     const tblStudentPayment = $("#tblStudentPayment");
@@ -777,7 +774,6 @@ async function fetchStudentPayment(studentId) {
         ]
     });
 }
-
 //====8-_TabSuspend
 async function fetchSuspend(studentId) { 
     const tblSuspend = $("#tblSuspend");
@@ -824,7 +820,6 @@ async function fetchSuspend(studentId) {
         ]
     });
 }
-
 //===9_TabGroupHistory
 async function fetchStudentGroup(studentId) { 
     const tblStudentGroup = $("#tblStudentGroup");
@@ -855,8 +850,6 @@ async function fetchStudentGroup(studentId) {
         ]
     });
 }
-
-
 //====10-_TabExtendFrom
 async function fetchStudentExtend(studentId) { 
     const tblStudentExtend = $("#tblStudentExtend");
@@ -896,7 +889,6 @@ async function fetchStudentExtend(studentId) {
         ]
     });
 }
-
 //====11-_TabComplement
 async function fetchComplement(studentId) { 
     const tblComplement = $("#tblComplement");
@@ -938,7 +930,6 @@ async function fetchComplement(studentId) {
         ]
     });
 }
-
 //====12-_TabQuit
 async function fetchQuit(studentId) { 
     const tblQuit = $("#tblQuit");
