@@ -24,6 +24,7 @@ async function BindData() {
 }
 async function LoadStudentDetail(studId) {
     if (!studId) return;
+    showLoading();
     $("#txtStudentId").val(studId); 
     if (!isStudentDropdownDoneLoaded) {
         await BindData();
@@ -45,6 +46,7 @@ async function LoadStudentDetail(studId) {
     ]);
     $('#custom-tabs-four-tab a:first').tab('show');
     $('#frmStudent :input').prop('disabled', true);
+    hideLoading(1);
 } 
 btnEdit.on("click", function (e) {
     e.preventDefault(); 
@@ -98,7 +100,7 @@ async function getStudent(student_id) {
         url: "/student/academic/student-id/" + student_id,
         type: "GET",
         data: {student_id: student_id},
-        success: function (result) {
+        success:async function (result) {
             const data = result.data;
             if (data) {
                 const student = data["student"];
@@ -174,9 +176,9 @@ async function getStudent(student_id) {
                 $("#student_IsContinuedStudent").prop("checked",student.isContinuedStudent===1);
                 $("#student_AssociateToBachelor").prop("checked",student.associateToBachelor===1);
                 $("#student_IsReceivePhoto").prop("checked",student.isPhotoReceived === 1);
-                GetGroup(stage.stageId, field.fieldId)
-                GetField(degree.degreeId, school.schoolId); 
+                await GetGroup(stage.stageId, field.fieldId)
                 $("#cboGroup").val(group.groupId).trigger("change");
+                await GetField(degree.degreeId, school.schoolId); 
             } else {
                 ShowToastError("Student not found.");
             }
@@ -987,6 +989,7 @@ frmStudent.on("submit", function (event) {
         success: function (response) {
             if (response.status.code === "200") {
                 ShowToastSuccess("Saved successfully!"); 
+                needReloadStudentList = true;
                 $("#studentDetailModal").modal("hide");
             } else {
                 ShowToastError(response.message);

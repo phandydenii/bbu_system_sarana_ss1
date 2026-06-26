@@ -1173,71 +1173,56 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     }
 
     [HttpPatch("update-student")]
-    public async Task<IActionResult> UpdateStudentAcceptedCertificate(StudentDto student, RegistryDto registry,
-        ContactPersonDto contactPerson)
+    public async Task<IActionResult> UpdateStudentAcceptedCertificate(StudentDto student, RegistryDto registry, ContactPersonDto contactPerson)
     {
-        var db = campusDbContext.DbContext(_campus);
-        await db.Database.BeginTransactionAsync();
+        var db = campusDbContext.DbContext(_campus);  
+        await using var tran = await db.Database.BeginTransactionAsync();
         try
         {
             var studentCheck = await db.TblStudent.FirstOrDefaultAsync(s => s.StudentId == student.StudentId);
             if (studentCheck == null)
             {
-                await db.Database.RollbackTransactionAsync();
+                await tran.RollbackAsync();
                 return new ServerResponse().NotFound("Student not found");
-            }
-
-            contactPerson.ContactPersonId = (int)studentCheck.ContactPersonId!;
+            } 
             //===student 
             var studentUpdate = new StudentUpdateViewModel();
             mapper.Map(student, studentUpdate);
-            mapper.Map(studentUpdate, studentCheck);
-            // db.TblStudent.Update(studentCheck);
+            mapper.Map(studentUpdate, studentCheck); 
             var studentChanged = db.Entry(studentCheck).Properties.Any(p => p.IsModified);
 
             //===registry
             var registryCheck = await db.TblRegistry.FirstOrDefaultAsync(x => x.StudentId == student.StudentId);
             if (registryCheck == null)
             {
-                await db.Database.RollbackTransactionAsync();
+                await tran.RollbackAsync();
                 return new ServerResponse().NotFound("Registry not found");
-            }
-
+            } 
             registryCheck.HighSchoolResult = registry.HighSchoolResult;
-            registryCheck.HighSchoolTableNo = registry.HighSchoolTableNo;
-            // db.TblRegistry.Update(registryCheck);
+            registryCheck.HighSchoolTableNo = registry.HighSchoolTableNo; 
             var registryChanged = db.Entry(registryCheck).Properties.Any(p => p.IsModified);
 
             //===Contact Person
-            var contactCheck =
-                await db.TblContactPerson.FirstOrDefaultAsync(x => x.ContactPersonId == contactPerson.ContactPersonId);
+            contactPerson.ContactPersonId = (int)studentCheck.ContactPersonId!;
+            var contactCheck = await db.TblContactPerson.FirstOrDefaultAsync(x => x.ContactPersonId == contactPerson.ContactPersonId);
             if (contactCheck == null)
             {
-                await db.Database.RollbackTransactionAsync();
-                return new ServerResponse().NotFound("Registry not found");
-            }
-
-            mapper.Map(contactPerson, contactCheck);
-            // db.TblContactPerson.Update(contactCheck);
+                await tran.RollbackAsync();
+                return new ServerResponse().NotFound("Contact person not found");
+            } 
+            mapper.Map(contactPerson, contactCheck); 
             var contactPersonChanged = db.Entry(contactCheck).Properties.Any(p => p.IsModified);
 
-            // ==== SAVE ONLY IF CHANGED ====
-            if (studentChanged || registryChanged || contactPersonChanged)
-            {
-                await db.SaveChangesAsync();
-            }
-            await db.Database.CommitTransactionAsync();
-            return new ServerResponse().Success("Student and related data updated successfully");
+            var hasChanges = studentChanged || registryChanged || contactPersonChanged; 
+            if (hasChanges) await db.SaveChangesAsync(); 
+            await tran.CommitAsync();
+            return new ServerResponse().Success(hasChanges ? "Student and related data updated successfully" : "No changes detected");
         }
         catch (Exception e)
         {
-            await db.Database.RollbackTransactionAsync();
+            await tran.RollbackAsync(); 
             return new ServerResponse().ErrorInternal(e);
-        }
-        finally
-        {
-            await db.DisposeAsync();
-        }
+        } 
     }
 
     [HttpPost("change-branch")]
