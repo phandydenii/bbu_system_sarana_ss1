@@ -31,7 +31,7 @@ async function LoadStudentDetail(studId) {
         isStudentDropdownDoneLoaded = true;
     }
     await getStudent(studId);
-    await Promise.all([
+    await Promise.allSettled([
         fetchStudentScholarship(studId),
         fetchStudentGroup(studId),
         fetchStudentExtend(studId),
@@ -43,30 +43,31 @@ async function LoadStudentDetail(studId) {
         fetchSuspend(studId),
         fetchQuit(studId),
         fetchComplement(studId)
-    ]);
-    $('#custom-tabs-four-tab a:first').tab('show');
+    ]); 
+    $('#student-history-tabs a:visible:first').tab('show');
     $('#frmStudent :input').prop('disabled', true);
     hideLoading(1);
 } 
+
 btnEdit.on("click", function (e) {
-    e.preventDefault(); 
-    const isEditing = $(this).data("editing") === true; 
+    e.preventDefault();
+
+    const isEditing = $(this).data("editing") === true;
+    const status = $("#student_Status").val();
+
     if (isEditing) {
         $(this).data("editing", false);
-        $(this).html('<i class="fas fa-pen"></i>'); 
-        actionButtons.find("button").not("#btnEdit").addClass("d-none");  
+        $(this).html('<i class="fas fa-pen"></i>');
+
+        setActionButtonsByStudentStatus(status, false);
+
         $('#frmStudent :input').prop('disabled', true);
     } else {
         $(this).data("editing", true);
-        $(this).html('<i class="fas fa-check"></i>');  
-        const status = $("#student_Status").val(); 
-        if (status === "CHANGE BRANCH") {
-            actionButtons.find("button").addClass("d-none"); 
-            $("#btnEdit").removeClass("d-none");
-            $("#btnUpdate").removeClass("d-none");
-        } else {
-            actionButtons.find("button").removeClass("d-none");
-        } 
+        $(this).html('<i class="fas fa-check"></i>');
+
+        setActionButtonsByStudentStatus(status, true);
+
         $('#frmStudent :input').prop('disabled', false);
     }
 });
@@ -93,6 +94,35 @@ function setStudentStatus(status) {
         .removeClass(defaultBgClass)
         .addClass(bgClass)
         .val(status || "");
+}
+function setActionButtonsByStudentStatus(status, isEditing = false) {
+    actionButtons.find("button").addClass("d-none");
+    $("#btnEdit").removeClass("d-none"); 
+    if (!isEditing) return; 
+    $("#btnUpdate").removeClass("d-none");
+
+    switch (status) {
+        case "CHANGE BRANCH":
+            actionButtons.find("button").addClass("d-none");
+            $("#btnEdit").removeClass("d-none");
+            $("#btnUpdate").removeClass("d-none");
+            return;
+        case "QUIT":
+            actionButtons.find("button").removeClass("d-none");
+            $("#btnQuit").addClass("d-none"); 
+            return;
+        case "SUSPEND":
+            actionButtons.find("button").removeClass("d-none");
+            $("#btnSuspend").addClass("d-none"); 
+            return; 
+        case "SUPPRESS":
+            actionButtons.find("button").removeClass("d-none");
+            $("#btnSuppress").addClass("d-none");
+            return; 
+        default:
+            actionButtons.find("button").removeClass("d-none");
+            return;
+    }
 }
 
 async function getStudent(student_id) {
@@ -126,6 +156,7 @@ async function getStudent(student_id) {
                 };
                 $("#txtDegree").val(degree.degreeName);
                 setStudentStatus(student.status);
+                setActionButtonsByStudentStatus(student.status, false);
                 $("#student_FieldId").val(student.fieldId).trigger("change");
                 if(school.isFoundationSchool ===1){
                     $("#txtSchool").val(`${school.schoolName} (${registry.schoolName})`); 
@@ -408,14 +439,71 @@ $(document).on("submit", "#frmChangeBranch", async function (e) {
     }
 });
 // =====5. adjust
-$(document).on("click", "#btnAdjust", async function (e) {
+$(document).on("click", "#btnAdjustGroup", async function (e) {
     e.preventDefault();
     $("#frmAdjustGroup")[0].reset();
     $("#adjustStudentId").val(currentStudentInfo.studentId);
     $("#adjustTermNo").val(currentStudentInfo.termNo);
     await BindSelectOptions("/group/get-groups","cboAdjustGroupId","groupId","groupName",{isAll:true},"Select Group");
+    const table = $("#tblStudentGroup").DataTable();
+    const row = table.row($(this).closest("tr")).data();  
+    if (!row) return ShowToastError("Cannot get student group data.");
+    $("#cboAdjustGroupId").val(row.groupId).trigger("change");
+    await getStudentScore(row.studentGroupId);
     $("#modalAdjustGroup").modal("show");
 });
+async function getStudentScore(studentGroupId){
+    const tblScore = $("#tblAdjustStudentScore");
+    tblScore.DataTable().clear().destroy();
+    tblScore.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        searching: false,
+        lengthChange: false,
+        pageLength: 10,
+        ajax: {
+            url: "/scores/get-scores/"+ studentGroupId,
+            type: "POST",
+            dataSrc: function (json) {
+                return json.data || [];
+            },
+            error: function (xhr) {
+                ShowToastError(xhr.responseText || "Error loading student scores.");
+            }
+        },
+        columns: [
+            { data: "scoreId", visible: false },
+            { data: "studentGroupId", visible: false },
+            { data: "courseId", visible: false },
+            { data: "courseName" },
+            {
+                data: "midTermScore",
+                className: "text-center",
+                render: function (data) {
+                    return data ?? 0;
+                }
+            },
+            {
+                data: "finalScore",
+                className: "text-center",
+                render: function (data) {
+                    return data ?? 0;
+                }
+            },
+            { data: "type", className: "text-center" },
+            {
+                data: "isAllow",
+                className: "text-center",
+                render: function (data) {
+                    return data
+                        ? `<span class="badge badge-success">Allow</span>`
+                        : `<span class="badge badge-secondary">No</span>`;
+                }
+            }
+        ]
+    });
+} 
 $(document).on("submit", "#modalAdjustGroup", async function (e) {
     e.preventDefault();
     const studentId = $("#suppressStudentId").val();
@@ -513,8 +601,8 @@ async function fetchStudentScholarship(studentId) {
             type: "POST",
             dataSrc: function (json) {
                 if (!json.data || json.data.length === 0) {
-                    $("#scholarship-tab").closest("li").remove();
-                    $("#scholarship").remove();
+                    $("#scholarship-tab").closest("li").hide();
+                    $("#scholarship").hide();
                 }
                 return json.data;
             },
@@ -545,9 +633,9 @@ async function fetchStudentIssueLetter(studentId) {
             type: "POST",
             dataSrc: function (json) {
                 if (!json.data || json.data.length === 0) {
-                    $("#issue-letter-tab").closest("li").remove();
-                    $("#issue-letter").remove();
-                }
+                    $("#issue-letter-tab").closest("li").hide();
+                    $("#issue-letter").hide();
+                } 
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -592,10 +680,10 @@ async function fetchStudentCertificate(studentId) {
         ajax: {
             url: "/student-certificate/get-student-certificate/" + studentId,
             type: "POST",
-            dataSrc: function (json) {
+            dataSrc: function (json) { 
                 if (!json.data || json.data.length === 0) {
-                    $("#certificate-tab").closest("li").remove();
-                    $("#certificate").remove();
+                    $("#certificate-tab").closest("li").hide();
+                    $("#certificate").hide();
                 }
                 return json.data;
             },
@@ -626,11 +714,9 @@ async function fetchStudentBranchHistory(studentId) {
             type: "POST",
             dataSrc: function (json) {
                 if (!json.data || json.data.length === 0) {
-                    $("#branch-history-tab").closest("li").remove();
-                    $("#branch-history").remove();
-                    $("#btnChangeBranch").data("action","changeBranch");
-                    $("#lblChangeBranch").text("Change Branch");
-                } 
+                    $("#branch-history-tab").closest("li").hide();
+                    $("#branch-history").hide();
+                }
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -690,10 +776,8 @@ async function fetchSuppress(studentId) {
             type: "POST",
             dataSrc: function (json) {
                 if (!json.data || json.data.length === 0) {
-                    $("#suppress-history-tab").closest("li").remove();
-                    $("#suppress-history").remove();
-                    $("#btnSuppress").data("action","suppress");
-                    $("#lblSuppress").text("Suppress");
+                    $("#suppress-history-tab").closest("li").hide();
+                    $("#suppress-history").hide();
                 } 
                 return json.data;
             },
@@ -746,11 +830,11 @@ async function fetchStudentPayment(studentId) {
         ajax: {
             url: "/payment/get-student-payments/" + studentId,
             type: "POST",
-            dataSrc: function (json) {
+            dataSrc: function (json) { 
                 if (!json.data || json.data.length === 0) {
-                    $("#payment-tab").closest("li").remove();
-                    $("#payment").remove();
-                }
+                    $("#payment-tab").closest("li").hide();
+                    $("#payment").hide();
+                } 
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -789,11 +873,9 @@ async function fetchSuspend(studentId) {
             type: "POST",
             dataSrc: function (json) {
                 if (!json.data || json.data.length === 0) {
-                    $("#suspend-tab").closest("li").remove();
-                    $("#suspend").remove();
-                    $("#btnSuspend").data("action","suspend");
-                    $("#lblSuspend").text("Suspend");
-                }
+                    $("#suspend-tab").closest("li").hide();
+                    $("#suspend").hide();
+                } 
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -835,9 +917,9 @@ async function fetchStudentGroup(studentId) {
             type: "POST",
             dataSrc: function (json) {
                 if (!json.data || json.data.length === 0) {
-                    $("#group-history-tab").closest("li").remove();
-                    $("#group-history").remove();
-                }
+                    $("#group-history-tab").closest("li").hide();
+                    $("#group-history").hide();
+                } 
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -849,6 +931,20 @@ async function fetchStudentGroup(studentId) {
             {data: "studentId"},
             {data: "termNo"},
             {data: "groupName"},
+            {
+                data: null,
+                className: "text-center",
+                render: function () {
+                    return `
+                            <button type="button"
+                                    class="btn btn-sm btn-primary"
+                                    id="btnAdjustGroup"
+                                    title="Edit">
+                                 <i class="fas fa-sliders-h"></i> Adjust
+                            </button>
+                        `;
+                }
+            }
         ]
     });
 }
@@ -865,9 +961,9 @@ async function fetchStudentExtend(studentId) {
             type: "POST",
             dataSrc: function (json) { 
                 if (!json.data || json.data.length === 0) {
-                    $("#extend-from-tab").closest("li").remove();
-                    $("#extend-from").remove();
-                }
+                    $("#extend-from-tab").closest("li").hide();
+                    $("#extend-from").hide();
+                } 
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -904,9 +1000,9 @@ async function fetchComplement(studentId) {
             type: "POST",
             dataSrc: function (json) {
                 if (!json.data || json.data.length === 0) {
-                    $("#complementation-tab").closest("li").remove();
-                    $("#complementation").remove();
-                }
+                    $("#complementation-tab").closest("li").hide();
+                    $("#complementation").hide();
+                } 
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -945,11 +1041,9 @@ async function fetchQuit(studentId) {
             type: "POST",
             dataSrc: function (json) {
                 if (!json.data || json.data.length === 0) {
-                    $("#quit-tab").closest("li").remove();
-                    $("#quit").remove();
-                    $("#btnQuit").data("action","quit");
-                    $("#lblQuit").text("Quit");
-                }
+                    $("#quit-tab").closest("li").hide();
+                    $("#quit").hide();
+                } 
                 return json.data;
             },
             error: function (xhr, status, error) {
