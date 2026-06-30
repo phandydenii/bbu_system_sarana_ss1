@@ -12,6 +12,61 @@ let currentStudentInfo = {
 };
 let isStudentDropdownDoneLoaded = false;
 let needReloadStudentList = false;
+function resetStudentDetailModal() {
+    currentStudentInfo = {
+        studentId: "",
+        termNo: "",
+        stageId: "",
+        fieldId: "",
+        groupId: "",
+        promotionId: "",
+        todayDate: ""
+    };
+    // Reset form
+    if ($("#frmStudent").length){$("#frmStudent")[0].reset();}
+    // Clear text inputs outside form
+    $("#txtStudentId").val("");
+    $("#txtDegree").val("");
+    $("#txtSchool").val("");
+    $("#txtPromotion").val("");
+    $("#txtStage").val("");
+    $("#txtTerm").val("");
+    $("#txtStudyTime").val("");
+    $("#txtRoom").val("");
+    $("#txtGroup").val("");
+    $("#txtFieldGroup").val("");
+    // Show all tab headers again
+    $("#student-history-tabs .nav-item").removeAttr("style");
+    // Reset active tab state
+    $(".student-history-pane").removeAttr("style");
+    $("#student-history-tabs .nav-link").removeClass("active"); 
+    $(".student-history-pane").removeClass("show active");
+    // Destroy all DataTables
+    const tables = [
+        "#tblStudentScholarship",
+        "#tblStudentIssueLetter",
+        "#tblStudentCertificate",
+        "#tblBranchHistory",
+        "#tblSuppress",
+        "#tblStudentPayment",
+        "#tblSuspend",
+        "#tblStudentGroup",
+        "#tblStudentExtend",
+        "#tblComplement",
+        "#tblQuit"
+    ];
+    tables.forEach(function (tableId) {
+        if ($.fn.DataTable.isDataTable(tableId)) {
+            $(tableId).DataTable().clear().destroy();
+        }
+        $(tableId + " tbody").empty();
+    });
+    // Reset buttons
+    btnEdit.data("editing", false);
+    btnEdit.html('<i class="fas fa-pen"></i>');
+    actionButtons.find("button").not("#btnEdit").addClass("d-none");
+    $("#frmStudent :input").prop("disabled", true);
+}
 
 async function BindData() {
     await BindSelectOptions("/Province/get-provinces", "student_PlaceOfBirthId", "provinceId", "provinceName");
@@ -72,10 +127,7 @@ btnEdit.on("click", function (e) {
     }
 });
 $("#studentDetailModal").on("hidden.bs.modal", function () {
-    btnEdit.data("editing", false);
-    btnEdit.html('<i class="fas fa-pen"></i>');
-    actionButtons.find("button").not("#btnEdit").addClass("d-none");
-    $("#frmStudent :input").prop("disabled", true);
+    resetStudentDetailModal();
     if (needReloadStudentList) {
         fetchStudent();
         needReloadStudentList = false;
@@ -155,6 +207,8 @@ async function getStudent(student_id) {
                     todayDate: new Date().toISOString().split("T")[0]
                 };
                 $("#txtDegree").val(degree.degreeName);
+                $("#txtField").val(field.fieldName);
+                $("#txtGroup").val(group.groupName); 
                 setStudentStatus(student.status);
                 setActionButtonsByStudentStatus(student.status, false);
                 $("#student_FieldId").val(student.fieldId).trigger("change");
@@ -169,8 +223,7 @@ async function getStudent(student_id) {
                 $("#txtStage").val(stage.stageNo);
                 $("#txtTerm").val(term.termNo);
                 $("#txtStudyTime").val(group.studyTime);
-                $("#txtRoom").val(groupRoom.roomName);
-                $("#txtGroup").val(group.groupName);
+                $("#txtRoom").val(groupRoom.roomName); 
                 $("#student_StudentId").val(student.studentId);
                 $("#student_StudentName").val(`${student.studentName}`);
                 $("#student_StudentNameInKhmer").val(`${student.studentNameInKhmer}`);
@@ -206,10 +259,7 @@ async function getStudent(student_id) {
                 $("#student_MotherOccupationInKhmer").val(student.motherOccupationInKhmer).trigger("change");
                 $("#student_IsContinuedStudent").prop("checked",student.isContinuedStudent===1);
                 $("#student_AssociateToBachelor").prop("checked",student.associateToBachelor===1);
-                $("#student_IsReceivePhoto").prop("checked",student.isPhotoReceived === 1);
-                await GetGroup(stage.stageId, field.fieldId)
-                $("#cboGroup").val(group.groupId).trigger("change");
-                await GetField(degree.degreeId, school.schoolId); 
+                $("#student_IsReceivePhoto").prop("checked",student.isPhotoReceived === 1);  
             } else {
                 ShowToastError("Student not found.");
             }
@@ -442,13 +492,14 @@ $(document).on("submit", "#frmChangeBranch", async function (e) {
 $(document).on("click", "#btnAdjustGroup", async function (e) {
     e.preventDefault();
     $("#frmAdjustGroup")[0].reset();
-    $("#adjustStudentId").val(currentStudentInfo.studentId);
-    $("#adjustTermNo").val(currentStudentInfo.termNo);
     await BindSelectOptions("/group/get-groups","cboAdjustGroupId","groupId","groupName",{isAll:true},"Select Group");
     const table = $("#tblStudentGroup").DataTable();
     const row = table.row($(this).closest("tr")).data();  
     if (!row) return ShowToastError("Cannot get student group data.");
+    $("#adjustStudentId").val(currentStudentInfo.studentId); 
+    $("#adjustStudentGroupId").val(row.studentGroupId); 
     $("#cboAdjustGroupId").val(row.groupId).trigger("change");
+    $("#adjustTermNo").val(row.termNo);
     await getStudentScore(row.studentGroupId);
     $("#modalAdjustGroup").modal("show");
 });
@@ -506,18 +557,19 @@ async function getStudentScore(studentGroupId){
 } 
 $(document).on("submit", "#modalAdjustGroup", async function (e) {
     e.preventDefault();
-    const studentId = $("#suppressStudentId").val();
+    const studentId = $("#adjustStudentId").val();
     if (!studentId) return ShowToastInfo("Please select student.");
     const btnSubmit = $("#modalAdjustGroup button[type='submit']");
     btnSubmit.prop("disabled", true);
     try {
         const response = await $.ajax({
-            url: "/student/adjust",
+            url: "/student/adjust-group",
             method: "POST",
             data: $("#frmAdjustGroup").serialize()
         });
         if (response.status.code === "200") {
             ShowToastSuccess("Adjust saved successfully.");
+            await fetchStudentGroup(studentId);
             $("#modalAdjustGroup").modal("hide");
         } else {
             ShowToastError(response.status?.message || response.message || "Save failed.");
@@ -572,21 +624,6 @@ $(document).on("change", "#cboChangeFieldId", async function () {
 });
 // endregion
 
-async function GetField(degreeId, schoolId) {
-    const cboField = $("#student_FieldId");
-    const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
-    fields.forEach(item => {
-        cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
-    });
-}
-async function GetGroup(stageId, fieldId) {
-    const cboGroup = $("#cboGroup");
-    const groups = await Group.GetGroups({stageId,fieldId}); 
-    groups.forEach(item => {
-        cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
-    });
-}
-
 // region "Tab History"
 //=====1-_TabScholarship
 async function fetchStudentScholarship(studentId) { 
@@ -603,6 +640,9 @@ async function fetchStudentScholarship(studentId) {
                 if (!json.data || json.data.length === 0) {
                     $("#scholarship-tab").closest("li").hide();
                     $("#scholarship").hide();
+                }else{
+                    $("#scholarship-tab").closest("li").removeAttr("style");
+                    $("#scholarship").removeAttr("style");
                 }
                 return json.data;
             },
@@ -635,7 +675,10 @@ async function fetchStudentIssueLetter(studentId) {
                 if (!json.data || json.data.length === 0) {
                     $("#issue-letter-tab").closest("li").hide();
                     $("#issue-letter").hide();
-                } 
+                }else{
+                    $("#issue-letter-tab").closest("li").removeAttr("style");
+                    $("#issue-letter").removeAttr("style");
+                }
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -684,6 +727,9 @@ async function fetchStudentCertificate(studentId) {
                 if (!json.data || json.data.length === 0) {
                     $("#certificate-tab").closest("li").hide();
                     $("#certificate").hide();
+                }else{
+                    $("#certificate-tab").closest("li").removeAttr("style");
+                    $("#certificate").removeAttr("style");
                 }
                 return json.data;
             },
@@ -716,6 +762,9 @@ async function fetchStudentBranchHistory(studentId) {
                 if (!json.data || json.data.length === 0) {
                     $("#branch-history-tab").closest("li").hide();
                     $("#branch-history").hide();
+                }else{
+                    $("#branch-history-tab").closest("li").removeAttr("style");
+                    $("#branch-history").removeAttr("style");
                 }
                 return json.data;
             },
@@ -755,7 +804,7 @@ async function fetchStudentBranchHistory(studentId) {
                         <button type="button"
                                 class="btn btn-sm btn-primary btn-edit-change-branch"
                                 title="Edit">
-                            <i class="fa fa-edit"></i>
+                            <i class="fa fa-undo"></i> Return
                         </button>
                     `;
                 }
@@ -778,7 +827,10 @@ async function fetchSuppress(studentId) {
                 if (!json.data || json.data.length === 0) {
                     $("#suppress-history-tab").closest("li").hide();
                     $("#suppress-history").hide();
-                } 
+                }else{
+                    $("#suppress-history-tab").closest("li").removeAttr("style");
+                    $("#suppress-history").removeAttr("style");
+                }
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -834,7 +886,10 @@ async function fetchStudentPayment(studentId) {
                 if (!json.data || json.data.length === 0) {
                     $("#payment-tab").closest("li").hide();
                     $("#payment").hide();
-                } 
+                }else{
+                    $("#payment-tab").closest("li").removeAttr("style");
+                    $("#payment").removeAttr("style");
+                }
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -875,6 +930,9 @@ async function fetchSuspend(studentId) {
                 if (!json.data || json.data.length === 0) {
                     $("#suspend-tab").closest("li").hide();
                     $("#suspend").hide();
+                }else{
+                    $("#suspend-tab").closest("li").removeAttr("style");
+                    $("#suspend").removeAttr("style");
                 } 
                 return json.data;
             },
@@ -919,7 +977,10 @@ async function fetchStudentGroup(studentId) {
                 if (!json.data || json.data.length === 0) {
                     $("#group-history-tab").closest("li").hide();
                     $("#group-history").hide();
-                } 
+                }else{
+                    $("#group-history-tab").closest("li").removeAttr("style");
+                    $("#group-history").removeAttr("style");
+                }
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -935,14 +996,14 @@ async function fetchStudentGroup(studentId) {
                 data: null,
                 className: "text-center",
                 render: function () {
-                    return `
-                            <button type="button"
+                    return (window.studentPrivileges?.isFull === true || window.studentPrivileges?.isAdjustGroup === true)
+                        ? `<button type="button"
                                     class="btn btn-sm btn-primary"
                                     id="btnAdjustGroup"
                                     title="Edit">
                                  <i class="fas fa-sliders-h"></i> Adjust
-                            </button>
-                        `;
+                            </button>`
+                        : "";
                 }
             }
         ]
@@ -963,6 +1024,9 @@ async function fetchStudentExtend(studentId) {
                 if (!json.data || json.data.length === 0) {
                     $("#extend-from-tab").closest("li").hide();
                     $("#extend-from").hide();
+                }else{
+                    $("#extend-from-tab").closest("li").removeAttr("style");
+                    $("#extend-from").removeAttr("style");
                 } 
                 return json.data;
             },
@@ -1002,7 +1066,10 @@ async function fetchComplement(studentId) {
                 if (!json.data || json.data.length === 0) {
                     $("#complementation-tab").closest("li").hide();
                     $("#complementation").hide();
-                } 
+                }else{
+                    $("#complementation-tab").closest("li").removeAttr("style");
+                    $("#complementation").removeAttr("style");
+                }
                 return json.data;
             },
             error: function (xhr, status, error) {
@@ -1043,6 +1110,9 @@ async function fetchQuit(studentId) {
                 if (!json.data || json.data.length === 0) {
                     $("#quit-tab").closest("li").hide();
                     $("#quit").hide();
+                }else{
+                    $("#quit-tab").closest("li").removeAttr("style");
+                    $("#quit").removeAttr("style");
                 } 
                 return json.data;
             },

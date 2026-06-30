@@ -37,7 +37,7 @@ public static class ScoreTypeConstant
 public static class StudentStatusConstant
 {
     private const string Register = "REGISTER";
-    private const string Active = "ACTIVE";
+    public const string Active = "ACTIVE";
     public const string Quit = "QUIT";
     private const string Graduated = "GRADUATED";
     private const string Completed = "COMPLETED";

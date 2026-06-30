@@ -16,6 +16,12 @@
     var isSuspend = privileges.Contains("MSSuspend");
     var isAdjustGroup = privileges.Contains("ASAdjustGroup");
 }
+<script>
+    window.studentPrivileges = {
+        isFull: @isFull.ToString().ToLower(),
+        isAdjustGroup: @isAdjustGroup.ToString().ToLower()
+    };
+</script>
 <style>
     #studentDetailModal.fullscreen-modal {
         padding: 0 !important;
@@ -150,13 +156,6 @@
                                                 <span id="lblSuspend">Suspend</span>
                                             </button>
                                         }
-
-                                        @if (isFull || isAdjustGroup)
-                                        {
-                                            <button class="btn btn-info btn-sm d-none" id="btnAdjust" data-action="adjust">
-                                                <i class="fas fa-sliders-h"></i> Adjust
-                                            </button>
-                                        }
                                     </div>
                                 </div>
                             </div>
@@ -251,8 +250,8 @@
                                                         </div>
 
                                                         <div class="col-9">
-                                                            <label>Field Student</label>
-                                                            <select asp-for="@student.FieldId" class="form-control select2"></select>
+                                                            <label>Field Student</label> 
+                                                            <input type="text" class="form-control" id="txtField" readonly />
                                                         </div>
                                                     </div>
 
@@ -274,7 +273,7 @@
 
                                                         <div class="col-3">
                                                             <label>Group</label>
-                                                            <select id="cboGroup" class="form-control select2"></select>
+                                                            <input type="text" class="form-control" id="txtGroup" readonly />
                                                         </div>
                                                     </div>
 
@@ -301,6 +300,31 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    @* <div id="Resume" hidden> *@
+                                                    @*     <hr> *@
+                                                    @*     <div class="row"> *@
+                                                    @*         <div class="col-4"> *@
+                                                    @*             <label>Payment Date</label> *@
+                                                    @*             <input type="date" class="form-control" *@
+                                                    @*                    asp-for="@student!.Resume!.DatePayment"> *@
+                                                    @*         </div> *@
+                                                    @*         <div class="col-4"> *@
+                                                    @*             <label class="required">Promotion</label> *@
+                                                    @*             <input type="number" class="form-control" min="0" value="0" *@
+                                                    @*                    asp-for="CPromotion"> *@
+                                                    @*         </div> *@
+                                                    @*         <div class="col-2"> *@
+                                                    @*             <label class="required">Year</label> *@
+                                                    @*             <input type="number" class="form-control" min="0" max="5" value="0" *@
+                                                    @*                    asp-for="CYear"> *@
+                                                    @*         </div> *@
+                                                    @*         <div class="col-2"> *@
+                                                    @*             <label class="required">Semester</label> *@
+                                                    @*             <input type="number" class="form-control" min="1" max="2" value="0" *@
+                                                    @*                    asp-for="CSemester"> *@
+                                                    @*         </div> *@
+                                                    @*     </div> *@
+                                                    @* </div> *@
                                                 </div>
                                             </div>
                                         </div>
@@ -420,55 +444,55 @@
 
                                     <div class="card-body">
                                         <div class="tab-content">
-                                            <div class="tab-pane fade show active" id="scholarship" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane show active" id="scholarship" role="tabpanel">
                                                 <partial name="_TabScholarship" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="issue-letter" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="issue-letter" role="tabpanel">
                                                 <partial name="_TabIssueLetter" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="certificate" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="certificate" role="tabpanel">
                                                 <partial name="_TabCertificate" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="branch-history" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="branch-history" role="tabpanel">
                                                 <partial name="_TabBranchHistory" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="suppress-history" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="suppress-history" role="tabpanel">
                                                 <partial name="_TabSuppressHistory" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="payment" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="payment" role="tabpanel">
                                                 <partial name="_TabPayment" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="suspend" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="suspend" role="tabpanel">
                                                 <partial name="_TabSuspend" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="group-history" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="group-history" role="tabpanel">
                                                 <partial name="_TabGroupHistory" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="extend-from" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="extend-from" role="tabpanel">
                                                 <partial name="_TabExtendFrom" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="complementation" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="complementation" role="tabpanel">
                                                 <partial name="_TabComplement" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="quit" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="quit" role="tabpanel">
                                                 <partial name="_TabQuit" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="continue-education" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="continue-education" role="tabpanel">
                                                 <partial name="_TabContinueEducation" />
                                             </div>
 
-                                            <div class="tab-pane fade" id="note" role="tabpanel">
+                                            <div class="tab-pane fade student-history-pane" id="note" role="tabpanel">
                                                 <partial name="_TabNote" />
                                             </div>
                                         </div>

@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Reflection.Metadata;
+using System.Security.Claims;
+using AutoMapper;
 using BBU_SYSTEM.Data;
 using BBU_SYSTEM.DTOs;
 using BBU_SYSTEM.Helper;
@@ -1307,6 +1309,92 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         { 
             await transaction.RollbackAsync(); 
             return new ServerResponse().ErrorInternal(e);
+        }
+    }
+    
+    [HttpPost("adjust-group")]
+    public async Task<IActionResult> AdjustStudentGroup(StudentGroupDto dto)
+    {
+        var db = campusDbContext.DbContext(_campus);
+        try
+        {
+            var student = await db.TblStudent
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.StudentId == dto.StudentId);
+            if (student == null) return new ServerResponse().NotFound("Student not found.");
+            var username = User.FindFirstValue(ClaimTypes.Name);
+            await using var transaction = await db.Database.BeginTransactionAsync();
+            if (dto.StudentGroupId == 0)
+            {
+                await db.Database.ExecuteSqlInterpolatedAsync($@"
+                    UPDATE STUDENT
+                    SET STATUS = {StudentStatusConstant.Active}
+                    WHERE STUDENT_ID = {dto.StudentId}
+                ");
+                await db.Database.ExecuteSqlInterpolatedAsync($@"
+                    INSERT INTO STUDENT_GROUP
+                    (
+                        STUDENT_ID,
+                        TERM_NO,
+                        GROUP_ID
+                    )
+                    VALUES
+                    (
+                        {dto.StudentId},
+                        {dto.TermNo},
+                        {dto.GroupId}
+                    )
+                ");
+                var insertedData = await db.TblStudentGroup
+                    .AsNoTracking()
+                    .Where(x => x.StudentId == dto.StudentId)
+                    .OrderByDescending(x => x.StudentGroupId)
+                    .FirstOrDefaultAsync();
+                await transaction.CommitAsync();
+                return new ServerResponse().Success(insertedData);
+            }
+
+            var oldData = await db.TblStudentGroup
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.StudentGroupId == dto.StudentGroupId);
+            if (oldData == null) return new ServerResponse().NotFound("Record not found.");
+            await db.Database.ExecuteSqlInterpolatedAsync($@"
+                INSERT INTO STUDENT_GROUP_HISTORY
+                (
+                    STUDENT_GROUP_ID,
+                    STUDENT_ID,
+                    TERM_NO,
+                    GROUP_ID,
+                    CHANGE_DATE,
+                    USERNAME
+                )
+                SELECT
+                    STUDENT_GROUP_ID,
+                    STUDENT_ID,
+                    TERM_NO,
+                    GROUP_ID,
+                    GETDATE(),
+                    {username}
+                FROM STUDENT_GROUP
+                WHERE STUDENT_GROUP_ID = {dto.StudentGroupId}
+            ");
+            await db.Database.ExecuteSqlInterpolatedAsync($@"
+                UPDATE STUDENT_GROUP
+                SET
+                    STUDENT_ID = {dto.StudentId},
+                    TERM_NO = {dto.TermNo},
+                    GROUP_ID = {dto.GroupId}
+                WHERE STUDENT_GROUP_ID = {dto.StudentGroupId}
+            ");
+            var updatedData = await db.TblStudentGroup
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.StudentGroupId == dto.StudentGroupId);
+            await transaction.CommitAsync();
+            return new ServerResponse().Success(updatedData);
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
     

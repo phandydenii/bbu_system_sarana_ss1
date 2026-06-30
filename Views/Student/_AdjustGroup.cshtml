@@ -12,24 +12,19 @@
 
             <form id="frmAdjustGroup">
                 <div class="modal-body bg-light">
-                    <input type="hidden" id="adjustStudentId" name="StudentId" /> 
+                    <input type="hidden" id="adjustStudentId" name="StudentId" />
+                    <input type="hidden" id="adjustStudentGroupId" name="StudentGroupId" /> 
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="font-weight-bold">Term</label>
-                                <input type="text"
-                                       id="adjustTermNo"
-                                       name="TermNo"
-                                       class="form-control text-center font-weight-bold"
-                                       readonly />
+                                <input type="text" id="adjustTermNo" name="TermNo" class="form-control text-center font-weight-bold" readonly />
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="font-weight-bold">Group</label>
-                                <select id="cboAdjustGroupId"
-                                        name="GroupId"
-                                        class="form-control select2 w-100">
+                                <select id="cboAdjustGroupId" name="GroupId" class="form-control select2 w-100">
                                 </select>
                             </div>
                         </div>
@@ -62,7 +57,7 @@
                 </div>
                 <div class="modal-footer py-2">
                     <button type="submit" class="btn btn-info">
-                        <i class="fas fa-check"></i> OK
+                        <i class="fas fa-check"></i> Adjust Group
                     </button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">
                         Cancel

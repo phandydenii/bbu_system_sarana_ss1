@@ -3739,7 +3739,7 @@ public class StudentDiscount
 public class StudentGroup
 {
     [Key]
-    [Column("STUDENT_GROUP_ID", TypeName = "int")]
+    [Column("STUDENT_GROUP_ID")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int? StudentGroupId { get; set; }
 
