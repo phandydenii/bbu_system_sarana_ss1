@@ -1,4 +1,6 @@
 ﻿using System.Data;
+using BBU_SYSTEM.DTOs;
+using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Repository;
 using BBU_SYSTEM.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -202,6 +204,101 @@ public class PaymentController(ICampusDbContext campusDbContext, IHttpContextAcc
                     message = e.Message
                 }
             });
+        }
+    }
+    
+    [HttpPost("save-re-exam-payment-detail")]
+    public async Task<IActionResult> SaveReExamPaymentDetail([FromForm] StudentReexamPaymentDetailDto? detail)
+    {
+        try
+        {
+            if (detail == null)
+            {
+                return new ServerResponse().BadRequest("Bad Request!");
+            }
+
+            var db = campusDbContext.DbContext(_campus);
+
+            var existingDetail = await db.TblReExamPaymentDetail
+                .FirstOrDefaultAsync(x => x.StudentReexamPaymentDetailId == detail.StudentReexamPaymentDetailId);
+
+            if (existingDetail != null)
+            {
+                existingDetail.CourseId = detail.CourseId;
+                existingDetail.TermNo = detail.TermNo;
+                existingDetail.Time = detail.Time;
+
+                await db.SaveChangesAsync();
+
+                return new ServerResponse().Success(existingDetail, "Updated successfully!");
+            }
+
+            db.TblReExamPaymentDetail.Add(new()
+            {
+                StudentReexamPaymentId = detail.StudentReexamPaymentId,
+                CourseId = detail.CourseId,
+                TermNo = detail.TermNo,
+                Time = detail.Time
+            });
+
+            await db.SaveChangesAsync();
+
+            return new ServerResponse().Success(detail, "Saved successfully!");
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
+        }
+    }
+    
+    [HttpPost("/payment/get-courses")]
+    public IActionResult GetCourses()
+    {
+        try
+        {
+            var db = campusDbContext.DbContext(_campus);
+
+            var courses = db.TblCourses
+                .OrderBy(x => x.CourseFullName)
+                .Select(x => new
+                {
+                    courseId = x.CourseId,
+                    courseFullName = x.CourseFullName,
+                    courseFullNameInKhmer = x.CourseFullNameInKhmer
+                })
+                .ToList();
+
+            return new ServerResponse().Success(courses, "Succeeded!");
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
+        }
+    }
+    
+    [HttpDelete("/payment/delete-re-exam-payment-detail/{id:int}")]
+    public async Task<IActionResult> DeleteReExamPaymentDetail(int id)
+    {
+        try
+        {
+            var db = campusDbContext.DbContext(_campus);
+
+            var detail = await db.TblReExamPaymentDetail
+                .FirstOrDefaultAsync(x => x.StudentReexamPaymentDetailId == id);
+
+            if (detail == null)
+            {
+                return new ServerResponse().NotFound("Re-exam subject not found.");
+            }
+
+            db.TblReExamPaymentDetail.Remove(detail);
+            await db.SaveChangesAsync();
+
+            return new ServerResponse().Success(detail, "Deleted successfully!");
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
     
