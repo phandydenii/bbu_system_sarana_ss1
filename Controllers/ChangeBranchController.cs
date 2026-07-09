@@ -1,4 +1,5 @@
 using AutoMapper;
+using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ public class ChangeBranchController(ICampusDbContext campusDbContext, IMapper ma
     private readonly string _campus = context.HttpContext?.User?.FindFirst("CampusKey")?.Value ?? "pp";
 
     [HttpPost("get-student-change-branch/{studentId}")]
-    public IActionResult GetStudentPayment(string studentId)
+    public IActionResult GetStudentChangeBranch(string studentId)
     {
         try
         {
@@ -23,10 +24,28 @@ public class ChangeBranchController(ICampusDbContext campusDbContext, IMapper ma
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
 
             var pageSize = length != null ? Convert.ToInt32(length) : 0;
-            var skip = start != null ? Convert.ToInt32(start) : 0;
-            //var campus = HttpContext.Session.GetString("campus");
+            var skip = start != null ? Convert.ToInt32(start) : 0; 
             var db = campusDbContext.DbContext(_campus);
-            var query = db.TblChangeBranch.Where(x=>x.StudentId == studentId).AsQueryable();  
+            var query =  from cb in db.TblChangeBranch
+                join b in db.TblBranch on cb.ToBranchId equals b.BranchId
+                where cb.StudentId == studentId
+                select new
+                {
+                    cb.ChangeBranchId,
+                    cb.StudentId,
+                    cb.ToBranchId,
+                    BranchName = b.BranchName,
+                    BranchNameInKhmer = b.BranchNameInKhmer,
+                    cb.TermNo,
+                    cb.FromDate,
+                    cb.ReturnDate,
+                    cb.DegreeId,
+                    cb.SchoolId,
+                    cb.FieldId,
+                    cb.PromotionId,
+                    cb.StageId,
+                    cb.GroupId
+                };
             var recordsTotal = query.Count();
             var data = query.Skip(skip).Take(pageSize).ToList();
             return Json(new
@@ -39,15 +58,7 @@ public class ChangeBranchController(ICampusDbContext campusDbContext, IMapper ma
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "500",
-                    message = e.Message
-                }
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 }

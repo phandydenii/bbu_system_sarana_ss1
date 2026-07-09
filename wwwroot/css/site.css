@@ -26,7 +26,13 @@ body {
    Global DataTable Fix
    Use for all DataTables with scrollX
 ================================ */
-
+.kh{
+    font-family: "Noto Sans Khmer", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: normal;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+}
 table.dataTable {
     margin: 0 !important;
 }

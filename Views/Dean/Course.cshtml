@@ -185,7 +185,8 @@
                 data: JSON.stringify(req),
                 success: function (res) { 
                     if (res.status.code === "200"){
-                        tblSchool.DataTable().ajax.reload();
+                        tblCourse.DataTable().ajax.reload();
+                        $("#stateSelect").val(null).trigger("change");
                         $("#AssignCourseModal").modal("hide");
                         return ShowToastSuccess(res.status.message); 
                     }

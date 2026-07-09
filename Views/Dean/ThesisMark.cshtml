@@ -7,8 +7,7 @@
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                @*<h3 class="card-title">AssignStudentGroup</h3>*@
+            <div class="card-header"> 
                 <div class="row">
                     <div class="col-md-2">
                         <label>Degree</label>
@@ -32,11 +31,11 @@
                     </div>
                     <div class="col-md-1">
                         <label>Term</label>
-                        <select id="cboTerm" class="form-control select2"> </select>
+                        <select id="cboTerm" class="form-control select2"></select>
                     </div>
                     <div class="col-md-2">
                         <label>Group</label>
-                        <select id="cboGroup" class="form-control select2"> </select>
+                        <select id="cboGroup" class="form-control select2"></select>
                     </div>
                     <div class="col-md-1">
                         <label>#</label>
@@ -51,17 +50,18 @@
                 <div class="row">
                     <div class="col-md-5">
                         <div class="card card-outline card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">Student List</h3>
+                            <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                                <h3 class="card-title font-weight-bold text-primary m-0"><i class="fas fa-user-graduate mr-2"></i>Student List</h3>
+                                <h4 id="studentCountText" class="text-muted mb-0 ml-auto text-end" style="font-size: 18px;font-weight: 500;"></h4>
                             </div>
                             <div class="card-body">
-                                <table id="tblStudent" class="table-sm table table-bordered table-striped">
+                                <table id="tblStudent" class="table table-sm table-bordered table-striped">
                                     <thead>
                                     <tr>
                                         <th>ID</th>
                                         <th>Name</th>
                                         <th>Gender</th>
-                                        <th>DOB</th> 
+                                        <th>DOB</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -72,8 +72,9 @@
                     </div>
                     <div class="col-md-7">
                         <div class="card card-outline card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">Score List</h3>
+                            <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                                <h3 class="card-title font-weight-bold text-primary m-0"><i class="fas fa-star mr-2"></i>Score Performance</h3>
+                                <span class="badge badge-pill badge-info px-3 py-2 font-weight-normal" id="lblStudentName" style="display:none;"></span>
                             </div>
                             <div class="card-body">
                                 <table id="tblScore" class="table table-sm table-bordered table-striped">
@@ -111,7 +112,6 @@
     <script src="~/function/Term.js"></script>
     <script src="~/function/Group.js"></script>
     <script>
-
         const cboDegree = $("#cboDegree");
         const cboSchool = $("#cboSchool");
         const cboField = $("#cboField");
@@ -128,14 +128,8 @@
             $("#tblScore").DataTable({
                 responsive: true,
             });
-
             GetDegree();
             GetSchool();
-            GetField();
-            GetPromotion();
-            GetStage();
-            GetTerm();
-            GetGroup();
         });
 
         cboDegree.change(function () {
@@ -194,7 +188,6 @@
                 cboField.val('');
                 return;
             }
-
             const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
             fields.forEach(item => {
                 cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
@@ -211,13 +204,11 @@
                 cboPromotion.val('');
                 return;
             }
-            const promotions = await Promotion.GetPromotions();
+            const promotions = await Promotion.GetPromotions({schoolId,degreeId});
             let hasPromotion = false;
             promotions.forEach(item => {
-                if (item.degree === parseInt(degreeId) && item.school === parseInt(schoolId)) {
-                    cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`);
-                    hasPromotion = true;
-                }
+                cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`);
+                hasPromotion = true;
             });
             if (!hasPromotion) {
                 cboPromotion.empty();
@@ -234,11 +225,9 @@
                 cboPromotion.val('');
                 return;
             }
-            const stages = await Stage.GetStages();
+            const stages = await Stage.GetStages({promotionId});
             stages.forEach(item => {
-                if (item.promotionId === parseInt(promotionId)) {
-                    cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
-                }
+                cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
             });
             cboStage.val('').trigger("change");
         }
@@ -251,11 +240,9 @@
                 cboTerm.val('');
                 return;
             }
-            const terms = await Term.GetTerms();
+            const terms = await Term.GetTerms({stageId});
             terms.forEach(item => {
-                if (item.stageId === parseInt(stageId)) {
-                    cboTerm.append(`<option value='${item.termNo}'>${item.termNo}</option>`);
-                }
+                cboTerm.append(`<option value='${item.termNo}'>${item.termNo}</option>`);
             });
             cboTerm.val('').trigger("change");
         }
@@ -270,14 +257,13 @@
                 cboGroup.val('');
                 return;
             }
-            const groups = await Group.GetGroups();
+            const groups = await Group.GetGroups({fieldId,stageId});
             groups.forEach(item => {
-                if (item.stageId === parseInt(stageId) && item.fieldId === parseInt(fieldId)) {
-                    cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
-                }
+                cboGroup.append(`<option value='${item.groupId}'>${item.groupName}</option>`);
             });
             cboGroup.val('').trigger("change");
         }
+
 
         function OnFilter() {
             const term_no = cboTerm.find("option:selected").text();
@@ -290,6 +276,7 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                info: false,
                 ajax: {
                     url: `/student/GetStudents`,
                     type: "POST",
@@ -297,6 +284,12 @@
                         groupid: group_id,
                         termno: term_no
                     },
+                },
+                drawCallback: function () {
+                    const info = this.api().page.info();
+                    $("#studentCountText").text(
+                        `Showing ${info.start + 1} to ${info.end} of ${info.recordsDisplay}`
+                    );
                 },
                 columns: [
                     {data: "studentId"},
@@ -308,7 +301,10 @@
                             return `${formatDate(data)}`
                         }
                     }
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblStudent",500);
+                }
             })
         }
 
@@ -374,7 +370,7 @@
 
         tblScore.on("click", "#btnEdit", function () {
             // Find the clicked row
-            const $row = $(this).closest('tr');
+            const $row = $(this).closest('tr'); 
             $row.find('input[name="midterm"]').prop('readonly', false);
             $row.find('input[name="final"]').prop('readonly', false);
 
