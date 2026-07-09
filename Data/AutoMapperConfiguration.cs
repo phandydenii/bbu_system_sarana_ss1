@@ -51,5 +51,6 @@ public class AutoMapperConfiguration : Profile
         CreateMap<Suppress, SuppressDto>().ReverseMap(); 
         CreateMap<Suspend, SuspendDto>().ReverseMap(); 
         CreateMap<StudentGroup, StudentGroupDto>().ReverseMap(); 
+        CreateMap<StudentDiscount, StudentDiscountDto>().ReverseMap();
     }
 }

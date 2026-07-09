@@ -3718,9 +3718,9 @@ public class StudentComplementalPayment
 public class StudentDiscount
 {
     [Key]
-    [Column("STUDENT_DISCOUNT_ID", TypeName = "int")]
+    [Column("STUDENT_DISCOUNT_ID")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int? StudentDiscountId { get; set; }
+    public int StudentDiscountId { get; set; }
 
     [Column("STUDENT_ID", TypeName = "varchar(50)")]
     public string? StudentId { get; set; }
