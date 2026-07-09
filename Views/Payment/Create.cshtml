@@ -1,6 +1,6 @@
 ﻿@model BBU_SYSTEM.ViewModel.PaymentViewModel
 @using BBU_SYSTEM.DTOs
-@using BBU_SYSTEM.Models.Req
+@using System.Text.Json
 @{
     ViewData["OpenMenu"] = "Administration";
     ViewData["Action"] = "Create";
@@ -149,6 +149,14 @@
     <script src="~/js/Alert.js"></script>
     <script src="~/function/Product.js"></script>
     <script>
+        const StudentStatusBadgeClasses = @Html.Raw(JsonSerializer.Serialize(ViewData["StudentStatusBadgeClasses"]));
+        const StudentStatusDefaultBadgeClass = "@ViewData["StudentStatusDefaultBadgeClass"]";
+        function renderStudentStatusBadge(status) {
+            const badgeClass = StudentStatusBadgeClasses[status] || StudentStatusDefaultBadgeClass;
+            return `<span class="badge ${badgeClass}">${status || ""}</span>`;
+        }
+    </script>
+    <script>
         const btnSearchStudent = $("#btnSearchStudent");
         const btnCreateNewPayment = $("#btnCreateNewPayment");
         const tblSearchStudent = $("#tblSearchStudent");
@@ -207,17 +215,12 @@
                     {data: "sex"},
                     {
                         data: null,
+                        orderable: false,
+                        searchable: false,
+                        className: "text-center",
                         render: function (data, type, row) {
-                            if (row.status === "REGISTER") {
-                                return ` <span class="badge badge-warning">${row.status}</span>`;
-                            } else if (row.status === "ACTIVE") {
-                                return ` <span class="badge badge-primary">${row.status}</span>`;
-                            } else if (row.status === "QUIT") {
-                                return ` <span class="badge badge-danger">${row.status}</span>`;
-                            } else {
-                                return `<span class="badge badge-secondary">${row.status}</span>`;
-                            }
-                        },
+                            return renderStudentStatusBadge(row.status);
+                        }
                     },
                     {
                         data: null,
@@ -238,10 +241,12 @@
             const $row = $(this).closest('tr'); 
             const selectedRow = tblSearchStudent.DataTable().row($row).data(); 
             if (selectedRow) {
-                document.getElementById("btnCreateNewPayment").disabled = false;
+                $("#btnCreateNewPayment").disabled = false;
+                showLoading();
                 getStudent(selectedRow.studentId);
                 getInvoice(selectedRow.studentId);
                 modalStudent.modal("hide");
+                hideLoading(1);
             } 
         });
 
