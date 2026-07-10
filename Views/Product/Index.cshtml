@@ -26,33 +26,35 @@
                 <button class="btn btn-primary" id="btnAddNewProduct"><i class="fas fa-plus"></i> Add New</button>
             </div>
             <div class="card-body">
-                <table id="tblProduct" class="table table-bordered table-striped table-sm" style="width: 100%;">
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>item_name</th>
-                        <th>name khmer</th>
-                        <th>price_khr</th>
-                        <th>price_usd</th>
-                        <th>degree</th>
-                        <th>vat</th>
-                        <th>default_pay</th>
-                        @* <th>category_id</th> *@
-                        @* <th>card</th> *@
-                        @* <th>fee</th> *@
-                        @* <th>status</th> *@
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+                <div class="table-responsive" style="width: 100%;">
+                    <table id="tblProduct" class="table table-bordered table-striped table-sm" style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>item_name</th>
+                            <th>name khmer</th>
+                            <th>price_khr</th>
+                            <th>price_usd</th>
+                            <th>degree</th>
+                            <th>vat</th>
+                            <th>default_pay</th>
+                            @* <th>category_id</th> *@
+                            @* <th>card</th> *@
+                            @* <th>fee</th> *@
+                            @* <th>status</th> *@
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="tab-pane fade show" id="custom-tabs-four-2" role="tabpanel"
              aria-labelledby="custom-tabs-four-2-tab">
             <div class="card-body">
-                <table id="tblProductPayOnline" class="table table-bordered table-striped table-sm" style="width: 100%;">
+                <table id="tblProductPayOnline" class="table table-bordered table-striped table-sm nowrap" style="width: 100%;">
                     <thead>
                     <tr>
                         <th>id</th>
@@ -108,19 +110,20 @@
             tblProduct.DataTable().clear().destroy();
             tblProduct.DataTable({
                 processing: true,
-                serverSide: true,
+                serverSide: true, 
+                scrollCollapse: true,
                 ajax: {
                     url: "/product/get-product-list",
                     type: "POST",
                 },
-                columns: [
-                    {data: "productId"},
-                    {data: "productName"},
-                    {data: "productNameInKhmer"},
-                    {data: "priceKhr"},
-                    {data: "price"},
-                    {data: "degreeId"},
-                    {data: "vat"},
+                columns: [ 
+                    { data: "productId", width: "5%" },
+                    { data: "productName", width: "20%" },
+                    { data: "productNameInKhmer", width: "25%" },
+                    { data: "priceKhr", width: "10%" },
+                    { data: "price", width: "10%" },
+                    { data: "degreeId", width: "10%" },
+                    { data: "vat", width: "5%" },
                     {
                         data: "paymentType",
                         render: function (data, type, row) {

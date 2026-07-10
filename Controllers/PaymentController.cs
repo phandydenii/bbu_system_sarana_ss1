@@ -1,11 +1,11 @@
-﻿using System.Data;
+using System.Data;
 using BBU_SYSTEM.DTOs;
 using BBU_SYSTEM.Helper;
+using BBU_SYSTEM.Data;
 using BBU_SYSTEM.Repository;
 using BBU_SYSTEM.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace BBU_SYSTEM.Controllers;
@@ -62,6 +62,8 @@ public class PaymentController(ICampusDbContext campusDbContext, IHttpContextAcc
     public IActionResult Create()
     {
         var db = campusDbContext.DbContext(_campus);
+        ViewData["StudentStatusBadgeClasses"] = StudentStatusConstant.BadgeClasses;
+        ViewData["StudentStatusDefaultBadgeClass"] = StudentStatusConstant.DefaultBadgeClass;
         var viewmodel = new PaymentViewModel
         {
             Products = db.TblProduct.ToList()

@@ -38,6 +38,7 @@ public class CampusDbContext(DbContextOptions<CampusDbContext> options) : DbCont
     public DbSet<HighSchool> TblHighSchool { get; set; }
     public DbSet<Disability> TblDisability { get; set; }
     public DbSet<StudentGroup> TblStudentGroup { get; set; }
+    public DbSet<StudentGroupHistory> TblStudentGroupHistory { get; set; }
     public DbSet<Nationality> TblNationality { get; set; }
     public DbSet<Race> TblRace { get; set; }
     public DbSet<Province> TblProvince { get; set; }
