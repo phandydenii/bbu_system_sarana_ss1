@@ -5,91 +5,91 @@
 }
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                @*<h3 class="card-title">AssignStudentGroup</h3>*@
-                <div class="row">
-                    <div class="col-md-2">
-                        <label>Degree</label>
-                        <select id="cboDegree" class="form-control select2"></select>
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pt-3 pb-2">
+                <div class="row align-items-end">
+                    <div class="col-md-3 col-lg-2 mb-2">
+                        <label class="font-weight-600 small text-muted">Degree</label>
+                        <select id="cboDegree" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-2">
-                        <label>School</label>
-                        <select id="cboSchool" class="form-control select2"></select>
+                    <div class="col-md-3 col-lg-2 mb-2">
+                        <label class="font-weight-600 small text-muted">School</label>
+                        <select id="cboSchool" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-3">
-                        <label>Field</label>
-                        <select id="cboField" class="form-control select2"></select>
+                    <div class="col-md-3 col-lg-2 mb-2">
+                        <label class="font-weight-600 small text-muted">Field</label>
+                        <select id="cboField" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-1">
-                        <label>Promotion</label>
-                        <select id="cboPromotion" class="form-control select2"></select>
+                    <div class="col-md-3 col-lg-1 mb-2">
+                        <label class="font-weight-600 small text-muted">Promotion</label>
+                        <select id="cboPromotion" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-1">
-                        <label>Stage</label>
-                        <select id="cboStage" class="form-control select2"></select>
+                    <div class="col-md-3 col-lg-1 mb-2">
+                        <label class="font-weight-600 small text-muted">Stage</label>
+                        <select id="cboStage" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-1">
-                        <label>Term</label>
-                        <select id="cboTerm" class="form-control select2"></select>
+                    <div class="col-md-3 col-lg-1 mb-2">
+                        <label class="font-weight-600 small text-muted">Term</label>
+                        <select id="cboTerm" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-1">
-                        <label>Group</label>
-                        <select id="cboGroup" class="form-control select2"></select>
+                    <div class="col-md-3 col-lg-2 mb-2">
+                        <label class="font-weight-600 small text-muted">Group</label>
+                        <select id="cboGroup" class="form-control select2 w-100"></select>
                     </div>
-                    <div class="col-md-1">
-                        <label>#</label>
-                        <button onclick="OnFilter()" class="form-control btn btn-success"><i class="fas fa-filter"></i>
-                            Filter
-                        </button>
+                    <div class="col-md-3 col-lg-1 mb-2">
+                        <button onclick="OnFilter()" class="btn btn-success btn-block"><i class="fas fa-filter mr-1"></i> Filter</button>
                     </div>
                 </div>
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-5">
-                        <div class="card card-outline card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">Student List</h3>
+                    <div class="col-12 col-xl-5 mb-2">
+                        <div class="card card-outline card-primary h-100 shadow-sm border-top-3">
+                            <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                                <h3 class="card-title font-weight-bold text-primary m-0"><i class="fas fa-user-graduate mr-2"></i>Student List</h3>
+                                <h4 id="studentCountText" class="text-muted mb-0 ml-auto text-end" style="font-size: 18px;font-weight: 500;"></h4>
                             </div>
-                            <div class="card-body">
-                                <table id="tblStudent" class="table table-sm table-bordered table-striped" style="width: 100%;">
-                                    <thead>
-                                    <tr>
-                                        <th class="hide-col">ID</th>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Gender</th>
-                                        <th>DOB</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                            <div class="card-body p-2">
+                                <div class="table-responsive w-100">
+                                    <table id="tblStudent" class="table table-hover table-bordered table-sm w-100 m-0">
+                                        <thead class="thead-light">
+                                        <tr>
+                                            <th width="15%">ID</th>
+                                            <th>Name</th>
+                                            <th width="10%">Gender</th>
+                                            <th width="20%">DOB</th>
+                                            <th width="10%">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-7">
-                        <div class="card card-outline card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">Score List</h3>
+                    <div class="col-12 col-xl-7 mb-2">
+                        <div class="card card-outline card-success h-100 shadow-sm border-top-3">
+                            <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                                <h3 class="card-title font-weight-bold text-primary m-0"><i class="fas fa-star mr-2"></i>Score Performance</h3>
+                                <span class="badge badge-pill badge-info px-3 py-2 font-weight-normal" id="lblStudentName" style="display:none;"></span>
                             </div>
-                            <div class="card-body">
-                                <table id="tblScore" class="table table-sm table-bordered table-striped" style="width: 100%;">
-                                    <thead>
-                                    <tr>
-                                        <th class="hide-col">id</th>
-                                        <th class="hide-col">student_group_id</th>
-                                        <th>name</th>
-                                        <th>midterm</th>
-                                        <th>final</th>
-                                        <th>grade</th>
-                                        <th>action</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
+                            <div class="card-body p-2">
+                                <div class="table-responsive w-100">
+                                    <table id="tblScore" class="table table-hover table-bordered table-sm w-100 m-0">
+                                        <thead class="thead-light">
+                                        <tr>
+                                            <th>Course Name</th>
+                                            <th class="hide-col">student_group_id</th>
+                                            <th width="25%">Midterm</th>
+                                            <th width="25%">Final</th>
+                                            <th width="10%">Grade</th>
+                                            <th width="10%">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -229,7 +229,7 @@
             cboTerm.append("<option value='' disabled>Select Term</option>");
             const terms = await Term.GetTerms({stageId});
             terms.forEach(item => {
-                cboTerm.append(`<option value='${item.termId}'>${item.termNo}</option>`);
+                cboTerm.append(`<option value='${item.termNo}'>${item.termNo}</option>`);
             });
             cboTerm.val('').trigger("change");
         }
@@ -262,21 +262,16 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                info: false,
                 ajax: {
                     url: `/student/GetStudents`,
                     type: "POST",
-                    data: {
-                        DegreeId: cboDegree.val(),
-                        SchoolId: cboSchool.val(),
-                        PromotionId: cboPromotion.val(),
-                        FieldId: cboField.val(),
-                        StageId: cboStage.val(),
-                        TermId: cboTerm.val(),
-                        GroupId: cboGroup.val()
+                    data: function (d){
+                        d.TermNo = cboTerm.val();
+                        d.GroupId = cboGroup.val();
                     }
                 },
                 columns: [
-                    { data: "studentGroupId", visible: false },
                     { data: "studentId" },
                     { data: "studentName" },
                     { data: "sex" },
@@ -285,8 +280,18 @@
                         render: function (data) {
                             return formatDate(data);
                         }
+                    },
+                    {
+                        data: null,
+                        defaultContent: `<button class="btn btn-xs btn-outline-primary py-0 px-1"><i class="fas fa-eye"></i></button>`
                     }
                 ],
+                drawCallback: function () {
+                    const info = this.api().page.info();
+                    $("#studentCountText").text(
+                        `Showing ${info.start + 1} to ${info.end} of ${info.recordsDisplay}`
+                    );
+                },
                 initComplete:function (){
                     MyApp.utils.dataTableDebounceSearch("#tblStudent",500);
                 }
@@ -296,12 +301,10 @@
             const table = tblStudent.DataTable();
             const data = table.row(this).data();   
             if ($(this).find('td').hasClass('dataTables_empty')) return;
-            if (!data) return;
-            showLoading();
+            if (!data) return; 
             tblStudent.find('tbody tr').removeClass('highlight');
             $(this).addClass('highlight');
-            GetScores(data.studentGroupId);
-            hideLoading(1);
+            GetScores(data.studentGroupId); 
         });
 
         function GetScores(student_group_id) {

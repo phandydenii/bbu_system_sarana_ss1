@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
 using BBU_SYSTEM.Data;
+using BBU_SYSTEM.DTOs;
 using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Repository;
 using BBU_SYSTEM.ViewModel;
@@ -163,46 +164,132 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
     [HttpPost("GetExternalScore/{studentId}")]
     public IActionResult GetExternalScore(string studentId)
     {
-        var draw = Request.Form["draw"].FirstOrDefault();
-        var start = Request.Form["start"].FirstOrDefault();
-        var length = Request.Form["length"].FirstOrDefault();
-        var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-        var pageSize = length != null ? Convert.ToInt32(length) : 0;
-        var skip = start != null ? Convert.ToInt32(start) : 0;
-        var db = campusDbContext.DbContext(_campus);
-
-        var query = (from es in db.TblExternalScores
-            join s in db.TblStudent on es.StudentId equals s.StudentId
-            where es.StudentId == studentId
-            select new
-            {
-                es.ExternalScoreId,
-                es.StudentId,
-                s.StudentName,
-                s.StudentNameInKhmer,
-                s.Sex,
-                s.DateOfBirth,
-                es.TermNo,
-                es.CourseCode,
-                es.CourseName,
-                es.CourseNameInKhmer,
-                es.Credit,
-                es.Grade,
-                es.Total,
-                es.YearStart,
-                es.YearEnd
-            }).AsQueryable();
-        var recordsTotal = query.Count();
-        var data = query.Skip(skip).Take(pageSize).ToList().OrderBy(x => x.TermNo);
-
-        return Json(new
+        try
         {
-            draw,
-            recordsFiltered = recordsTotal,
-            recordsTotal,
-            data
-        });
+            var draw = Request.Form["draw"].FirstOrDefault();
+            var start = Request.Form["start"].FirstOrDefault();
+            var length = Request.Form["length"].FirstOrDefault();
+            var searchValue = Request.Form["search[value]"].FirstOrDefault();
+
+            var pageSize = !string.IsNullOrEmpty(length) ? Convert.ToInt32(length) : 10;
+            var skip = !string.IsNullOrEmpty(start) ? Convert.ToInt32(start) : 0;
+
+            if (pageSize <= 0)
+            {
+                pageSize = 10;
+            }
+
+            var db = campusDbContext.DbContext(_campus);
+
+            var query =
+                from es in db.TblExternalScores
+                join s in db.TblStudent on es.StudentId equals s.StudentId
+                where es.StudentId == studentId
+                select new
+                {
+                    externalScoreId = es.ExternalScoreId,
+                    studentId = es.StudentId,
+
+                    studentName = s.StudentName,
+                    studentNameInKhmer = s.StudentNameInKhmer,
+                    sex = s.Sex,
+                    dateOfBirth = s.DateOfBirth,
+
+                    termNo = es.TermNo,
+                    courseCode = es.CourseCode,
+                    courseName = es.CourseName,
+                    courseNameInKhmer = es.CourseNameInKhmer,
+                    credit = es.Credit,
+
+                    grade = es.Grade,
+                    total = es.Total,
+
+                    yearStart = es.YearStart,
+                    yearEnd = es.YearEnd,
+                    username = es.Username,
+                    dateEdit = es.DateEdit
+                };
+
+            var recordsTotal = query.Count();
+
+            if (!string.IsNullOrWhiteSpace(searchValue))
+            {
+                query = query.Where(x =>
+                    (x.courseCode ?? "").Contains(searchValue) ||
+                    (x.courseName ?? "").Contains(searchValue) ||
+                    (x.courseNameInKhmer ?? "").Contains(searchValue) ||
+                    (x.grade ?? "").Contains(searchValue));
+            }
+
+            var recordsFiltered = query.Count();
+
+            var data = query
+                .OrderBy(x => x.termNo)
+                .Skip(skip)
+                .Take(pageSize)
+                .ToList();
+
+            return Json(new
+            {
+                draw = draw,
+                recordsTotal = recordsTotal,
+                recordsFiltered = recordsFiltered,
+                data = data
+            });
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
+        }
+    }
+    
+    [HttpPost("/scores/save-external-score")]
+    public async Task<IActionResult> SaveExternalScore([FromForm] ExternalScoreDto? externalScore)
+    {
+        try
+        {
+            if (externalScore == null)
+            {
+                return new ServerResponse().BadRequest("Bad Request!");
+            }
+
+            var db = campusDbContext.DbContext(_campus);
+
+            var existingScore = await db.TblExternalScores
+                .FirstOrDefaultAsync(x => x.ExternalScoreId == externalScore.ExternalScoreId);
+
+            if (existingScore == null)
+            {
+                return new ServerResponse().NotFound("External score not found!");
+            }
+
+            var username =
+                User.Identity?.Name ??
+                User.FindFirst("UserName")?.Value ??
+                User.FindFirst("username")?.Value;
+
+            existingScore.TermNo = externalScore.TermNo;
+            existingScore.CourseCode = externalScore.CourseCode?.Trim();
+            existingScore.CourseName = externalScore.CourseName?.Trim();
+            existingScore.CourseNameInKhmer = externalScore.CourseNameInKhmer?.Trim();
+            existingScore.Credit = externalScore.Credit;
+            existingScore.Total = externalScore.Total;
+            existingScore.Grade = externalScore.Grade?.Trim();
+            existingScore.YearStart = externalScore.YearStart;
+            existingScore.YearEnd = externalScore.YearEnd;
+
+            // save edit user and edit date
+            existingScore.Username = username;
+            existingScore.DateEdit = DateTime.Now;
+
+            await db.SaveChangesAsync();
+
+            return new ServerResponse().Success(existingScore, "Updated successfully!");
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
+        }
     }
 
 
@@ -292,61 +379,54 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
     [HttpPost("GetComplementFailedCourseScores/{studentId}")]
     public IActionResult GetComplementFailedCourseScores(string studentId)
     {
-        var draw = Request.Form["draw"].FirstOrDefault();
-        var start = Request.Form["start"].FirstOrDefault();
-        var length = Request.Form["length"].FirstOrDefault();
-        var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-        var pageSize = length != null ? Convert.ToInt32(length) : 0;
-        var skip = start != null ? Convert.ToInt32(start) : 0;
-        var db = campusDbContext.DbContext(_campus); 
-        var query = (from css in db.TblComplementFailedCourseScores
-            join c in db.TblCourses on css.CourseId equals c.CourseId
-            where css.StudentId == studentId
-            select new
-            {
-                css.ComplementFailedCourseScoreId,
-                css.StudentId,
-                css.TermNo,
-                css.MidTermScore,
-                css.FinalScore,
-                c.CourseId,
-                c.CourseFullName,
-                c.CourseFullNameInKhmer
-            }).AsQueryable();
-        var recordsTotal = query.Count();
-        var data = query.Skip(skip).Take(pageSize).ToList().OrderBy(x => x.TermNo);
-
-        return Json(new
-        {
-            draw,
-            recordsFiltered = recordsTotal,
-            recordsTotal,
-            data
-        });
-    }
-
-    [HttpPost("get-score-history/{studentId}")]
-    public async Task<IActionResult> GetScoreHistory(bool isAll = false, string studentId = "")
-    {
         try
         {
-            var db = campusDbContext.DbContext(_campus);
-            var query = db.TblScoreHistory.Where(x => x.StudentId == studentId).AsQueryable();
-            if (isAll)
-            {
-                return new ServerResponse().Success(await query.ToListAsync());
-            }
-
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
 
-            var pageSize = length != null ? Convert.ToInt32(length) : 0;
-            var skip = start != null ? Convert.ToInt32(start) : 0;
+            var pageSize = !string.IsNullOrEmpty(length) ? Convert.ToInt32(length) : 10;
+            var skip = !string.IsNullOrEmpty(start) ? Convert.ToInt32(start) : 0;
+
+            if (pageSize <= 0)
+            {
+                pageSize = 10;
+            }
+
+            var db = campusDbContext.DbContext(_campus);
+
+            var query = (
+                from css in db.TblComplementFailedCourseScores
+                join c in db.TblCourses on css.CourseId equals c.CourseId
+                where css.StudentId == studentId
+                select new
+                {
+                    complementFailedCourseScoreId = css.ComplementFailedCourseScoreId,
+                    studentId = css.StudentId,
+                    termNo = css.TermNo,
+                    midTermScore = css.MidTermScore,
+                    finalScore = css.FinalScore,
+                    courseId = c.CourseId,
+                    courseFullName = c.CourseFullName,
+                    courseFullNameInKhmer = c.CourseFullNameInKhmer
+                }
+            ).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchValue))
+            {
+                query = query.Where(x =>
+                    x.courseFullName.Contains(searchValue) ||
+                    x.courseFullNameInKhmer.Contains(searchValue));
+            }
+
             var recordsTotal = query.Count();
-            var data = query.Skip(skip).Take(pageSize).ToList().OrderBy(x => x.TermNo);
+
+            var data = query
+                .OrderBy(x => x.termNo)
+                .Skip(skip)
+                .Take(pageSize)
+                .ToList();
 
             return Json(new
             {
@@ -356,42 +436,135 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
                 data
             });
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return new ServerResponse().ErrorInternal(e);
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
-
-    [HttpPost("get-score-history/{studentId}/{courseId:int}")]
-    public async Task<IActionResult> GetScoreHistory(string studentId, int courseId)
+    [HttpPost("/scores/save-complement-failed-course-score")]
+    public async Task<IActionResult> SaveComplementFailedCourseScore([FromForm] ComplementFailedCourseScoreDto? dto)
     {
         try
         {
+            if (dto == null)
+            {
+                return new ServerResponse().BadRequest("Bad Request!");
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.StudentId))
+            {
+                return new ServerResponse().BadRequest("Student ID is required.");
+            }
+
+            if (dto.CourseId <= 0)
+            {
+                return new ServerResponse().BadRequest("Course ID is required.");
+            }
+
             var db = campusDbContext.DbContext(_campus);
-            var query = (from sh in db.TblScoreHistory
+
+            var username =
+                User.Identity?.Name ??
+                User.FindFirst("UserName")?.Value ??
+                User.FindFirst("username")?.Value ??
+                User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ??
+                User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ??
+                "System";
+
+            var score = await db.TblComplementFailedCourseScores
+                .FirstOrDefaultAsync(x =>
+                    x.StudentId == dto.StudentId &&
+                    x.CourseId == dto.CourseId &&
+                    x.TermNo == dto.TermNo);
+
+            if (score == null)
+            {
+                db.TblComplementFailedCourseScores.Add(new()
+                {
+                    StudentId = dto.StudentId,
+                    TermNo = dto.TermNo,
+                    CourseId = dto.CourseId,
+                    MidTermScore = dto.MidTermScore,
+                    FinalScore = dto.FinalScore,
+                    UserName = username,
+                    DateEdit = DateTime.Now
+                });
+            }
+            else
+            {
+                score.MidTermScore = dto.MidTermScore;
+                score.FinalScore = dto.FinalScore;
+                score.UserName = username;
+                score.DateEdit = DateTime.Now;
+            }
+
+            await db.SaveChangesAsync();
+
+            return new ServerResponse().Success(dto, "Updated successfully!");
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
+        }
+    }
+    
+
+    [HttpPost("get-score-history/{studentId}/{courseId}")]
+    public IActionResult GetScoreHistory(string studentId = "", int courseId = 0)
+    {
+        try
+        {
+            var draw = Request.Form["draw"].FirstOrDefault();
+            var start = Request.Form["start"].FirstOrDefault();
+            var length = Request.Form["length"].FirstOrDefault();
+            var searchValue = Request.Form["search[value]"].FirstOrDefault();
+
+            var pageSize = !string.IsNullOrEmpty(length) ? Convert.ToInt32(length) : 1000;
+            var skip = !string.IsNullOrEmpty(start) ? Convert.ToInt32(start) : 0;
+
+            if (pageSize <= 0)
+            {
+                pageSize = 1000;
+            }
+
+            var db = campusDbContext.DbContext(_campus);
+
+            var query = (
+                from sh in db.TblScoreHistory
                 join c in db.TblCourses on sh.CourseId equals c.CourseId
                 where sh.StudentId == studentId && sh.CourseId == courseId
                 select new
                 {
-                    sh.StudentId,
-                    sh.TermNo,
-                    c.CourseId,
-                    c.CourseFullName,
-                    sh.MidTermScore,
-                    sh.FinalScore,
-                    sh.Username,
-                    sh.DateEdit
-                }).AsQueryable();
+                    scoreHistoryId = sh.ScoreHistoryId,
+                    studentId = sh.StudentId,
+                    courseId = sh.CourseId,
+                    termNo = sh.TermNo,
+                    midTermScore = sh.MidTermScore,
+                    finalScore = sh.FinalScore,
+                    time = sh.Time,
+                    username = sh.Username,
+                    dateEdit = sh.DateEdit,
 
-            var draw = Request.Form["draw"].FirstOrDefault();
-            var start = Request.Form["start"].FirstOrDefault();
-            var length = Request.Form["length"].FirstOrDefault();
-            var searchValue = Request.Form["search[value]"].FirstOrDefault();
+                    courseFullName = c.CourseFullName,
+                    courseFullNameInKhmer = c.CourseFullNameInKhmer
+                }
+            ).AsQueryable();
 
-            var pageSize = length != null ? Convert.ToInt32(length) : 0;
-            var skip = start != null ? Convert.ToInt32(start) : 0;
+            if (!string.IsNullOrWhiteSpace(searchValue))
+            {
+                query = query.Where(x =>
+                    x.courseFullName.Contains(searchValue) ||
+                    x.courseFullNameInKhmer.Contains(searchValue) ||
+                    x.username.Contains(searchValue));
+            }
+
             var recordsTotal = query.Count();
-            var data = await query.Skip(skip).Take(pageSize).OrderBy(x => x.TermNo).ToListAsync();
+
+            var data = query
+                .OrderByDescending(x => x.dateEdit)
+                .Skip(skip)
+                .Take(pageSize)
+                .ToList();
 
             return Json(new
             {
@@ -404,6 +577,61 @@ public class ScoreController(ICampusDbContext campusDbContext, IMapper mapper, I
         catch (Exception e)
         {
             return new ServerResponse().ErrorInternal(e);
+        }
+    }
+    [HttpPost("/scores/save/score-history")]
+    public async Task<IActionResult> SaveScoreHistory([FromForm] ScoreHistoryDto? dto)
+    {
+        try
+        {
+            if (dto == null)
+            {
+                return new ServerResponse().BadRequest("Bad Request!");
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.StudentId))
+            {
+                return new ServerResponse().BadRequest("Student ID is required.");
+            }
+
+            if (dto.CourseId <= 0)
+            {
+                return new ServerResponse().BadRequest("Course ID is required.");
+            }
+
+            var db = campusDbContext.DbContext(_campus);
+
+            var username =
+                User.Identity?.Name ??
+                User.FindFirst("UserName")?.Value ??
+                User.FindFirst("username")?.Value;
+
+            var time = dto.Time > 0 ? dto.Time : 1;
+
+            var scoreHistory = await db.TblScoreHistory
+                .FirstOrDefaultAsync(x =>
+                    x.StudentId == dto.StudentId &&
+                    x.CourseId == dto.CourseId &&
+                    x.TermNo == dto.TermNo &&
+                    x.Time == time);
+
+            if (scoreHistory == null)
+            {
+                return new ServerResponse().NotFound("Score history not found.");
+            }
+
+            scoreHistory.MidTermScore = dto.MidTermScore;
+            scoreHistory.FinalScore = dto.FinalScore;
+            scoreHistory.Username = username;
+            scoreHistory.DateEdit = DateTime.Now;
+
+            await db.SaveChangesAsync();
+
+            return new ServerResponse().Success(scoreHistory, "Score history updated successfully!");
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
 

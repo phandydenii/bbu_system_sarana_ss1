@@ -7,10 +7,14 @@
 }
 <div class="card-body">
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-6">
             <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Extend Student List</h3>
+                <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                    <h3 class="card-title font-weight-bold text-primary m-0">Extend Student List</h3>
+                    <h4 id="studentReExamCountText"
+                        class="text-muted mb-0 ml-auto text-right"
+                        style="font-size: 18px; font-weight: 500;">
+                    </h4>
                 </div>
                 <div class="card-body">
                     <table id="tblStudentReExam" class="table table-sm table-bordered table-striped"
@@ -29,7 +33,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-7">
+        <div class="col-md-6">
             <div class="card card-outline card-primary">
                 <div class="card-header">
                     <h3 class="card-title">Invoice</h3>
@@ -55,25 +59,53 @@
                     <h3 class="card-title">ReExam Subject</h3>
                 </div>
                 <div class="card-body">
-                    <form id="">
+                    <form id="reExamPaymentDetailForm">
+                        <input type="hidden"
+                               id="reExamPaymentDetail_StudentReexamPaymentDetailId"
+                               name="StudentReexamPaymentDetailId"
+                               value="0" />
+
+                        <input type="hidden"
+                               id="reExamPaymentDetail_StudentReexamPaymentId"
+                               name="StudentReexamPaymentId"
+                               value="0"/>
+
                         <div class="row">
                             <div class="col-6">
                                 <label>Subject</label>
-                                <select class="select select2" asp-for="@reExamPaymentDetailDto.CourseId">
-                                    <option value="1">1</option>
+                                <select id="reExamPaymentDetail_CourseId"
+                                        name="CourseId"
+                                        class="form-control select2"
+                                        required>
+                                    <option value="">-- Select Subject --</option>
                                 </select>
                             </div>
+
                             <div class="col-2">
                                 <label>Term</label>
-                                <input type="number" class="form-control" asp-for="@reExamPaymentDetailDto.TermNo" min="1" value="1"/>
+                                <input type="number"
+                                       id="reExamPaymentDetail_TermNo"
+                                       name="TermNo"
+                                       class="form-control"
+                                       min="1"
+                                       value="1"/>
                             </div>
+
                             <div class="col-2">
                                 <label>Time</label>
-                                <input type="number" class="form-control" asp-for="@reExamPaymentDetailDto.Time" min="1" value="1"/>
+                                <input type="number"
+                                       id="reExamPaymentDetail_Time"
+                                       name="Time"
+                                       class="form-control"
+                                       min="1"
+                                       value="1"/>
                             </div>
+
                             <div class="col-2">
                                 <label>&nbsp;</label>
-                                <button type="submit" class="btn form-control btn-success">Add</button>
+                                <button type="submit" class="btn form-control btn-success">
+                                    Add
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -93,6 +125,76 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ReExamPaymentDetailModal" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Re-Exam Payment Detail</h4>
+            </div>
+
+            <div class="modal-body">
+                <form id="editReExamPaymentDetailForm">
+
+                    <input type="hidden"
+                           id="editReExamPaymentDetail_StudentReexamPaymentDetailId"
+                           name="StudentReexamPaymentDetailId" />
+
+                    <input type="hidden"
+                           id="editReExamPaymentDetail_StudentReexamPaymentId"
+                           name="StudentReexamPaymentId" />
+                        <div class="form-group">
+                            <label class="required">Course</label>
+                            <select id="editReExamPaymentDetail_CourseId"
+                                    name="CourseId"
+                                    class="form-control select2"
+                                    required>
+                                <option value="">-- Select Subject --</option>
+                            </select>
+                        </div>
+                    
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <label class="required">Term No</label>
+                            <input type="number"
+                                   id="editReExamPaymentDetail_TermNo"
+                                   name="TermNo"
+                                   class="form-control"
+                                   placeholder="Enter term no"
+                                   required />
+                        </div>
+
+                        <div class="col-6">
+                            <label class="required">Time</label>
+                            <input type="number"
+                                   id="editReExamPaymentDetail_Time"
+                                   name="Time"
+                                   class="form-control"
+                                   placeholder="Enter time"
+                                   required />
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit"
+                        form="editReExamPaymentDetailForm"
+                        class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Change
+                </button>
+
+                <button type="button"
+                        id="btnCloseEditReExamPaymentDetail"
+                        class="btn btn-danger">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
