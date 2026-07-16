@@ -1085,6 +1085,7 @@ public class ProductDetailDto
     public int? ProductId { get; set; }
     public int? DegreeId { get; set; }
     public int? SchoolId { get; set; }
+    public int? FromPromotionNo { get; set; }
 }
 
 public class ProductDto
