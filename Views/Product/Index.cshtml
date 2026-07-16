@@ -1,33 +1,56 @@
 @{
-    ViewData["OpenMenu"] = "Administration";
-    ViewData["Action"] = "Index";
+ViewData["OpenMenu"] = "Administration";
+ViewData["Action"] = "Index";
 }
+
 <div class="card card-primary card-outline card-outline-tabs">
     <div class="card-header p-0 border-bottom-0">
         <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="custom-tabs-four-1-tab" data-toggle="pill"
-                   href="#custom-tabs-four-1" role="tab" aria-controls="custom-tabs-four-1"
-                   aria-selected="true">ផលិតផលបង់ថ្លៃសិក្សា</a>
+                <a class="nav-link active"
+                   id="custom-tabs-four-1-tab"
+                   data-toggle="pill"
+                   href="#custom-tabs-four-1"
+                   role="tab"
+                   aria-controls="custom-tabs-four-1"
+                   aria-selected="true">
+                    ផលិតផលបង់ថ្លៃសិក្សា
+                </a>
             </li>
+
             <li class="nav-item">
-                <a class="nav-link" id="custom-tabs-four-2-tab" data-toggle="pill"
-                   href="#custom-tabs-four-2" role="tab" aria-controls="custom-tabs-four-2"
+                <a class="nav-link"
+                   id="custom-tabs-four-2-tab"
+                   data-toggle="pill"
+                   href="#custom-tabs-four-2"
+                   role="tab"
+                   aria-controls="custom-tabs-four-2"
                    aria-selected="false">
                     ផលិតផលបង់ថ្លៃសិក្សាលើ WeBill
                 </a>
             </li>
         </ul>
     </div>
+
     <div class="tab-content" id="custom-tabs-four-tabContent">
-        <div class="tab-pane fade show active" id="custom-tabs-four-1" role="tabpanel"
+
+        <!-- Product Tab -->
+        <div class="tab-pane fade show active"
+             id="custom-tabs-four-1"
+             role="tabpanel"
              aria-labelledby="custom-tabs-four-1-tab">
+
             <div class="card-header">
-                <button class="btn btn-primary" id="btnAddNewProduct"><i class="fas fa-plus"></i> Add New</button>
+                <button type="button" class="btn btn-primary" id="btnAddNewProduct">
+                    <i class="fas fa-plus"></i> Add New
+                </button>
             </div>
+
             <div class="card-body">
                 <div class="table-responsive" style="width: 100%;">
-                    <table id="tblProduct" class="table table-bordered table-striped table-sm" style="width: 100%;">
+                    <table id="tblProduct"
+                           class="table table-bordered table-striped table-sm"
+                           style="width: 100%;">
                         <thead>
                         <tr>
                             <th>id</th>
@@ -38,27 +61,33 @@
                             <th>degree</th>
                             <th>vat</th>
                             <th>default_pay</th>
-                            @* <th>category_id</th> *@
-                            @* <th>card</th> *@
-                            @* <th>fee</th> *@
-                            @* <th>status</th> *@
+                            <th>category_id</th>
+                            <th>card</th>
+                            <th>fee</th>
+                            <th>status</th>
                             <th>Action</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade show" id="custom-tabs-four-2" role="tabpanel"
+
+        <!-- WeBill Product Tab -->
+        <div class="tab-pane fade"
+             id="custom-tabs-four-2"
+             role="tabpanel"
              aria-labelledby="custom-tabs-four-2-tab">
+
             <div class="card-body">
-                <table id="tblProductPayOnline" class="table table-bordered table-striped table-sm nowrap" style="width: 100%;">
+                <table id="tblProductPayOnline"
+                       class="table table-bordered table-striped table-sm nowrap"
+                       style="width: 100%;">
                     <thead>
                     <tr>
                         <th>id</th>
-                        <th>product_id</th>
+                        <th>product</th>
                         <th>degree</th>
                         <th>school</th>
                         <th>price</th>
@@ -67,255 +96,696 @@
                         <th>Action</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
+
     </div>
 </div>
 
-<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
-<partial name="_ValidationScriptsPartial"/>
-<partial name="_ProductModal"/>
-<partial name="_ProductPayOnline"/>
+<partial name="_ValidationScriptsPartial" />
+<partial name="_ProductModal" />
+<partial name="_ProductPayOnline" />
 
-@section Scripts{
-    <script src="~/function/Degree.js"></script>
-    <script src="~/function/School.js"></script>
-    <script src="~/js/Components.js"></script>
-    <script>
-        const tblProduct = $("#tblProduct");
-        const modalProduct = $("#ProductModal");
-        const btnAddNewProduct = $("#btnAddNewProduct");
-        const btnEditProduct = $("#btnEdit");
-        const btnCloseProduct = $("#btnCloseProduct");
-        const btnCloseProductWeBill = $("#btnCloseProductWeBill");
-        const btnSaveProduct = $("#btnSaveProduct");
-        const tblProductPayOnline = $("#tblProductPayOnline");
-        const ProductPayOnlineModal = $("#ProductPayOnlineModal");
+@section Scripts {
+<script src="~/function/Degree.js"></script>
+<script src="~/function/School.js"></script>
+<script src="~/js/Components.js"></script>
+<style>
+    #tblProductPayOnline {
+        min-width: 1300px;
+    }
 
-        const cboDegree = $("#productDetail_DegreeId");
-        const cboSchool = $("#productDetail_SchoolId");
-        const cboProduct = $("#productDetail_ProductId");
-        const frmProduct = $("#frmProduct");
-        const frmProductWeBill = $("#frmProductWeBill");
-        $(document).ready(function () {
-            fetchProduct();
-            Components.BindSelectOptions("/product/get-product-category-list","product_CategoryId","categoryId","categoryName")
-            fetchProductPayOnline();
-        });
+    #tblProductPayOnline th,
+    #tblProductPayOnline td {
+        white-space: nowrap !important;
+        vertical-align: middle !important;
+    }
 
-        function fetchProduct() {
+    table.dataTable thead th {
+        padding-right: 24px !important;
+    }
+
+    .dataTables_scrollBody {
+        overflow-x: auto !important;
+    }
+    #tblProduct th,
+    #tblProduct td {
+        white-space: nowrap !important;
+        vertical-align: middle !important;
+    }
+
+    #tblProduct {
+        min-width: 1600px;
+    }
+
+    .dt-action {
+        min-width: 170px !important;
+        width: 170px !important;
+    }
+
+    .dt-action-wrap {
+        display: inline-flex;
+        gap: 5px;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    table.dataTable thead th {
+        padding-right: 24px !important;
+    }
+</style>
+
+<script>
+    const tblProduct = $("#tblProduct");
+    const tblProductPayOnline = $("#tblProductPayOnline");
+
+    const modalProduct = $("#ProductModal");
+    const ProductPayOnlineModal = $("#ProductPayOnlineModal");
+
+    const btnAddNewProduct = $("#btnAddNewProduct");
+    const btnCloseProduct = $("#btnCloseProduct");
+    const btnCloseProductWeBill = $("#btnCloseProductWeBill");
+
+    const frmProduct = $("#frmProduct");
+    const frmProductWeBill = $("#frmProductWeBill");
+
+    const cboDegree = $("#productDetail_DegreeId");
+    const cboSchool = $("#productDetail_SchoolId");
+    const cboProduct = $("#productDetail_ProductId");
+
+    $(document).ready(function () {
+        fetchProduct();
+        fetchProductPayOnline();
+
+        Components.BindSelectOptions(
+            "/product/get-product-category-list",
+            "product_CategoryId",
+            "categoryId",
+            "categoryName"
+        );
+    });
+    $('a[data-toggle="pill"]').on("shown.bs.tab", function () {
+        setTimeout(function () {
+            $.fn.dataTable
+                .tables({ visible: true, api: true })
+                .columns.adjust();
+        }, 200);
+    });
+
+    function fetchProduct() {
+        if ($.fn.DataTable.isDataTable("#tblProduct")) {
             tblProduct.DataTable().clear().destroy();
-            tblProduct.DataTable({
-                processing: true,
-                serverSide: true, 
-                scrollCollapse: true,
-                ajax: {
-                    url: "/product/get-product-list",
-                    type: "POST",
-                },
-                columns: [ 
-                    { data: "productId", width: "5%" },
-                    { data: "productName", width: "20%" },
-                    { data: "productNameInKhmer", width: "25%" },
-                    { data: "priceKhr", width: "10%" },
-                    { data: "price", width: "10%" },
-                    { data: "degreeId", width: "10%" },
-                    { data: "vat", width: "5%" },
-                    {
-                        data: "paymentType",
-                        render: function (data, type, row) {
-                            return data ? '<span class="badge bg-info">KHR</span>' : '<span class="badge bg-success">USD</span>';
-                        }
-                    },
-                    // {data: "categoryId"},
-                    // {data: "cardCertificate"},
-                    // {data: "tuitionFees"},
-                    // {data: "status"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `<a class="btn btn-warning btn-sm" id="btnEdit"><i class="fas fa-edit"></i> Edit</a>
-                                    <a class="btn btn-danger btn-sm" id="btnDelete"><i class="fas fa-trash"></i> Delete</a>
-                                    `;
-                        }
-                    }
-                ],
-                initComplete: function () {
-                    MyApp.utils.dataTableDebounceSearch("#tblProduct", 500);
-                }
-            });
+            tblProduct.empty();
         }
 
-        function fetchProductPayOnline() {
-            tblProductPayOnline.DataTable().clear().destroy();
-            tblProductPayOnline.DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "/product/get-product-detail-list",
-                    type: "POST",
-                    // success: function (data, status, headers) {
-                    //     console.log(data.data);
-                    //     return data.data;
-                    // },
-                    // error: function (data, status, error) {
-                    //     console.log(data.responseText);
-                    // }
-                },
-                columns: [
-                    {data: "productDetailId"},
-                    {data: "productName"},
-                    {data: "degreeName"},
-                    {data: "schoolName"},
-                    {data: "price"},
-                    {data: "priceKhr"},
-                    {data: "fromPromotionNo"},
-                    {
-                        data: null,
-                        render: function (data, type, row) { 
-                            return `<a class="btn btn-warning btn-sm" ><i class="fas fa-edit"></i> Edit</a>`;
-                        }
-                    }
-                ],
-                initComplete: function () {
-                    MyApp.utils.dataTableDebounceSearch("#tblProductPayOnline", 500);
-                }
-            });
-        }
+        tblProduct.DataTable({
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
 
-        btnAddNewProduct.click(function () {
-            frmProduct[0].reset();
-            modalProduct.modal("show");
-            modalProduct.find(".modal-title").text("Add New Product");
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+
+            processing: true,
+            serverSide: true,
+
+            order: [[0, "desc"]],
+
+            ajax: {
+                url: "/product/get-product-list",
+                type: "POST",
+                dataType: "json",
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    ShowToastError("Cannot load product list.");
+                }
+            },
+
+            columns: [
+                {
+                    title: "ID",
+                    data: "productId",
+                    width: "60px"
+                },
+                {
+                    title: "Item Name",
+                    data: "productName",
+                    width: "230px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Name Khmer",
+                    data: "productNameInKhmer",
+                    width: "260px",
+                    render: function (data) {
+                        return renderTruncate(data);
+                    }
+                },
+                {
+                    title: "Price KHR",
+                    data: "priceKhr",
+                    width: "120px",
+                    render: function (data) {
+                        return data ?? 0;
+                    }
+                },
+                {
+                    title: "Price USD",
+                    data: "price",
+                    width: "120px",
+                    render: function (data) {
+                        return data ?? 0;
+                    }
+                },
+                {
+                    title: "Degree",
+                    data: "degreeId",
+                    width: "120px",
+                    render: function (data) {
+                        return data ?? "";
+                    }
+                },
+                {
+                    title: "VAT",
+                    data: "vat",
+                    width: "90px",
+                    render: function (data) {
+                        return data ?? 0;
+                    }
+                },
+                {
+                    title: "Default Pay",
+                    data: "paymentType",
+                    width: "120px",
+                    render: function (data) {
+                        return data
+                            ? '<span class="badge bg-info">KHR</span>'
+                            : '<span class="badge bg-success">USD</span>';
+                    }
+                },
+                {
+                    title: "Category",
+                    data: "categoryId",
+                    width: "110px",
+                    render: function (data) {
+                        return data ?? "";
+                    }
+                },
+                {
+                    title: "Card",
+                    data: "cardCertificate",
+                    width: "90px",
+                    render: function (data) {
+                        return data
+                            ? '<span class="badge badge-success">Yes</span>'
+                            : '<span class="badge badge-secondary">No</span>';
+                    }
+                },
+                {
+                    title: "Fee",
+                    data: "tuitionFees",
+                    width: "90px",
+                    render: function (data) {
+                        return data
+                            ? '<span class="badge badge-success">Yes</span>'
+                            : '<span class="badge badge-secondary">No</span>';
+                    }
+                },
+                {
+                    title: "Status",
+                    data: "hidden",
+                    width: "100px",
+                    render: function (data) {
+                        return data
+                            ? '<span class="badge badge-danger">Hidden</span>'
+                            : '<span class="badge badge-success">Show</span>';
+                    }
+                },
+                {
+                    title: "Action",
+                    data: null,
+                    width: "170px",
+                    className: "dt-action text-center",
+                    orderable: false,
+                    searchable: false,
+                    render: function () {
+                        return `
+                        <div class="dt-action-wrap">
+                            <button type="button" class="btn btn-warning btn-sm btnEditProduct">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm btnDeleteProduct">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    `;
+                    }
+                }
+            ],
+
+            initComplete: function () {
+                const api = this.api();
+
+                MyApp.utils.dataTableDebounceSearch("#tblProduct", 500);
+
+                setTimeout(function () {
+                    api.columns.adjust();
+                }, 300);
+            },
+
+            drawCallback: function () {
+                const api = this.api();
+
+                setTimeout(function () {
+                    api.columns.adjust();
+                }, 100);
+            }
         });
 
-        tblProduct.on("click", "#btnEdit", function (e) {
-            const $row = $(this).closest("tr");
-            const data = tblProduct.DataTable().row($row).data();
-            console.log(data);
+        setTimeout(function () {
+            tblProduct.DataTable().columns.adjust();
+        }, 1000);
+    }
+
+    function fetchProductPayOnline() {
+        if ($.fn.DataTable.isDataTable("#tblProductPayOnline")) {
+            tblProductPayOnline.DataTable().clear().destroy();
+        }
+
+        tblProductPayOnline.DataTable({
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+
+            processing: true,
+            serverSide: true,
+
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+
+            order: [[0, "desc"]],
+
+            ajax: {
+                url: "/product/get-product-detail-list",
+                type: "POST",
+                dataType: "json",
+
+                dataSrc: function (json) {
+                    console.log("Product WeBill response:", json);
+                    return json.data || [];
+                },
+
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    ShowToastError("Cannot load WeBill product list.");
+                }
+            },
+
+            columns: [
+                { data: "productDetailId" },
+                { data: "productName" },
+                { data: "degreeName" },
+                { data: "schoolName" },
+                {
+                    data: "price",
+                    render: function (data) {
+                        return data ?? 0;
+                    }
+                },
+                {
+                    data: "priceKhr",
+                    render: function (data) {
+                        return data ?? 0;
+                    }
+                },
+                {
+                    data: "fromPromotionNo",
+                    render: function (data) {
+                        return data ?? "";
+                    }
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: "text-center",
+                    render: function () {
+                        return `
+                        <button type="button" class="btn btn-warning btn-sm btnEditProductWeBill">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    `;
+                    }
+                }
+            ],
+
+            initComplete: function () {
+                const api = this.api();
+
+                MyApp.utils.dataTableDebounceSearch("#tblProductPayOnline", 500);
+
+                setTimeout(function () {
+                    api.columns.adjust();
+                }, 300);
+            },
+
+            drawCallback: function () {
+                const api = this.api();
+
+                setTimeout(function () {
+                    api.columns.adjust();
+                }, 100);
+            }
+        });
+    }
+
+    btnAddNewProduct.off("click").on("click", function () {
+        frmProduct[0].reset();
+
+        $("#product_ProductId").val(0);
+        $("#radioPrimary2").prop("checked", true);
+        $("#product_PaymentType").prop("checked", false);
+
+        modalProduct.find(".modal-title").text("Add New Product");
+        modalProduct.modal("show");
+    });
+
+    $(document)
+        .off("click", "#tblProduct .btnEditProduct")
+        .on("click", "#tblProduct .btnEditProduct", function (e) {
+            e.preventDefault();
+
+            const table = $("#tblProduct").DataTable();
+            let rowElement = $(this).closest("tr");
+
+            if (rowElement.hasClass("child")) {
+                rowElement = rowElement.prev();
+            }
+
+            const data = table.row(rowElement).data();
+
+            if (!data) {
+                ShowToastError("Cannot get selected product.");
+                return;
+            }
+
+            console.log("Edit product:", data);
+
             $("#product_ProductId").val(data.productId);
             $("#product_ProductName").val(data.productName);
-            $("#product_PriceKhr").val(data.priceKhr);
             $("#product_ProductNameInKhmer").val(data.productNameInKhmer);
+            $("#product_PriceKhr").val(data.priceKhr);
             $("#product_Price").val(data.price);
-            $("#product_CategoryId").val(data.categoryId).trigger("change");
             $("#product_DegreeId").val(data.degreeId);
+            $("#product_CategoryId").val(data.categoryId).trigger("change");
             $("#product_FromPromotion").val(data.fromPromotion);
             $("#product_Vat").val(data.vat);
             $("#product_CardCertificate").val(data.cardCertificate);
             $("#product_Type").val(data.type);
+
             $("#isFee").prop("checked", data.tuitionFees);
             $("#isHidden").prop("checked", data.hidden);
 
             $("#product_PaymentType").prop("checked", data.paymentType);
-
             $("#radioPrimary1").prop("checked", data.paymentType);
-            $("#radioPrimary2").prop("checked", !data.paymentType || false);
+            $("#radioPrimary2").prop("checked", !data.paymentType);
+
             modalProduct.find(".modal-title").text("Edit Product");
             modalProduct.modal("show");
         });
 
-        tblProduct.on("click", "#btnDelete", function (e) {
-            const $row = $(this).closest("tr");
-            const data = tblProduct.DataTable().row($row).data();
-            console.log(data);
-        });
-
-        $("#radioPrimary1").on("change", function (e) { 
-            $("#product_PaymentType").prop("checked", e.target.checked);
-        });
-
-        $("#radioPrimary2").on("change", function (e) { 
-            $("#product_PaymentType").prop("checked", !e.target.checked);
-        });
-
-        btnCloseProduct.click(function () {
-            frmProduct[0].reset();
-            modalProduct.modal("hide");
-        });
-
-        frmProduct.on("submit",function (e) {
+    $(document)
+        .off("click", "#tblProduct .btnDeleteProduct")
+        .on("click", "#tblProduct .btnDeleteProduct", function (e) {
             e.preventDefault();
-            const form = $(this);
-            const formData = form.serialize();
+
+            const table = $("#tblProduct").DataTable();
+            let rowElement = $(this).closest("tr");
+
+            if (rowElement.hasClass("child")) {
+                rowElement = rowElement.prev();
+            }
+
+            const data = table.row(rowElement).data();
+
+            if (!data) {
+                ShowToastError("Cannot get selected product.");
+                return;
+            }
+
+            console.log("Delete product:", data);
+
+            if (!confirm("Are you sure you want to delete this product?")) {
+                return;
+            }
+
             $.ajax({
-                url: '/product/save-change-product',
-                method: 'POST',
-                data: formData,
+                url: "/product/delete-product/" + data.productId,
+                type: "DELETE",
+
                 success: function (response) {
-                    if (response.status.code === "200") {
-                        ShowToastSuccess(response.status.message);
-                        frmProduct[0].reset();
-                        modalProduct.modal("hide");
-                        tblProduct.DataTable().ajax.reload();
+                    const code = response.status?.code;
+                    const message = response.status?.message;
+
+                    if (code === "200" || code === 200) {
+                        ShowToastSuccess(message || "Deleted successfully!");
+                        tblProduct.DataTable().ajax.reload(null, false);
                     } else {
-                        ShowToastError(response);
+                        ShowToastError(message || "Delete failed.");
                     }
                 },
-                error: function (error, status, xhr) {
-                    ShowToastError(error.responseText); 
+
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    ShowToastError("Delete failed.");
                 }
             });
         });
 
-        const OnEditProductWeBill = (row) => {
-            console.log(row);
-            GetDegree();
-            GetSchool();
-            GetProduct();
-            ProductPayOnlineModal.modal("show");
-        }
+    $("#radioPrimary1").off("change").on("change", function (e) {
+        $("#product_PaymentType").prop("checked", e.target.checked);
+    });
 
-        async function GetDegree() {
-            cboDegree.empty();
-            cboDegree.append("<option value='' disabled>Select Degree</option>");
-            const degrees = await Degree.GetAllDegree();
-            degrees.forEach(item => {
-                cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
-            });
-            cboDegree.val('').trigger("change");
-        }
+    $("#radioPrimary2").off("change").on("change", function (e) {
+        $("#product_PaymentType").prop("checked", !e.target.checked);
+    });
 
-        async function GetSchool() {
-            cboSchool.empty();
-            cboSchool.append("<option value='' disabled>Select School</option>");
-            const schools = await School.GetSchool()
-            schools.forEach(function (item) {
-                cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
-            });
-            cboSchool.val('').trigger("change");
-        }
+    btnCloseProduct.off("click").on("click", function () {
+        frmProduct[0].reset();
+        modalProduct.modal("hide");
+    });
 
-        async function GetProduct() {
-            cboProduct.empty();
-            cboProduct.append("<option value='' disabled>Select Product</option>");
-            try {
-                const response = await $.ajax({
-                    url: "/product/get-product-list",
-                    method: 'POST',
-                    data: {isAll: true}
-                });
-                if (response.code === "200" && response.data !== "") {
-                    response.data.forEach(function (item) {
-                        cboProduct.append(`<option value='${item.productId}'>${item.productId}-${item.productName}-(Price Usd: ${item.price}, Price Khr: ${item.priceKhr})</option>`);
-                    });
-                    cboProduct.val('').trigger("change");
+    frmProduct.off("submit").on("submit", function (e) {
+        e.preventDefault();
+
+        const form = $(this);
+        const formData = form.serialize();
+
+        $.ajax({
+            url: "/product/save-change-product",
+            method: "POST",
+            data: formData,
+
+            success: function (response) {
+                const code = response.status?.code;
+                const message = response.status?.message;
+
+                if (code === "200" || code === 200) {
+                    ShowToastSuccess(message || "Saved successfully!");
+
+                    frmProduct[0].reset();
+                    modalProduct.modal("hide");
+                    tblProduct.DataTable().ajax.reload(null, false);
                 } else {
-                    ShowToastError(response.message);
-                    return [];
+                    ShowToastError(message || "Save failed.");
                 }
-            } catch (err) {
-                console.log(err);
-                ShowToastError(err);
-            }
-        }
+            },
 
-        btnCloseProductWeBill.click(function () {
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                ShowToastError(xhr.responseText || "Server error.");
+            }
+        });
+    });
+
+    $(document)
+        .off("click", "#tblProductPayOnline .btnEditProductWeBill")
+        .on("click", "#tblProductPayOnline .btnEditProductWeBill", async function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const table = $("#tblProductPayOnline").DataTable();
+
+            let rowElement = $(this).closest("tr");
+
+            if (rowElement.hasClass("child")) {
+                rowElement = rowElement.prev();
+            }
+
+            const row = table.row(rowElement).data();
+
+            if (!row) {
+                ShowToastError("Cannot get selected WeBill product.");
+                return;
+            }
+
+            console.log("Edit WeBill product:", row);
+
+            await GetDegree();
+            await GetSchool();
+            await GetProduct();
+
+            $("#productDetail_ProductDetailId").val(row.productDetailId);
+            $("#productDetail_ProductId").val(row.productId).trigger("change");
+            $("#productDetail_DegreeId").val(row.degreeId).trigger("change");
+            $("#productDetail_SchoolId").val(row.schoolId).trigger("change");
+            $("#productDetail_FromPromotionNo").val(row.fromPromotionNo);
+
+            ProductPayOnlineModal.find(".modal-title").text("Edit Product WeBill Payment");
+            ProductPayOnlineModal.modal("show");
+        });
+
+    async function GetDegree() {
+        cboDegree.empty();
+        cboDegree.append("<option value='' disabled selected>Select Degree</option>");
+
+        try {
+            const degrees = await Degree.GetAllDegree();
+
+            degrees.forEach(function (item) {
+                cboDegree.append(`
+                <option value="${item.degreeId}">
+                    ${item.degreeName}
+                </option>
+            `);
+            });
+
+            cboDegree.val("").trigger("change");
+        } catch (err) {
+            console.log(err);
+            ShowToastError("Cannot load degree.");
+        }
+    }
+
+    async function GetSchool() {
+        cboSchool.empty();
+        cboSchool.append("<option value='' disabled selected>Select School</option>");
+
+        try {
+            const schools = await School.GetSchool();
+
+            schools.forEach(function (item) {
+                cboSchool.append(`
+                <option value="${item.schoolId}">
+                    ${item.schoolName}
+                </option>
+            `);
+            });
+
+            cboSchool.val("").trigger("change");
+        } catch (err) {
+            console.log(err);
+            ShowToastError("Cannot load school.");
+        }
+    }
+
+    async function GetProduct() {
+        cboProduct.empty();
+        cboProduct.append("<option value='' disabled selected>Select Product</option>");
+
+        try {
+            const response = await $.ajax({
+                url: "/product/get-product-list",
+                method: "POST",
+                data: {
+                    isAll: true
+                }
+            });
+
+            const code = response.status?.code || response.code;
+            const data = response.data || [];
+
+            if (code === "200" || code === 200) {
+                data.forEach(function (item) {
+                    cboProduct.append(`
+                    <option value="${item.productId}">
+                        ${item.productId} - ${item.productName}
+                        (Price USD: ${item.price}, Price KHR: ${item.priceKhr})
+                    </option>
+                `);
+                });
+
+                cboProduct.val("").trigger("change");
+            } else {
+                ShowToastError(response.status?.message || response.message || "Cannot load product.");
+            }
+        } catch (err) {
+            console.log(err);
+            ShowToastError("Cannot load product.");
+        }
+    }
+    frmProductWeBill
+        .off("submit")
+        .on("submit", function (e) {
+            e.preventDefault();
+
+            const formData = frmProductWeBill.serialize();
+
+            console.log("Saving Product WeBill:", formData);
+
+            $.ajax({
+                url: "/product/save-change-product-detail",
+                type: "POST",
+                data: formData,
+
+                success: function (response) {
+                    const code = response.status?.code;
+                    const message = response.status?.message;
+
+                    if (code === "200" || code === 200) {
+                        ShowToastSuccess(message || "Saved successfully!");
+
+                        frmProductWeBill[0].reset();
+                        ProductPayOnlineModal.modal("hide");
+
+                        tblProductPayOnline.DataTable().ajax.reload(null, false);
+                    } else {
+                        ShowToastError(message || "Save failed.");
+                    }
+                },
+
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    ShowToastError("Server error.");
+                }
+            });
+        });
+
+    btnCloseProductWeBill
+        .off("click")
+        .on("click", function () {
             frmProductWeBill[0].reset();
+
+            $("#productDetail_ProductDetailId").val(0);
+            $("#productDetail_ProductId").val("").trigger("change");
+            $("#productDetail_DegreeId").val("").trigger("change");
+            $("#productDetail_SchoolId").val("").trigger("change");
+            $("#productDetail_FromPromotionNo").val(0);
+
             ProductPayOnlineModal.modal("hide");
-        })
-    </script>
+        });
+</script>
 }
