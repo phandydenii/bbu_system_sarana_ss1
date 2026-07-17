@@ -30,8 +30,7 @@ public class ReportPartialController : Controller
         return formType switch
         {
             "student_list" => PartialView("Academic/TabStudent/_TabStudentList"),
-            "student_skill_list" => PartialView("Academic/TabStudent/_TabStudentSkillList"),
-            "student_all_status" => PartialView("Academic/TabStudent/_TabAllStatus"),
+            "student_skill_list" => PartialView("Academic/TabStudent/_TabStudentSkillList"), 
             "student_score_list" => PartialView("Academic/TabStudent/_TabScoreList"),
             "student_ministry_doc" => PartialView("Academic/TabStudent/_TabMinistryDoc"),
             _           => Content("Select form type")

@@ -5,6 +5,7 @@ using BBU_SYSTEM.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using AspNetCore.Reporting;
+using BBU_SYSTEM.Data;
 using BBU_SYSTEM.Helper;
 using Microsoft.AspNetCore.Authorization;
 using LocalReport = Microsoft.Reporting.NETCore.LocalReport;
@@ -18,7 +19,7 @@ namespace BBU_SYSTEM.Controllers;
 
 [Authorize]
 [Route("report")]
-public class ReportController(
+public class   ReportController(
     IConfiguration configuration,
     ICampusDbContext campusDbContext,
     IHttpContextAccessor context)
@@ -421,7 +422,7 @@ public class ReportController(
     }
 
     [HttpPost("student-moeys")]
-    public IActionResult StudentMoeys(int degreeId, int schoolId, int fieldId, int promotionId, string filter)
+    public async Task<IActionResult> StudentMoeys(int degreeId, int schoolId, int fieldId, int promotionId, string filter)
     {
         var degree = $" DEGREE_ID={degreeId}";
         var school = $" AND SCHOOL_ID={schoolId}";
@@ -475,13 +476,21 @@ public class ReportController(
         }
 
         var connectionString = configuration.GetConnectionString($"{_campus}_campus");
-        var con = new SqlConnection(connectionString);
-        var cmd = new SqlCommand(
-            $"SELECT * FROM V_ACADEMIC_OFFICE_REPORT_MOYES_OFFICIAL_LIST WHERE {degree} {school} {field} {promotion} {target} ORDER BY STUDENT_NAME",
-            con);
-        var da = new SqlDataAdapter(cmd);
-        var dt = new DataTable();
-        da.Fill(dt);
+        var parms = new[]
+        {
+            new SqlParameter("@DegreeId", degreeId),
+            new SqlParameter("@SchoolId", schoolId),
+            new SqlParameter("@FieldId", fieldId),
+            new SqlParameter("@PromotionId", promotionId)
+        };
+        var dt = await DataManager.DataTableRawSqlAsync(
+            connectionString!,
+            $"SELECT * " +
+                $"FROM V_ACADEMIC_OFFICE_REPORT_MOYES_OFFICIAL_LIST " +
+                $"WHERE {degree} {school} {field} {promotion} {target} " +
+                $"ORDER BY STUDENT_NAME",
+            parms
+        );
         var localReport = new LocalReport();
         localReport.ReportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports", "MOEYS", $"{report}");
 
