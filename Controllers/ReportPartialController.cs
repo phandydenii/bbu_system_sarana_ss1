@@ -24,16 +24,18 @@ public class ReportPartialController : Controller
     }
     
     
-    [Route("academic/student/{formType}")]
-    public IActionResult Student(string formType = "")
+    
+    [HttpGet]
+    [Route("academic/student/{formType?}")]
+    public IActionResult Student(string formType = "student_list")
     {
+        ViewBag.CurrentForm = formType;
         return formType switch
         {
-            "student_list" => PartialView("Academic/TabStudent/_TabStudentList"),
-            "student_skill_list" => PartialView("Academic/TabStudent/_TabStudentSkillList"), 
-            "student_score_list" => PartialView("Academic/TabStudent/_TabScoreList"),
-            "student_ministry_doc" => PartialView("Academic/TabStudent/_TabMinistryDoc"),
-            _           => Content("Select form type")
+            "student_skill_list" => View("~/View/Report/Academic/Student/StudentSkillList"),
+            "student_score_list" => View("Academic/TabStudent/StudentScoreList"),
+            "student_ministry_doc" => View("Academic/TabStudent/StudentMinistryDoc"),
+            _ => RedirectToAction(nameof(Student), new { formType = "student_list" })
         };
     }
     [Route("academic/student-result/{formType}")]

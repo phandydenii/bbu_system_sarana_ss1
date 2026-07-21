@@ -54,11 +54,32 @@ public class   ReportController(
     }
 
     //======2-Academic Report===
+
+    #region Student Report
     [Route("academic/student")]
     public IActionResult Student()
     {
-        return View("Academic/Student");
+        return View("Academic/Student/Index");
     }
+    [HttpGet]
+    [Route("academic/student/skill")]
+    public IActionResult StudentSkillList()
+    {
+        return View("Academic/Student/StudentSkillList");
+    }
+    [HttpGet]
+    [Route("academic/student/score")]
+    public IActionResult StudentScoreList()
+    {
+        return View("Academic/Student/StudentScoreList");
+    }
+    [HttpGet]
+    [Route("academic/student/moeys")]
+    public IActionResult StudentMinistryDoc()
+    {
+        return View("Academic/Student/StudentMinistryDoc");
+    }
+    #endregion
 
     [Route("academic/passing-candidate")]
     public IActionResult PassingCandidate()

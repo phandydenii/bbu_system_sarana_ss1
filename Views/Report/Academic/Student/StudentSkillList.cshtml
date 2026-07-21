@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Skill Student List";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AcademicReport";
+    ViewData["Action"] = "StudentReport";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="margin">
+            <a asp-controller="Report"
+               asp-action="StudentSkillList"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                Skill Student List
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentScoreList"
+               class="btn btn-outline-primary btn-sm">
+                Student Score List
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentMinistryDoc"
+               class="btn btn-outline-primary btn-sm">
+                MoEYS Student
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- Skill Student List UI -->
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            console.log("Skill Student List loaded");
+        });
+    </script>
+}

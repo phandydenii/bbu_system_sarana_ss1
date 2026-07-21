@@ -172,6 +172,10 @@
         <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\MasterGroup.cshtml" />
         <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\OtherGroup.cshtml" />
         <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\SpecializeGroup.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\ReportPartial\Academic\TabStudent\StudentMinistryDoc.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\ReportPartial\Academic\TabStudent\StudentScoreList.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\ReportPartial\Academic\TabStudent\StudentSkillList.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\ReportPartial\Academic\TabStudent\_StudentReportTabs.cshtml" />
     </ItemGroup>
     <ItemGroup>
         <UpToDateCheckInput Remove="Views\Report\_TabStudentSkillList.cshtml" />
@@ -191,7 +195,6 @@
       <AdditionalFiles Include="Views\Academic\TabAssignGroup\_OtherGroupForm.cshtml" />
       <AdditionalFiles Include="Views\Academic\TabAssignGroup\_SpecializeGroupForm.cshtml" />
       <AdditionalFiles Include="Views\Academic\TabAssignGroup\_UnPromoteGroupForm.cshtml" />
-      <AdditionalFiles Include="Views\ReportPartial\Academic\TabStudent\_TabMinistryDoc.cshtml" />
       <AdditionalFiles Include="Views\ReportPartial\Admin\TabBooking\_BookingClothes.cshtml" />
       <AdditionalFiles Include="Views\ReportPartial\Admin\TabBooking\_ReturnClothes.cshtml" />
       <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_GraduateStudent.cshtml" />
@@ -199,5 +202,7 @@
       <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentAcceptCertificate.cshtml" />
       <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentFeeCollection.cshtml" />
       <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentLetterList.cshtml" />
+      <AdditionalFiles Include="Views\Report\Academic\Student\StudentScoreList.cshtml" />
+      <AdditionalFiles Include="Views\Report\Academic\Student\StudentSkillList.cshtml" />
     </ItemGroup>
 </Project>
