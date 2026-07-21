@@ -59,7 +59,7 @@ public class   ReportController(
     [Route("academic/student")]
     public IActionResult Student()
     {
-        return View("Academic/Student/Index");
+        return View("Academic/Student/StudentList");
     }
     [HttpGet]
     [Route("academic/student/skill")]

@@ -5,40 +5,561 @@
     ViewData["Action"] = "StudentReport";
 }
 
-<div class="card">
+<style>
+    .score-page .card-body {
+        padding: 10px;
+    } 
+    .score-page .section-card {
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+        overflow: hidden;
+    } 
+    .score-page .section-header {
+        padding: 7px 10px;
+        background: #f4f6f9;
+        border-bottom: 1px solid #dee2e6;
+        font-size: 14px;
+        font-weight: 600;
+        color: #343a40;
+    } 
+    .score-page .search-panel {
+        padding: 8px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+    } 
+    .score-page .form-group {
+        margin-bottom: 0;
+    } 
+    .score-page label {
+        margin-bottom: 4px;
+        font-size: 13px;
+    } 
+    .score-page .table {
+        margin-bottom: 0;
+        font-size: 13px;
+    } 
+    .score-page .table thead th {
+        padding: 7px 8px;
+        background: #f4f6f9;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 600;
+        white-space: nowrap;
+        vertical-align: middle;
+    } 
+    .score-page .table tbody td {
+        padding: 6px 8px;
+        vertical-align: middle;
+    } 
+    .score-page .table-container {
+        min-height: 220px;
+        max-height: 380px;
+        overflow: auto;
+    } 
+    .score-page .history-container {
+        min-height: 135px;
+        max-height: 220px;
+        overflow: auto;
+    } 
+    .score-page .reexam-container {
+        min-height: 250px;
+        max-height: 330px;
+        overflow: auto;
+    } 
+    .score-page .empty-message {
+        text-align: center;
+        color: #6c757d;
+        padding: 18px 8px !important;
+    } 
+    .score-page .student-summary {
+        display: none;
+        padding: 8px 10px;
+        margin-top: 8px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+        font-size: 13px;
+    } 
+    .score-page .student-summary strong {
+        color: #495057;
+    } 
+    .score-page .content-row {
+        margin-top: 8px;
+    } 
+    .score-page .action-bar {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+        margin-top: 8px;
+    } 
+    @@media (max-width: 991.98px) {
+        .score-page .reexam-container {
+            min-height: 150px;
+            max-height: 240px;
+        }
+    } 
+    @@media (max-width: 767.98px) {
+        .score-page .action-bar {
+            flex-direction: column;
+        } 
+        .score-page .action-bar .btn {
+            width: 100%;
+        } 
+        .score-page .table-container,
+        .score-page .history-container,
+        .score-page .reexam-container {
+            min-height: auto;
+        }
+    }
+</style>
+
+<div class="card score-page">
     <div class="card-header">
         <div class="margin">
-            <a asp-controller="Report"
-               asp-action="StudentSkillList"
-               class="btn btn-outline-primary btn-sm">
+            <a asp-controller="Report" asp-action="Student" class="btn btn-outline-primary btn-sm"> 
+                Student List
+            </a>
+            <a asp-controller="Report" asp-action="Student" class="btn btn-outline-primary btn-sm">
                 Skill Student List
             </a>
-
-            <a asp-controller="Report"
-               asp-action="StudentScoreList"
-               class="btn btn-primary btn-sm">
+            <a asp-controller="Report" asp-action="StudentScoreList" class="btn btn-primary btn-sm">
                 <i class="fas fa-check mr-1"></i>
                 Student Score List
             </a>
-
-            <a asp-controller="Report"
-               asp-action="StudentMinistryDoc"
-               class="btn btn-outline-primary btn-sm">
+            <a asp-controller="Report" asp-action="StudentMinistryDoc" class="btn btn-outline-primary btn-sm">
                 MoEYS Student
             </a>
         </div>
     </div>
 
     <div class="card-body">
-        <!-- Student Score List UI -->
+        <div class="search-panel">
+            <div class="row align-items-end">
+                <div class="col-md-10">
+                    <div class="form-group">
+                        <label for="cboStudent">Search Student</label>
+                        <select id="cboStudent" class="form-control select2">
+                            <option value="">Search by ID, English name or Khmer name</option>
+                        </select>
+                    </div>
+                </div> 
+                <div class="col-md-2 mt-2 mt-md-0">
+                    <button type="button" id="btnSearchStudent" class="btn btn-primary btn-block">
+                        <i class="fas fa-search mr-1"></i>
+                        Search
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="studentSummary" class="student-summary">
+            <div class="row">
+                <div class="col-md-3">
+                    <strong>ID:</strong>
+                    <span id="lblStudentId">-</span>
+                </div> 
+                <div class="col-md-3">
+                    <strong>Name:</strong>
+                    <span id="lblStudentName">-</span>
+                </div> 
+                <div class="col-md-3">
+                    <strong>Khmer:</strong>
+                    <span id="lblStudentKhmerName">-</span>
+                </div> 
+                <div class="col-md-3">
+                    <strong>Promotion:</strong>
+                    <span id="lblPromotion">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row content-row">
+            <div class="col-lg-7 mb-2 mb-lg-0">
+                <div class="section-card mb-2">
+                    <div class="section-header">
+                        <i class="fas fa-graduation-cap mr-1"></i>
+                        Student Examination Result
+                    </div>
+
+                    <div class="table-responsive table-container">
+                        <table id="tblStudentResult" class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th style="width: 90px;">Term</th>
+                                <th>Course</th>
+                                <th style="width: 100px;">Mid</th>
+                                <th style="width: 100px;">Final</th>
+                                <th style="width: 100px;">Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td colspan="5" class="empty-message">
+                                    Select a student to view examination results.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section-card mb-2">
+                    <div class="section-header">
+                        <i class="fas fa-history mr-1"></i>
+                        Exam Score History
+                    </div> 
+                    <div class="table-responsive history-container">
+                        <table id="tblExamHistory" class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>Course Name</th>
+                                <th style="width: 120px;">Mid Term</th>
+                                <th style="width: 120px;">Final</th>
+                                <th style="width: 120px;">Total</th>
+                                <th style="width: 120px;">Attempt</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td colspan="5" class="empty-message">
+                                    No examination history available.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <i class="fas fa-book-reader mr-1"></i>
+                        Restudy Score History
+                    </div> 
+                    <div class="table-responsive history-container">
+                        <table id="tblRestudyHistory" class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th style="width: 90px;">Term</th>
+                                <th>Course</th>
+                                <th style="width: 100px;">Mid</th>
+                                <th style="width: 100px;">Final</th>
+                                <th style="width: 100px;">Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td colspan="5" class="empty-message">
+                                    No restudy history available.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="section-card mb-2">
+                    <div class="section-header">
+                        <i class="fas fa-redo-alt mr-1"></i>
+                        Re-Exam 1
+                    </div> 
+                    <div class="table-responsive reexam-container">
+                        <table id="tblReExam1" class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th style="width: 70px;">No.</th>
+                                <th>Course</th>
+                                <th style="width: 100px;">Score</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td colspan="3" class="empty-message">
+                                    No data available.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-header">
+                        <i class="fas fa-redo-alt mr-1"></i>
+                        Re-Exam 2
+                    </div> 
+                    <div class="table-responsive reexam-container">
+                        <table id="tblReExam2" class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th style="width: 70px;">No.</th>
+                                <th>Course</th>
+                                <th style="width: 100px;">Score</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td colspan="3" class="empty-message">
+                                    No data available.
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button type="button" id="btnViewContract" class="btn btn-outline-primary">
+                <i class="fas fa-file-contract mr-1"></i>
+                Contract
+            </button> 
+            <button type="button" id="btnPrintScore" class="btn btn-success">
+                <i class="fas fa-print mr-1"></i>
+                Print
+            </button>
+        </div>
     </div>
 </div>
 
 @section Scripts
 {
     <script>
+        const cboStudent = $("#cboStudent");
+        const btnSearchStudent = $("#btnSearchStudent");
+        const studentSummary = $("#studentSummary");
+        const tblStudentResult = $("#tblStudentResult tbody");
+        const tblReExam1 = $("#tblReExam1 tbody");
+        const tblReExam2 = $("#tblReExam2 tbody");
+        const tblExamHistory = $("#tblExamHistory tbody");
+        const tblRestudyHistory = $("#tblRestudyHistory tbody");
+
         $(document).ready(function () {
-            console.log("Student Score List loaded");
+            cboStudent.select2({
+                width: "100%",
+                placeholder: "Search by ID, English name or Khmer name",
+                allowClear: true
+            });
+
+            bindEvents();
+            loadStudents();
         });
+
+        function bindEvents() {
+            btnSearchStudent.on("click", function () {
+                loadStudentScore();
+            });
+
+            cboStudent.on("change", function () {
+                if (cboStudent.val()) loadStudentScore();
+            });
+
+            $("#btnPrintScore").on("click", function () {
+                printStudentScore();
+            });
+
+            $("#btnViewContract").on("click", function () {
+                viewStudentContract();
+            });
+        }
+
+        async function loadStudents() {
+            cboStudent.empty();
+            cboStudent.append("<option value=''>Search by ID, English name or Khmer name</option>");
+
+            try {
+                // Replace with your real API.
+                // const students = await Student.GetStudents();
+
+                const students = [];
+
+                students.forEach(function (item) {
+                    const studentCode = item.studentCode || "";
+                    const studentName = item.studentName || "";
+                    const studentNameKh = item.studentNameKh || "";
+                    const displayText = `${studentCode} - ${studentName} - ${studentNameKh}`;
+
+                    cboStudent.append(`<option value="${item.studentId}">${displayText}</option>`);
+                });
+
+                cboStudent.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("Student API error:", error);
+            }
+        }
+
+        function loadStudentScore() {
+            const studentId = cboStudent.val();
+
+            if (!studentId) {
+                alert("Please select a student.");
+                return;
+            }
+
+            showLoading();
+
+            $.ajax({
+                url: "/report/student-score-detail",
+                type: "GET",
+                data: {
+                    studentId: studentId
+                },
+                success: function (response) {
+                    bindStudentSummary(response.student);
+                    bindExamResults(response.examResults);
+                    bindReExam1(response.reExam1);
+                    bindReExam2(response.reExam2);
+                    bindExamHistory(response.examHistory);
+                    bindRestudyHistory(response.restudyHistory);
+                },
+                error: function (xhr) {
+                    console.error(xhr);
+                    alert("Unable to load student scores.");
+                },
+                complete: function () {
+                    hideLoading(1);
+                }
+            });
+        }
+
+        function bindStudentSummary(student) {
+            if (!student) {
+                studentSummary.hide();
+                return;
+            }
+
+            $("#lblStudentId").text(student.studentCode || "-");
+            $("#lblStudentName").text(student.studentName || "-");
+            $("#lblStudentKhmerName").text(student.studentNameKh || "-");
+            $("#lblPromotion").text(student.promotionNo || "-");
+
+            studentSummary.show();
+        }
+
+        function bindExamResults(items) {
+            tblStudentResult.empty();
+
+            if (!items || items.length === 0) {
+                tblStudentResult.append('<tr><td colspan="5" class="empty-message">No examination result found.</td></tr>');
+                return;
+            }
+
+            items.forEach(function (item) {
+                tblStudentResult.append(`
+                    <tr>
+                        <td>${item.termNo ?? ""}</td>
+                        <td>${item.courseName ?? ""}</td>
+                        <td>${item.midScore ?? ""}</td>
+                        <td>${item.finalScore ?? ""}</td>
+                        <td>${item.totalScore ?? ""}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        function bindReExam1(items) {
+            tblReExam1.empty();
+
+            if (!items || items.length === 0) {
+                tblReExam1.append('<tr><td colspan="3" class="empty-message">No Re-Exam 1 data.</td></tr>');
+                return;
+            }
+
+            items.forEach(function (item, index) {
+                tblReExam1.append(`
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.courseName ?? ""}</td>
+                        <td>${item.score ?? ""}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        function bindReExam2(items) {
+            tblReExam2.empty();
+
+            if (!items || items.length === 0) {
+                tblReExam2.append('<tr><td colspan="3" class="empty-message">No Re-Exam 2 data.</td></tr>');
+                return;
+            }
+
+            items.forEach(function (item, index) {
+                tblReExam2.append(`
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.courseName ?? ""}</td>
+                        <td>${item.score ?? ""}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        function bindExamHistory(items) {
+            tblExamHistory.empty();
+
+            if (!items || items.length === 0) {
+                tblExamHistory.append('<tr><td colspan="5" class="empty-message">No examination history found.</td></tr>');
+                return;
+            }
+
+            items.forEach(function (item) {
+                tblExamHistory.append(`
+                    <tr>
+                        <td>${item.courseName ?? ""}</td>
+                        <td>${item.midScore ?? ""}</td>
+                        <td>${item.finalScore ?? ""}</td>
+                        <td>${item.totalScore ?? ""}</td>
+                        <td>${item.attemptNo ?? ""}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        function bindRestudyHistory(items) {
+            tblRestudyHistory.empty();
+
+            if (!items || items.length === 0) {
+                tblRestudyHistory.append('<tr><td colspan="5" class="empty-message">No restudy history found.</td></tr>');
+                return;
+            }
+
+            items.forEach(function (item) {
+                tblRestudyHistory.append(`
+                    <tr>
+                        <td>${item.termNo ?? ""}</td>
+                        <td>${item.courseName ?? ""}</td>
+                        <td>${item.midScore ?? ""}</td>
+                        <td>${item.finalScore ?? ""}</td>
+                        <td>${item.totalScore ?? ""}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        function printStudentScore() {
+            const studentId = cboStudent.val();
+
+            if (!studentId) {
+                alert("Please select a student.");
+                return;
+            }
+
+            window.open(`/report/student-score/print?studentId=${studentId}`, "_blank");
+        }
+
+        function viewStudentContract() {
+            const studentId = cboStudent.val();
+
+            if (!studentId) {
+                alert("Please select a student.");
+                return;
+            }
+
+            window.open(`/report/student-contract?studentId=${studentId}`, "_blank");
+        }
     </script>
 }

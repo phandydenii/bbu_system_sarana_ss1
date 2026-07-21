@@ -5,246 +5,287 @@
     ViewData["OpenSubMenu"] = "AcademicReport";
     ViewData["Action"] = "StudentReport";
     var req = new QueryReportViewModel();
-}
-<div class="card">
+} 
+<style>
+    .moeys-report-page .card-body {
+        padding: 10px;
+    } 
+    .moeys-report-page .filter-panel {
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .moeys-report-page .form-group {
+        margin-bottom: 8px;
+    }
+
+    .moeys-report-page label {
+        margin-bottom: 3px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    .moeys-report-page .form-control {
+        min-height: 36px;
+        font-size: 13px;
+    }
+
+    .moeys-report-page .filter-actions {
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+    }
+
+    .moeys-report-page .preview-panel {
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        overflow: hidden;
+        background: #f8f9fa;
+        min-height: 700px;
+    }
+
+    .moeys-report-page .preview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .moeys-report-page .preview-empty {
+        min-height: 650px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        color: #6c757d;
+        text-align: center;
+    }
+
+    .moeys-report-page .preview-empty i {
+        margin-bottom: 10px;
+        font-size: 42px;
+        opacity: .45;
+    }
+
+    .moeys-report-page #reportContainer {
+        display: none;
+        width: 100%;
+        height: 820px;
+        border: 0;
+        background: #fff;
+    }
+
+    @@media (max-width: 991.98px) {
+        .moeys-report-page .preview-panel {
+            min-height: 450px;
+            margin-top: 10px;
+        }
+
+        .moeys-report-page .preview-empty {
+            min-height: 400px;
+        }
+
+        .moeys-report-page #reportContainer {
+            height: 650px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .moeys-report-page .filter-actions {
+            flex-direction: column;
+        }
+
+        .moeys-report-page .filter-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="card moeys-report-page">
     <div class="card-header">
         <div class="margin">
+            <a asp-controller="Report" asp-action="Student" class="btn btn-outline-primary btn-sm"> 
+                Student List
+            </a>
             <a asp-controller="Report"
                asp-action="StudentSkillList"
                class="btn btn-outline-primary btn-sm">
                 Skill Student List
             </a>
-
             <a asp-controller="Report"
                asp-action="StudentScoreList"
                class="btn btn-outline-primary btn-sm">
                 Student Score List
             </a>
-
-            <a asp-controller="Report"
-               asp-action="StudentMinistryDoc"
-               class="btn btn-primary btn-sm">
+            <a asp-controller="Report" asp-action="StudentMinistryDoc" class="btn btn-primary btn-sm">
                 <i class="fas fa-check mr-1"></i>
                 MoEYS Student
             </a>
         </div>
     </div>
-</div>
 
-<div id="studentMoeysTab">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">MoEYS Student Report</h5>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentMoeysFilterModal">
-            <i class="fas fa-filter mr-1"></i>
-            Filter
-        </button>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <iframe src="" width="100%" height="850px" id="reportContainer" frameborder="1"></iframe>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">MoEYS Student Report</h5> 
         </div>
-    </div>
-</div>
-
-<div class="modal fade" id="studentMoeysFilterModal" tabindex="-1" role="dialog" aria-labelledby="studentMoeysFilterModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="studentMoeysFilterModalLabel">MoEYS Report Filter</h5>
-
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="required">Degree</label>
-                            <select asp-for="@req.DegreeId" id="cboDegree" class="form-control select2">
-                                <option value="">Select Degree</option>
-                            </select>
-                        </div>
+        <div class="row">
+            <div class="col-12 col-md-4 col-lg-3 mb-2 mb-md-0">
+                <div class="filter-panel">
+                    <div class="form-group">
+                        <label class="required">Degree</label>
+                        <select asp-for="@req.DegreeId" id="cboDegree" class="form-control select2">
+                            <option value="">Select Degree</option>
+                        </select>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="required">School</label>
-                            <select asp-for="@req.SchoolId" id="cboSchool" class="form-control select2">
-                                <option value="">Select School</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label class="required">School</label>
+                        <select asp-for="@req.SchoolId" id="cboSchool" class="form-control select2">
+                            <option value="">Select School</option>
+                        </select>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Field</label>
-                            <select asp-for="@req.FieldId" id="cboField" class="form-control select2">
-                                <option value="">Select Field</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label class="required">Field</label>
+                        <select asp-for="@req.FieldId" id="cboField" class="form-control select2">
+                            <option value="">Select Field</option>
+                        </select>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Promotion</label>
-                            <select asp-for="@req.PromotionId" id="cboPromotion" class="form-control select2">
-                                <option value="">Select Promotion</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label class="required">Promotion</label>
+                        <select asp-for="@req.PromotionId" id="cboPromotion" class="form-control select2">
+                            <option value="">Select Promotion</option>
+                        </select>
+                    </div> 
+
+                    <div class="form-group">
+                        <label>Type</label> 
+                        <select asp-for="@req.Filter" id="cboFilter" class="form-control select2">
+                            <option value="all">All</option>
+                            <option value="document_in">Document In</option>
+                            <option value="document_out">Document Out</option>
+                            <option value="authenticated">High School Clarification</option>
+                        </select>
                     </div>
 
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Stage</label>
-                            <select asp-for="@req.StageId" id="cboStage" class="form-control select2">
-                                <option value="">Select Stage</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Term</label>
-                            <select asp-for="@req.TermNo" id="cboTerm" class="form-control select2">
-                                <option value="">Select Term</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Group</label>
-                            <select asp-for="@req.GroupId" id="cboGroup" class="form-control select2">
-                                <option value="">Select Group</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label>Type</label>
-                            <select asp-for="@req.Filter" id="cboFilter" class="form-control select2">
-                                <option value="official">Official</option>
-                                <option value="document_in">Document In</option>
-                                <option value="document_out">Document Out</option>
-                                <option value="authenticated">High School Clarification</option>
-                                <option value="no_document_in">No Document In</option>
-                                <option value="no_document_out">No Document Out</option>
-                                <option value="no_official">No Official</option>
-                                <option value="no_authenticated">No High School Clarification</option>
-                            </select>
-                        </div>
+                    <div class="filter-actions"> 
+                        <button type="button" id="btnPreviewMoeys" onclick="loadStudentMoeys()" class="btn btn-primary flex-fill">
+                            <i class="fas fa-eye mr-1"></i>
+                            Preview
+                        </button>  
                     </div>
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    Cancel
-                </button>
-
-                <button type="button" id="btnApplyStudentMoeysFilter" class="btn btn-success" onclick="loadStudentMoeys()">
-                    <i class="fas fa-check mr-1"></i>
-                    Apply Filter
-                </button>
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="preview-panel">
+                    <div class="preview-header">
+                        <span>
+                            <i class="fas fa-file-pdf mr-1"></i>
+                            MoEYS Report Preview
+                        </span> 
+                        <a id="btnOpenNewTab"
+                           href="#"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-outline-primary btn-sm"
+                           style="display:none;">
+                            <i class="fas fa-external-link-alt mr-1"></i>
+                            Open
+                        </a>
+                    </div> 
+                    <div id="previewEmpty" class="preview-empty">
+                        <i class="far fa-file-pdf"></i>
+                        <strong>No report generated</strong>
+                        <span>Filters and click preview.</span>
+                    </div>
+                    <iframe id="reportContainer"></iframe>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+@section Scripts
+{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script> 
 <script>
+    const cboDegree = $("#cboDegree");
+    const cboSchool = $("#cboSchool");
+    const cboField = $("#cboField");
+    const cboPromotion = $("#cboPromotion"); 
+    
+
     $(document).ready(async function () { 
         $(".select2").select2({
             width: "100%",
             placeholder: "Select an option",
             allowClear: true
         });
-        bindStudentMoeysEvents();
-
+        $("#btnOpenNewTab").on("click", function () {
+            if (!window.studentMoeysPdfUrl) {
+                ShowToastInfo("Please preview the report first.");
+                return;
+            } 
+            window.open(window.studentMoeysPdfUrl, "_blank");
+        });  
         await getDegree();
         await getSchool();
+    }); 
+    cboDegree.on("change", async function () {
+        await getField();
+        await getPromotion();
     });
+    cboSchool.on("change", async function (){
+        await getField();
+        await getPromotion();
+    });
+    cboField.on("change", async function (){
+        await getGroup();
+    }); 
 
-    function bindStudentMoeysEvents() {
-        var root = $("#studentMoeysTab");
-
-        root.off(".studentMoeys");
-
-        $("#cboDegree", async function () {
-            await getField();
-            await getPromotion();
-        });
-
-        root.on("change.studentMoeys", "#cboSchool", async function () {
-            await getField();
-            await getPromotion();
-
-            clearSelect("#cboStage", "Select Stage");
-            clearSelect("#cboTerm", "Select Term");
-            clearSelect("#cboGroup", "Select Group");
-        });
-
-        root.on("change.studentMoeys", "#cboField", async function () {
-            await getGroup();
-        });
-
-        root.on("change.studentMoeys", "#cboPromotion", async function () {
-            await getStage();
-
-            clearSelect("#cboTerm", "Select Term");
-            clearSelect("#cboGroup", "Select Group");
-        });
-
-        root.on("change.studentMoeys", "#cboStage", async function () {
-            await getTerm();
-            await getGroup();
-        });
-    }
-
-    async function getDegree() {
-        var cboDegree = $("#studentMoeysTab #cboDegree");
-
+    async function getDegree() { 
         cboDegree.empty();
-        cboDegree.append("<option value=''>Select Degree</option>");
-
-        try {
-            console.log("Calling degree API");
-
-            var degrees = await Degree.GetAllDegree();
-
+        cboDegree.append("<option value=''>Select Degree</option>"); 
+        try { 
+            const degrees = await Degree.GetAllDegree(); 
             degrees.forEach(function (item) {
                 cboDegree.append(
                     `<option value="${item.degreeId}">
                         ${item.degreeName}
                     </option>`
                 );
-            });
-
+            }); 
             cboDegree.val("").trigger("change.select2");
         } catch (error) {
             console.error("Degree API error:", error);
         }
     }
 
-    async function getSchool() {
-        var cboSchool = $("#studentMoeysTab #cboSchool");
-
+    async function getSchool() { 
         cboSchool.empty();
-        cboSchool.append("<option value=''>Select School</option>");
-
+        cboSchool.append("<option value=''>Select School</option>"); 
         try {
-            var schools = await School.GetSchool();
-
+            const schools = await School.GetSchool(); 
             schools.forEach(function (item) {
                 cboSchool.append(
                     `<option value="${item.schoolId}">
                         ${item.schoolName}
                     </option>`
                 );
-            });
-
+            }); 
             cboSchool.val("").trigger("change.select2");
         } catch (error) {
             console.error("School API error:", error);
@@ -252,39 +293,27 @@
     }
 
     async function getField() {
-        var degreeId = parseInt(
-            $("#studentMoeysTab #cboDegree").val()
-        );
-
-        var schoolId = parseInt(
-            $("#studentMoeysTab #cboSchool").val()
-        );
-
-        var cboField = $("#studentMoeysTab #cboField");
-
+        const degreeId = $("#cboDegree").val();
+        const schoolId = $("#cboSchool").val(); 
         cboField.empty();
-        cboField.append("<option value=''>Select Field</option>");
-
+        cboField.append("<option value=''>Select Field</option>"); 
         if (!degreeId || !schoolId) {
             cboField.val("").trigger("change.select2");
             return;
-        }
-
+        } 
         try {
-            var fields = await Field.GetFields({
+            const fields = await Field.GetFields({
                 isAll: true,
                 degreeId: degreeId,
                 schoolId: schoolId
-            });
-
+            }); 
             fields.forEach(function (item) {
                 cboField.append(
                     `<option value="${item.fieldId}">
                         ${item.fieldName}
                     </option>`
                 );
-            });
-
+            }); 
             cboField.val("").trigger("change.select2");
         } catch (error) {
             console.error("Field API error:", error);
@@ -292,28 +321,16 @@
     }
 
     async function getPromotion() {
-        var degreeId = parseInt(
-            $("#studentMoeysTab #cboDegree").val()
-        );
-
-        var schoolId = parseInt(
-            $("#studentMoeysTab #cboSchool").val()
-        );
-
-        var cboPromotion = $("#studentMoeysTab #cboPromotion");
-
+        const degreeId = $("#cboDegree").val(); 
+        const schoolId = $("#cboSchool").val();  
         cboPromotion.empty();
-        cboPromotion.append(
-            "<option value=''>Select Promotion</option>"
-        );
-
+        cboPromotion.append("<option value=''>Select Promotion</option>"); 
         if (!degreeId || !schoolId) {
             cboPromotion.val("").trigger("change.select2");
             return;
-        }
-
+        } 
         try {
-            var promotions = await Promotion.GetPromotions({
+            const promotions = await Promotion.GetPromotions({
                 schoolId: schoolId,
                 degreeId: degreeId
             });
@@ -332,127 +349,26 @@
         }
     }
 
-    async function getStage() {
-        var promotionId = parseInt(
-            $("#studentMoeysTab #cboPromotion").val()
-        );
-
-        var cboStage = $("#studentMoeysTab #cboStage");
-
-        cboStage.empty();
-        cboStage.append("<option value=''>Select Stage</option>");
-
-        if (!promotionId) {
-            cboStage.val("").trigger("change.select2");
-            return;
-        }
-
-        try {
-            var stages = await Stage.GetStages({
-                promotionId: promotionId
-            });
-
-            stages.forEach(function (item) {
-                cboStage.append(
-                    `<option value="${item.stageId}">
-                        ${item.stageNo}
-                    </option>`
-                );
-            });
-
-            cboStage.val("").trigger("change.select2");
-        } catch (error) {
-            console.error("Stage API error:", error);
-        }
-    }
-
-    async function getTerm() {
-        const stageId = $("#cboStage").val();
-        const cboTerm = $("#cboTerm");
-        cboTerm.empty();
-        cboTerm.append("<option value=''>Select Term</option>");
-        if (!stageId) {
-            cboTerm.val("").trigger("change.select2");
-            return;
-        }
-
-        try {
-            const terms = await Term.GetTerms({stageId: stageId});
-            terms.forEach(function (item) {
-                cboTerm.append(
-                    `<option value="${item.termNo}">
-                        ${item.termNo}
-                    </option>`
-                );
-            });
-            cboTerm.val("").trigger("change.select2");
-        } catch (error) {
-            console.error("Term API error:", error);
-        }
-    }
-
-    async function getGroup() {
-        const stageId = $("#cboStage").val();
-        const fieldId = $("#cboField").val(); 
-        const cboGroup = $("#cboGroup");
-        cboGroup.empty();
-        cboGroup.append("<option value=''>Select Group</option>");
-        if (!stageId || !fieldId) {
-            cboGroup.val("").trigger("change.select2");
-            return;
-        }
-        try {
-            const groups = await Group.GetGroups({
-                stageId: stageId,
-                fieldId: fieldId
-            });
-
-            groups.forEach(function (item) {
-                cboGroup.append(
-                    `<option value="${item.groupId}">
-                        ${item.groupName}
-                    </option>`
-                );
-            });
-            cboGroup.val("").trigger("change.select2");
-        } catch (error) {
-            console.error("Group API error:", error);
-        }
-    }
-
     function loadStudentMoeys() {
-        // var degreeId = $("#studentMoeysTab #cboDegree").val();
-        // var schoolId = $("#studentMoeysTab #cboSchool").val();
-        // var fieldId = $("#studentMoeysTab #cboField").val();
-        // var promotionId = $("#studentMoeysTab #cboPromotion").val();
-        // var filter = $("#studentMoeysTab #cboFilter").val();
-
-        // if (!degreeId || !schoolId || !fieldId || !promotionId) {
-        //     alert(
-        //         "Please select Degree, School, Field and Promotion."
-        //     );
-        //
-        //     return;
-        // }
-
-        showLoading();
-
+        const degreeId = $("#cboDegree").val();
+        const schoolId = $("#cboSchool").val();
+        const fieldId = $("#cboField").val();
+        const promotionId = $("#cboPromotion").val();
+        const filter = $("#cboFilter").val(); 
+        if (!degreeId || !schoolId || !fieldId || !promotionId) {
+            ShowToastInfo("Please select Degree, School, and Promotion."); 
+            return;
+        } 
+        showLoading(); 
         $.ajax({
             url: "/report/student-moeys",
-            type: "POST",
-            // data: {
-            //     degreeId: degreeId,
-            //     schoolId: schoolId,
-            //     fieldId: fieldId,
-            //     promotionId: promotionId,
-            //     filter: filter
-            // },
+            type: "POST", 
             data: {
-                degreeId: 2,
-                schoolId: 2,
-                fieldId: 18,
-                promotionId: 368,
-                filter: "document_in"
+                degreeId: degreeId,
+                schoolId: schoolId,
+                fieldId: fieldId,
+                promotionId: promotionId,
+                filter: filter
             },
             xhrFields: {
                 responseType: "blob"
@@ -460,18 +376,24 @@
             success: function (blob) {
                 if (window.studentMoeysPdfUrl) {
                     URL.revokeObjectURL(window.studentMoeysPdfUrl);
-                }
-                window.studentMoeysPdfUrl = URL.createObjectURL(blob);
-                $("#reportContainer").attr("src",window.studentMoeysPdfUrl);
+                } 
+                window.studentMoeysPdfUrl = URL.createObjectURL(blob); 
+                $("#previewEmpty").hide(); 
+                $("#reportContainer")
+                    .attr("src", window.studentMoeysPdfUrl)
+                    .show();
+
+                $("#btnOpenNewTab")
+                    .attr("href", window.studentMoeysPdfUrl)
+                    .show();
             },
             error: function (xhr) {
-                console.error("Report error:", xhr);
-                alert("Unable to generate report.");
+                console.error("Report error:", xhr); 
             },
             complete: function () {
-                hideLoading(1);
-                $("#studentMoeysFilterModal").modal("hide");
+                hideLoading(1); 
             }
         });
     }
 </script>
+}
