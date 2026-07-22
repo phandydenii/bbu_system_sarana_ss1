@@ -25,7 +25,7 @@ public class ReportPartialController : Controller
     
     
     
-    [HttpGet]
+    /*[HttpGet]
     [Route("academic/student/{formType?}")]
     public IActionResult Student(string formType = "student_list")
     {
@@ -37,7 +37,7 @@ public class ReportPartialController : Controller
             "student_ministry_doc" => View("Academic/TabStudent/StudentMinistryDoc"),
             _ => RedirectToAction(nameof(Student), new { formType = "student_list" })
         };
-    }
+    }*/
     [Route("academic/student-result/{formType}")]
     public IActionResult StudentResult(string formType = "")
     {
@@ -67,7 +67,7 @@ public class ReportPartialController : Controller
         };
     }
     
-    [Route("admin/registered/{formType}")]
+    /*[Route("admin/registered/{formType}")]
     public IActionResult Registered(string formType = "")
     {
         return formType switch
@@ -78,7 +78,7 @@ public class ReportPartialController : Controller
             "scholarship" => PartialView("Admin/TabRegistrations/_ScholarshipStudent"),
             _           => Content("Select form type")
         };
-    }
+    }*/
     
      
     [Route("admin/payment/{formType}")]

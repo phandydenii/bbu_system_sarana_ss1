@@ -1,0 +1,351 @@
+@model BBU_SYSTEM.ViewModel.Report.RegisteredByProvinceViewModel
+
+@{
+    ViewData["Title"] = "Registration By Province";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AdminReport";
+    ViewData["Action"] = "RegistrationReport";
+}
+
+<style>
+    .registration-province-page .card-body {
+        padding: 10px;
+    }
+
+    .registration-province-page .filter-panel {
+        height: 100%;
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+    }
+
+    .registration-province-page .filter-title {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .registration-province-page .form-group {
+        margin-bottom: 10px;
+    }
+
+    .registration-province-page label {
+        margin-bottom: 3px;
+        color: #343a40;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .registration-province-page .form-control {
+        height: 34px;
+        font-size: 13px;
+    }
+
+    .registration-province-page .report-panel {
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .registration-province-page .report-header {
+        padding: 8px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .registration-province-page .report-frame {
+        display: block;
+        width: 100%;
+        height: 700px;
+        border: 0;
+        background: #fff;
+    }
+
+    .registration-province-page .report-loading {
+        height: 700px;
+        padding-top: 100px;
+        text-align: center;
+    }
+
+    @@media (max-width: 991.98px) {
+        .registration-province-page .filter-panel {
+            margin-bottom: 10px;
+        }
+
+        .registration-province-page .report-frame,
+        .registration-province-page .report-loading {
+            height: 550px;
+        }
+    }
+</style>
+
+<div class="card registration-province-page">
+    <div class="card-header">
+        <div class="margin">
+            <a asp-controller="Report"
+               asp-action="Registration"
+               class="btn btn-outline-primary btn-sm">
+                Registered Students
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="RegistrationStatic"
+               class="btn btn-outline-primary btn-sm">
+                Registration Static
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="RegistrationByProvince"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                Registration By Province
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="Scholarship"
+               class="btn btn-outline-primary btn-sm">
+                Scholarship
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-4 col-lg-3">
+                <div id="registrationProvinceFilters"
+                     class="filter-panel">
+
+                    <div class="filter-title">
+                        <i class="fas fa-filter mr-1"></i>
+                        Report Filters
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="DegreeId"
+                               class="required">
+                            Degree
+                        </label>
+
+                        <select asp-for="DegreeId"
+                                asp-items="ViewBag.DegreeList"
+                                class="form-control select2">
+                            <option value="">Select degree</option>
+                        </select>
+
+                        <span asp-validation-for="DegreeId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="PromotionNo">
+                            Promotion
+                        </label>
+
+                        <input asp-for="PromotionNo"
+                               type="number"
+                               class="form-control"
+                               min="1"
+                               value="1" />
+
+                        <span asp-validation-for="PromotionNo"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Sex">
+                            Sex
+                        </label>
+
+                        <select asp-for="Sex"
+                                class="form-control select2">
+                            <option value="">All</option>
+                            <option value="1">Male</option>
+                            <option value="2">Female</option>
+                        </select>
+
+                        <span asp-validation-for="Sex"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <button type="button"
+                            id="btnPreview"
+                            class="btn btn-primary btn-block">
+                        <i class="fas fa-eye mr-1"></i>
+                        Preview
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="report-panel">
+                    <div class="report-header">
+                        <i class="fas fa-file-pdf mr-1"></i>
+                        Registration By Province Report
+                    </div>
+
+                    <div id="reportLoading"
+                         class="report-loading d-none">
+                        <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+
+                        <div class="mt-2">
+                            Loading report...
+                        </div>
+                    </div>
+
+                    <iframe id="reportContainer"
+                            title="Registration By Province Report"
+                            src="about:blank"
+                            class="report-frame">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script>
+        const degreeId = $("#DegreeId");
+        const promotionNo = $("#PromotionNo");
+        const sex = $("#Sex");
+
+        const btnPreview = $("#btnPreview");
+        const reportLoading = $("#reportLoading");
+        const reportContainer = $("#reportContainer");
+
+        let currentPdfUrl = null;
+
+        $(document).ready(function () {
+            degreeId.select2({
+                width: "100%",
+                placeholder: "Select degree",
+                allowClear: true
+            });
+
+            sex.select2({
+                width: "100%",
+                placeholder: "All",
+                allowClear: true,
+                minimumResultsForSearch: Infinity
+            });
+
+            btnPreview.on("click", function () {
+                previewRegistrationByProvince();
+            });
+        });
+
+        function previewRegistrationByProvince() {
+            if (!degreeId.val()) {
+                ShowToastInfo("Please select a degree.");
+                degreeId.select2("open");
+                return;
+            }
+
+            showReportLoading();
+
+            $.ajax({
+                url: '@Url.Action("RegistrationByProvincePreview", "Report")',
+                type: "GET",
+
+                data: {
+                    DegreeId: degreeId.val(),
+                    PromotionNo: promotionNo.val() || 1,
+                    Sex: sex.val() || ""
+                },
+
+                xhrFields: {
+                    responseType: "blob"
+                },
+
+                success: function (response, textStatus, xhr) {
+                    const contentType =
+                        xhr.getResponseHeader("Content-Type")
+                        || "application/pdf";
+
+                    if (currentPdfUrl) {
+                        URL.revokeObjectURL(currentPdfUrl);
+                    }
+
+                    const pdfBlob = new Blob(
+                        [response],
+                        {
+                            type: contentType
+                        }
+                    );
+
+                    currentPdfUrl = URL.createObjectURL(pdfBlob);
+
+                    reportContainer
+                        .off("load.registrationProvince")
+                        .one("load.registrationProvince", function () {
+                            hideReportLoading();
+                        })
+                        .attr("src", currentPdfUrl);
+                },
+
+                error: function (xhr) {
+                    hideReportLoading();
+
+                    const response = xhr.response;
+
+                    if (response instanceof Blob) {
+                        response.text().then(function (message) {
+                            ShowToastError(
+                                message ||
+                                "Unable to generate registration by province report."
+                            );
+                        });
+
+                        return;
+                    }
+
+                    ShowToastError(
+                        xhr.responseText ||
+                        "Unable to generate registration by province report."
+                    );
+                }
+            });
+        }
+
+        function showReportLoading() {
+            reportContainer.addClass("d-none");
+            reportLoading.removeClass("d-none");
+
+            btnPreview
+                .prop("disabled", true)
+                .html(
+                    '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+                );
+        }
+
+        function hideReportLoading() {
+            reportLoading.addClass("d-none");
+            reportContainer.removeClass("d-none");
+
+            btnPreview
+                .prop("disabled", false)
+                .html(
+                    '<i class="fas fa-eye mr-1"></i> Preview'
+                );
+        }
+
+        $(window).on("beforeunload", function () {
+            if (currentPdfUrl) {
+                URL.revokeObjectURL(currentPdfUrl);
+            }
+        });
+    </script>
+}

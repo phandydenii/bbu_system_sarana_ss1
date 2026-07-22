@@ -166,6 +166,9 @@
                     },
                 },
             ],
+            initComplete: function () {
+                MyApp.utils.dataTableDebounceSearch("#tblSearchStudent",500);
+            }
         });
     });
 

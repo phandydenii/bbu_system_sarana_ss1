@@ -1,10 +1,11 @@
 ﻿@using BBU_SYSTEM.ViewModel
-@{
-    ViewData["Title"] = "Student List";
+@{ 
     ViewData["OpenMenu"] = "Report";
-    ViewData["OpenSubMenu"] = "AcademicReport";
-    ViewData["Action"] = "StudentReport";
-
+    ViewData["OpenSubMenu"] = "AcademicReport"; 
+    // Override the breadcrumb text used by the layout.
+    ViewContext.RouteData.Values["controller"] = "Student List";
+    ViewContext.RouteData.Values["action"] = "Student List";
+    
     var req = new QueryReportViewModel();
 }
 

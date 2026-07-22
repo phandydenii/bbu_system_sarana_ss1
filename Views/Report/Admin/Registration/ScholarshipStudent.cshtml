@@ -1,0 +1,461 @@
+@model BBU_SYSTEM.ViewModel.Report.ScholarshipViewModel
+
+@{
+    ViewData["Title"] = "Scholarship";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AdminReport";
+    ViewData["Action"] = "RegistrationReport";
+}
+
+<style>
+    .scholarship-page .card-body {
+        padding: 10px;
+    }
+
+    .scholarship-page .filter-panel {
+        height: 100%;
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+    }
+
+    .scholarship-page .filter-title {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .scholarship-page .form-group {
+        margin-bottom: 10px;
+    }
+
+    .scholarship-page label {
+        margin-bottom: 3px;
+        color: #343a40;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .scholarship-page .form-control {
+        height: 34px;
+        font-size: 13px;
+    }
+
+    .scholarship-page .report-panel {
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .scholarship-page .report-header {
+        padding: 8px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .scholarship-page .report-frame {
+        display: block;
+        width: 100%;
+        height: 700px;
+        border: 0;
+        background: #fff;
+    }
+
+    .scholarship-page .report-loading {
+        height: 700px;
+        padding-top: 100px;
+        text-align: center;
+    }
+
+    @@media (max-width: 991.98px) {
+        .scholarship-page .filter-panel {
+            margin-bottom: 10px;
+        }
+
+        .scholarship-page .report-frame,
+        .scholarship-page .report-loading {
+            height: 550px;
+        }
+    }
+</style>
+
+<div class="card scholarship-page">
+    <div class="card-header">
+        <div class="margin">
+            <a asp-controller="Report"
+               asp-action="Registration"
+               class="btn btn-outline-primary btn-sm">
+                Registered Students
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="RegistrationStatic"
+               class="btn btn-outline-primary btn-sm">
+                Registration Static
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="RegistrationByProvince"
+               class="btn btn-outline-primary btn-sm">
+                Registration By Province
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="Scholarship"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                Scholarship
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-4 col-lg-3">
+                <div id="scholarshipFilters"
+                     class="filter-panel">
+
+                    <div class="filter-title">
+                        <i class="fas fa-filter mr-1"></i>
+                        Report Filters
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="DegreeId"
+                               class="required">
+                            Degree
+                        </label>
+
+                        <select asp-for="DegreeId"
+                                asp-items="ViewBag.DegreeList"
+                                class="form-control select2">
+                            <option value="">Select degree</option>
+                        </select>
+
+                        <span asp-validation-for="DegreeId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="PromotionNo">
+                                    Promotion
+                                </label>
+
+                                <input asp-for="PromotionNo"
+                                       type="number"
+                                       class="form-control"
+                                       min="1"
+                                       value="1" />
+
+                                <span asp-validation-for="PromotionNo"
+                                      class="text-danger">
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="StageNo">
+                                    Stage
+                                </label>
+
+                                <input asp-for="StageNo"
+                                       type="number"
+                                       class="form-control"
+                                       min="1"
+                                       value="1" />
+
+                                <span asp-validation-for="StageNo"
+                                      class="text-danger">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="FromDate">
+                                    From Date
+                                </label>
+
+                                <input asp-for="FromDate"
+                                       type="date"
+                                       class="form-control" />
+
+                                <span asp-validation-for="FromDate"
+                                      class="text-danger">
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="ToDate">
+                                    To Date
+                                </label>
+
+                                <input asp-for="ToDate"
+                                       type="date"
+                                       class="form-control" />
+
+                                <span asp-validation-for="ToDate"
+                                      class="text-danger">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="Reporter">
+                                    Reporter
+                                </label>
+
+                                <input asp-for="Reporter"
+                                       type="text"
+                                       class="form-control"
+                                       autocomplete="off"
+                                       placeholder="Reporter name" />
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="Receiver">
+                                    Receiver
+                                </label>
+
+                                <input asp-for="Receiver"
+                                       type="text"
+                                       class="form-control"
+                                       autocomplete="off"
+                                       placeholder="Receiver name" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Status"
+                               class="required">
+                            Status
+                        </label>
+
+                        <select asp-for="Status"
+                                asp-items="ViewBag.StatusList"
+                                class="form-control select2">
+                            <option value="">Select status</option>
+                        </select>
+
+                        <span asp-validation-for="Status"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <button type="button"
+                            id="btnPreview"
+                            class="btn btn-primary btn-block">
+                        <i class="fas fa-eye mr-1"></i>
+                        Preview
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="report-panel">
+                    <div class="report-header">
+                        <i class="fas fa-file-pdf mr-1"></i>
+                        Scholarship Report
+                    </div>
+
+                    <div id="reportLoading"
+                         class="report-loading d-none">
+                        <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+
+                        <div class="mt-2">
+                            Loading report...
+                        </div>
+                    </div>
+
+                    <iframe id="reportContainer"
+                            title="Scholarship Report"
+                            src="about:blank"
+                            class="report-frame">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script>
+        const degreeId = $("#DegreeId");
+        const promotionNo = $("#PromotionNo");
+        const stageNo = $("#StageNo");
+        const fromDate = $("#FromDate");
+        const toDate = $("#ToDate");
+        const reporter = $("#Reporter");
+        const receiver = $("#Receiver");
+        const status = $("#Status");
+
+        const btnPreview = $("#btnPreview");
+        const reportLoading = $("#reportLoading");
+        const reportContainer = $("#reportContainer");
+
+        let currentPdfUrl = null;
+
+        $(document).ready(function () {
+            degreeId.select2({
+                width: "100%",
+                placeholder: "Select degree",
+                allowClear: true
+            });
+
+            status.select2({
+                width: "100%",
+                placeholder: "Select status",
+                allowClear: true
+            });
+
+            btnPreview.on("click", function () {
+                previewScholarshipReport();
+            });
+        });
+
+        function previewScholarshipReport() {
+            if (!degreeId.val()) {
+                ShowToastInfo("Please select a degree.");
+                degreeId.select2("open");
+                return;
+            }
+
+            if (!status.val()) {
+                ShowToastInfo("Please select a status.");
+                status.select2("open");
+                return;
+            }
+
+            if (
+                fromDate.val() &&
+                toDate.val() &&
+                new Date(toDate.val()) < new Date(fromDate.val())
+            ) {
+                ShowToastInfo("To Date must be later than From Date.");
+                return;
+            }
+
+            showReportLoading();
+
+            $.ajax({
+                url: '@Url.Action("ScholarshipPreview", "Report")',
+                type: "GET",
+
+                data: {
+                    DegreeId: degreeId.val(),
+                    PromotionNo: promotionNo.val() || 1,
+                    StageNo: stageNo.val() || 1,
+                    FromDate: fromDate.val(),
+                    ToDate: toDate.val(),
+                    Reporter: reporter.val(),
+                    Receiver: receiver.val(),
+                    Status: status.val()
+                },
+
+                xhrFields: {
+                    responseType: "blob"
+                },
+
+                success: function (response, textStatus, xhr) {
+                    const contentType =
+                        xhr.getResponseHeader("Content-Type")
+                        || "application/pdf";
+
+                    if (currentPdfUrl) {
+                        URL.revokeObjectURL(currentPdfUrl);
+                    }
+
+                    const pdfBlob = new Blob(
+                        [response],
+                        {
+                            type: contentType
+                        }
+                    );
+
+                    currentPdfUrl = URL.createObjectURL(pdfBlob);
+
+                    reportContainer
+                        .off("load.scholarshipReport")
+                        .one("load.scholarshipReport", function () {
+                            hideReportLoading();
+                        });
+
+                    reportContainer.attr("src", currentPdfUrl);
+                },
+
+                error: function (xhr) {
+                    hideReportLoading();
+
+                    const response = xhr.response;
+
+                    if (response instanceof Blob) {
+                        response.text().then(function (message) {
+                            ShowToastError(
+                                message || "Unable to generate scholarship report."
+                            );
+                        });
+
+                        return;
+                    }
+
+                    ShowToastError(
+                        xhr.responseText
+                        || "Unable to generate scholarship report."
+                    );
+                }
+            });
+        }
+
+        function showReportLoading() {
+            reportContainer.addClass("d-none");
+            reportLoading.removeClass("d-none");
+
+            btnPreview
+                .prop("disabled", true)
+                .html(
+                    '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+                );
+        }
+
+        function hideReportLoading() {
+            reportLoading.addClass("d-none");
+            reportContainer.removeClass("d-none");
+
+            btnPreview
+                .prop("disabled", false)
+                .html(
+                    '<i class="fas fa-eye mr-1"></i> Preview'
+                );
+        }
+
+        $(window).on("beforeunload", function () {
+            if (currentPdfUrl) {
+                URL.revokeObjectURL(currentPdfUrl);
+            }
+        });
+    </script>
+}

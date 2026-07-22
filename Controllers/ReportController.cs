@@ -1,18 +1,14 @@
-﻿using System.Data;
-using AutoMapper;
-using BBU_SYSTEM.Repository;
-using BBU_SYSTEM.ViewModel;
+﻿using System.Data; 
+using BBU_SYSTEM.Repository; 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using AspNetCore.Reporting;
+using Microsoft.Data.SqlClient; 
 using BBU_SYSTEM.Data;
 using BBU_SYSTEM.Helper;
 using Microsoft.AspNetCore.Authorization;
 using LocalReport = Microsoft.Reporting.NETCore.LocalReport;
 using Microsoft.Reporting.NETCore;
 using BBU_SYSTEM.Models;
-using BBU_SYSTEM.Models.Req;
-using BBU_SYSTEM.ViewModel.Report;
+using BBU_SYSTEM.Models.Req; 
 using BBU_SYSTEM.ViewModel.Report.Academic;
 
 namespace BBU_SYSTEM.Controllers;
@@ -29,11 +25,30 @@ public class   ReportController(
 
 
     //======1-Administration Report
+
+    #region registration 
     [Route("administration/registration")]
     public IActionResult Registration()
     {
-        return View("Admin/Registration");
+        return View("Admin/Registration/RegisteredStudent");
     }
+    [Route("administration/registration-static")]
+    public IActionResult RegistrationStatic()
+    {
+        return View("Admin/Registration/RegistrationStatic");
+    }
+    [Route("administration/registration-by-province")]
+    public IActionResult RegistrationByProvince()
+    {
+        return View("Admin/Registration/RegistrationStaticProvince");
+    }
+    [Route("administration/registration-scholarship")]
+    public IActionResult Scholarship()
+    {
+        return View("Admin/Registration/ScholarshipStudent");
+    }
+    #endregion
+
 
     [Route("administration/payment")]
     public IActionResult Payment()

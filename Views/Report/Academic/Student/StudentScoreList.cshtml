@@ -8,13 +8,15 @@
 <style>
     .score-page .card-body {
         padding: 10px;
-    } 
+    }
+
     .score-page .section-card {
         border: 1px solid #dee2e6;
         border-radius: 6px;
         background: #fff;
         overflow: hidden;
-    } 
+    }
+
     .score-page .section-header {
         padding: 7px 10px;
         background: #f4f6f9;
@@ -22,24 +24,49 @@
         font-size: 14px;
         font-weight: 600;
         color: #343a40;
-    } 
+    }
+
     .score-page .search-panel {
         padding: 8px;
         border: 1px solid #dee2e6;
         border-radius: 6px;
         background: #f8f9fa;
-    } 
+    }
+
     .score-page .form-group {
         margin-bottom: 0;
-    } 
+    }
+
     .score-page label {
-        margin-bottom: 4px;
+        margin-bottom: 3px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    .score-page .search-panel .form-control {
+        height: 32px;
         font-size: 13px;
-    } 
+    }
+
+    .score-page .search-panel .input-group-text,
+    .score-page .search-panel .btn {
+        height: 32px;
+    }
+
+    .score-page .search-panel .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        padding: 0 10px;
+    }
+
     .score-page .table {
         margin-bottom: 0;
         font-size: 13px;
-    } 
+    }
+
     .score-page .table thead th {
         padding: 7px 8px;
         background: #f4f6f9;
@@ -47,65 +74,72 @@
         font-weight: 600;
         white-space: nowrap;
         vertical-align: middle;
-    } 
+    }
+
     .score-page .table tbody td {
         padding: 6px 8px;
         vertical-align: middle;
-    } 
+    }
+
     .score-page .table-container {
         min-height: 220px;
         max-height: 380px;
         overflow: auto;
-    } 
+    }
+
     .score-page .history-container {
         min-height: 135px;
         max-height: 220px;
         overflow: auto;
-    } 
+    }
+
     .score-page .reexam-container {
         min-height: 250px;
         max-height: 330px;
         overflow: auto;
-    } 
+    }
+
     .score-page .empty-message {
+        padding: 16px 6px !important;
         text-align: center;
         color: #6c757d;
-        padding: 18px 8px !important;
-    } 
-    .score-page .student-summary {
-        display: none;
-        padding: 8px 10px;
-        margin-top: 8px;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        background: #fff;
-        font-size: 13px;
-    } 
-    .score-page .student-summary strong {
-        color: #495057;
-    } 
+    }
+
     .score-page .content-row {
         margin-top: 8px;
-    } 
+    }
+
     .score-page .action-bar {
         display: flex;
         justify-content: flex-end;
         gap: 6px;
         margin-top: 8px;
-    } 
+    }
+
     @@media (max-width: 991.98px) {
         .score-page .reexam-container {
             min-height: 150px;
             max-height: 240px;
         }
-    } 
+    }
+
     @@media (max-width: 767.98px) {
+        .score-page .search-panel .form-group {
+            margin-bottom: 8px;
+        }
+
+        .score-page .search-panel .col-12:last-child .form-group {
+            margin-bottom: 0;
+        }
+
         .score-page .action-bar {
             flex-direction: column;
-        } 
+        }
+
         .score-page .action-bar .btn {
             width: 100%;
-        } 
+        }
+
         .score-page .table-container,
         .score-page .history-container,
         .score-page .reexam-container {
@@ -117,17 +151,25 @@
 <div class="card score-page">
     <div class="card-header">
         <div class="margin">
-            <a asp-controller="Report" asp-action="Student" class="btn btn-outline-primary btn-sm"> 
+            <a asp-controller="Report"
+               asp-action="Student"
+               class="btn btn-outline-primary btn-sm">
                 Student List
-            </a>
-            <a asp-controller="Report" asp-action="Student" class="btn btn-outline-primary btn-sm">
+            </a> 
+            <a asp-controller="Report"
+               asp-action="StudentSkillList"
+               class="btn btn-outline-primary btn-sm">
                 Skill Student List
-            </a>
-            <a asp-controller="Report" asp-action="StudentScoreList" class="btn btn-primary btn-sm">
+            </a> 
+            <a asp-controller="Report"
+               asp-action="StudentScoreList"
+               class="btn btn-primary btn-sm">
                 <i class="fas fa-check mr-1"></i>
                 Student Score List
-            </a>
-            <a asp-controller="Report" asp-action="StudentMinistryDoc" class="btn btn-outline-primary btn-sm">
+            </a> 
+            <a asp-controller="Report"
+               asp-action="StudentMinistryDoc"
+               class="btn btn-outline-primary btn-sm">
                 MoEYS Student
             </a>
         </div>
@@ -135,55 +177,58 @@
 
     <div class="card-body">
         <div class="search-panel">
-            <div class="row align-items-end">
-                <div class="col-md-10">
-                    <div class="form-group">
-                        <label for="cboStudent">Search Student</label>
-                        <select id="cboStudent" class="form-control select2">
-                            <option value="">Search by ID, English name or Khmer name</option>
-                        </select>
-                    </div>
-                </div> 
-                <div class="col-md-2 mt-2 mt-md-0">
-                    <button type="button" id="btnSearchStudent" class="btn btn-primary btn-block">
-                        <i class="fas fa-search mr-1"></i>
-                        Search
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div id="studentSummary" class="student-summary">
+            <input type="hidden" id="studentId" /> 
             <div class="row">
-                <div class="col-md-3">
-                    <strong>ID:</strong>
-                    <span id="lblStudentId">-</span>
-                </div> 
-                <div class="col-md-3">
-                    <strong>Name:</strong>
-                    <span id="lblStudentName">-</span>
-                </div> 
-                <div class="col-md-3">
-                    <strong>Khmer:</strong>
-                    <span id="lblStudentKhmerName">-</span>
-                </div> 
-                <div class="col-md-3">
-                    <strong>Promotion:</strong>
-                    <span id="lblPromotion">-</span>
+                <div class="col-12 col-md-4">
+                    <div class="form-group">
+                        <label class="required" for="txtStudentId">Student ID</label> 
+                        <div class="input-group input-group-sm">
+                            <input type="text" id="txtStudentId" class="form-control" readonly placeholder="Select student" /> 
+                            <div class="input-group-append">
+                                <button type="button"
+                                        id="btnSearchStudent"
+                                        class="btn btn-primary"
+                                        title="Search student">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="form-group">
+                        <label for="txtStudentName">Student Name</label>
+                        <input type="text"
+                               id="txtStudentName"
+                               class="form-control form-control-sm"
+                               readonly
+                               placeholder="English name" />
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="form-group">
+                        <label for="txtStudentNameKhmer">Student Name Khmer</label>
+                        <input type="text"
+                               id="txtStudentNameKhmer"
+                               class="form-control form-control-sm"
+                               readonly
+                               placeholder="Khmer name" />
+                    </div>
                 </div>
             </div>
         </div>
-
+        
         <div class="row content-row">
             <div class="col-lg-7 mb-2 mb-lg-0">
+                @* Examination *@ 
                 <div class="section-card mb-2">
                     <div class="section-header">
                         <i class="fas fa-graduation-cap mr-1"></i>
                         Student Examination Result
                     </div>
-
                     <div class="table-responsive table-container">
-                        <table id="tblStudentResult" class="table table-bordered table-hover">
+                        <table id="tblStudentResult"
+                               class="table table-bordered table-hover">
                             <thead>
                             <tr>
                                 <th style="width: 90px;">Term</th>
@@ -204,13 +249,15 @@
                     </div>
                 </div>
 
+                @* Exam history *@ 
                 <div class="section-card mb-2">
                     <div class="section-header">
                         <i class="fas fa-history mr-1"></i>
                         Exam Score History
-                    </div> 
+                    </div>
                     <div class="table-responsive history-container">
-                        <table id="tblExamHistory" class="table table-bordered table-hover">
+                        <table id="tblExamHistory"
+                               class="table table-bordered table-hover">
                             <thead>
                             <tr>
                                 <th>Course Name</th>
@@ -231,13 +278,15 @@
                     </div>
                 </div>
 
+                @* Re-Study history *@
                 <div class="section-card">
                     <div class="section-header">
                         <i class="fas fa-book-reader mr-1"></i>
                         Restudy Score History
-                    </div> 
+                    </div>
                     <div class="table-responsive history-container">
-                        <table id="tblRestudyHistory" class="table table-bordered table-hover">
+                        <table id="tblRestudyHistory"
+                               class="table table-bordered table-hover">
                             <thead>
                             <tr>
                                 <th style="width: 90px;">Term</th>
@@ -258,15 +307,17 @@
                     </div>
                 </div>
             </div>
-
+            
+            @* Re-Exam 1 *@
             <div class="col-lg-5">
                 <div class="section-card mb-2">
                     <div class="section-header">
                         <i class="fas fa-redo-alt mr-1"></i>
                         Re-Exam 1
-                    </div> 
+                    </div>
                     <div class="table-responsive reexam-container">
-                        <table id="tblReExam1" class="table table-bordered table-hover">
+                        <table id="tblReExam1"
+                               class="table table-bordered table-hover">
                             <thead>
                             <tr>
                                 <th style="width: 70px;">No.</th>
@@ -284,14 +335,16 @@
                         </table>
                     </div>
                 </div>
-
+                
+                @* Re-Exam 2 *@ 
                 <div class="section-card">
                     <div class="section-header">
                         <i class="fas fa-redo-alt mr-1"></i>
                         Re-Exam 2
-                    </div> 
+                    </div>
                     <div class="table-responsive reexam-container">
-                        <table id="tblReExam2" class="table table-bordered table-hover">
+                        <table id="tblReExam2"
+                               class="table table-bordered table-hover">
                             <thead>
                             <tr>
                                 <th style="width: 70px;">No.</th>
@@ -324,13 +377,16 @@
         </div>
     </div>
 </div>
-
+<partial name="Academic/_StudentModal"/>
 @section Scripts
 {
     <script>
-        const cboStudent = $("#cboStudent");
+        const studentId = $("#studentId");
+        const txtStudentId = $("#txtStudentId");
+        const txtStudentName = $("#txtStudentName");
+        const txtStudentNameKhmer = $("#txtStudentNameKhmer");
         const btnSearchStudent = $("#btnSearchStudent");
-        const studentSummary = $("#studentSummary");
+
         const tblStudentResult = $("#tblStudentResult tbody");
         const tblReExam1 = $("#tblReExam1 tbody");
         const tblReExam2 = $("#tblReExam2 tbody");
@@ -338,24 +394,10 @@
         const tblRestudyHistory = $("#tblRestudyHistory tbody");
 
         $(document).ready(function () {
-            cboStudent.select2({
-                width: "100%",
-                placeholder: "Search by ID, English name or Khmer name",
-                allowClear: true
-            });
-
             bindEvents();
-            loadStudents();
         });
 
-        function bindEvents() {
-            btnSearchStudent.on("click", function () {
-                loadStudentScore();
-            });
-
-            cboStudent.on("change", function () {
-                if (cboStudent.val()) loadStudentScore();
-            });
+        function bindEvents() { 
 
             $("#btnPrintScore").on("click", function () {
                 printStudentScore();
@@ -365,50 +407,21 @@
                 viewStudentContract();
             });
         }
-
-        async function loadStudents() {
-            cboStudent.empty();
-            cboStudent.append("<option value=''>Search by ID, English name or Khmer name</option>");
-
-            try {
-                // Replace with your real API.
-                // const students = await Student.GetStudents();
-
-                const students = [];
-
-                students.forEach(function (item) {
-                    const studentCode = item.studentCode || "";
-                    const studentName = item.studentName || "";
-                    const studentNameKh = item.studentNameKh || "";
-                    const displayText = `${studentCode} - ${studentName} - ${studentNameKh}`;
-
-                    cboStudent.append(`<option value="${item.studentId}">${displayText}</option>`);
-                });
-
-                cboStudent.val("").trigger("change.select2");
-            } catch (error) {
-                console.error("Student API error:", error);
-            }
-        }
-
+ 
         function loadStudentScore() {
-            const studentId = cboStudent.val();
-
-            if (!studentId) {
-                alert("Please select a student.");
+            const selectedStudentId = studentId.val();
+            if (!selectedStudentId) {
+                ShowToastInfo("Please select a student.");
                 return;
-            }
-
-            showLoading();
-
+            } 
+            showLoading(); 
             $.ajax({
                 url: "/report/student-score-detail",
                 type: "GET",
                 data: {
-                    studentId: studentId
+                    studentId: selectedStudentId
                 },
-                success: function (response) {
-                    bindStudentSummary(response.student);
+                success: function (response) { 
                     bindExamResults(response.examResults);
                     bindReExam1(response.reExam1);
                     bindReExam2(response.reExam2);
@@ -416,8 +429,8 @@
                     bindRestudyHistory(response.restudyHistory);
                 },
                 error: function (xhr) {
-                    console.error(xhr);
-                    alert("Unable to load student scores.");
+                    console.error("Student score error:", xhr);
+                    ShowToastError("Unable to load student scores.");
                 },
                 complete: function () {
                     hideLoading(1);
@@ -425,28 +438,18 @@
             });
         }
 
-        function bindStudentSummary(student) {
-            if (!student) {
-                studentSummary.hide();
-                return;
-            }
-
-            $("#lblStudentId").text(student.studentCode || "-");
-            $("#lblStudentName").text(student.studentName || "-");
-            $("#lblStudentKhmerName").text(student.studentNameKh || "-");
-            $("#lblPromotion").text(student.promotionNo || "-");
-
-            studentSummary.show();
-        }
-
         function bindExamResults(items) {
             tblStudentResult.empty();
-
             if (!items || items.length === 0) {
-                tblStudentResult.append('<tr><td colspan="5" class="empty-message">No examination result found.</td></tr>');
+                tblStudentResult.append(`
+                    <tr>
+                        <td colspan="5" class="empty-message">
+                            No examination result found.
+                        </td>
+                    </tr>
+                `);
                 return;
             }
-
             items.forEach(function (item) {
                 tblStudentResult.append(`
                     <tr>
@@ -464,7 +467,14 @@
             tblReExam1.empty();
 
             if (!items || items.length === 0) {
-                tblReExam1.append('<tr><td colspan="3" class="empty-message">No Re-Exam 1 data.</td></tr>');
+                tblReExam1.append(`
+                    <tr>
+                        <td colspan="3" class="empty-message">
+                            No Re-Exam 1 data.
+                        </td>
+                    </tr>
+                `);
+
                 return;
             }
 
@@ -480,10 +490,16 @@
         }
 
         function bindReExam2(items) {
-            tblReExam2.empty();
-
+            tblReExam2.empty(); 
             if (!items || items.length === 0) {
-                tblReExam2.append('<tr><td colspan="3" class="empty-message">No Re-Exam 2 data.</td></tr>');
+                tblReExam2.append(`
+                    <tr>
+                        <td colspan="3" class="empty-message">
+                            No Re-Exam 2 data.
+                        </td>
+                    </tr>
+                `);
+
                 return;
             }
 
@@ -502,7 +518,14 @@
             tblExamHistory.empty();
 
             if (!items || items.length === 0) {
-                tblExamHistory.append('<tr><td colspan="5" class="empty-message">No examination history found.</td></tr>');
+                tblExamHistory.append(`
+                    <tr>
+                        <td colspan="5" class="empty-message">
+                            No examination history found.
+                        </td>
+                    </tr>
+                `);
+
                 return;
             }
 
@@ -523,7 +546,14 @@
             tblRestudyHistory.empty();
 
             if (!items || items.length === 0) {
-                tblRestudyHistory.append('<tr><td colspan="5" class="empty-message">No restudy history found.</td></tr>');
+                tblRestudyHistory.append(`
+                    <tr>
+                        <td colspan="5" class="empty-message">
+                            No restudy history found.
+                        </td>
+                    </tr>
+                `);
+
                 return;
             }
 
@@ -541,25 +571,151 @@
         }
 
         function printStudentScore() {
-            const studentId = cboStudent.val();
+            const selectedStudentId = studentId.val();
 
-            if (!studentId) {
+            if (!selectedStudentId) {
                 alert("Please select a student.");
                 return;
             }
 
-            window.open(`/report/student-score/print?studentId=${studentId}`, "_blank");
+            window.open(
+                `/report/student-score/print?studentId=${selectedStudentId}`,
+                "_blank"
+            );
         }
 
         function viewStudentContract() {
-            const studentId = cboStudent.val();
+            const selectedStudentId = studentId.val();
 
-            if (!studentId) {
+            if (!selectedStudentId) {
                 alert("Please select a student.");
                 return;
             }
 
-            window.open(`/report/student-contract?studentId=${studentId}`, "_blank");
+            window.open(
+                `/report/student-contract?studentId=${selectedStudentId}`,
+                "_blank"
+            );
+        }
+        
+        function OnSelectStudent(e) {
+            const $input = $(e);
+            const $row = $input.closest('tr');
+            const selectedRow = $("#tblSearchStudent").DataTable().row($row).data();
+            if (!selectedRow) {
+                clearSelectedStudent();
+                return;
+            }
+            if (selectedRow) { 
+                studentId.val(selectedRow.studentId);
+                txtStudentId.val(selectedRow.studentId);
+                txtStudentName.val(selectedRow.studentName);
+                txtStudentNameKhmer.val(selectedRow.studentNameInKhmer);
+                $("#StudentModal").modal("hide");
+                loadStudentScore();
+            }
+        } 
+        
+        btnSearchStudent.on("click", function (e) {
+            e.preventDefault();
+            $("#StudentModal").modal("show");
+            const tblSearchStudent = $("#tblSearchStudent");
+            tblSearchStudent.DataTable().clear().destroy();
+            tblSearchStudent.DataTable({
+                processing: true,
+                serverSide: true,
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: true,
+                scrollCollapse: true,
+                ajax: {
+                    url: "/student/academic/student-list/all",
+                    type: "POST",
+                },
+                columns: [
+                    {data: "studentId"},
+                    {data: "studentName"},
+                    {data: "studentNameInKhmer"},
+                    {data: "sex"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            if (row.status === "REGISTER") {
+                                return ` <span class="badge badge-warning">${row.status}</span>`;
+                            } else if (row.status === "ACTIVE") {
+                                return ` <span class="badge badge-primary">${row.status}</span>`;
+                            } else if (row.status === "QUIT") {
+                                return ` <span class="badge badge-danger">${row.status}</span>`;
+                            } else {
+                                return `<span class="badge badge-secondary">${row.status}</span>`;
+                            }
+                        },
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `<a onclick="OnSelectStudent(this)"  class="btn btn-success btn-xs">Select</a>`;
+                        },
+                    },
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblSearchStudent",500);
+                }
+            });
+        });
+
+        // clear ui data
+        function clearSelectedStudent() {
+            studentId.val("");
+            txtStudentId.val("");
+            txtStudentName.val("");
+            txtStudentNameKhmer.val("");
+            clearScoreTables();
+        }
+        function clearScoreTables() {
+            tblStudentResult.html(`
+                <tr>
+                    <td colspan="5" class="empty-message">
+                        Select a student to view examination results.
+                    </td>
+                </tr>
+            `);
+
+            tblExamHistory.html(`
+                <tr>
+                    <td colspan="5" class="empty-message">
+                        No examination history available.
+                    </td>
+                </tr>
+            `);
+
+            tblRestudyHistory.html(`
+                <tr>
+                    <td colspan="5" class="empty-message">
+                        No restudy history available.
+                    </td>
+                </tr>
+            `);
+
+            tblReExam1.html(`
+                <tr>
+                    <td colspan="3" class="empty-message">
+                        No data available.
+                    </td>
+                </tr>
+            `);
+
+            tblReExam2.html(`
+                <tr>
+                    <td colspan="3" class="empty-message">
+                        No data available.
+                    </td>
+                </tr>
+            `);
         }
     </script>
 }
