@@ -38,7 +38,7 @@ public class ReportPartialController : Controller
             _ => RedirectToAction(nameof(Student), new { formType = "student_list" })
         };
     }*/
-    [Route("academic/student-result/{formType}")]
+    /*[Route("academic/student-result/{formType}")]
     public IActionResult StudentResult(string formType = "")
     {
         return formType switch
@@ -50,7 +50,9 @@ public class ReportPartialController : Controller
             "student_fee_collection" => PartialView("Academic/TabStudentResult/_TabStudentFeeConllection"), 
             _           => Content("Select form type")
         };
-    }
+    }*/
+    
+    
     [Route("academic/student-passing-candidate/{formType}")]
     public IActionResult StudentPassingCandidate(string formType = "")
     {
@@ -81,7 +83,7 @@ public class ReportPartialController : Controller
     }*/
     
      
-    [Route("admin/payment/{formType}")]
+    /*[Route("admin/payment/{formType}")]
     public IActionResult Payment(string formType = "")
     {
         return formType switch
@@ -96,9 +98,9 @@ public class ReportPartialController : Controller
             "insurance" => PartialView("Admin/TabPayments/_StudentInsurance"),
             _           => Content("Select form type")
         };
-    }
+    }*/
     
-    [Route("admin/book-clothes/{formType}")]
+    /*[Route("admin/book-clothes/{formType}")]
     public IActionResult BookClothes(string formType = "")
     {
         return formType switch
@@ -107,9 +109,9 @@ public class ReportPartialController : Controller
             "return_booking" => PartialView("Admin/TabBooking/_ReturnClothes"),
             _           => Content("Select form type")
         };
-    }
+    }*/
     
-    [Route("admin/others/{formType}")]
+    /*[Route("admin/others/{formType}")]
     public IActionResult Other(string formType = "")
     {
         return formType switch
@@ -121,5 +123,5 @@ public class ReportPartialController : Controller
             "student_fee_collection" => PartialView("Admin/TabOthers/_StudentFeeCollection"),
             _           => Content("Select form type")
         };
-    }
+    }*/
 }

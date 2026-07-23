@@ -26,7 +26,7 @@ public class   ReportController(
 
     //======1-Administration Report
 
-    #region registration 
+    #region ------------------------ registration ------------------------
     [Route("administration/registration")]
     public IActionResult Registration()
     {
@@ -48,29 +48,94 @@ public class   ReportController(
         return View("Admin/Registration/ScholarshipStudent");
     }
     #endregion
-
-
+    
+    #region ------------------------ Payment ------------------------
     [Route("administration/payment")]
     public IActionResult Payment()
     {
-        return View("admin/Payment");
+        return View("Admin/Payment/StudentPaymentSummary");
     }
+    [Route("administration/income")]
+    public IActionResult Income()
+    {
+        return View("Admin/Payment/Income");
+    } 
+    [Route("administration/payment-by-date")]
+    public IActionResult PaymentByDate()
+    {
+        return View("Admin/Payment/StudentPaymentByDate");
+    }
+    [Route("administration/payment_by_group")]
+    public IActionResult PaymentByGroup()
+    {
+        return View("Admin/Payment/StudentPaymentByGroup");
+    }
+    [Route("administration/not_payment")]
+    public IActionResult NotPayment()
+    {
+        return View("Admin/Payment/StudentNotPaymentNew");
+    }
+    [Route("administration/re_exam_payment")]
+    public IActionResult ReExamPayment()
+    {
+        return View("Admin/Payment/ReExaminationPayment");
+    }
+    [Route("administration/owe")]
+    public IActionResult Owe()
+    {
+        return View("Admin/Payment/StudentIncomplete");
+    }
+    [Route("administration/insurance")]
+    public IActionResult Insurance()
+    {
+        return View("Admin/Payment/StudentInsurance");
+    }
+    #endregion
 
+    #region ------------------------ Book Clothe ------------------------
     [Route("administration/booking-clothes")]
     public IActionResult BookClothes()
     {
-        return View("Admin/BookClothes");
+        return View("Admin/BookClothe/BookingClothes");
     }
+    [Route("administration/return-clothes")]
+    public IActionResult ReturnClothes()
+    {
+        return View("Admin/BookClothe/ReturnClothes");
+    }
+    #endregion
 
+    #region ------------------------ Others ------------------------
     [Route("administration/others")]
     public IActionResult Other()
     {
-        return View("Admin/Other");
+        return View("Admin/Other/GraduateStudent");
     }
+    [Route("administration/student-statistic")]
+    public IActionResult StudentStatistic()
+    {
+        return View("Admin/Other/StatisticStudent");
+    }
+    [Route("administration/student-letter-list")]
+    public IActionResult StudentLetterList()
+    {
+        return View("Admin/Other/StudentLetterList");
+    }
+    [Route("administration/student-accept-certificate")]
+    public IActionResult StudentAcceptCertificate()
+    {
+        return View("Admin/Other/StudentAcceptCertificate");
+    }
+    [Route("administration/student_fee_collection")]
+    public IActionResult StudentFeeCollection()
+    {
+        return View("Admin/Other/StudentFeeCollection");
+    }
+    #endregion
 
     //======2-Academic Report===
 
-    #region Student Report
+    #region ------------------------ Student Report ------------------------ 
     [Route("academic/student")]
     public IActionResult Student()
     {
@@ -108,11 +173,33 @@ public class   ReportController(
         return View("academic/certificate");
     }
 
+    #region ------------------------ Student Result ------------------------ 
     [Route("academic/student-result")]
     public IActionResult StudentResult()
     {
-        return View("Academic/StudentResult");
+        return View("Academic/Result/GraduateStudent");
     }
+    /*[Route("academic/student-statistic")]
+    public IActionResult StudentStatic()
+    {
+        return View("Academic/Result/StudentStatic");
+    }
+    [Route("academic/student_letter_list")]
+    public IActionResult StudentStatic()
+    {
+        return View("Academic/Result/StudentStatic");
+    }
+    [Route("academic/student-accept-certificate")]
+    public IActionResult StudentStatic()
+    {
+        return View("Academic/Result/StudentAcceptCertificate");
+    }
+    [Route("academic/student-fee-collection")]
+    public IActionResult StudentFeeCollection()
+    {
+        return View("Admin/Result/StudentFeeCollection");
+    }*/
+    #endregion
 
     //======3-Continue Education
     [Route("continue-edu/student")]

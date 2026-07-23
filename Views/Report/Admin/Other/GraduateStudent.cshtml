@@ -1,0 +1,434 @@
+@model BBU_SYSTEM.ViewModel.Report.Others.GraduateStudentViewModel
+
+@{
+    ViewData["Title"] = "Graduate Student";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AdminReport";
+    ViewData["Action"] = "OtherReport";
+
+    ViewContext.RouteData.Values["action"] = "Graduate Student";
+}
+
+<style>
+    .other-report-page .card-body {
+        padding: 10px;
+    }
+
+    .other-report-page .report-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .other-report-page .filter-panel {
+        height: 100%;
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+    }
+
+    .other-report-page .filter-title {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .other-report-page .form-group {
+        margin-bottom: 10px;
+    }
+
+    .other-report-page label {
+        margin-bottom: 3px;
+        color: #343a40;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .other-report-page .form-control {
+        height: 34px;
+        font-size: 13px;
+    }
+
+    .other-report-page .report-panel {
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .other-report-page .report-header {
+        padding: 8px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .other-report-page .report-frame {
+        display: block;
+        width: 100%;
+        height: 700px;
+        border: 0;
+        background: #fff;
+    }
+
+    .other-report-page .report-loading {
+        height: 700px;
+        padding-top: 100px;
+        text-align: center;
+    }
+
+    @@media (max-width: 991.98px) {
+        .other-report-page .filter-panel {
+            margin-bottom: 10px;
+        }
+
+        .other-report-page .report-frame,
+        .other-report-page .report-loading {
+            height: 550px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .other-report-page .report-navigation .btn {
+            width: 100%;
+        }
+
+        .other-report-page .report-frame,
+        .other-report-page .report-loading {
+            height: 450px;
+        }
+    }
+</style>
+
+<div class="card other-report-page">
+    <div class="card-header">
+        <div class="report-navigation">
+            <a asp-controller="Report"
+               asp-action="Other"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                Graduate Student
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentStatistic"
+               class="btn btn-outline-primary btn-sm">
+                Student Statistic
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentLetterList"
+               class="btn btn-outline-primary btn-sm">
+                Student Letter List
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentAcceptCertificate"
+               class="btn btn-outline-primary btn-sm">
+                Accept Certificate
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentFeeCollection"
+               class="btn btn-outline-primary btn-sm">
+                Student Fee Collection
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="filter-panel">
+                    <div class="filter-title">
+                        <i class="fas fa-filter mr-1"></i>
+                        Report Filters
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="DegreeId"
+                               class="required">
+                            Degree
+                        </label>
+
+                        <select asp-for="DegreeId"
+                                class="form-control select2">
+                            <option value="">Select degree</option>
+                        </select>
+
+                        <span asp-validation-for="DegreeId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="SchoolId"
+                               class="required">
+                            School
+                        </label>
+
+                        <select asp-for="SchoolId"
+                                class="form-control select2">
+                            <option value="">Select school</option>
+                        </select>
+
+                        <span asp-validation-for="SchoolId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="FieldId"
+                               class="required">
+                            Field
+                        </label>
+
+                        <select asp-for="FieldId"
+                                class="form-control select2">
+                            <option value="">Select field</option>
+                        </select>
+
+                        <span asp-validation-for="FieldId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="PromotionNo"
+                               class="required">
+                            Promotion
+                        </label>
+
+                        <select asp-for="PromotionNo"
+                                class="form-control select2">
+                            <option value="">Select promotion</option>
+                        </select>
+
+                        <span asp-validation-for="PromotionNo"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <button type="button"
+                            id="btnPreview"
+                            class="btn btn-primary btn-block">
+                        <i class="fas fa-eye mr-1"></i>
+                        Preview
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="report-panel">
+                    <div class="report-header">
+                        <i class="fas fa-user-graduate mr-1"></i>
+                        Graduate Student Report
+                    </div>
+
+                    <div id="reportLoading"
+                         class="report-loading d-none">
+                        <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+
+                        <div class="mt-2">
+                            Loading report...
+                        </div>
+                    </div>
+
+                    <iframe id="printFrame"
+                            title="Graduate Student Report"
+                            src="about:blank"
+                            class="report-frame">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        const degreeId = $("#DegreeId");
+        const schoolId = $("#SchoolId");
+        const fieldId = $("#FieldId");
+        const promotionNo = $("#PromotionNo");
+
+        const btnPreview = $("#btnPreview");
+        const reportLoading = $("#reportLoading");
+        const printFrame = $("#printFrame");
+
+        let currentPdfUrl = null;
+
+        $(document).ready(function () {
+            initializeSelect2();
+            bindEvents();
+        });
+
+        function initializeSelect2() {
+            degreeId.select2({
+                width: "100%",
+                placeholder: "Select degree",
+                allowClear: true
+            });
+
+            schoolId.select2({
+                width: "100%",
+                placeholder: "Select school",
+                allowClear: true
+            });
+
+            fieldId.select2({
+                width: "100%",
+                placeholder: "Select field",
+                allowClear: true
+            });
+
+            promotionNo.select2({
+                width: "100%",
+                placeholder: "Select promotion",
+                allowClear: true
+            });
+        }
+
+        function bindEvents() {
+            btnPreview.on("click", function () {
+                previewGraduateStudent();
+            });
+        }
+
+        function previewGraduateStudent() {
+            if (!degreeId.val()) {
+                ShowToastInfo("Please select a degree.");
+                degreeId.select2("open");
+                return;
+            }
+
+            if (!schoolId.val()) {
+                ShowToastInfo("Please select a school.");
+                schoolId.select2("open");
+                return;
+            }
+
+            if (!fieldId.val()) {
+                ShowToastInfo("Please select a field.");
+                fieldId.select2("open");
+                return;
+            }
+
+            if (!promotionNo.val()) {
+                ShowToastInfo("Please select a promotion.");
+                promotionNo.select2("open");
+                return;
+            }
+
+            const requestData = {
+                DegreeId: degreeId.val(),
+                SchoolId: schoolId.val(),
+                FieldId: fieldId.val(),
+                PromotionNo: promotionNo.val()
+            };
+
+            showReportLoading();
+
+            /*
+            $.ajax({
+                url: "YOUR_REPORT_CONTROLLER_URL",
+                type: "GET",
+                data: requestData,
+
+                xhrFields: {
+                    responseType: "blob"
+                },
+
+                success: function (response, textStatus, xhr) {
+                    const contentType =
+                        xhr.getResponseHeader("Content-Type")
+                        || "application/pdf";
+
+                    if (currentPdfUrl) {
+                        URL.revokeObjectURL(currentPdfUrl);
+                    }
+
+                    const pdfBlob = new Blob(
+                        [response],
+                        {
+                            type: contentType
+                        }
+                    );
+
+                    currentPdfUrl =
+                        URL.createObjectURL(pdfBlob);
+
+                    printFrame
+                        .off("load.graduateStudent")
+                        .one("load.graduateStudent", function () {
+                            hideReportLoading();
+                        })
+                        .attr("src", currentPdfUrl);
+                },
+
+                error: function (xhr) {
+                    hideReportLoading();
+
+                    const response = xhr.response;
+
+                    if (response instanceof Blob) {
+                        response.text().then(function (message) {
+                            ShowToastError(
+                                message ||
+                                "Unable to generate graduate student report."
+                            );
+                        });
+
+                        return;
+                    }
+
+                    ShowToastError(
+                        xhr.responseText ||
+                        "Unable to generate graduate student report."
+                    );
+                }
+            });
+            */
+
+            console.log(requestData);
+
+            // Remove this after adding your AJAX report URL.
+            hideReportLoading();
+        }
+
+        function showReportLoading() {
+            printFrame.addClass("d-none");
+            reportLoading.removeClass("d-none");
+
+            btnPreview
+                .prop("disabled", true)
+                .html(
+                    '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+                );
+        }
+
+        function hideReportLoading() {
+            reportLoading.addClass("d-none");
+            printFrame.removeClass("d-none");
+
+            btnPreview
+                .prop("disabled", false)
+                .html(
+                    '<i class="fas fa-eye mr-1"></i> Preview'
+                );
+        }
+
+        $(window).on("beforeunload", function () {
+            if (currentPdfUrl) {
+                URL.revokeObjectURL(currentPdfUrl);
+            }
+        });
+    </script>
+}

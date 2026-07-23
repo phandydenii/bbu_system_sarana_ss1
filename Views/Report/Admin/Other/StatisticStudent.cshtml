@@ -1,0 +1,567 @@
+@{
+    ViewData["Title"] = "Student Accept Certificate";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AdminReport";
+    ViewData["Action"] = "OtherReport";
+
+    ViewContext.RouteData.Values["action"] =
+        "Student Accept Certificate";
+}
+
+<style>
+    .certificate-page .card-body {
+        padding: 10px;
+    }
+
+    .certificate-page .report-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .certificate-page .filter-panel {
+        height: 100%;
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+    }
+
+    .certificate-page .filter-section {
+        margin-bottom: 12px;
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        background: #fff;
+    }
+
+    .certificate-page .filter-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .certificate-page .filter-title {
+        margin-bottom: 10px;
+        padding-bottom: 7px;
+        border-bottom: 1px solid #dee2e6;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .certificate-page .form-group {
+        margin-bottom: 10px;
+    }
+
+    .certificate-page label {
+        margin-bottom: 3px;
+        color: #343a40;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .certificate-page .form-control {
+        height: 34px;
+        font-size: 13px;
+    }
+
+    .certificate-page .report-panel {
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .certificate-page .report-header {
+        padding: 8px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .certificate-page .report-frame {
+        display: block;
+        width: 100%;
+        height: 700px;
+        border: 0;
+        background: #fff;
+    }
+
+    .certificate-page .report-loading {
+        height: 700px;
+        padding-top: 100px;
+        text-align: center;
+    }
+
+    @@media (max-width: 991.98px) {
+        .certificate-page .filter-panel {
+            margin-bottom: 10px;
+        }
+
+        .certificate-page .report-frame,
+        .certificate-page .report-loading {
+            height: 550px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .certificate-page .report-navigation .btn {
+            width: 100%;
+        }
+
+        .certificate-page .report-frame,
+        .certificate-page .report-loading {
+            height: 450px;
+        }
+    }
+</style>
+
+<div class="card certificate-page">
+    <div class="card-header">
+        <div class="report-navigation">
+            <a asp-controller="Report"
+               asp-action="Other"
+               class="btn btn-outline-primary btn-sm">
+                Graduate Student
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentStatistic"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                Student Statistic
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentLetterList"
+               class="btn btn-outline-primary btn-sm">
+                Student Letter List
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentAcceptCertificate"
+               class="btn btn-outline-primary btn-sm">
+                Accept Certificate
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentFeeCollection"
+               class="btn btn-outline-primary btn-sm">
+                Student Fee Collection
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+
+            <!-- Filters -->
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="filter-panel">
+
+                    <!-- Certificate list -->
+                    <div class="filter-section">
+                        <div class="filter-title">
+                            <i class="fas fa-certificate mr-1"></i>
+                            Certificate List
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="PromotionNo"
+                                           class="required">
+                                        Promotion
+                                    </label>
+
+                                    <input type="number"
+                                           id="PromotionNo"
+                                           class="form-control"
+                                           min="1"
+                                           value="1" />
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="TermNo"
+                                           class="required">
+                                        Term
+                                    </label>
+
+                                    <input type="number"
+                                           id="TermNo"
+                                           class="form-control"
+                                           min="1"
+                                           value="1" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button"
+                                id="btnPreviewCertificate"
+                                class="btn btn-primary btn-block btn-sm">
+                            <i class="fas fa-eye mr-1"></i>
+                            Preview
+                        </button>
+                    </div>
+
+                    <!-- Not yet certificate -->
+                    <div class="filter-section">
+                        <div class="filter-title">
+                            <i class="fas fa-clock mr-1"></i>
+                            Not Yet Certificate
+                        </div>
+
+                        <div class="form-group">
+                            <label for="NotYetPromotionNo"
+                                   class="required">
+                                Promotion
+                            </label>
+
+                            <input type="number"
+                                   id="NotYetPromotionNo"
+                                   class="form-control"
+                                   min="1"
+                                   value="1" />
+                        </div>
+
+                        <button type="button"
+                                id="btnNotYetCertificate"
+                                class="btn btn-warning btn-block btn-sm">
+                            <i class="fas fa-clock mr-1"></i>
+                            Not Yet Certificate
+                        </button>
+                    </div>
+
+                    <!-- Already certificate -->
+                    <div class="filter-section">
+                        <div class="filter-title">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            Already Certificate
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="FromDate">
+                                        From Date
+                                    </label>
+
+                                    <input type="date"
+                                           id="FromDate"
+                                           class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="ToDate">
+                                        To Date
+                                    </label>
+
+                                    <input type="date"
+                                           id="ToDate"
+                                           class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button"
+                                id="btnAlreadyCertificate"
+                                class="btn btn-success btn-block btn-sm">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            Already Certificate
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Report preview -->
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="report-panel">
+                    <div class="report-header">
+                        <i class="fas fa-file-pdf mr-1"></i>
+                        Student Certificate Report
+                    </div>
+
+                    <div id="reportLoading"
+                         class="report-loading d-none">
+                        <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+
+                        <div class="mt-2">
+                            Loading report...
+                        </div>
+                    </div>
+
+                    <iframe id="printFrame"
+                            title="Student Certificate Report"
+                            src="about:blank"
+                            class="report-frame">
+                    </iframe>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        const promotionNo = $("#PromotionNo");
+        const termNo = $("#TermNo");
+
+        const notYetPromotionNo = $("#NotYetPromotionNo");
+
+        const fromDate = $("#FromDate");
+        const toDate = $("#ToDate");
+
+        const btnPreviewCertificate =
+            $("#btnPreviewCertificate");
+
+        const btnNotYetCertificate =
+            $("#btnNotYetCertificate");
+
+        const btnAlreadyCertificate =
+            $("#btnAlreadyCertificate");
+
+        const reportLoading = $("#reportLoading");
+        const printFrame = $("#printFrame");
+
+        let currentPdfUrl = null;
+
+        $(document).ready(function () {
+            btnPreviewCertificate.on("click", function () {
+                previewCertificateList();
+            });
+
+            btnNotYetCertificate.on("click", function () {
+                previewNotYetCertificate();
+            });
+
+            btnAlreadyCertificate.on("click", function () {
+                previewAlreadyCertificate();
+            });
+        });
+
+        function previewCertificateList() {
+            if (
+                !promotionNo.val()
+                || Number(promotionNo.val()) < 1
+            ) {
+                ShowToastInfo(
+                    "Please enter a valid promotion."
+                );
+
+                promotionNo.focus();
+                return;
+            }
+
+            if (
+                !termNo.val()
+                || Number(termNo.val()) < 1
+            ) {
+                ShowToastInfo(
+                    "Please enter a valid term."
+                );
+
+                termNo.focus();
+                return;
+            }
+
+            const requestData = {
+                PromotionNo: promotionNo.val(),
+                TermNo: termNo.val()
+            };
+
+            loadCertificateReport(
+                "YOUR_CERTIFICATE_LIST_REPORT_URL",
+                requestData,
+                btnPreviewCertificate,
+                "Unable to generate certificate report."
+            );
+        }
+
+        function previewNotYetCertificate() {
+            if (
+                !notYetPromotionNo.val()
+                || Number(notYetPromotionNo.val()) < 1
+            ) {
+                ShowToastInfo(
+                    "Please enter a valid promotion."
+                );
+
+                notYetPromotionNo.focus();
+                return;
+            }
+
+            const requestData = {
+                PromotionNo: notYetPromotionNo.val()
+            };
+
+            loadCertificateReport(
+                "YOUR_NOT_YET_CERTIFICATE_REPORT_URL",
+                requestData,
+                btnNotYetCertificate,
+                "Unable to generate not yet certificate report."
+            );
+        }
+
+        function previewAlreadyCertificate() {
+            if (
+                fromDate.val()
+                && toDate.val()
+                && new Date(toDate.val()) < new Date(fromDate.val())
+            ) {
+                ShowToastInfo(
+                    "To Date must be later than From Date."
+                );
+
+                return;
+            }
+
+            const requestData = {
+                FromDate: fromDate.val() || "",
+                ToDate: toDate.val() || ""
+            };
+
+            loadCertificateReport(
+                "YOUR_ALREADY_CERTIFICATE_REPORT_URL",
+                requestData,
+                btnAlreadyCertificate,
+                "Unable to generate already certificate report."
+            );
+        }
+
+        function loadCertificateReport(
+            reportUrl,
+            requestData,
+            activeButton,
+            errorMessage
+        ) {
+            showReportLoading(activeButton);
+
+            $.ajax({
+                url: reportUrl,
+                type: "GET",
+                data: requestData,
+
+                xhrFields: {
+                    responseType: "blob"
+                },
+
+                success: function (
+                    response,
+                    textStatus,
+                    xhr
+                ) {
+                    const contentType =
+                        xhr.getResponseHeader("Content-Type")
+                        || "application/pdf";
+
+                    if (currentPdfUrl) {
+                        URL.revokeObjectURL(currentPdfUrl);
+                    }
+
+                    const pdfBlob = new Blob(
+                        [response],
+                        {
+                            type: contentType
+                        }
+                    );
+
+                    currentPdfUrl =
+                        URL.createObjectURL(pdfBlob);
+
+                    printFrame
+                        .off("load.certificateReport")
+                        .one(
+                            "load.certificateReport",
+                            function () {
+                                hideReportLoading(activeButton);
+                            }
+                        )
+                        .attr("src", currentPdfUrl);
+                },
+
+                error: function (xhr) {
+                    hideReportLoading(activeButton);
+
+                    const response = xhr.response;
+
+                    if (response instanceof Blob) {
+                        response
+                            .text()
+                            .then(function (message) {
+                                ShowToastError(
+                                    message || errorMessage
+                                );
+                            });
+
+                        return;
+                    }
+
+                    ShowToastError(
+                        xhr.responseText || errorMessage
+                    );
+                }
+            });
+        }
+
+        function showReportLoading(activeButton) {
+            printFrame.addClass("d-none");
+            reportLoading.removeClass("d-none");
+
+            disableReportButtons();
+
+            activeButton.html(
+                '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+            );
+        }
+
+        function hideReportLoading(activeButton) {
+            reportLoading.addClass("d-none");
+            printFrame.removeClass("d-none");
+
+            enableReportButtons();
+
+            activeButton.find(".fa-spinner").remove();
+            resetButtonContent();
+        }
+
+        function disableReportButtons() {
+            btnPreviewCertificate.prop("disabled", true);
+            btnNotYetCertificate.prop("disabled", true);
+            btnAlreadyCertificate.prop("disabled", true);
+        }
+
+        function enableReportButtons() {
+            btnPreviewCertificate.prop("disabled", false);
+            btnNotYetCertificate.prop("disabled", false);
+            btnAlreadyCertificate.prop("disabled", false);
+        }
+
+        function resetButtonContent() {
+            btnPreviewCertificate.html(
+                '<i class="fas fa-eye mr-1"></i> Preview'
+            );
+
+            btnNotYetCertificate.html(
+                '<i class="fas fa-clock mr-1"></i> Not Yet Certificate'
+            );
+
+            btnAlreadyCertificate.html(
+                '<i class="fas fa-check-circle mr-1"></i> Already Certificate'
+            );
+        }
+
+        $(window).on("beforeunload", function () {
+            if (currentPdfUrl) {
+                URL.revokeObjectURL(currentPdfUrl);
+            }
+        });
+    </script>
+}

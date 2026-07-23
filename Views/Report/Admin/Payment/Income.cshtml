@@ -1,0 +1,436 @@
+@{
+    ViewData["Title"] = "Student Payment Summary";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AdminReport";
+    ViewData["Action"] = "PaymentReport";
+    ViewContext.RouteData.Values["action"] = "Income Report";
+}
+
+<style>
+    .payment-page .card-body {
+        padding: 10px;
+    }
+
+    .payment-page .payment-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .payment-page .filter-panel {
+        height: 100%;
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+    }
+
+    .payment-page .filter-title {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .payment-page .form-group {
+        margin-bottom: 10px;
+    }
+
+    .payment-page label {
+        margin-bottom: 3px;
+        color: #343a40;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .payment-page .form-control {
+        height: 34px;
+        font-size: 13px;
+    }
+
+    .payment-page .report-panel {
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .payment-page .report-header {
+        padding: 8px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .payment-page .report-frame {
+        display: block;
+        width: 100%;
+        height: 700px;
+        border: 0;
+        background: #fff;
+    }
+
+    .payment-page .report-loading {
+        height: 700px;
+        padding-top: 100px;
+        text-align: center;
+    }
+
+    @@media (max-width: 991.98px) {
+        .payment-page .filter-panel {
+            margin-bottom: 10px;
+        }
+
+        .payment-page .report-frame,
+        .payment-page .report-loading {
+            height: 550px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .payment-page .payment-navigation .btn {
+            width: 100%;
+        }
+
+        .payment-page .report-frame,
+        .payment-page .report-loading {
+            height: 450px;
+        }
+    }
+</style>
+
+<div class="card payment-page">
+    <div class="card-header">
+        <div class="payment-navigation">
+            <a asp-controller="Report"
+               asp-action="Payment"
+               class="btn btn-outline-primary btn-sm">
+                Payment Summary
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="Income"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                Income
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="PaymentByDate"
+               class="btn btn-outline-primary btn-sm">
+                Payment By Date
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="PaymentByGroup"
+               class="btn btn-outline-primary btn-sm">
+                Payment By Group
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="NotPayment"
+               class="btn btn-outline-primary btn-sm">
+                Not Payment
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="ReExamPayment"
+               class="btn btn-outline-primary btn-sm">
+                Re-Exam Payment
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="Owe"
+               class="btn btn-outline-primary btn-sm">
+                Student Owe
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="Insurance"
+               class="btn btn-outline-primary btn-sm">
+                Insurance
+            </a>
+
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+
+            <!-- Filters -->
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="filter-panel">
+
+                    <div class="filter-title">
+                        <i class="fas fa-filter mr-1"></i>
+                        Report Filters
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="PromotionNo">
+                                    Promotion
+                                </label>
+
+                                <input type="number"
+                                       id="PromotionNo"
+                                       class="form-control"
+                                       min="1"
+                                       value="1" />
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="StageNo">
+                                    Stage
+                                </label>
+
+                                <input type="number"
+                                       id="StageNo"
+                                       class="form-control"
+                                       min="1"
+                                       value="1" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="FromDate">
+                                    From Date
+                                </label>
+
+                                <input type="date"
+                                       id="FromDate"
+                                       class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="ToDate">
+                                    To Date
+                                </label>
+
+                                <input type="date"
+                                       id="ToDate"
+                                       class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="Reporter">
+                                    Reporter
+                                </label>
+
+                                <input type="text"
+                                       id="Reporter"
+                                       class="form-control"
+                                       autocomplete="off"
+                                       placeholder="Reporter name" />
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="Receiver">
+                                    Receiver
+                                </label>
+
+                                <input type="text"
+                                       id="Receiver"
+                                       class="form-control"
+                                       autocomplete="off"
+                                       placeholder="Receiver name" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button"
+                            id="btnPreview"
+                            class="btn btn-primary btn-block mt-2">
+                        <i class="fas fa-eye mr-1"></i>
+                        Preview
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- PDF preview -->
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="report-panel">
+
+                    <div class="report-header">
+                        <i class="fas fa-file-pdf mr-1"></i>
+                        Student Payment Summary Report
+                    </div>
+
+                    <div id="reportLoading"
+                         class="report-loading d-none">
+                        <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+
+                        <div class="mt-2">
+                            Loading report...
+                        </div>
+                    </div>
+
+                    <iframe id="reportContainer"
+                            title="Student Payment Summary Report"
+                            src="about:blank"
+                            class="report-frame">
+                    </iframe>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        const promotionNo = $("#PromotionNo");
+        const stageNo = $("#StageNo");
+        const fromDate = $("#FromDate");
+        const toDate = $("#ToDate");
+        const reporter = $("#Reporter");
+        const receiver = $("#Receiver");
+
+        const btnPreview = $("#btnPreview");
+        const reportLoading = $("#reportLoading");
+        const reportContainer = $("#reportContainer");
+
+        let currentPdfUrl = null;
+
+        $(document).ready(function () {
+            btnPreview.on("click", function () {
+                previewPaymentSummary();
+            });
+        });
+
+        function previewPaymentSummary() {
+            if (
+                fromDate.val() &&
+                toDate.val() &&
+                new Date(toDate.val()) < new Date(fromDate.val())
+            ) {
+                ShowToastInfo(
+                    "To Date must be later than From Date."
+                );
+
+                return;
+            }
+
+            showReportLoading();
+
+            $.ajax({
+                url: '@Url.Action("PaymentSummaryPreview", "Report")',
+                type: "GET",
+
+                data: {
+                    PromotionNo: promotionNo.val() || 1,
+                    StageNo: stageNo.val() || 1,
+                    FromDate: fromDate.val() || "",
+                    ToDate: toDate.val() || "",
+                    Reporter: reporter.val() || "",
+                    Receiver: receiver.val() || ""
+                },
+
+                xhrFields: {
+                    responseType: "blob"
+                },
+
+                success: function (response, textStatus, xhr) {
+                    const contentType =
+                        xhr.getResponseHeader("Content-Type")
+                        || "application/pdf";
+
+                    if (currentPdfUrl) {
+                        URL.revokeObjectURL(currentPdfUrl);
+                    }
+
+                    const pdfBlob = new Blob(
+                        [response],
+                        {
+                            type: contentType
+                        }
+                    );
+
+                    currentPdfUrl =
+                        URL.createObjectURL(pdfBlob);
+
+                    reportContainer
+                        .off("load.paymentSummary")
+                        .one(
+                            "load.paymentSummary",
+                            function () {
+                                hideReportLoading();
+                            }
+                        )
+                        .attr("src", currentPdfUrl);
+                },
+
+                error: function (xhr) {
+                    hideReportLoading();
+
+                    const response = xhr.response;
+
+                    if (response instanceof Blob) {
+                        response.text().then(function (message) {
+                            ShowToastError(
+                                message ||
+                                "Unable to generate payment report."
+                            );
+                        });
+
+                        return;
+                    }
+
+                    ShowToastError(
+                        xhr.responseText ||
+                        "Unable to generate payment report."
+                    );
+                }
+            });
+        }
+
+        function showReportLoading() {
+            reportContainer.addClass("d-none");
+            reportLoading.removeClass("d-none");
+
+            btnPreview
+                .prop("disabled", true)
+                .html(
+                    '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+                );
+        }
+
+        function hideReportLoading() {
+            reportLoading.addClass("d-none");
+            reportContainer.removeClass("d-none");
+
+            btnPreview
+                .prop("disabled", false)
+                .html(
+                    '<i class="fas fa-eye mr-1"></i> Preview'
+                );
+        }
+
+        $(window).on("beforeunload", function () {
+            if (currentPdfUrl) {
+                URL.revokeObjectURL(currentPdfUrl);
+            }
+        });
+    </script>
+}

@@ -56,11 +56,6 @@
     </ItemGroup>
     <ItemGroup>
         <Folder Include="Views\Account\" />
-        <Folder Include="Views\ReportPartial\Admin\" />
-        <Folder Include="Views\ReportPartial\ContinueEducation\" />
-        <Folder Include="Views\ReportPartial\Dean\" />
-        <Folder Include="Views\ReportPartial\FoundationYear\" />
-        <Folder Include="Views\ReportPartial\SPO\" />
     </ItemGroup>
     <ItemGroup>
         <Content Remove="Views\Payment\Index1.cshtml" />
@@ -195,13 +190,6 @@
       <AdditionalFiles Include="Views\Academic\TabAssignGroup\_OtherGroupForm.cshtml" />
       <AdditionalFiles Include="Views\Academic\TabAssignGroup\_SpecializeGroupForm.cshtml" />
       <AdditionalFiles Include="Views\Academic\TabAssignGroup\_UnPromoteGroupForm.cshtml" />
-      <AdditionalFiles Include="Views\ReportPartial\Admin\TabBooking\_BookingClothes.cshtml" />
-      <AdditionalFiles Include="Views\ReportPartial\Admin\TabBooking\_ReturnClothes.cshtml" />
-      <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_GraduateStudent.cshtml" />
-      <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StatisticStudent.cshtml" />
-      <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentAcceptCertificate.cshtml" />
-      <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentFeeCollection.cshtml" />
-      <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentLetterList.cshtml" />
       <AdditionalFiles Include="Views\Report\Academic\Student\StudentScoreList.cshtml" />
       <AdditionalFiles Include="Views\Report\Academic\Student\StudentSkillList.cshtml" />
     </ItemGroup>
