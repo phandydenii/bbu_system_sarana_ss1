@@ -65,17 +65,44 @@ public class   ReportController(
     {
         return View("Admin/Payment/StudentPaymentByDate");
     }
-    [Route("administration/payment_by_group")]
+    [Route("administration/payment-by-group")]
     public IActionResult PaymentByGroup()
     {
         return View("Admin/Payment/StudentPaymentByGroup");
     }
-    [Route("administration/not_payment")]
+    [Route("administration/not-payment")]
     public IActionResult NotPayment()
     {
         return View("Admin/Payment/StudentNotPaymentNew");
     }
-    [Route("administration/re_exam_payment")]
+    [HttpPost("administration/generate/not-payment")]
+    public async Task<IActionResult> NotPayments(AdministrationNotPaymentReq req)
+    {
+        var connectionString = configuration.GetConnectionString($"{_campus}_campus");
+        var parms = new[]
+        {
+            new SqlParameter("@DegreeId", req.DegreeId),
+            new SqlParameter("@SchoolId", req.SchoolId),
+            new SqlParameter("@FieldId", req.FieldId),
+            new SqlParameter("@PromotionId", req.PromotionId)
+        };
+        var dt = await DataManager.DataTableRawSqlAsync(
+            connectionString!,
+            $"SELECT * FROM V_ADMIN_REPORT_LIST_OF_STUDENT_NOT_PAYMENT_NEW " +
+            $"WHERE DEGREE_ID = @DegreeId " +
+            $"AND SCHOOL_ID = @SchoolId " +
+            $"AND FIELD_ID = @FieldId " +
+            $"AND PROMOTION_NO = @PromotionId " +
+            $"ORDER BY STUDENT_NAME",
+            parms
+        );
+        var localReport = new LocalReport();
+        localReport.ReportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports","STUDENT_NOT_PAYMENT_RPT.rdlc");
+        localReport.DataSources.Add(new ReportDataSource("DataSet1", dt));
+        var pdf = localReport.Render("PDF");
+        return File(pdf, "application/pdf", "not_payment.pdf");
+    }
+    [Route("administration/re-exam-payment")]
     public IActionResult ReExamPayment()
     {
         return View("Admin/Payment/ReExaminationPayment");

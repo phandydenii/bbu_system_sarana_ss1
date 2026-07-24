@@ -1,11 +1,9 @@
 ﻿@using BBU_SYSTEM.ViewModel
 @{ 
+    ViewData["Title"] = "Student List"; 
+    ViewData["Action"] = "StudentReport";
     ViewData["OpenMenu"] = "Report";
-    ViewData["OpenSubMenu"] = "AcademicReport"; 
-    // Override the breadcrumb text used by the layout.
-    ViewContext.RouteData.Values["controller"] = "Student List";
-    ViewContext.RouteData.Values["action"] = "Student List";
-    
+    ViewData["OpenSubMenu"] = "AcademicReport";  
     var req = new QueryReportViewModel();
 }
 
@@ -13,49 +11,41 @@
     .student-list-page .card-body {
         padding: 10px;
     }
-
     .student-list-page .filter-panel {
         padding: 10px;
         border: 1px solid #dee2e6;
         border-radius: 6px;
         background: #fff;
     }
-
     .student-list-page .form-group {
         margin-bottom: 8px;
     }
-
     .student-list-page label {
         margin-bottom: 3px;
         font-size: 13px;
         font-weight: 600;
         color: #343a40;
     }
-
     .student-list-page .form-control {
         min-height: 36px;
         font-size: 13px;
     }
-
     .student-list-page .group-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 3px;
     }
-
     .student-list-page .group-actions {
         display: flex;
         gap: 8px;
     }
-
     .student-list-page .group-actions button {
         padding: 0;
         border: 0;
         background: transparent;
         font-size: 12px;
     }
-
     .student-list-page .group-list {
         min-height: 170px;
         max-height: 230px;
@@ -65,7 +55,6 @@
         border-radius: 4px;
         background: #fff;
     }
-
     .student-list-page .group-item {
         display: flex;
         align-items: center;
@@ -77,15 +66,12 @@
         font-size: 13px;
         font-weight: 400;
     }
-
     .student-list-page .group-item:hover {
         background: #f4f6f9;
     }
-
     .student-list-page .group-item input {
         margin: 0;
     }
-
     .student-list-page .option-panel {
         padding: 8px;
         margin-top: 8px;
@@ -93,7 +79,6 @@
         border-radius: 5px;
         background: #f8f9fa;
     }
-
     .student-list-page .option-item {
         display: flex;
         align-items: center;
@@ -106,21 +91,17 @@
         font-size: 13px;
         font-weight: 500;
     }
-
     .student-list-page .option-item:hover {
         background: #fff;
     }
-
     .student-list-page .option-item input {
         margin: 0;
     }
-
     .student-list-page .filter-actions {
         display: flex;
         gap: 6px;
         margin-top: 8px;
     }
-
     .student-list-page .preview-panel {
         min-height: 720px;
         overflow: hidden;
@@ -128,7 +109,6 @@
         border-radius: 6px;
         background: #f8f9fa;
     }
-
     .student-list-page .preview-header {
         display: flex;
         align-items: center;
@@ -139,7 +119,6 @@
         font-size: 13px;
         font-weight: 600;
     }
-
     .student-list-page .preview-empty {
         min-height: 665px;
         display: flex;
@@ -150,13 +129,11 @@
         color: #6c757d;
         text-align: center;
     }
-
     .student-list-page .preview-empty i {
         margin-bottom: 10px;
         font-size: 42px;
         opacity: .45;
     }
-
     .student-list-page #reportContainer {
         display: none;
         width: 100%;
@@ -164,7 +141,6 @@
         border: 0;
         background: #fff;
     }
-
     @@media (max-width: 991.98px) {
         .student-list-page .preview-panel {
             min-height: 550px;
@@ -178,7 +154,6 @@
             height: 650px;
         }
     }
-
     @@media (max-width: 767.98px) {
         .student-list-page .preview-panel {
             margin-top: 10px;
@@ -470,12 +445,9 @@
                 placeholder: "Select an option",
                 allowClear: true
             });
-
             bindEvents();
-
             await getDegree();
             await getSchool();
-
             clearSelect(cboField, "Select Field");
             clearSelect(cboPromotion, "Select Promotion");
             clearSelect(cboStage, "Select Stage");
@@ -485,7 +457,6 @@
             cboDegree.on("change", async function () {
                 await getField();
                 await getPromotion();
-
                 clearSelect(cboStage, "Select Stage");
                 clearStageInformation();
                 clearGroups();
@@ -494,7 +465,6 @@
             cboSchool.on("change", async function () {
                 await getField();
                 await getPromotion();
-
                 clearSelect(cboStage, "Select Stage");
                 clearStageInformation();
                 clearGroups();
@@ -506,7 +476,6 @@
 
             cboPromotion.on("change", async function () {
                 await getStage();
-
                 clearStageInformation();
                 clearGroups();
             });
@@ -535,16 +504,13 @@
 
         async function getDegree() {
             clearSelect(cboDegree, "Select Degree");
-
             try {
                 const degrees = await Degree.GetAllDegree();
-
                 degrees.forEach(function (item) {
                     cboDegree.append(
                         `<option value="${item.degreeId}">${item.degreeName}</option>`
                     );
                 });
-
                 cboDegree.val("").trigger("change.select2");
             } catch (error) {
                 console.error("Degree API error:", error);
@@ -553,16 +519,13 @@
 
         async function getSchool() {
             clearSelect(cboSchool, "Select School");
-
             try {
                 const schools = await School.GetSchool();
-
                 schools.forEach(function (item) {
                     cboSchool.append(
                         `<option value="${item.schoolId}">${item.schoolName}</option>`
                     );
                 });
-
                 cboSchool.val("").trigger("change.select2");
             } catch (error) {
                 console.error("School API error:", error);
@@ -572,24 +535,19 @@
         async function getField() {
             const degreeId = parseInt(cboDegree.val());
             const schoolId = parseInt(cboSchool.val());
-
             clearSelect(cboField, "Select Field");
-
             if (!degreeId || !schoolId) return;
-
             try {
                 const fields = await Field.GetFields({
                     isAll: true,
                     degreeId: degreeId,
                     schoolId: schoolId
                 });
-
                 fields.forEach(function (item) {
                     cboField.append(
                         `<option value="${item.fieldId}">${item.fieldName}</option>`
                     );
                 });
-
                 cboField.val("").trigger("change.select2");
             } catch (error) {
                 console.error("Field API error:", error);
@@ -599,23 +557,18 @@
         async function getPromotion() {
             const degreeId = parseInt(cboDegree.val());
             const schoolId = parseInt(cboSchool.val());
-
             clearSelect(cboPromotion, "Select Promotion");
-
             if (!degreeId || !schoolId) return;
-
             try {
                 const promotions = await Promotion.GetPromotions({
                     degreeId: degreeId,
                     schoolId: schoolId
                 });
-
                 promotions.forEach(function (item) {
                     cboPromotion.append(
                         `<option value="${item.promotionId}">${item.promotionNo}</option>`
                     );
                 });
-
                 cboPromotion.val("").trigger("change.select2");
             } catch (error) {
                 console.error("Promotion API error:", error);
@@ -624,16 +577,12 @@
 
         async function getStage() {
             const promotionId = parseInt(cboPromotion.val());
-
             clearSelect(cboStage, "Select Stage");
-
             if (!promotionId) return;
-
             try {
                 const stages = await Stage.GetStages({
                     promotionId: promotionId
                 });
-
                 stages.forEach(function (item) {
                     cboStage.append(`
                         <option value="${item.stageId}"
@@ -643,7 +592,6 @@
                         </option>
                     `);
                 });
-
                 cboStage.val("").trigger("change.select2");
             } catch (error) {
                 console.error("Stage API error:", error);
@@ -653,26 +601,20 @@
         async function getGroups() {
             const stageId = parseInt(cboStage.val());
             const fieldId = parseInt(cboField.val());
-
             clearGroups();
-
             if (!stageId || !fieldId) return;
-
             try {
                 const groups = await Group.GetGroups({
                     stageId: stageId,
                     fieldId: fieldId
                 });
-
                 groupList.empty();
-
                 if (!groups || groups.length === 0) {
                     groupList.html(
                         '<div class="text-muted text-center py-4">No groups available.</div>'
                     );
                     return;
                 }
-
                 groups.forEach(function (item) {
                     groupList.append(`
                         <label class="group-item">

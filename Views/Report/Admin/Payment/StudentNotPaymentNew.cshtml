@@ -3,10 +3,8 @@
     ViewData["OpenMenu"] = "Report";
     ViewData["OpenSubMenu"] = "AdminReport";
     ViewData["Action"] = "PaymentReport";
-
     ViewContext.RouteData.Values["action"] = "Student Owe";
 }
-
 <style>
     .owe-page .card-body {
         padding: 10px;
@@ -112,44 +110,37 @@
                class="btn btn-outline-primary btn-sm">
                 Payment Summary
             </a>
-
             <a asp-controller="Report"
                asp-action="Income"
                class="btn btn-outline-primary btn-sm">
                 Income
             </a>
-
             <a asp-controller="Report"
                asp-action="PaymentByDate"
                class="btn btn-outline-primary btn-sm">
                 Payment By Date
             </a>
-
             <a asp-controller="Report"
                asp-action="PaymentByGroup"
                class="btn btn-outline-primary btn-sm">
                 Payment By Group
             </a>
-
             <a asp-controller="Report"
                asp-action="NotPayment"
-               class="btn btn-outline-primary btn-sm">
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
                 Not Payment
             </a>
-
             <a asp-controller="Report"
                asp-action="ReExamPayment"
                class="btn btn-outline-primary btn-sm">
                 Re-Exam Payment
             </a>
-
             <a asp-controller="Report"
                asp-action="Owe"
-               class="btn btn-primary btn-sm">
-                <i class="fas fa-check mr-1"></i>
+               class="btn btn-outline-primary btn-sm">
                 Student Owe
             </a>
-
             <a asp-controller="Report"
                asp-action="Insurance"
                class="btn btn-outline-primary btn-sm">
@@ -166,112 +157,77 @@
                         <i class="fas fa-filter mr-1"></i>
                         Report Filters
                     </div>
-
                     <div class="form-group">
-                        <label for="cboDegree" class="required">
+                        <label for="cboDegreeId" class="required">
                             Degree
                         </label>
-
-                        <select id="cboDegree"
+                        <select id="cboDegreeId"
                                 class="form-control select2">
                             <option value="">Select degree</option>
                         </select>
                     </div>
-
                     <div class="form-group">
-                        <label for="cboSchool" class="required">
-                            School
-                        </label>
-
-                        <select id="cboSchool"
-                                class="form-control select2">
+                        <label for="cboSchoolId" class="required">School</label>
+                        <select id="cboSchoolId" class="form-control select2">
                             <option value="">Select school</option>
                         </select>
                     </div>
-
+                    <div class="form-group">
+                        <label for="cboFieldId" class="required">Field</label>
+                        <select id="cboFieldId" class="form-control select2">
+                            <option value="">Select</option>
+                        </select>
+                    </div>
                     <div class="row">
                         <div class="col-4">
                             <div class="form-group">
-                                <label for="cboPromotion"
-                                       class="required">
-                                    Promotion
-                                </label>
-
-                                <select id="cboPromotion"
-                                        class="form-control select2">
+                                <label for="cboPromotionId" class="required">Promotion</label>
+                                <select id="cboPromotionId" class="form-control select2">
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
+                        </div> 
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="cboStageId" class="required">Stage</label>
+                                <select id="cboStageId" class="form-control select2">
                                     <option value="">Select</option>
                                 </select>
                             </div>
                         </div>
-
                         <div class="col-4">
                             <div class="form-group">
-                                <label for="cboStage"
-                                       class="required">
-                                    Stage
-                                </label>
-
-                                <select id="cboStage"
-                                        class="form-control select2">
-                                    <option value="">Select</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <div class="form-group">
-                                <label for="TermNo">
-                                    Term
-                                </label>
-
+                                <label for="txtTermNo">Term</label>
                                 <input type="number"
-                                       id="TermNo"
+                                       id="txtTermNo"
                                        class="form-control"
                                        min="1"
                                        value="1" />
                             </div>
                         </div>
-                    </div>
-
+                    </div> 
                     <div class="form-group">
-                        <label for="cboCategory">
-                            Category
-                        </label>
-
-                        <select id="cboCategory"
-                                class="form-control select2">
+                        <label for="cboCategoryId"> Category </label>
+                        <select id="cboCategoryId" class="form-control select2">
                             <option value="">All categories</option>
                         </select>
                     </div>
-
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
-                                <label for="FromDate">
-                                    From Date
-                                </label>
-
-                                <input type="date"
-                                       id="FromDate"
-                                       class="form-control" />
+                                <label for="dtpFromDate">From Date</label>
+                                <input type="date" id="dtpFromDate" class="form-control" />
                             </div>
                         </div>
-
                         <div class="col-6">
                             <div class="form-group">
-                                <label for="ToDate">
-                                    To Date
-                                </label>
-
-                                <input type="date"
-                                       id="ToDate"
-                                       class="form-control" />
+                                <label for="dtpToDate">To Date</label>
+                                <input type="date" id="dtpToDate" class="form-control" />
                             </div>
                         </div>
                     </div>
-
-                    <button type="button"
-                            id="btnPreview"
+                    <button type="button" id="btnPreview"
+                            onclick="previewOweReport()"
                             class="btn btn-primary btn-block">
                         <i class="fas fa-eye mr-1"></i>
                         Preview
@@ -308,168 +264,245 @@
 
 @section Scripts
 {
-    <script>
-        const degreeId = $("#cboDegree");
-        const schoolId = $("#cboSchool");
-        const promotionNo = $("#cboPromotion");
-        const stageNo = $("#cboStage");
-        const termNo = $("#TermNo");
-        const categoryId = $("#cboCategory");
-        const fromDate = $("#FromDate");
-        const toDate = $("#ToDate");
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Group.js"></script>
+<script>
+    const cboDegreeId = $("#cboDegreeId");
+    const cboSchoolId = $("#cboSchoolId");
+    const cboPromotionId = $("#cboPromotionId");
+    const cboStageId = $("#cboStageId");
+    const cboFieldId = $("#cboFieldId");
+    const txtTermNo = $("#txtTermNo");
+    const cboCategoryId = $("#cboCategoryId");
+    const dtpFromDate = $("#dtpFromDate");
+    const dtpToDate = $("#dtpToDate");
 
-        const btnPreview = $("#btnPreview");
-        const reportLoading = $("#reportLoading");
-        const reportContainer = $("#reportContainer");
+    const btnPreview = $("#btnPreview");
+    const reportLoading = $("#reportLoading");
+    const reportContainer = $("#reportContainer");
 
-        let currentPdfUrl = null;
+    let currentPdfUrl = null;
 
-        $(document).ready(function () {
-            $(".select2").select2({
-                width: "100%",
-                allowClear: true
-            });
+    $(document).ready(async function () {
+        $(".select2").select2({
+            width: "100%"
+        }); 
+        await getDegree();
+        await getSchool();
+    });
+    cboDegreeId.on("change", async function () {
+        await getField();
+        clearSelect(cboStageId, "Select Stage");
+        await getPromotion();
+    });
+    cboSchoolId.on("change", async function () {
+        await getField();
+        clearSelect(cboStageId, "Select Stage");
+        await getPromotion();
+    });
+    cboPromotionId.on("change", async function () {
+        await getStage();
+    }); 
 
-            btnPreview.on("click", function () {
-                previewOweReport();
-            });
-        });
+    function clearSelect(select, text) {
+        select.empty().append(`<option value="">${text}</option>`);
+        select.val("").trigger("change.select2");
+    }
 
-        function previewOweReport() {
-            if (!degreeId.val()) {
-                ShowToastInfo("Please select a degree.");
-                degreeId.select2("open");
-                return;
-            }
-
-            if (!schoolId.val()) {
-                ShowToastInfo("Please select a school.");
-                schoolId.select2("open");
-                return;
-            }
-
-            if (!promotionNo.val()) {
-                ShowToastInfo("Please select a promotion.");
-                promotionNo.select2("open");
-                return;
-            }
-
-            if (!stageNo.val()) {
-                ShowToastInfo("Please select a stage.");
-                stageNo.select2("open");
-                return;
-            }
-
-            if (
-                fromDate.val() &&
-                toDate.val() &&
-                new Date(toDate.val()) < new Date(fromDate.val())
-            ) {
-                ShowToastInfo(
-                    "To Date must be later than From Date."
+    async function getDegree() {
+        clearSelect(cboDegreeId, "Select Degree");
+        try {
+            const degrees = await Degree.GetAllDegree();
+            degrees.forEach(function (item) {
+                cboDegreeId.append(
+                    `<option value="${item.degreeId}">${item.degreeName}</option>`
                 );
+            });
+            cboDegreeId.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Degree API error:", error);
+        }
+    }
 
-                return;
-            }
+    async function getSchool() {
+        clearSelect(cboSchoolId, "Select School");
+        try {
+            const schools = await School.GetSchool();
+            schools.forEach(function (item) {
+                cboSchoolId.append(
+                    `<option value="${item.schoolId}">${item.schoolName}</option>`
+                );
+            });
+            cboSchoolId.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("School API error:", error);
+        }
+    }
 
-            showReportLoading();
+    async function getPromotion() {
+        const degreeId = parseInt(cboDegreeId.val());
+        const schoolId = parseInt(cboSchoolId.val());
+        clearSelect(cboPromotionId, "Select Promotion");
+        if (!degreeId || !schoolId) {
+            return;
+        }
+        try {
+            const promotions = await Promotion.GetPromotions({
+                degreeId: degreeId,
+                schoolId: schoolId
+            });
+            promotions.forEach(function (item) {
+                cboPromotionId.append(
+                    `<option value="${item.promotionId}">${item.promotionNo}</option>`
+                );
+            });
+            cboPromotionId.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Promotion API error:", error);
+        }
+    }
 
-            $.ajax({
-                url: '@Url.Action("OwePreview", "Report")',
-                type: "GET",
+    async function getStage() {
+        const promotionId = parseInt(cboPromotionId.val());
+        clearSelect(cboStageId, "Select Stage");
+        if (!promotionId) return;
+        try {
+            const stages = await Stage.GetStages({
+                promotionId: promotionId
+            });
+            stages.forEach(function (item) {
+                cboStageId.append(`
+                    <option value="${item.stageId}">${item.stageNo}</option>
+                `);
+            });
+            cboStageId.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Stage API error:", error);
+        }
+    }
 
-                data: {
-                    DegreeId: degreeId.val(),
-                    SchoolId: schoolId.val(),
-                    PromotionNo: promotionNo.val(),
-                    StageNo: stageNo.val(),
-                    TermNo: termNo.val() || 1,
-                    CategoryId: categoryId.val() || "",
-                    FromDate: fromDate.val() || "",
-                    ToDate: toDate.val() || ""
-                },
+    async function getField() {
+        const degreeId = parseInt(cboDegreeId.val());
+        const schoolId = parseInt(cboSchoolId.val());
+        clearSelect(cboFieldId, "Select Field");
+        if (!degreeId || !schoolId) return;
+        try {
+            const fields = await Field.GetFields({
+                isAll: true,
+                degreeId: degreeId,
+                schoolId: schoolId
+            });
+            fields.forEach(function (item) {
+                cboFieldId.append(
+                    `<option value="${item.fieldId}">${item.fieldName}</option>`
+                );
+            });
+            cboFieldId.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Field API error:", error);
+        }
+    }
 
-                xhrFields: {
-                    responseType: "blob"
-                },
-
-                success: function (response, textStatus, xhr) {
-                    const contentType =
-                        xhr.getResponseHeader("Content-Type")
-                        || "application/pdf";
-
-                    if (currentPdfUrl) {
-                        URL.revokeObjectURL(currentPdfUrl);
-                    }
-
-                    const pdfBlob = new Blob(
-                        [response],
-                        {
-                            type: contentType
-                        }
-                    );
-
-                    currentPdfUrl =
-                        URL.createObjectURL(pdfBlob);
-
-                    reportContainer
-                        .off("load.oweReport")
-                        .one("load.oweReport", function () {
-                            hideReportLoading();
-                        })
-                        .attr("src", currentPdfUrl);
-                },
-
-                error: function (xhr) {
-                    hideReportLoading();
-
-                    const response = xhr.response;
-
-                    if (response instanceof Blob) {
-                        response.text().then(function (message) {
-                            ShowToastError(
-                                message ||
-                                "Unable to generate student owe report."
-                            );
-                        });
-
-                        return;
-                    }
-
-                    ShowToastError(
-                        xhr.responseText ||
-                        "Unable to generate student owe report."
-                    );
+    function previewOweReport() {
+        // if (!cboDegreeId.val()) {
+        //     ShowToastInfo("Please select a degree.");
+        //     cboDegreeId.select2("open");
+        //     return;
+        // }
+        // if (!cboSchoolId.val()) {
+        //     ShowToastInfo("Please select a school.");
+        //     cboSchoolId.select2("open");
+        //     return;
+        // }
+        // if (!cboPromotionId.val()) {
+        //     ShowToastInfo("Please select a promotion.");
+        //     cboPromotionId.select2("open");
+        //     return;
+        // }
+        // if (!cboStageId.val()) {
+        //     ShowToastInfo("Please select a stage.");
+        //     cboStageId.select2("open");
+        //     return;
+        // }
+        // if (dtpFromDate.val() && dtpToDate.val() && new Date(dtpToDate.val()) < new Date(dtpFromDate.val())) {
+        //     ShowToastInfo("To Date must be later than From Date.");
+        //     return;
+        // }
+        showReportLoading();
+        $.ajax({
+            url: '/report/administration/generate/not-payment',
+            type: "POST",
+            data: {
+                DegreeId: cboDegreeId.val(),
+                SchoolId: cboSchoolId.val(),
+                FieldId: cboFieldId.val(),
+                StageId: cboStageId.val(),
+                Term: txtTermNo.val(),
+                CategoryId: cboCategoryId.val() || "",
+                FromDate: dtpFromDate.val() || "",
+                ToDate: dtpToDate.val() || ""
+            },
+            xhrFields: {
+                responseType: "blob"
+            },
+            success: function (response, textStatus, xhr) {
+                const contentType = xhr.getResponseHeader("Content-Type") || "application/pdf";
+                if (currentPdfUrl) {
+                    URL.revokeObjectURL(currentPdfUrl);
                 }
-            });
-        }
-
-        function showReportLoading() {
-            reportContainer.addClass("d-none");
-            reportLoading.removeClass("d-none");
-
-            btnPreview
-                .prop("disabled", true)
-                .html(
-                    '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+                const pdfBlob = new Blob(
+                    [response],
+                    {
+                        type: contentType
+                    }
                 );
-        }
-
-        function hideReportLoading() {
-            reportLoading.addClass("d-none");
-            reportContainer.removeClass("d-none");
-
-            btnPreview
-                .prop("disabled", false)
-                .html(
-                    '<i class="fas fa-eye mr-1"></i> Preview'
-                );
-        }
-
-        $(window).on("beforeunload", function () {
-            if (currentPdfUrl) {
-                URL.revokeObjectURL(currentPdfUrl);
+                currentPdfUrl = URL.createObjectURL(pdfBlob);
+                reportContainer.off("load.oweReport")
+                    .one("load.oweReport", function () {
+                        hideReportLoading();
+                    })
+                    .attr("src", currentPdfUrl);
+            },
+            error: function (xhr) {
+                hideReportLoading();
+                const response = xhr.response;
+                if (response instanceof Blob) {
+                    response.text().then(function (message) {
+                        ShowToastError(message || "Unable to generate student owe report.");
+                    });
+                    return;
+                }
+                ShowToastError(xhr.responseText || "Unable to generate student owe report.");
             }
         });
-    </script>
+    }
+
+    function showReportLoading() {
+        reportContainer.addClass("d-none");
+        reportLoading.removeClass("d-none");
+        btnPreview.prop("disabled", true)
+            .html(
+                '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+            );
+    }
+
+    function hideReportLoading() {
+        reportLoading.addClass("d-none");
+        reportContainer.removeClass("d-none");
+        btnPreview.prop("disabled", false)
+            .html(
+                '<i class="fas fa-eye mr-1"></i> Preview'
+            );
+    }
+
+    $(window).on("beforeunload", function () {
+        if (currentPdfUrl) {
+            URL.revokeObjectURL(currentPdfUrl);
+        }
+    });
+</script>
 }
