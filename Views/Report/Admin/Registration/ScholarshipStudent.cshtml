@@ -126,25 +126,15 @@
                     <div class="filter-title">
                         <i class="fas fa-filter mr-1"></i>
                         Report Filters
-                    </div>
-
+                    </div> 
                     <div class="form-group">
-                        <label asp-for="DegreeId"
-                               class="required">
+                        <label for="cboDegree" class="required">
                             Degree
                         </label>
-
-                        <select asp-for="DegreeId"
-                                asp-items="ViewBag.DegreeList"
-                                class="form-control select2">
+                        <select id="cboDegree" class="form-control select2">
                             <option value="">Select degree</option>
                         </select>
-
-                        <span asp-validation-for="DegreeId"
-                              class="text-danger">
-                        </span>
                     </div>
-
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
@@ -303,8 +293,9 @@
 
 @section Scripts
 {
+    <script src="~/function/Degree.js"></script>
     <script>
-        const degreeId = $("#DegreeId");
+        const cboDegree = $("#cboDegree");
         const promotionNo = $("#PromotionNo");
         const stageNo = $("#StageNo");
         const fromDate = $("#FromDate");
@@ -319,28 +310,41 @@
 
         let currentPdfUrl = null;
 
-        $(document).ready(function () {
-            degreeId.select2({
+        $(document).ready(async function () {
+            cboDegree.select2({
                 width: "100%",
                 placeholder: "Select degree",
                 allowClear: true
-            });
-
+            }); 
             status.select2({
                 width: "100%",
                 placeholder: "Select status",
                 allowClear: true
-            });
-
+            }); 
             btnPreview.on("click", function () {
                 previewScholarshipReport();
             });
+            await getDegree();
         });
 
+        async function getDegree() {
+            try {
+                const degrees = await Degree.GetAllDegree();
+                degrees.forEach(function (item) {
+                    cboDegree.append(
+                        `<option value="${item.degreeId}">${item.degreeName}</option>`
+                    );
+                });
+                cboDegree.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("Degree API error:", error);
+            }
+        }
+
         function previewScholarshipReport() {
-            if (!degreeId.val()) {
+            if (!cboDegree.val()) {
                 ShowToastInfo("Please select a degree.");
-                degreeId.select2("open");
+                cboDegree.select2("open");
                 return;
             }
 
@@ -350,11 +354,7 @@
                 return;
             }
 
-            if (
-                fromDate.val() &&
-                toDate.val() &&
-                new Date(toDate.val()) < new Date(fromDate.val())
-            ) {
+            if (fromDate.val() && toDate.val() && new Date(toDate.val()) < new Date(fromDate.val())) {
                 ShowToastInfo("To Date must be later than From Date.");
                 return;
             }
@@ -366,7 +366,7 @@
                 type: "GET",
 
                 data: {
-                    DegreeId: degreeId.val(),
+                    DegreeId: cboDegree.val(),
                     PromotionNo: promotionNo.val() || 1,
                     StageNo: stageNo.val() || 1,
                     FromDate: fromDate.val(),

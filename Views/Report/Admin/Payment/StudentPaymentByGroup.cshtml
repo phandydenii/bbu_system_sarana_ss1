@@ -221,13 +221,13 @@
 
                         <div class="col-4">
                             <div class="form-group">
-                                <label for="TermNo"
+                                <label for="txtTermNo"
                                        class="required">
                                     Term
                                 </label>
 
                                 <input type="number"
-                                       id="TermNo"
+                                       id="txtTermNo"
                                        class="form-control"
                                        min="1"
                                        value="1" />
@@ -238,24 +238,24 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
-                                <label for="FromDate">
+                                <label for="dtFromDate">
                                     From Date
                                 </label>
 
                                 <input type="date"
-                                       id="FromDate"
+                                       id="dtFromDate"
                                        class="form-control" />
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="form-group">
-                                <label for="ToDate">
+                                <label for="dtToDate">
                                     To Date
                                 </label>
 
                                 <input type="date"
-                                       id="ToDate"
+                                       id="dtToDate"
                                        class="form-control" />
                             </div>
                         </div>
@@ -329,16 +329,21 @@
 
 @section Scripts
 {
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script> 
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Group.js"></script>
     <script>
-        const degreeId = $("#cboDegree");
-        const schoolId = $("#cboSchool");
-        const promotionNo = $("#cboPromotion");
-        const stageNo = $("#cboStage");
-        const termNo = $("#TermNo");
-        const fromDate = $("#FromDate");
-        const toDate = $("#ToDate");
-        const groupId = $("#cboGroup");
-        const categoryId = $("#cboCategory");
+        const cboDegree = $("#cboDegree");
+        const cboSchool = $("#cboSchool");
+        const cboPromotion = $("#cboPromotion");
+        const cboStage = $("#cboStage");
+        const txtTermNo = $("#txtTermNo");
+        const dtFromDate = $("#dtFromDate");
+        const dtToDate = $("#dtToDate");
+        const cboGroup = $("#cboGroup");
+        const cboCategory = $("#cboCategory");
 
         const btnPreview = $("#btnPreview");
         const reportLoading = $("#reportLoading");
@@ -346,151 +351,208 @@
 
         let currentPdfUrl = null;
 
-        $(document).ready(function () {
+        $(document).ready(async function () {
             initializeSelect2();
             bindEvents();
+            await getDegree();
+            await getSchool();
         });
 
         function initializeSelect2() {
-            degreeId.select2({
+            cboDegree.select2({
                 width: "100%",
                 placeholder: "Select degree",
                 allowClear: true
             });
-
-            schoolId.select2({
+            cboSchool.select2({
                 width: "100%",
                 placeholder: "Select school",
                 allowClear: true
             });
-
-            promotionNo.select2({
+            cboPromotion.select2({
                 width: "100%",
                 placeholder: "Select promotion",
                 allowClear: true
             });
-
-            stageNo.select2({
+            cboStage.select2({
                 width: "100%",
                 placeholder: "Select stage",
                 allowClear: true
             });
 
-            groupId.select2({
+            cboGroup.select2({
                 width: "100%",
                 placeholder: "Select group",
                 allowClear: true
             });
-
-            categoryId.select2({
+            cboCategory.select2({
                 width: "100%",
                 placeholder: "Select category",
                 allowClear: true
             });
         }
 
-        function bindEvents() {
-            btnPreview.on("click", function () {
-                previewPaymentByGroup();
-            });
+        function bindEvents() { 
+            btnPreview.on("click", previewPaymentByGroup);
+            cboDegree.on("change", getPromotion);
+            cboSchool.on("change", getPromotion);
+            cboPromotion.on("change", getStage);
         }
 
+        function clearSelect(select, text) {
+            select.empty().append(`<option value="">${text}</option>`);
+            select.val("").trigger("change.select2");
+        }
+
+        async function getDegree() {
+            clearSelect(cboDegree, "Select Degree");
+            try {
+                const degrees = await Degree.GetAllDegree();
+                degrees.forEach(function (item) {
+                    cboDegree.append(
+                        `<option value="${item.degreeId}">${item.degreeName}</option>`
+                    );
+                });
+                cboDegree.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("Degree API error:", error);
+            }
+        }
+
+        async function getSchool() {
+            clearSelect(cboSchool, "Select School");
+            try {
+                const schools = await School.GetSchool();
+                schools.forEach(function (item) {
+                    cboSchool.append(
+                        `<option value="${item.schoolId}">${item.schoolName}</option>`
+                    );
+                });
+                cboSchool.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("School API error:", error);
+            }
+        }
+
+        async function getPromotion() {
+            const selectedDegreeId = Number(cboDegree.val());
+            const selectedSchoolId = Number(cboSchool.val());
+            clearSelect(cboPromotion, "Select Promotion");
+            clearSelect(cboStage, "Select Stage");
+            if (!selectedDegreeId || !selectedSchoolId) return;
+            try {
+                const promotions = await Promotion.GetPromotions({
+                    degreeId: selectedDegreeId,
+                    schoolId: selectedSchoolId
+                });
+                promotions.forEach(function (item) {
+                    cboPromotion.append(
+                        `<option value="${item.promotionId}">${item.promotionNo}</option>`
+                    );
+                });
+                cboPromotion.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("Promotion API error:", error);
+            }
+        }
+
+        async function getStage() {
+            const selectedPromotionId = Number(cboPromotion.val());
+            clearSelect(cboStage, "Select Stage");
+            if (!selectedPromotionId) return;
+            try {
+                const stages = await Stage.GetStages({
+                    promotionId: selectedPromotionId
+                });
+                stages.forEach(function (item) {
+                    cboStage.append(`
+                    <option value="${item.stageId}">${item.stageNo}</option>
+                `);
+                });
+                cboStage.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("Stage API error:", error);
+            }
+        }
+
+
         function previewPaymentByGroup() {
-            if (!degreeId.val()) {
+            if (!cboDegree.val()) {
                 ShowToastInfo("Please select a degree.");
-                degreeId.select2("open");
+                cboDegree.select2("open");
                 return;
             }
 
-            if (!schoolId.val()) {
+            if (!cboSchool.val()) {
                 ShowToastInfo("Please select a school.");
-                schoolId.select2("open");
+                cboSchool.select2("open");
                 return;
             }
 
-            if (!promotionNo.val()) {
+            if (!cboPromotion.val()) {
                 ShowToastInfo("Please select a promotion.");
-                promotionNo.select2("open");
+                cboPromotion.select2("open");
                 return;
             }
 
-            if (!stageNo.val()) {
+            if (!cboStage.val()) {
                 ShowToastInfo("Please select a stage.");
-                stageNo.select2("open");
+                cboStage.select2("open");
                 return;
             }
 
-            if (!termNo.val() || Number(termNo.val()) < 1) {
+            if (!txtTermNo.val() || Number(txtTermNo.val()) < 1) {
                 ShowToastInfo("Please enter a valid term.");
-                termNo.focus();
+                txtTermNo.focus();
                 return;
             }
 
-            if (!groupId.val()) {
+            if (!cboGroup.val()) {
                 ShowToastInfo("Please select a group.");
-                groupId.select2("open");
+                cboGroup.select2("open");
                 return;
             }
 
-            if (!categoryId.val()) {
+            if (!cboCategory.val()) {
                 ShowToastInfo("Please select a category.");
-                categoryId.select2("open");
+                cboCategory.select2("open");
                 return;
             }
 
-            if (
-                fromDate.val() &&
-                toDate.val() &&
-                new Date(toDate.val()) < new Date(fromDate.val())
-            ) {
-                ShowToastInfo(
-                    "To Date must be later than From Date."
-                );
-
+            if (dtFromDate.val() && dtToDate.val() && new Date(dtToDate.val()) < new Date(dtFromDate.val())) {
+                ShowToastInfo("To Date must be later than From Date.");
                 return;
             }
-
             showReportLoading();
-
             $.ajax({
                 url: '@Url.Action("PaymentByGroupPreview", "Report")',
                 type: "GET",
-
                 data: {
-                    DegreeId: degreeId.val(),
-                    SchoolId: schoolId.val(),
-                    PromotionNo: promotionNo.val(),
-                    StageNo: stageNo.val(),
-                    TermNo: termNo.val(),
-                    FromDate: fromDate.val() || "",
-                    ToDate: toDate.val() || "",
-                    GroupId: groupId.val(),
-                    CategoryId: categoryId.val()
+                    DegreeId: cboDegree.val(),
+                    SchoolId: cboSchool.val(),
+                    PromotionNo: cboPromotion.val(),
+                    StageNo: cboStage.val(),
+                    TermNo: txtTermNo.val(),
+                    FromDate: dtFromDate.val() || "",
+                    ToDate: dtToDate.val() || "",
+                    GroupId: cboGroup.val(),
+                    CategoryId: cboCategory.val()
                 },
-
                 xhrFields: {
                     responseType: "blob"
                 },
-
                 success: function (response, textStatus, xhr) {
-                    const contentType =
-                        xhr.getResponseHeader("Content-Type")
-                        || "application/pdf";
-
+                    const contentType = xhr.getResponseHeader("Content-Type") || "application/pdf";
                     if (currentPdfUrl) {
                         URL.revokeObjectURL(currentPdfUrl);
                     }
-
                     const pdfBlob = new Blob(
                         [response],
                         {
                             type: contentType
                         }
                     );
-
-                    currentPdfUrl =
-                        URL.createObjectURL(pdfBlob);
-
+                    currentPdfUrl = URL.createObjectURL(pdfBlob);
                     reportContainer
                         .off("load.paymentByGroup")
                         .one(
@@ -501,27 +563,16 @@
                         )
                         .attr("src", currentPdfUrl);
                 },
-
                 error: function (xhr) {
                     hideReportLoading();
-
                     const response = xhr.response;
-
                     if (response instanceof Blob) {
                         response.text().then(function (message) {
-                            ShowToastError(
-                                message ||
-                                "Unable to generate payment by group report."
-                            );
+                            ShowToastError(message || "Unable to generate payment by group report.");
                         });
-
                         return;
                     }
-
-                    ShowToastError(
-                        xhr.responseText ||
-                        "Unable to generate payment by group report."
-                    );
+                    ShowToastError(xhr.responseText || "Unable to generate payment by group report.");
                 }
             });
         }

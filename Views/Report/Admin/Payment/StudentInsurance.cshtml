@@ -1,10 +1,10 @@
 @{
-    ViewData["Title"] = "Student Insurance";
-    ViewData["OpenMenu"] = "Report";
-    ViewData["OpenSubMenu"] = "AdminReport";
-    ViewData["Action"] = "PaymentReport";
+ViewData["Title"] = "Student Insurance";
+ViewData["OpenMenu"] = "Report";
+ViewData["OpenSubMenu"] = "AdminReport";
+ViewData["Action"] = "PaymentReport";
 
-    ViewContext.RouteData.Values["action"] = "Student Insurance";
+ViewContext.RouteData.Values["action"] = "Student Insurance";
 }
 
 <style>
@@ -220,12 +220,12 @@
 
                         <div class="col-4">
                             <div class="form-group">
-                                <label for="TermNo">
+                                <label for="txtTermNo">
                                     Term
                                 </label>
 
                                 <input type="number"
-                                       id="TermNo"
+                                       id="txtTermNo"
                                        class="form-control"
                                        min="1"
                                        value="1" />
@@ -234,11 +234,11 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="InsuranceStatus">
+                        <label for="cboInsuranceStatus">
                             Status
                         </label>
 
-                        <select id="InsuranceStatus"
+                        <select id="cboInsuranceStatus"
                                 class="form-control select2">
                             <option value="">All statuses</option>
                             <option value="PAID">Paid</option>
@@ -249,24 +249,24 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
-                                <label for="FromDate">
+                                <label for="dtFromDate">
                                     From Date
                                 </label>
 
                                 <input type="date"
-                                       id="FromDate"
+                                       id="dtFromDate"
                                        class="form-control" />
                             </div>
                         </div>
 
                         <div class="col-6">
                             <div class="form-group">
-                                <label for="ToDate">
+                                <label for="dtToDate">
                                     To Date
                                 </label>
 
                                 <input type="date"
-                                       id="ToDate"
+                                       id="dtToDate"
                                        class="form-control" />
                             </div>
                         </div>
@@ -310,168 +310,280 @@
 
 @section Scripts
 {
-    <script>
-        const degreeId = $("#cboDegree");
-        const schoolId = $("#cboSchool");
-        const promotionNo = $("#cboPromotion");
-        const stageNo = $("#cboStage");
-        const termNo = $("#TermNo");
-        const insuranceStatus = $("#InsuranceStatus");
-        const fromDate = $("#FromDate");
-        const toDate = $("#ToDate");
+<script src="~/function/Degree.js"></script>
+<script src="~/function/School.js"></script>
+<script src="~/function/Promotion.js"></script>
+<script src="~/function/Stage.js"></script>
 
-        const btnPreview = $("#btnPreview");
-        const reportLoading = $("#reportLoading");
-        const reportContainer = $("#reportContainer");
+<script>
+    const cboDegree = $("#cboDegree");
+    const cboSchool = $("#cboSchool");
+    const cboPromotion = $("#cboPromotion");
+    const cboStage = $("#cboStage");
+    const txtTermNo = $("#txtTermNo");
+    const cboInsuranceStatus = $("#cboInsuranceStatus");
+    const dtFromDate = $("#dtFromDate");
+    const dtToDate = $("#dtToDate");
 
-        let currentPdfUrl = null;
+    const btnPreview = $("#btnPreview");
+    const reportLoading = $("#reportLoading");
+    const reportContainer = $("#reportContainer");
 
-        $(document).ready(function () {
-            $(".select2").select2({
-                width: "100%",
-                allowClear: true
-            });
+    let currentPdfUrl = null;
 
-            btnPreview.on("click", function () {
-                previewInsuranceReport();
-            });
+    $(document).ready(async function () {
+        initializeSelect2();
+        bindEvents();
+
+        await getDegree();
+        await getSchool();
+    });
+
+    function initializeSelect2() {
+        cboDegree.select2({
+            width: "100%",
+            placeholder: "Select degree",
+            allowClear: true
         });
 
-        function previewInsuranceReport() {
-            if (!degreeId.val()) {
-                ShowToastInfo("Please select a degree.");
-                degreeId.select2("open");
-                return;
-            }
+        cboSchool.select2({
+            width: "100%",
+            placeholder: "Select school",
+            allowClear: true
+        });
 
-            if (!schoolId.val()) {
-                ShowToastInfo("Please select a school.");
-                schoolId.select2("open");
-                return;
-            }
+        cboPromotion.select2({
+            width: "100%",
+            placeholder: "Select promotion",
+            allowClear: true
+        });
 
-            if (!promotionNo.val()) {
-                ShowToastInfo("Please select a promotion.");
-                promotionNo.select2("open");
-                return;
-            }
+        cboStage.select2({
+            width: "100%",
+            placeholder: "Select stage",
+            allowClear: true
+        });
 
-            if (!stageNo.val()) {
-                ShowToastInfo("Please select a stage.");
-                stageNo.select2("open");
-                return;
-            }
+        cboInsuranceStatus.select2({
+            width: "100%",
+            placeholder: "All statuses",
+            allowClear: true
+        });
+    }
 
-            if (
-                fromDate.val() &&
-                toDate.val() &&
-                new Date(toDate.val()) < new Date(fromDate.val())
-            ) {
-                ShowToastInfo(
-                    "To Date must be later than From Date."
+    function bindEvents() {
+        btnPreview.on("click", previewInsuranceReport);
+        cboDegree.on("change", getPromotion);
+        cboSchool.on("change", getPromotion);
+        cboPromotion.on("change", getStage);
+    }
+
+    function clearSelect(select, text) {
+        select.empty().append(`<option value="">${text}</option>`);
+        select.val("").trigger("change.select2");
+    }
+
+    async function getDegree() {
+        clearSelect(cboDegree, "Select Degree");
+
+        try {
+            const degrees = await Degree.GetAllDegree();
+
+            degrees.forEach(function (item) {
+                cboDegree.append(
+                    `<option value="${item.degreeId}">${item.degreeName}</option>`
                 );
+            });
 
-                return;
-            }
+            cboDegree.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Degree API error:", error);
+        }
+    }
 
-            showReportLoading();
+    async function getSchool() {
+        clearSelect(cboSchool, "Select School");
 
-            $.ajax({
-                url: '@Url.Action("InsurancePreview", "Report")',
-                type: "GET",
+        try {
+            const schools = await School.GetSchool();
 
-                data: {
-                    DegreeId: degreeId.val(),
-                    SchoolId: schoolId.val(),
-                    PromotionNo: promotionNo.val(),
-                    StageNo: stageNo.val(),
-                    TermNo: termNo.val() || 1,
-                    Status: insuranceStatus.val() || "",
-                    FromDate: fromDate.val() || "",
-                    ToDate: toDate.val() || ""
-                },
+            schools.forEach(function (item) {
+                cboSchool.append(
+                    `<option value="${item.schoolId}">${item.schoolName}</option>`
+                );
+            });
 
-                xhrFields: {
-                    responseType: "blob"
-                },
+            cboSchool.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("School API error:", error);
+        }
+    }
 
-                success: function (response, textStatus, xhr) {
-                    const contentType =
-                        xhr.getResponseHeader("Content-Type")
-                        || "application/pdf";
+    async function getPromotion() {
+        const selectedDegreeId = Number(cboDegree.val());
+        const selectedSchoolId = Number(cboSchool.val());
 
-                    if (currentPdfUrl) {
-                        URL.revokeObjectURL(currentPdfUrl);
-                    }
+        clearSelect(cboPromotion, "Select Promotion");
+        clearSelect(cboStage, "Select Stage");
 
-                    const pdfBlob = new Blob(
-                        [response],
-                        {
-                            type: contentType
-                        }
-                    );
+        if (!selectedDegreeId || !selectedSchoolId) {
+            return;
+        }
 
-                    currentPdfUrl =
-                        URL.createObjectURL(pdfBlob);
+        try {
+            const promotions = await Promotion.GetPromotions({
+                degreeId: selectedDegreeId,
+                schoolId: selectedSchoolId
+            });
 
-                    reportContainer
-                        .off("load.insuranceReport")
-                        .one("load.insuranceReport", function () {
-                            hideReportLoading();
-                        })
-                        .attr("src", currentPdfUrl);
-                },
+            promotions.forEach(function (item) {
+                cboPromotion.append(
+                    `<option value="${item.promotionId}">${item.promotionNo}</option>`
+                );
+            });
 
-                error: function (xhr) {
-                    hideReportLoading();
+            cboPromotion.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Promotion API error:", error);
+        }
+    }
 
-                    const response = xhr.response;
+    async function getStage() {
+        const selectedPromotionId = Number(cboPromotion.val());
 
-                    if (response instanceof Blob) {
-                        response.text().then(function (message) {
-                            ShowToastError(
-                                message ||
-                                "Unable to generate insurance report."
-                            );
-                        });
+        clearSelect(cboStage, "Select Stage");
 
-                        return;
-                    }
+        if (!selectedPromotionId) {
+            return;
+        }
 
-                    ShowToastError(
-                        xhr.responseText ||
-                        "Unable to generate insurance report."
-                    );
+        try {
+            const stages = await Stage.GetStages({
+                promotionId: selectedPromotionId
+            });
+
+            stages.forEach(function (item) {
+                cboStage.append(
+                    `<option value="${item.stageId}">${item.stageNo}</option>`
+                );
+            });
+
+            cboStage.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Stage API error:", error);
+        }
+    }
+
+    function previewInsuranceReport() {
+        if (!cboDegree.val()) {
+            ShowToastInfo("Please select a degree.");
+            cboDegree.select2("open");
+            return;
+        }
+
+        if (!cboSchool.val()) {
+            ShowToastInfo("Please select a school.");
+            cboSchool.select2("open");
+            return;
+        }
+
+        if (!cboPromotion.val()) {
+            ShowToastInfo("Please select a promotion.");
+            cboPromotion.select2("open");
+            return;
+        }
+
+        if (!cboStage.val()) {
+            ShowToastInfo("Please select a stage.");
+            cboStage.select2("open");
+            return;
+        }
+
+        if (
+            dtFromDate.val() &&
+            dtToDate.val() &&
+            new Date(dtToDate.val()) < new Date(dtFromDate.val())
+        ) {
+            ShowToastInfo("To Date must be later than From Date.");
+            return;
+        }
+
+        showReportLoading();
+
+        $.ajax({
+            url: '@Url.Action("InsurancePreview", "Report")',
+            type: "GET",
+            data: {
+                DegreeId: cboDegree.val(),
+                SchoolId: cboSchool.val(),
+                PromotionNo: cboPromotion.val(),
+                StageNo: cboStage.val(),
+                TermNo: txtTermNo.val() || 1,
+                Status: cboInsuranceStatus.val() || "",
+                FromDate: dtFromDate.val() || "",
+                ToDate: dtToDate.val() || ""
+            },
+            xhrFields: {
+                responseType: "blob"
+            },
+            success: function (response, textStatus, xhr) {
+                const contentType = xhr.getResponseHeader("Content-Type") || "application/pdf";
+                if (currentPdfUrl) {
+                    URL.revokeObjectURL(currentPdfUrl);
                 }
-            });
-        }
-
-        function showReportLoading() {
-            reportContainer.addClass("d-none");
-            reportLoading.removeClass("d-none");
-
-            btnPreview
-                .prop("disabled", true)
-                .html(
-                    '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+                const pdfBlob = new Blob(
+                    [response],
+                    {
+                        type: contentType
+                    }
                 );
-        }
-
-        function hideReportLoading() {
-            reportLoading.addClass("d-none");
-            reportContainer.removeClass("d-none");
-
-            btnPreview
-                .prop("disabled", false)
-                .html(
-                    '<i class="fas fa-eye mr-1"></i> Preview'
-                );
-        }
-
-        $(window).on("beforeunload", function () {
-            if (currentPdfUrl) {
-                URL.revokeObjectURL(currentPdfUrl);
+                currentPdfUrl = URL.createObjectURL(pdfBlob);
+                reportContainer.off("load.insuranceReport")
+                    .one("load.insuranceReport", function () {
+                        hideReportLoading();
+                    })
+                    .attr("src", currentPdfUrl);
+            },
+            error: function (xhr) {
+                hideReportLoading();
+                const response = xhr.response;
+                if (response instanceof Blob) {
+                    response.text().then(function (message) {
+                        ShowToastError(message || "Unable to generate insurance report.");
+                    });
+                    return;
+                }
+                ShowToastError(xhr.responseText || "Unable to generate insurance report.");
             }
         });
-    </script>
+    }
+
+    function showReportLoading() {
+        reportContainer.addClass("d-none");
+        reportLoading.removeClass("d-none");
+
+        btnPreview
+            .prop("disabled", true)
+            .html(
+                '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+            );
+    }
+
+    function hideReportLoading() {
+        reportLoading.addClass("d-none");
+        reportContainer.removeClass("d-none");
+
+        btnPreview
+            .prop("disabled", false)
+            .html(
+                '<i class="fas fa-eye mr-1"></i> Preview'
+            );
+    }
+
+    $(window).on("beforeunload", function () {
+        if (currentPdfUrl) {
+            URL.revokeObjectURL(currentPdfUrl);
+        }
+    });
+</script>
 }

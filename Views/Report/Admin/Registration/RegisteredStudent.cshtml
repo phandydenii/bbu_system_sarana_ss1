@@ -1,10 +1,9 @@
 @model BBU_SYSTEM.ViewModel.Report.RegisteredViewModel
 @{  
+    ViewData["Title"] = "Registered Students"; 
     ViewData["OpenMenu"] = "Report";
-    ViewData["OpenSubMenu"] = "AdminReport"; 
-    // Override the breadcrumb text used by the layout.
-    ViewContext.RouteData.Values["controller"] = "Report";
-    ViewContext.RouteData.Values["action"] = "Registered Students";
+    ViewData["OpenSubMenu"] = "AdminReport";
+    ViewData["Action"] = "RegistrationReport";
 }
 
 <style>
@@ -124,16 +123,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="DegreeId" class="required">Degree</label>
-                        <select asp-for="DegreeId"
-                                asp-items="ViewBag.DegreeList"
-                                class="form-control select2">
+                        <label for="cboDegree" class="required">
+                            Degree
+                        </label>
+                        <select id="cboDegree" class="form-control select2">
                             <option value="">Select degree</option>
                         </select>
-
-                        <span asp-validation-for="DegreeId"
-                              class="text-danger">
-                        </span>
                     </div>
 
                     <div class="row">
@@ -147,7 +142,6 @@
                                        value="1" />
                             </div>
                         </div>
-
                         <div class="col-6">
                             <div class="form-group">
                                 <label asp-for="StageNo">Stage</label> 
@@ -162,16 +156,12 @@
 
                     <div class="form-group">
                         <label asp-for="FromDate">From Date</label> 
-                        <input asp-for="FromDate"
-                               type="datetime-local"
-                               class="form-control" />
+                        <input asp-for="FromDate" type="datetime-local" class="form-control" />
                     </div>
 
                     <div class="form-group">
                         <label asp-for="ToDate">To Date</label> 
-                        <input asp-for="ToDate"
-                               type="datetime-local"
-                               class="form-control" />
+                        <input asp-for="ToDate" type="datetime-local" class="form-control" />
                     </div>
 
                     <div class="form-group">
@@ -230,8 +220,9 @@
 
 @section Scripts
 {
+    <script src="~/function/Degree.js"></script>
     <script>
-        const degreeId = $("#DegreeId");
+        const cboDegree = $("#cboDegree"); 
         const promotionNo = $("#PromotionNo");
         const stageNo = $("#StageNo");
         const fromDate = $("#FromDate");
@@ -245,42 +236,48 @@
 
         let currentPdfUrl = null;
 
-        $(document).ready(function () {
-            degreeId.select2({
+        $(document).ready(async function () {
+            cboDegree.select2({
                 width: "100%",
                 placeholder: "Select degree",
                 allowClear: true
             });
-
+            await  getDegree();
             btnPreview.on("click", function () {
                 previewRegisteredStudent();
             });
         });
+        async function getDegree() { 
+            try {
+                const degrees = await Degree.GetAllDegree();
+                degrees.forEach(function (item) {
+                    cboDegree.append(
+                        `<option value="${item.degreeId}">${item.degreeName}</option>`
+                    );
+                });
+                cboDegree.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("Degree API error:", error);
+            }
+        }
 
         function previewRegisteredStudent() {
-            if (!degreeId.val()) {
+            if (!cboDegree.val()) {
                 ShowToastInfo("Please select a degree.");
-                degreeId.select2("open");
+                cboDegree.select2("open");
                 return;
             }
 
-            if (
-                fromDate.val() &&
-                toDate.val() &&
-                new Date(toDate.val()) < new Date(fromDate.val())
-            ) {
+            if (fromDate.val() && toDate.val() && new Date(toDate.val()) < new Date(fromDate.val())){
                 ShowToastInfo("To Date must be later than From Date.");
                 return;
             }
-
             showReportLoading();
-
             $.ajax({
                 url: '@Url.Action("RegisteredStudentPreview", "Report")',
                 type: "GET",
-
                 data: {
-                    DegreeId: degreeId.val(),
+                    DegreeId: cboDegree.val(),
                     PromotionNo: promotionNo.val() || 1,
                     StageNo: stageNo.val() || 1,
                     FromDate: fromDate.val() || "",
@@ -288,57 +285,37 @@
                     Reporter: reporter.val() || "",
                     Receiver: receiver.val() || ""
                 },
-
                 xhrFields: {
                     responseType: "blob"
                 },
-
                 success: function (response, textStatus, xhr) {
-                    const contentType =
-                        xhr.getResponseHeader("Content-Type")
-                        || "application/pdf";
-
+                    const contentType = xhr.getResponseHeader("Content-Type") || "application/pdf";
                     if (currentPdfUrl) {
                         URL.revokeObjectURL(currentPdfUrl);
                     }
-
                     const pdfBlob = new Blob(
                         [response],
                         {
                             type: contentType
                         }
                     );
-
                     currentPdfUrl = URL.createObjectURL(pdfBlob);
-
-                    reportContainer
-                        .off("load.registeredStudent")
+                    reportContainer.off("load.registeredStudent")
                         .one("load.registeredStudent", function () {
                             hideReportLoading();
                         })
                         .attr("src", currentPdfUrl);
                 },
-
                 error: function (xhr) {
                     hideReportLoading();
-
                     const response = xhr.response;
-
                     if (response instanceof Blob) {
                         response.text().then(function (message) {
-                            ShowToastError(
-                                message ||
-                                "Unable to generate registered student report."
-                            );
+                            ShowToastError(message ||"Unable to generate registered student report.");
                         });
-
                         return;
                     }
-
-                    ShowToastError(
-                        xhr.responseText ||
-                        "Unable to generate registered student report."
-                    );
+                    ShowToastError(xhr.responseText || "Unable to generate registered student report.");
                 }
             });
         }
@@ -346,7 +323,6 @@
         function showReportLoading() {
             reportContainer.addClass("d-none");
             reportLoading.removeClass("d-none");
-
             btnPreview
                 .prop("disabled", true)
                 .html(
@@ -357,7 +333,6 @@
         function hideReportLoading() {
             reportLoading.addClass("d-none");
             reportContainer.removeClass("d-none");
-
             btnPreview
                 .prop("disabled", false)
                 .html(
