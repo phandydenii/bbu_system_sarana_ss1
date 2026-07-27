@@ -1,12 +1,56 @@
-﻿@using BBU_SYSTEM.DTOs
-@{
-    var contactPerson = new ContactPersonDto();
-}
-<label class="required">Name</label>
-<input type="text" class="form-control" asp-for="@contactPerson.ContactPersonName" required>
-<label>Job</label>
-<input type="text" class="form-control" asp-for="@contactPerson.Job">
-<label>Phone</label>
-<input type="text" class="form-control" asp-for="@contactPerson.Phone">
-<label>Address</label>
-<textarea type="text" rows="4" class="form-control" asp-for="@contactPerson.Address"></textarea>
+﻿@model BBU_SYSTEM.Models.Req.RegistryReq
+
+<input asp-for="ContactPerson!.ContactPersonId"
+       type="hidden" />
+
+<div class="form-group">
+    <label asp-for="ContactPerson!.ContactPersonName"
+           class="required">
+        Name
+    </label>
+
+    <input asp-for="ContactPerson!.ContactPersonName"
+           type="text"
+           class="form-control"
+           placeholder="Enter contact person name"
+           required />
+
+    <span asp-validation-for="ContactPerson!.ContactPersonName"
+          class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="ContactPerson!.Job">Job</label>
+
+    <input asp-for="ContactPerson!.Job"
+           type="text"
+           class="form-control"
+           placeholder="Enter job" />
+
+    <span asp-validation-for="ContactPerson!.Job"
+          class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="ContactPerson!.Phone">Phone</label>
+
+    <input asp-for="ContactPerson!.Phone"
+           type="tel"
+           class="form-control"
+           placeholder="Enter phone number" />
+
+    <span asp-validation-for="ContactPerson!.Phone"
+          class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="ContactPerson!.Address">Address</label>
+
+    <textarea asp-for="ContactPerson!.Address"
+              rows="4"
+              class="form-control"
+              placeholder="Enter address"></textarea>
+
+    <span asp-validation-for="ContactPerson!.Address"
+          class="text-danger"></span>
+</div>
