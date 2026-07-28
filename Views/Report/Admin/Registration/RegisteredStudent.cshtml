@@ -274,8 +274,11 @@
             }
             showReportLoading();
             $.ajax({
-                url: '@Url.Action("RegisteredStudentPreview", "Report")',
-                type: "GET",
+                url: '@Url.Action(
+                    "RegistrationStudentGenerate",
+                    "Report"
+                    )',
+                type: "POST",
                 data: {
                     DegreeId: cboDegree.val(),
                     PromotionNo: promotionNo.val() || 1,
@@ -289,6 +292,10 @@
                     responseType: "blob"
                 },
                 success: function (response, textStatus, xhr) {
+                    if (response.status === "200" || response.status === "400") {
+                        hideReportLoading();
+                        return ShowToastInfo(response.status.message);
+                    }
                     const contentType = xhr.getResponseHeader("Content-Type") || "application/pdf";
                     if (currentPdfUrl) {
                         URL.revokeObjectURL(currentPdfUrl);
@@ -307,15 +314,8 @@
                         .attr("src", currentPdfUrl);
                 },
                 error: function (xhr) {
-                    hideReportLoading();
-                    const response = xhr.response;
-                    if (response instanceof Blob) {
-                        response.text().then(function (message) {
-                            ShowToastError(message ||"Unable to generate registered student report.");
-                        });
-                        return;
-                    }
-                    ShowToastError(xhr.responseText || "Unable to generate registered student report.");
+                    hideReportLoading(); 
+                    ShowToastInfo("Unable to generate registered student report.");
                 }
             });
         }

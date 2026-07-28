@@ -4,19 +4,6 @@ namespace BBU_SYSTEM.Helper;
 
 public class ServerResponse : ControllerBase
 {
-    // public IActionResult Success<T>(IQueryable<T>? data1 =null,string msg="Success")
-    // {
-    //     return Ok(new
-    //     {
-    //         data = data1 ? data1.ToList() : new{},
-    //         status = new
-    //         {
-    //             code = "200",
-    //             message = msg
-    //         }
-    //     });
-    // }
-    
     public IActionResult Success(object? data1 =null,string msg="Success")
     {
         return Ok(new

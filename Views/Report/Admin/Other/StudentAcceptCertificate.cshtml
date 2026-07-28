@@ -227,6 +227,17 @@
                             <option value="">Select School</option>
                         </select>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="Title">Certificate Title</label> 
+                        <input type="text"
+                               id="Title"
+                               name="Title"
+                               class="form-control"
+                               maxlength="200"
+                               placeholder="Enter certificate title"
+                               autocomplete="off" />
+                    </div>
 
                     <div class="row">
                         <div class="col-6">
@@ -400,8 +411,7 @@
         const reportLoading = $("#reportLoading");
         const printFrame = $("#printFrame");
 
-        let acceptCertificatePdfUrl = null;
-        const acceptCertificateReportUrl = "";
+        let acceptCertificatePdfUrl = null; 
 
         $(document).ready(async function () {
             initializeSelect2();
@@ -483,10 +493,11 @@
                 SchoolId: cboSchool.val(),
                 FromPromotionNo: fromPromotionNo.val(),
                 ToPromotionNo: toPromotionNo.val(),
-                CertificateStatus: $("input[name='certificateStatus']:checked").val(),
-                StudentStatus: $("input[name='studentStatus']:checked").val(),
+                IsAcceptCertificate: $("input[name='certificateStatus']:checked").val() === "NOT_ACCEPTED" ? 0 : 1,
+                Status: $("input[name='studentStatus']:checked").val(),
                 FromDate:fromDate.val() || "",
-                ToDate:toDate.val() || ""
+                ToDate:toDate.val() || "",
+                Title : $("#title").val() || ""
             };
         }
 
@@ -533,15 +544,14 @@
             const request = getReportRequest();
             if (!validateFilters(request)) {
                 return;
-            }
-            if (!acceptCertificateReportUrl) {
-                ShowToastInfo( "Accept Certificate report URL is not configured yet.");
-                return;
-            }
+            } 
             showReportLoading();
             $.ajax({
-                url: acceptCertificateReportUrl,
-                type: "GET",
+                url: '@Url.Action(
+                    "StudentListAcceptCertificateGenerate",
+                "Report"
+                )',
+                type: "POST",
                 data: request,
                 xhrFields: {
                     responseType: "blob"
@@ -573,17 +583,8 @@
                 },
                 error: function (xhr) {
                     hideReportLoading();
-                    const response = xhr.response;
-                    if (response instanceof Blob) {
-                        response.text()
-                            .then(function (message) {
-                                ShowToastError(message || "Unable to generate certificate report.");
-                            });
-                        return;
-                    }
-                    ShowToastError(xhr.responseText || "Unable to generate certificate report.");
+                    ShowToastInfo("Unable to generate certificate report.");
                 },
-
                 complete: function () {
                     btnPreview.prop("disabled", false)
                         .html(

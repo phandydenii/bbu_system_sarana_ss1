@@ -32,6 +32,83 @@ public class   ReportController(
     {
         return View("Admin/Registration/RegisteredStudent");
     }
+    [HttpPost("registration-student-generate")] 
+    public async Task<IActionResult> RegistrationStudentGenerate([FromForm] RegistrationStudentGenerateReq req)
+    {
+        try
+        {
+            if (req.DegreeId <= 0) return new ServerResponse().BadRequest("Degree is required."); 
+            if (req.PromotionNo <= 0) return new ServerResponse().BadRequest("Promotion is required."); 
+            if (req.StageNo <= 0)  return new ServerResponse().BadRequest("Stage is required."); 
+            if (req.FromDate.HasValue && req.ToDate.HasValue && req.ToDate.Value < req.FromDate.Value)
+                return new ServerResponse().BadRequest("To Date must be greater than or equal to From Date.");
+
+            var connectionString = configuration.GetConnectionString($"{_campus}_campus"); 
+            const string query = @"
+                SELECT *
+                FROM V_ADMIN_REPORT_REGISTERED_STUDENT
+                WHERE DEGREE_ID = @DegreeId
+                  AND PROMOTION_NO = @PromotionNo
+                  AND STAGE_NO = @StageNo
+                  AND (
+                        @FromDate IS NULL
+                        OR REGISTRATION_DATE >= @FromDate
+                      )
+                  AND (
+                        @ToDate IS NULL
+                        OR REGISTRATION_DATE < DATEADD(
+                            DAY,
+                            1,
+                            CAST(@ToDate AS DATE)
+                        )
+                      )
+                ORDER BY STUDENT_NAME;
+            ";
+
+            var parameters = new[]
+            {
+                new SqlParameter("@DegreeId",req.DegreeId),
+                new SqlParameter("@PromotionNo",req.PromotionNo),
+                new SqlParameter("@StageNo",req.StageNo), 
+                new SqlParameter("@FromDate",req.FromDate.HasValue ? req.FromDate.Value : DBNull.Value),  
+                new SqlParameter("@ToDate",req.ToDate.HasValue ? req.ToDate.Value : DBNull.Value)
+            };
+
+            var dt = await DataManager.DataTableRawSqlAsync(connectionString!,query,parameters);
+            if (dt.Rows.Count == 0) 
+                return new ServerResponse().Success(msg:"No registered student data was found.");
+            
+            var reportPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Reports",
+                "REGISTER",
+                "REGISTER_RPT.rdlc"
+            ); 
+
+            using var localReport = new LocalReport();
+            localReport.ReportPath = reportPath;
+            localReport.DataSources.Add(
+                new ReportDataSource("DataSet1",dt)
+            );
+
+            localReport.SetParameters(new[]
+                {
+                    new ReportParameter("reporter",req.Reporter ?? string.Empty),
+                    new ReportParameter("receiver",req.Receiver ?? string.Empty)
+                }
+            );
+            var pdf = localReport.Render("PDF");
+            return File(
+                pdf,
+                "application/pdf",
+                "registered-student.pdf"
+            );
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
+        }
+    }
     [Route("administration/registration-static")]
     public IActionResult RegistrationStatic()
     {
@@ -152,6 +229,89 @@ public class   ReportController(
     public IActionResult StudentAcceptCertificate()
     {
         return View("Admin/Other/StudentAcceptCertificate");
+    }
+    [HttpPost("student-list-accept-certificate-generate")] 
+    public async Task<IActionResult> StudentListAcceptCertificateGenerate([FromForm] StudentListAcceptCertificateGenerateReq req)
+    {
+        try
+        {
+            if (req.FromPromotionNo <= 0 || req.ToPromotionNo <=0 || req.DegreeId <=0 || req.SchoolId <=0) 
+                return new ServerResponse().BadRequest("Degree, School and Promotion is required.");  
+            if (req.FromDate.HasValue && req.ToDate.HasValue && req.ToDate.Value < req.FromDate.Value)
+                return new ServerResponse().BadRequest("To Date must be greater than or equal to From Date.");
+
+            var connectionString = configuration.GetConnectionString($"{_campus}_campus"); 
+            const string query = @"
+                SELECT *
+                FROM V_STUDENT
+                WHERE DEGREE_ID = @DegreeId
+                  AND SCHOOL_ID = @SchoolId
+                  AND PROMOTION_NO BETWEEN @FromPromotionNo AND @ToPromotionNo
+                  AND IS_ACCEPT_CERTIFICATE = @IsAcceptCertificate
+                  AND (
+                        @FromDate IS NULL
+                        OR START_DATE >= @FromDate
+                      )
+                  AND (
+                        @ToDate IS NULL
+                        OR END_DATE < DATEADD(
+                            DAY,
+                            1,
+                            CAST(@ToDate AS DATE)
+                        )
+                      )
+                ORDER BY STUDENT_NAME;
+            ";
+
+            var parameters = new[]
+            {
+                new SqlParameter("@DegreeId",req.DegreeId),
+                new SqlParameter("@SchoolId",req.SchoolId),
+                new SqlParameter("@FromPromotionNo",req.FromPromotionNo),
+                new SqlParameter("@ToPromotionNo",req.ToPromotionNo), 
+                new SqlParameter("@Title",req.Title ?? string.Empty), 
+                new SqlParameter("@IsAcceptCertificate",req.IsAcceptCertificate), 
+                new SqlParameter("@FromDate",req.FromDate.HasValue ? req.FromDate.Value : DBNull.Value),  
+                new SqlParameter("@ToDate",req.ToDate.HasValue ? req.ToDate.Value : DBNull.Value)
+            };
+
+            var dt = await DataManager.DataTableRawSqlAsync(connectionString!,query,parameters);
+            if (dt.Rows.Count == 0) 
+                return new ServerResponse().Success(msg:"No accept certificate student data was found.");
+            
+            var reportPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Reports",
+                "STUDENT_CERTIFICATE",
+                "STUDENT_LIST_ACCEPT_CERTIFICATE_RPT.rdlc"
+            ); 
+
+            using var localReport = new LocalReport();
+            localReport.ReportPath = reportPath;
+            localReport.DataSources.Add(
+                new ReportDataSource("DataSet1",dt)
+            );
+
+            localReport.SetParameters(new[]
+                {
+                    new ReportParameter("title",req.Title ?? string.Empty), 
+                    new ReportParameter("frompro",req.FromPromotionNo.ToString()), 
+                    new ReportParameter("topro",req.ToPromotionNo.ToString()), 
+                    new ReportParameter("fromdate",req.FromDate.ToString()), 
+                    new ReportParameter("todate",req.ToDate.ToString()), 
+                }
+            );
+            var pdf = localReport.Render("PDF");
+            return File(
+                pdf,
+                "application/pdf",
+                "student-list-accept-certificate.pdf"
+            );
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
+        }
     }
     [Route("administration/student_fee_collection")]
     public IActionResult StudentFeeCollection()
