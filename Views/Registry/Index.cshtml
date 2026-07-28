@@ -1,15 +1,57 @@
 ﻿@{
-    ViewData["OpenMenu"] = "Administration";
-    ViewData["Action"] = "Register";
+ViewData["OpenMenu"] = "Administration";
+ViewData["Action"] = "Register";
 }
+
+<style>
+    #tblRegistry_wrapper {
+        width: 100%;
+    }
+
+    #tblRegistry {
+        width: 100% !important;
+    }
+
+    #tblRegistry th,
+    #tblRegistry td {
+        vertical-align: middle !important;
+        white-space: nowrap;
+    }
+
+    #tblRegistry td.dt-action-col {
+        text-align: center;
+    }
+
+    #tblRegistry .badge {
+        min-width: 75px;
+        padding: 6px 8px;
+    }
+
+    .dataTables_scrollHead {
+        overflow: hidden !important;
+    }
+
+    .dataTables_scrollBody {
+        overflow-x: auto !important;
+    }
+</style>
+
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header"> 
-                <a asp-action="Create" asp-controller="Registry" class="btn btn-primary"><i class="fas fa-plus"></i> New Register</a>
+            <div class="card-header">
+                <a asp-action="Create"
+                   asp-controller="Registry"
+                   class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    New Register
+                </a>
             </div>
+
             <div class="card-body">
-                <table id="tblRegistry" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                <table id="tblRegistry"
+                       class="table table-sm table-bordered table-striped"
+                       style="width: 100%;">
                     <thead>
                     <tr>
                         <th>Student Id</th>
@@ -24,87 +66,299 @@
                         <th>Action</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
-<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
-<partial name="_ValidationScriptsPartial"/>
+
 @section Scripts
 {
-    <script>
-        const tblRegistry = $("#tblRegistry");
-        document.addEventListener("DOMContentLoaded", function () {
-            fetchStudent();
-        });
-        
-        function fetchStudent() {
-            tblRegistry.DataTable().clear().destroy();
-            tblRegistry.DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                ajax: {
-                    url: "/Registry/GetStudentRegistryList",
-                    type: "POST",
-                    dataSrc: function (json) {
-                        return json.data;
+<script>
+    let registryTable = null;
+    let registryResizeTimer = null;
+
+    $(function () {
+        initializeRegistryTable();
+        registerRegistryResizeEvents();
+    });
+
+    function initializeRegistryTable() {
+        const tableSelector = "#tblRegistry";
+
+        if ($.fn.DataTable.isDataTable(tableSelector)) {
+            $(tableSelector).DataTable().destroy();
+            $(tableSelector).find("tbody").empty();
+        }
+
+        registryTable = $(tableSelector).DataTable({
+            processing: true,
+            serverSide: true,
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+
+            order: [[0, "desc"]],
+
+            ajax: {
+                url: "@Url.Action("GetStudentRegistryList", "Registry")",
+                type: "POST",
+                dataSrc: function (response) {
+                    return response?.data ?? [];
+                },
+                error: function (xhr, error, thrown) {
+                    console.error(
+                        "Cannot load student registry list:",
+                        xhr.responseText || error || thrown
+                    );
+
+                    if (typeof ShowToastError === "function") {
+                        ShowToastError(
+                            "Cannot load student registry list."
+                        );
+                    }
+                }
+            },
+
+            columns: [
+                {
+                    data: "studentId",
+                    defaultContent: ""
+                },
+                {
+                    data: "studentName",
+                    defaultContent: ""
+                },
+                {
+                    data: "studentNameInKhmer",
+                    defaultContent: ""
+                },
+                {
+                    data: "sex",
+                    defaultContent: ""
+                },
+                {
+                    data: "dateOfBirth",
+                    defaultContent: "",
+                    render: function (data, type) {
+                        if (type !== "display" &&
+                            type !== "filter") {
+                            return data ?? "";
+                        }
+
+                        return formatRegistryDate(data);
                     }
                 },
-                columns: [
-                    {data: "studentId"},
-                    {data: "studentName"},
-                    {data: "studentNameInKhmer"},
-                    {data: "sex"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            const dt = formatDate(row.dateOfBirth);
-                            return `${dt}`
+                {
+                    data: "registrationDate",
+                    defaultContent: "",
+                    render: function (data, type) {
+                        if (type !== "display" &&
+                            type !== "filter") {
+                            return data ?? "";
                         }
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            const dt = formatDate(row.registrationDate);
-                            return `${dt}`
-                        }
-                    },
-                    {data: "degreeName"},
-                    {data: "schoolName"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            if (row.status === "REGISTER") {
-                                return ` <span class="badge badge-warning">${row.status}</span>`;
-                            } else if (row.status === "ACTIVE") {
-                                return ` <span class="badge badge-primary">${row.status}</span>`;
-                            } else if (row.status === "QUIT") {
-                                return ` <span class="badge badge-danger">${row.status}</span>`;
-                            }else if (row.status === "GRADUATED") {
-                                return ` <span class="badge badge-fuchsia">${row.status}</span>`;
-                            }else if (row.status === "COMPLETED") {
-                                return ` <span class="badge badge-pink">${row.status}</span>`;
-                            }else {
-                                return `<span class="badge badge-default">${row.status}</span>`;
-                            }
 
-                        }
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) { 
-                            return `<a href="/registry/details/${row.studentId}" class="btn btn-success btn-sm"><i class="fas fa-gear"></i> Manage</a>`;
-                        }
+                        return formatRegistryDate(data);
                     }
-                ],
-                initComplete: function () {
-                    MyApp.utils.dataTableDebounceSearch("#tblRegistry", 500);
+                },
+                {
+                    data: "degreeName",
+                    defaultContent: ""
+                },
+                {
+                    data: "schoolName",
+                    defaultContent: ""
+                },
+                {
+                    data: "status",
+                    defaultContent: "",
+                    orderable: false,
+                    searchable: false,
+                    className: "text-center",
+                    render: function (data, type) {
+                        const status = String(data ?? "")
+                            .trim()
+                            .toUpperCase();
+
+                        if (type !== "display") {
+                            return status;
+                        }
+
+                        const badgeClasses = {
+                            REGISTER: "badge-warning",
+                            ACTIVE: "badge-primary",
+                            QUIT: "badge-danger",
+                            GRADUATED: "badge-fuchsia",
+                            COMPLETED: "badge-pink"
+                        };
+
+                        const badgeClass =
+                            badgeClasses[status] ??
+                            "badge-secondary";
+
+                        return `
+                                <span class="badge ${badgeClass}">
+                                    ${escapeRegistryHtml(status)}
+                                </span>
+                            `;
+                    }
+                },
+                {
+                    data: "studentId",
+                    defaultContent: "",
+                    orderable: false,
+                    searchable: false,
+                    className: "dt-action-col",
+                    render: function (data, type) {
+                        if (type !== "display") {
+                            return data ?? "";
+                        }
+
+                        const studentId =
+                            encodeURIComponent(data ?? "");
+
+                        return `
+                                <a href="/registry/details/${studentId}"
+                                   class="btn btn-success btn-sm">
+                                    <i class="fas fa-cog"></i>
+                                    Manage
+                                </a>
+                            `;
+                    }
                 }
+            ],
+
+            columnDefs: [
+                { targets: 0, width: "90px" },
+                { targets: 1, width: "145px" },
+                { targets: 2, width: "145px" },
+                { targets: 3, width: "65px" },
+                { targets: 4, width: "100px" },
+                { targets: 5, width: "105px" },
+                { targets: 6, width: "130px" },
+                { targets: 7, width: "180px" },
+                { targets: 8, width: "85px" },
+                {
+                    targets: 9,
+                    width: "105px",
+                    orderable: false,
+                    searchable: false
+                }
+            ],
+
+            language: {
+                processing: "Loading...",
+                emptyTable: "No student registry found.",
+                zeroRecords: "No matching student found."
+            },
+
+            initComplete: function () {
+                const api = this.api();
+
+                if (typeof MyApp !== "undefined" &&
+                    MyApp.utils &&
+                    typeof MyApp.utils
+                        .dataTableDebounceSearch ===
+                    "function") {
+                    MyApp.utils.dataTableDebounceSearch(
+                        tableSelector,
+                        500
+                    );
+                }
+
+                adjustRegistryColumns(api);
+            },
+
+            drawCallback: function () {
+                adjustRegistryColumns(this.api());
+            }
+        });
+    }
+
+    function adjustRegistryColumns(api) {
+        window.requestAnimationFrame(function () {
+            api.columns.adjust();
+        });
+
+        window.setTimeout(function () {
+            api.columns.adjust();
+        }, 150);
+
+        window.setTimeout(function () {
+            api.columns.adjust();
+        }, 350);
+    }
+
+    function registerRegistryResizeEvents() {
+        $(window)
+            .off("resize.registryTable")
+            .on("resize.registryTable", function () {
+                clearTimeout(registryResizeTimer);
+
+                registryResizeTimer = setTimeout(function () {
+                    if ($.fn.DataTable.isDataTable(
+                        "#tblRegistry"
+                    )) {
+                        registryTable.columns.adjust();
+                    }
+                }, 100);
             });
+
+        /*
+         * AdminLTE changes the content width when the sidebar opens
+         * or closes. Recalculate after that transition completes.
+         */
+        $(document)
+            .off(
+                "collapsed.lte.pushmenu.registry " +
+                "shown.lte.pushmenu.registry"
+            )
+            .on(
+                "collapsed.lte.pushmenu.registry " +
+                "shown.lte.pushmenu.registry",
+                function () {
+                    setTimeout(function () {
+                        if ($.fn.DataTable.isDataTable(
+                            "#tblRegistry"
+                        )) {
+                            registryTable.columns.adjust();
+                        }
+                    }, 350);
+                }
+            );
+    }
+
+    function formatRegistryDate(value) {
+        if (!value) {
+            return "";
         }
-    </script>
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return value;
+        }
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1)
+            .padStart(2, "0");
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+    }
+
+    function escapeRegistryHtml(value) {
+        return $("<div>")
+            .text(value ?? "")
+            .html();
+    }
+</script>
 }
