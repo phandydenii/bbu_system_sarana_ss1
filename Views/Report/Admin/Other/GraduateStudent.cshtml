@@ -1,11 +1,9 @@
 @model BBU_SYSTEM.ViewModel.Report.Others.GraduateStudentViewModel
-
 @{
     ViewData["Title"] = "Graduate Student";
     ViewData["OpenMenu"] = "Report";
     ViewData["OpenSubMenu"] = "AdminReport";
     ViewData["Action"] = "OtherReport";
-
     ViewContext.RouteData.Values["action"] = "Graduate Student";
 }
 
@@ -49,7 +47,7 @@
     }
 
     .other-report-page .form-control {
-        height: 34px;
+        min-height: 34px;
         font-size: 13px;
     }
 
@@ -61,6 +59,10 @@
     }
 
     .other-report-page .report-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 42px;
         padding: 8px 10px;
         border-bottom: 1px solid #dee2e6;
         background: #f4f6f9;
@@ -70,17 +72,36 @@
     }
 
     .other-report-page .report-frame {
-        display: block;
+        display: none;
         width: 100%;
         height: 700px;
         border: 0;
         background: #fff;
     }
 
+    .other-report-page .report-empty,
     .other-report-page .report-loading {
+        display: flex;
         height: 700px;
-        padding-top: 100px;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
         text-align: center;
+    }
+
+    .other-report-page .report-empty {
+        color: #6c757d;
+    }
+
+    .other-report-page .report-empty i {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 42px;
+        opacity: .45;
+    }
+
+    .other-report-page .report-loading {
+        display: none;
     }
 
     @@media (max-width: 991.98px) {
@@ -89,6 +110,7 @@
         }
 
         .other-report-page .report-frame,
+        .other-report-page .report-empty,
         .other-report-page .report-loading {
             height: 550px;
         }
@@ -100,6 +122,7 @@
         }
 
         .other-report-page .report-frame,
+        .other-report-page .report-empty,
         .other-report-page .report-loading {
             height: 450px;
         }
@@ -152,32 +175,20 @@
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="DegreeId"
-                               class="required">
-                            Degree
-                        </label>
-
-                        <select asp-for="DegreeId"
-                                class="form-control select2">
-                            <option value="">Select degree</option>
+                        <label asp-for="DegreeId" class="required">Degree</label>
+                        <select asp-for="DegreeId" id="cboDegree" class="form-control select2">
+                            <option value="">Select Degree</option>
                         </select>
-
                         <span asp-validation-for="DegreeId"
                               class="text-danger">
                         </span>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="SchoolId"
-                               class="required">
-                            School
-                        </label>
-
-                        <select asp-for="SchoolId"
-                                class="form-control select2">
-                            <option value="">Select school</option>
+                        <label asp-for="SchoolId" class="required">School</label>
+                        <select asp-for="SchoolId" id="cboSchool" class="form-control select2">
+                            <option value="">Select School</option>
                         </select>
-
                         <span asp-validation-for="SchoolId"
                               class="text-danger">
                         </span>
@@ -190,8 +201,9 @@
                         </label>
 
                         <select asp-for="FieldId"
+                                id="cboField"
                                 class="form-control select2">
-                            <option value="">Select field</option>
+                            <option value="">Select Field</option>
                         </select>
 
                         <span asp-validation-for="FieldId"
@@ -206,8 +218,9 @@
                         </label>
 
                         <select asp-for="PromotionNo"
+                                id="cboPromotion"
                                 class="form-control select2">
-                            <option value="">Select promotion</option>
+                            <option value="">Select Promotion</option>
                         </select>
 
                         <span asp-validation-for="PromotionNo"
@@ -227,16 +240,45 @@
             <div class="col-12 col-md-8 col-lg-9">
                 <div class="report-panel">
                     <div class="report-header">
-                        <i class="fas fa-user-graduate mr-1"></i>
-                        Graduate Student Report
+                        <span>
+                            <i class="fas fa-user-graduate mr-1"></i>
+                            Graduate Student Report
+                        </span>
+
+                        <a id="btnOpenReport"
+                           href="#"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-outline-primary btn-sm"
+                           style="display: none;">
+                            <i class="fas fa-external-link-alt mr-1"></i>
+                            Open
+                        </a>
+                    </div>
+
+                    <div id="reportEmpty"
+                         class="report-empty">
+                        <div>
+                            <i class="far fa-file-pdf"></i>
+
+                            <strong class="d-block">
+                                No report generated
+                            </strong>
+
+                            <span>
+                                Select all filters and click Preview.
+                            </span>
+                        </div>
                     </div>
 
                     <div id="reportLoading"
-                         class="report-loading d-none">
-                        <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                         class="report-loading">
+                        <div>
+                            <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
 
-                        <div class="mt-2">
-                            Loading report...
+                            <div class="mt-2">
+                                Loading report...
+                            </div>
                         </div>
                     </div>
 
@@ -253,182 +295,388 @@
 
 @section Scripts
 {
-    <script>
-        const degreeId = $("#DegreeId");
-        const schoolId = $("#SchoolId");
-        const fieldId = $("#FieldId");
-        const promotionNo = $("#PromotionNo");
+<script src="~/function/Degree.js"></script>
+<script src="~/function/School.js"></script>
+<script src="~/function/Field.js"></script>
+<script src="~/function/Promotion.js"></script>
 
-        const btnPreview = $("#btnPreview");
-        const reportLoading = $("#reportLoading");
-        const printFrame = $("#printFrame");
+<script>
+    const cboDegree = $("#cboDegree");
+    const cboSchool = $("#cboSchool");
+    const cboField = $("#cboField");
+    const cboPromotion = $("#cboPromotion");
 
-        let currentPdfUrl = null;
+    const btnPreview = $("#btnPreview");
+    const btnOpenReport = $("#btnOpenReport");
 
-        $(document).ready(function () {
-            initializeSelect2();
-            bindEvents();
+    const reportEmpty = $("#reportEmpty");
+    const reportLoading = $("#reportLoading");
+    const printFrame = $("#printFrame");
+
+    let graduateStudentPdfUrl = null;
+
+    // Add your report endpoint later.
+    const graduateStudentReportUrl = "";
+
+    $(document).ready(async function () {
+        initializeSelect2();
+        bindEvents();
+
+        clearSelect(cboField, "Select Field");
+        clearSelect(cboPromotion, "Select Promotion");
+
+        await getDegree();
+        await getSchool();
+    });
+
+    function initializeSelect2() {
+        cboDegree.select2({
+            width: "100%",
+            placeholder: "Select Degree",
+            allowClear: true
         });
 
-        function initializeSelect2() {
-            degreeId.select2({
-                width: "100%",
-                placeholder: "Select degree",
-                allowClear: true
-            });
+        cboSchool.select2({
+            width: "100%",
+            placeholder: "Select School",
+            allowClear: true
+        });
 
-            schoolId.select2({
-                width: "100%",
-                placeholder: "Select school",
-                allowClear: true
-            });
+        cboField.select2({
+            width: "100%",
+            placeholder: "Select Field",
+            allowClear: true
+        });
 
-            fieldId.select2({
-                width: "100%",
-                placeholder: "Select field",
-                allowClear: true
-            });
+        cboPromotion.select2({
+            width: "100%",
+            placeholder: "Select Promotion",
+            allowClear: true
+        });
+    }
 
-            promotionNo.select2({
-                width: "100%",
-                placeholder: "Select promotion",
-                allowClear: true
-            });
+    function bindEvents() {
+        cboDegree.on("change", async function () {
+            await reloadDependentFilters();
+        });
+
+        cboSchool.on("change", async function () {
+            await reloadDependentFilters();
+        });
+
+        btnPreview.on("click", function () {
+            previewGraduateStudent();
+        });
+    }
+
+    async function reloadDependentFilters() {
+        clearSelect(cboField, "Select Field");
+        clearSelect(cboPromotion, "Select Promotion");
+
+        const degreeId = parseInt(cboDegree.val());
+        const schoolId = parseInt(cboSchool.val());
+
+        if (!degreeId || !schoolId) {
+            return;
         }
 
-        function bindEvents() {
-            btnPreview.on("click", function () {
-                previewGraduateStudent();
+        await Promise.all([
+            getField(),
+            getPromotion()
+        ]);
+    }
+
+    async function getDegree() {
+        clearSelect(cboDegree, "Select Degree");
+
+        try {
+            const degrees = await Degree.GetAllDegree();
+
+            degrees.forEach(function (item) {
+                cboDegree.append(
+                    `<option value="${item.degreeId}">
+                            ${item.degreeName}
+                        </option>`
+                );
             });
+
+            cboDegree
+                .val("")
+                .trigger("change.select2");
+        } catch (error) {
+            console.error("Degree API error:", error);
+            ShowToastError("Unable to load degrees.");
+        }
+    }
+
+    async function getSchool() {
+        clearSelect(cboSchool, "Select School");
+
+        try {
+            const schools = await School.GetSchool();
+
+            schools.forEach(function (item) {
+                cboSchool.append(
+                    `<option value="${item.schoolId}">
+                            ${item.schoolName}
+                        </option>`
+                );
+            });
+
+            cboSchool
+                .val("")
+                .trigger("change.select2");
+        } catch (error) {
+            console.error("School API error:", error);
+            ShowToastError("Unable to load schools.");
+        }
+    }
+
+    async function getField() {
+        const degreeId = parseInt(cboDegree.val());
+        const schoolId = parseInt(cboSchool.val());
+
+        clearSelect(cboField, "Select Field");
+
+        if (!degreeId || !schoolId) {
+            return;
         }
 
-        function previewGraduateStudent() {
-            if (!degreeId.val()) {
-                ShowToastInfo("Please select a degree.");
-                degreeId.select2("open");
-                return;
-            }
+        try {
+            const fields = await Field.GetFields({
+                isAll: true,
+                degreeId: degreeId,
+                schoolId: schoolId
+            });
 
-            if (!schoolId.val()) {
-                ShowToastInfo("Please select a school.");
-                schoolId.select2("open");
-                return;
-            }
+            fields.forEach(function (item) {
+                cboField.append(
+                    `<option value="${item.fieldId}">
+                            ${item.fieldName}
+                        </option>`
+                );
+            });
 
-            if (!fieldId.val()) {
-                ShowToastInfo("Please select a field.");
-                fieldId.select2("open");
-                return;
-            }
+            cboField
+                .val("")
+                .trigger("change.select2");
+        } catch (error) {
+            console.error("Field API error:", error);
+            ShowToastError("Unable to load fields.");
+        }
+    }
 
-            if (!promotionNo.val()) {
-                ShowToastInfo("Please select a promotion.");
-                promotionNo.select2("open");
-                return;
-            }
+    async function getPromotion() {
+        const degreeId = parseInt(cboDegree.val());
+        const schoolId = parseInt(cboSchool.val());
 
-            const requestData = {
-                DegreeId: degreeId.val(),
-                SchoolId: schoolId.val(),
-                FieldId: fieldId.val(),
-                PromotionNo: promotionNo.val()
-            };
+        clearSelect(cboPromotion, "Select Promotion");
 
-            showReportLoading();
+        if (!degreeId || !schoolId) {
+            return;
+        }
 
-            /*
-            $.ajax({
-                url: "YOUR_REPORT_CONTROLLER_URL",
-                type: "GET",
-                data: requestData,
+        try {
+            const promotions =
+                await Promotion.GetPromotions({
+                    degreeId: degreeId,
+                    schoolId: schoolId
+                });
 
-                xhrFields: {
-                    responseType: "blob"
-                },
+            promotions.forEach(function (item) {
+                /*
+                 * PromotionNo is the model property, so the
+                 * option value uses item.promotionNo.
+                 */
+                cboPromotion.append(
+                    `<option value="${item.promotionNo}">
+                            ${item.promotionNo}
+                        </option>`
+                );
+            });
 
-                success: function (response, textStatus, xhr) {
-                    const contentType =
-                        xhr.getResponseHeader("Content-Type")
-                        || "application/pdf";
+            cboPromotion
+                .val("")
+                .trigger("change.select2");
+        } catch (error) {
+            console.error("Promotion API error:", error);
+            ShowToastError("Unable to load promotions.");
+        }
+    }
 
-                    if (currentPdfUrl) {
-                        URL.revokeObjectURL(currentPdfUrl);
-                    }
+    function clearSelect(selectElement, placeholder) {
+        selectElement
+            .empty()
+            .append(
+                `<option value="">${placeholder}</option>`
+            )
+            .val("")
+            .trigger("change.select2");
+    }
 
-                    const pdfBlob = new Blob(
-                        [response],
-                        {
-                            type: contentType
-                        }
-                    );
+    function getReportRequest() {
+        return {
+            DegreeId: cboDegree.val(),
+            SchoolId: cboSchool.val(),
+            FieldId: cboField.val(),
+            PromotionNo: cboPromotion.val()
+        };
+    }
 
-                    currentPdfUrl =
-                        URL.createObjectURL(pdfBlob);
+    function previewGraduateStudent() {
+        const request = getReportRequest();
 
-                    printFrame
-                        .off("load.graduateStudent")
-                        .one("load.graduateStudent", function () {
-                            hideReportLoading();
-                        })
-                        .attr("src", currentPdfUrl);
-                },
+        if (!request.DegreeId) {
+            ShowToastInfo("Please select a degree.");
+            cboDegree.select2("open");
+            return;
+        }
 
-                error: function (xhr) {
-                    hideReportLoading();
+        if (!request.SchoolId) {
+            ShowToastInfo("Please select a school.");
+            cboSchool.select2("open");
+            return;
+        }
 
-                    const response = xhr.response;
+        if (!request.FieldId) {
+            ShowToastInfo("Please select a field.");
+            cboField.select2("open");
+            return;
+        }
 
-                    if (response instanceof Blob) {
-                        response.text().then(function (message) {
-                            ShowToastError(
-                                message ||
-                                "Unable to generate graduate student report."
-                            );
-                        });
+        if (!request.PromotionNo) {
+            ShowToastInfo("Please select a promotion.");
+            cboPromotion.select2("open");
+            return;
+        }
 
-                        return;
-                    }
+        if (!graduateStudentReportUrl) {
+            console.log("Graduate Student request:", request);
 
-                    ShowToastError(
-                        xhr.responseText ||
-                        "Unable to generate graduate student report."
+            ShowToastInfo(
+                "Graduate Student report URL is not configured yet."
+            );
+
+            return;
+        }
+
+        showReportLoading();
+
+        $.ajax({
+            url: graduateStudentReportUrl,
+            type: "GET",
+            data: request,
+
+            xhrFields: {
+                responseType: "blob"
+            },
+
+            success: function (
+                response,
+                textStatus,
+                xhr
+            ) {
+                const contentType =
+                    xhr.getResponseHeader("Content-Type")
+                    || "application/pdf";
+
+                if (graduateStudentPdfUrl) {
+                    URL.revokeObjectURL(
+                        graduateStudentPdfUrl
                     );
                 }
-            });
-            */
 
-            console.log(requestData);
-
-            // Remove this after adding your AJAX report URL.
-            hideReportLoading();
-        }
-
-        function showReportLoading() {
-            printFrame.addClass("d-none");
-            reportLoading.removeClass("d-none");
-
-            btnPreview
-                .prop("disabled", true)
-                .html(
-                    '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+                const pdfBlob = new Blob(
+                    [response],
+                    {
+                        type: contentType
+                    }
                 );
-        }
 
-        function hideReportLoading() {
-            reportLoading.addClass("d-none");
-            printFrame.removeClass("d-none");
+                graduateStudentPdfUrl =
+                    URL.createObjectURL(pdfBlob);
 
-            btnPreview
-                .prop("disabled", false)
-                .html(
-                    '<i class="fas fa-eye mr-1"></i> Preview'
+                reportEmpty.hide();
+                reportLoading.hide();
+
+                printFrame
+                    .attr("src", graduateStudentPdfUrl)
+                    .show();
+
+                btnOpenReport
+                    .attr("href", graduateStudentPdfUrl)
+                    .show();
+            },
+
+            error: function (xhr) {
+                hideReportLoading();
+
+                const response = xhr.response;
+
+                if (response instanceof Blob) {
+                    response.text().then(function (message) {
+                        ShowToastError(
+                            message ||
+                            "Unable to generate Graduate Student report."
+                        );
+                    });
+
+                    return;
+                }
+
+                ShowToastError(
+                    xhr.responseText ||
+                    "Unable to generate Graduate Student report."
                 );
-        }
+            },
 
-        $(window).on("beforeunload", function () {
-            if (currentPdfUrl) {
-                URL.revokeObjectURL(currentPdfUrl);
+            complete: function () {
+                btnPreview
+                    .prop("disabled", false)
+                    .html(
+                        '<i class="fas fa-eye mr-1"></i> Preview'
+                    );
             }
         });
-    </script>
+    }
+
+    function showReportLoading() {
+        reportEmpty.hide();
+        printFrame.hide();
+        btnOpenReport.hide();
+        reportLoading.css("display", "flex");
+
+        btnPreview
+            .prop("disabled", true)
+            .html(
+                '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+            );
+    }
+
+    function hideReportLoading() {
+        reportLoading.hide();
+
+        btnPreview
+            .prop("disabled", false)
+            .html(
+                '<i class="fas fa-eye mr-1"></i> Preview'
+            );
+
+        if (graduateStudentPdfUrl) {
+            printFrame.show();
+            btnOpenReport.show();
+            return;
+        }
+
+        reportEmpty.css("display", "flex");
+    }
+
+    $(window).on("beforeunload", function () {
+        if (graduateStudentPdfUrl) {
+            URL.revokeObjectURL(
+                graduateStudentPdfUrl
+            );
+        }
+    });
+</script>
 }
