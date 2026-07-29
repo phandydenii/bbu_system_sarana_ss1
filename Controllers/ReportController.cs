@@ -89,8 +89,7 @@ public class   ReportController(
             localReport.ReportPath = reportPath;
             localReport.DataSources.Add(
                 new ReportDataSource("DataSet1",dt)
-            );
-
+            ); 
             localReport.SetParameters(new[]
                 {
                     new ReportParameter("reporter",req.Reporter ?? string.Empty),
@@ -142,6 +141,45 @@ public class   ReportController(
     {
         return View("Admin/Payment/StudentPaymentByDate");
     }
+    [HttpPost("administration/generate/payment-by-date")]
+    public async Task<IActionResult> PaymentByDateGenerate(PaymentByDateGenerateReq req)
+    {
+        var connectionString = configuration.GetConnectionString($"{_campus}_campus");
+        var parms = new[]
+        {
+            new SqlParameter("@DegreeId", req.DegreeId),
+            new SqlParameter("@SchoolId", req.SchoolId), 
+            new SqlParameter("@PromotionId", req.PromotionId),
+            new SqlParameter("@StageId", req.StageId), 
+            new SqlParameter("@TermNo", req.TermNo),
+            new SqlParameter("@FromDate", req.FromDate.HasValue ? req.FromDate : DBNull.Value),
+            new SqlParameter("@ToDate", req.ToDate.HasValue ? req.ToDate : DBNull.Value)
+        };
+        const string query = @"
+            SELECT *
+            FROM INVOICE_Rep_v
+            WHERE DEGREE_ID = @DegreeId
+              AND SCHOOL_ID = @SchoolId 
+              AND PROMOTION_ID = @PromotionId
+              AND STAGE_ID = @StageId
+              AND TERM_NO = @TermNo
+              AND (@FromDate IS NULL OR STARTDATE >= @FromDate)
+              AND (@ToDate IS NULL OR ENDDATE <= @ToDate)
+            ORDER BY STUDENT_NAME;
+        ";
+        var dt = await DataManager.DataTableRawSqlAsync(connectionString!,query,parms);
+        var localReport = new LocalReport();
+        localReport.ReportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports","STUDENT_PAYMENT_NEW_RPT.rdlc");
+        localReport.DataSources.Add(new ReportDataSource("DataSet1", dt));
+        localReport.SetParameters(new[]
+            {
+                new ReportParameter("fromdate",req.FromDate.ToString() ?? string.Empty),
+                new ReportParameter("todate",req.ToDate.ToString() ?? string.Empty)
+            }
+        );
+        var pdf = localReport.Render("PDF");
+        return File(pdf, "application/pdf", "not_payment.pdf");
+    }
     [Route("administration/payment-by-group")]
     public IActionResult PaymentByGroup()
     {
@@ -153,7 +191,7 @@ public class   ReportController(
         return View("Admin/Payment/StudentNotPaymentNew");
     }
     [HttpPost("administration/generate/not-payment")]
-    public async Task<IActionResult> NotPayments(AdministrationNotPaymentReq req)
+    public async Task<IActionResult> NotPaymentGenerate(AdministrationNotPaymentReq req)
     {
         var connectionString = configuration.GetConnectionString($"{_campus}_campus");
         var parms = new[]
@@ -161,18 +199,26 @@ public class   ReportController(
             new SqlParameter("@DegreeId", req.DegreeId),
             new SqlParameter("@SchoolId", req.SchoolId),
             new SqlParameter("@FieldId", req.FieldId),
-            new SqlParameter("@PromotionId", req.PromotionId)
+            new SqlParameter("@PromotionNo", req.PromotionNo),
+            new SqlParameter("@StageNo", req.StageNo),
+            new SqlParameter("@TermNo", req.TermNo),
+            new SqlParameter("@FromDate", req.FromDate.HasValue ? req.FromDate : DBNull.Value),
+            new SqlParameter("@ToDate", req.ToDate.HasValue ? req.ToDate : DBNull.Value)
         };
-        var dt = await DataManager.DataTableRawSqlAsync(
-            connectionString!,
-            $"SELECT * FROM V_ADMIN_REPORT_LIST_OF_STUDENT_NOT_PAYMENT_NEW " +
-            $"WHERE DEGREE_ID = @DegreeId " +
-            $"AND SCHOOL_ID = @SchoolId " +
-            $"AND FIELD_ID = @FieldId " +
-            $"AND PROMOTION_NO = @PromotionId " +
-            $"ORDER BY STUDENT_NAME",
-            parms
-        );
+        const string query = @"
+            SELECT *
+            FROM V_ADMIN_REPORT_LIST_OF_STUDENT_NOT_PAYMENT_NEW
+            WHERE DEGREE_ID = @DegreeId
+              AND SCHOOL_ID = @SchoolId
+              AND FIELD_ID = @FieldId
+              AND PROMOTION_NO = @PromotionNo
+              AND STAGE_NO = @StageNo
+              AND TERM_NO = @TermNo
+              AND (@FromDate IS NULL OR startdate >= @FromDate)
+              AND (@ToDate IS NULL OR enddate <= @ToDate)
+            ORDER BY STUDENT_NAME;
+        ";
+        var dt = await DataManager.DataTableRawSqlAsync(connectionString!,query,parms);
         var localReport = new LocalReport();
         localReport.ReportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports","STUDENT_NOT_PAYMENT_RPT.rdlc");
         localReport.DataSources.Add(new ReportDataSource("DataSet1", dt));
@@ -239,7 +285,9 @@ public class   ReportController(
                 return new ServerResponse().BadRequest("Degree, School and Promotion is required.");  
             if (req.FromDate.HasValue && req.ToDate.HasValue && req.ToDate.Value < req.FromDate.Value)
                 return new ServerResponse().BadRequest("To Date must be greater than or equal to From Date.");
-
+            bool isNotAccepted = req.IsAcceptCertificate == "NOT_ACCEPTED";
+            string report = isNotAccepted 
+                ? "STUDENT_LIST_NOT_ACCEPT_CERTIFICATE_RPT.rdlc" : "STUDENT_LIST_ACCEPT_CERTIFICATE_RPT.rdlc";
             var connectionString = configuration.GetConnectionString($"{_campus}_campus"); 
             const string query = @"
                 SELECT *
@@ -270,9 +318,9 @@ public class   ReportController(
                 new SqlParameter("@FromPromotionNo",req.FromPromotionNo),
                 new SqlParameter("@ToPromotionNo",req.ToPromotionNo), 
                 new SqlParameter("@Title",req.Title ?? string.Empty), 
-                new SqlParameter("@IsAcceptCertificate",req.IsAcceptCertificate), 
-                new SqlParameter("@FromDate",req.FromDate.HasValue ? req.FromDate.Value : DBNull.Value),  
-                new SqlParameter("@ToDate",req.ToDate.HasValue ? req.ToDate.Value : DBNull.Value)
+                new SqlParameter("@IsAcceptCertificate",req.IsAcceptCertificate == "NOT_ACCEPTED" ? 0 : 1), 
+                new SqlParameter("@FromDate", isNotAccepted && req.FromDate.HasValue ? req.FromDate.Value : DBNull.Value),
+                new SqlParameter("@ToDate", isNotAccepted && req.ToDate.HasValue ? req.ToDate.Value : DBNull.Value)
             };
 
             var dt = await DataManager.DataTableRawSqlAsync(connectionString!,query,parameters);
@@ -283,24 +331,24 @@ public class   ReportController(
                 Directory.GetCurrentDirectory(),
                 "Reports",
                 "STUDENT_CERTIFICATE",
-                "STUDENT_LIST_ACCEPT_CERTIFICATE_RPT.rdlc"
+                report
             ); 
 
             using var localReport = new LocalReport();
             localReport.ReportPath = reportPath;
-            localReport.DataSources.Add(
-                new ReportDataSource("DataSet1",dt)
-            );
-
-            localReport.SetParameters(new[]
-                {
-                    new ReportParameter("title",req.Title ?? string.Empty), 
-                    new ReportParameter("frompro",req.FromPromotionNo.ToString()), 
-                    new ReportParameter("topro",req.ToPromotionNo.ToString()), 
-                    new ReportParameter("fromdate",req.FromDate.ToString()), 
-                    new ReportParameter("todate",req.ToDate.ToString()), 
-                }
-            );
+            localReport.DataSources.Add(new ReportDataSource("DataSet1", dt));
+            var reportParameters = new List<ReportParameter>
+            {
+                new("title", req.Title ?? string.Empty),
+                new("frompro", req.FromPromotionNo.ToString()),
+                new("topro", req.ToPromotionNo.ToString())
+            };
+            if (!isNotAccepted)
+            {
+                reportParameters.Add(new ReportParameter("fromdate",req.FromDate?.ToString("dd/MM/yyyy") ?? string.Empty));
+                reportParameters.Add(new ReportParameter("todate",req.ToDate?.ToString("dd/MM/yyyy") ?? string.Empty));
+            }
+            localReport.SetParameters(reportParameters);
             var pdf = localReport.Render("PDF");
             return File(
                 pdf,

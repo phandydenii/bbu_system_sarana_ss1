@@ -205,13 +205,7 @@
                                        value="1" />
                             </div>
                         </div>
-                    </div> 
-                    <div class="form-group">
-                        <label for="cboCategoryId"> Category </label>
-                        <select id="cboCategoryId" class="form-control select2">
-                            <option value="">All categories</option>
-                        </select>
-                    </div>
+                    </div>  
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
@@ -276,8 +270,7 @@
     const cboPromotionId = $("#cboPromotionId");
     const cboStageId = $("#cboStageId");
     const cboFieldId = $("#cboFieldId");
-    const txtTermNo = $("#txtTermNo");
-    const cboCategoryId = $("#cboCategoryId");
+    const txtTermNo = $("#txtTermNo"); 
     const dtpFromDate = $("#dtpFromDate");
     const dtpToDate = $("#dtpToDate");
 
@@ -408,30 +401,42 @@
     }
 
     function previewOweReport() {
-        // if (!cboDegreeId.val()) {
-        //     ShowToastInfo("Please select a degree.");
-        //     cboDegreeId.select2("open");
-        //     return;
-        // }
-        // if (!cboSchoolId.val()) {
-        //     ShowToastInfo("Please select a school.");
-        //     cboSchoolId.select2("open");
-        //     return;
-        // }
-        // if (!cboPromotionId.val()) {
-        //     ShowToastInfo("Please select a promotion.");
-        //     cboPromotionId.select2("open");
-        //     return;
-        // }
-        // if (!cboStageId.val()) {
-        //     ShowToastInfo("Please select a stage.");
-        //     cboStageId.select2("open");
-        //     return;
-        // }
-        // if (dtpFromDate.val() && dtpToDate.val() && new Date(dtpToDate.val()) < new Date(dtpFromDate.val())) {
-        //     ShowToastInfo("To Date must be later than From Date.");
-        //     return;
-        // }
+        if (!cboDegreeId.val()) {
+            ShowToastInfo("Please select a degree.");
+            cboDegreeId.select2("open");
+            return;
+        }
+        if (!cboSchoolId.val()) {
+            ShowToastInfo("Please select a school.");
+            cboSchoolId.select2("open");
+            return;
+        }
+        if (!cboFieldId.val()) {
+            ShowToastInfo("Please select a field.");
+            cboFieldId.select2("open");
+            return;
+        }
+        if (!cboPromotionId.val()) {
+            ShowToastInfo("Please select a promotion.");
+            cboPromotionId.select2("open");
+            return;
+        }
+        if (!cboStageId.val()) {
+            ShowToastInfo("Please select a stage.");
+            cboStageId.select2("open");
+            return;
+        }
+        const termNo = parseInt(txtTermNo.val());
+        if (!termNo || termNo <= 0) {
+            ShowToastInfo("Please enter a valid term number.");
+            txtTermNo.focus();
+            return;
+        }
+        if (dtpFromDate.val() && tpToDate.val() && dtpToDate.val() < dtpFromDate.val()){
+            ShowToastInfo("To Date must be later than or equal to From Date.");
+            dtpToDate.focus();
+            return;
+        }
         showReportLoading();
         $.ajax({
             url: '/report/administration/generate/not-payment',
@@ -440,9 +445,9 @@
                 DegreeId: cboDegreeId.val(),
                 SchoolId: cboSchoolId.val(),
                 FieldId: cboFieldId.val(),
-                StageId: cboStageId.val(),
-                Term: txtTermNo.val(),
-                CategoryId: cboCategoryId.val() || "",
+                PromotionNo: cboPromotionId.find("option:selected").text(), 
+                TermNo: txtTermNo.val(), 
+                StageNo: cboStageId.find("option:selected").text(),
                 FromDate: dtpFromDate.val() || "",
                 ToDate: dtpToDate.val() || ""
             },

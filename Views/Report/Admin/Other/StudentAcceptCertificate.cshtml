@@ -493,7 +493,7 @@
                 SchoolId: cboSchool.val(),
                 FromPromotionNo: fromPromotionNo.val(),
                 ToPromotionNo: toPromotionNo.val(),
-                IsAcceptCertificate: $("input[name='certificateStatus']:checked").val() === "NOT_ACCEPTED" ? 0 : 1,
+                IsAcceptCertificate: $("input[name='certificateStatus']:checked").val(),
                 Status: $("input[name='studentStatus']:checked").val(),
                 FromDate:fromDate.val() || "",
                 ToDate:toDate.val() || "",

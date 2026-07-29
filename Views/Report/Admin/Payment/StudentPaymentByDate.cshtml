@@ -217,14 +217,7 @@ ViewContext.RouteData.Values["action"] = "Student Payment By Date";
                                        class="form-control" />
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="cboCategory" class="required">Category</label>
-                        <select id="cboCategory"
-                                class="form-control select2">
-                            <option value="">Select category</option>
-                        </select>
-                    </div>
+                    </div> 
                     <button type="button"
                             id="btnPreview"
                             class="btn btn-success btn-block">
@@ -273,8 +266,7 @@ ViewContext.RouteData.Values["action"] = "Student Payment By Date";
     const cboStage = $("#cboStage");
     const txtTermNo = $("#txtTermNo");
     const dtFromDate = $("#dtFromDate");
-    const dtToDate = $("#dtToDate");
-    const cboCategory = $("#cboCategory");
+    const dtToDate = $("#dtToDate"); 
 
     const btnPreview = $("#btnPreview");
     const reportLoading = $("#reportLoading");
@@ -309,12 +301,7 @@ ViewContext.RouteData.Values["action"] = "Student Payment By Date";
             width: "100%",
             placeholder: "Select stage",
             allowClear: true
-        });
-        cboCategory.select2({
-            width: "100%",
-            placeholder: "Select category",
-            allowClear: true
-        });
+        }); 
     }
 
     function bindEvents() {
@@ -410,7 +397,7 @@ ViewContext.RouteData.Values["action"] = "Student Payment By Date";
             ShowToastInfo("Please select a school.");
             cboSchool.select2("open");
             return;
-        }
+        } 
         if (!cboPromotion.val()) {
             ShowToastInfo("Please select a promotion.");
             cboPromotion.select2("open");
@@ -425,29 +412,23 @@ ViewContext.RouteData.Values["action"] = "Student Payment By Date";
             ShowToastInfo("Please enter a valid term.");
             txtTermNo.focus();
             return;
-        }
-        if (!cboCategory.val()) {
-            ShowToastInfo("Please select a category.");
-            cboCategory.select2("open");
-            return;
-        }
+        } 
         if (dtFromDate.val() && dtToDate.val() && new Date(dtToDate.val()) < new Date(dtFromDate.val())) {
             ShowToastInfo("To Date must be later than From Date.");
             return;
         }
         showReportLoading();
         $.ajax({
-            url: '@Url.Action("PaymentByDatePreview", "Report")',
-            type: "GET",
+            url: '/report/administration/generate/payment-by-date',
+            type: "POST",
             data: {
-                DegreeId: cboDegree.val(),
-                SchoolId: cboSchool.val(),
+                DegreeId: cboDegree.find("option:selected").text(),
+                SchoolId: cboSchool.find("option:selected").text(),
                 PromotionId: cboPromotion.val(),
-                StageNo: cboStage.val(),
+                StageId: cboStage.val(),
                 TermNo: txtTermNo.val(),
                 FromDate: dtFromDate.val() || "",
-                ToDate: dtToDate.val() || "",
-                CategoryId: cboCategory.val()
+                ToDate: dtToDate.val() || ""
             },
             xhrFields: {
                 responseType: "blob"
