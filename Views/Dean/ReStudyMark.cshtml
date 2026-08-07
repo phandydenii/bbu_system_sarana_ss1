@@ -433,279 +433,430 @@
 </div>
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <partial name="_studentPartial"/>
-
 @section Scripts
 {
     <script>
-        const tblStudentScore = $("#tblStudentScore");
-        const tblExamScoreHistory = $("#tblExamScoreHistory");
-        const tblReStudyScoreHistory  = $("#tblReStudyScoreHistory");
-
-
-        const tblReExam1 = $("#tblReExam1");
-        const tblReExam2 = $("#tblReExam2");
         const studentId = $("#studentId");
-        $(document).ready(function () {
-            tblStudentScore.DataTable({
-                responsive: true,
-            });
-        });
+        const txtStudentId = $("#txtStudentId");
+        const txtStudentName = $("#txtStudentName");
+        const txtStudentNameKhmer = $("#txtStudentNameKhmer");
 
-        $("#btnSearchStudent").on("click", function (e) {
-            e.preventDefault();
-            $("#StudentModal").modal("show");
-            const tblSearchStudent = $("#tblSearchStudent");
-            tblSearchStudent.DataTable().clear().destroy();
-            tblSearchStudent.DataTable({
-                processing: true,
-                serverSide: true,
-                paging: true,
-                lengthChange: true,
-                searching: true,
-                ordering: true,
-                info: true,
-                responsive: true,
-                autoWidth: true,
-                scrollCollapse: true,
-                ajax: {
-                    url: "/student/academic/student-list/all",
-                    type: "POST",
-                },
-                columns: [
-                    {data: "studentId"},
-                    {data: "studentName"},
-                    {data: "studentNameInKhmer"},
-                    {data: "sex"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            if (row.status === "REGISTER") {
-                                return ` <span class="badge badge-warning">${row.status}</span>`;
-                            } else if (row.status === "ACTIVE") {
-                                return ` <span class="badge badge-primary">${row.status}</span>`;
-                            } else if (row.status === "QUIT") {
-                                return ` <span class="badge badge-danger">${row.status}</span>`;
-                            } else {
-                                return `<span class="badge badge-secondary">${row.status}</span>`;
+        const tblStudentResult = $("#tblStudentResult");
+        const tblExamHistory = $("#tblExamHistory");
+        const tblRestudyHistory = $("#tblRestudyHistory");
+
+        $(document).ready(function () {
+            $("#btnSearchStudent").on("click", function (e) {
+                e.preventDefault();
+
+                $("#StudentModal").modal("show");
+
+                const tblSearchStudent = $("#tblSearchStudent");
+
+                if ($.fn.DataTable.isDataTable("#tblSearchStudent")) {
+                    tblSearchStudent.DataTable().clear().destroy();
+                }
+
+                tblSearchStudent.DataTable({
+                    processing: true,
+                    serverSide: true,
+                    paging: true,
+                    lengthChange: true,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    responsive: true,
+                    autoWidth: true,
+                    scrollCollapse: true,
+
+                    ajax: {
+                        url: "/student/academic/student-list/all",
+                        type: "POST"
+                    },
+
+                    columns: [
+                        { data: "studentId" },
+                        { data: "studentName" },
+                        { data: "studentNameInKhmer" },
+                        { data: "sex" },
+                        {
+                            data: null,
+                            render: function (data, type, row) {
+                                if (row.status === "REGISTER") {
+                                    return `<span class="badge badge-warning">${row.status}</span>`;
+                                }
+
+                                if (row.status === "ACTIVE") {
+                                    return `<span class="badge badge-primary">${row.status}</span>`;
+                                }
+
+                                if (row.status === "QUIT") {
+                                    return `<span class="badge badge-danger">${row.status}</span>`;
+                                }
+
+                                return `<span class="badge badge-secondary">${row.status ?? ""}</span>`;
                             }
                         },
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `<a onclick="OnSelectStudent(this)"  class="btn btn-success btn-xs">Select</a>`;
-                        },
-                    },
-                ],
-                initComplete: function () {
-                    MyApp.utils.dataTableDebounceSearch("#tblSearchStudent", 500);
-                }
+                        {
+                            data: null,
+                            render: function () {
+                                return `
+                                    <button type="button"
+                                            onclick="OnSelectStudent(this)"
+                                            class="btn btn-success btn-xs">
+                                        Select
+                                    </button>
+                                `;
+                            }
+                        }
+                    ],
+
+                    initComplete: function () {
+                        MyApp.utils.dataTableDebounceSearch(
+                            "#tblSearchStudent",
+                            500
+                        );
+                    }
+                });
+            });
+
+            $("#btnPrintScore").on("click", function () {
+                printStudentScore();
+            });
+
+            $("#btnViewContract").on("click", function () {
+                viewStudentContract();
             });
         });
 
         function OnSelectStudent(e) {
-            const $input = $(e);
-            const $row = $input.closest('tr');
-            const selectedRow = $("#tblSearchStudent").DataTable().row($row).data();
-            if (selectedRow) {
-                getStudent(selectedRow.studentId);
-                getStudentScore(selectedRow.studentId);
-                $("#StudentModal").modal("hide");
+            const row = $(e).closest("tr");
+
+            const selectedRow = $("#tblSearchStudent")
+                .DataTable()
+                .row(row)
+                .data();
+
+            if (!selectedRow) {
+                return;
             }
+
+            getStudent(selectedRow.studentId);
+            getStudentScore(selectedRow.studentId);
+
+            clearHistoryTables();
+
+            $("#StudentModal").modal("hide");
         }
 
         function getStudent(student_id) {
             $.ajax({
                 url: "/student/academic/student-id/" + student_id,
                 type: "GET",
-                data: {student_id: student_id},
+
+                data: {
+                    student_id: student_id
+                },
+
                 success: function (res) {
                     const data = res.data;
-                    if (data) {
-                        const student = data.student ?? {};
-                        const degree = data.degree ?? {};
-                        const school = data.school ?? {};
-                        const field = data.field ?? {};
-                        const promotion = data.promotion ?? {};
-                        const stage = data.stage ?? {};
-                        const term = data.term ?? {};
-                        const group = data.group ?? {};
-                        const groupRoom = data.groupRoom ?? {};
-                        const registry = data.registry ?? {};
 
-                        $("#studentId").val(student.studentId ?? "");
-                        $("#studentName").val(student.studentName ?? "");
-                        $("#studentNameInKhmer").val(student.studentNameInKhmer ?? "");
-                        $("#phone").val(student.phone ?? "");
-
-                        if (student.dateOfBirth) {
-                            $("#dateOfBirth").val(formatDate(student.dateOfBirth, "DD-MMM-YYYY"));
-                        } else {
-                            $("#dateOfBirth").val("");
-                        }
-
-                        $("#sex").val(student.sex ?? "");
-                        $("#status").val(student.status ?? "");
-
-                        $("#degree").val(degree.degreeName ?? "");
-                        $("#school").val(school.schoolName ?? "");
-                        $("#field").val(field.fieldName ?? "");
-
-                        $("#promotion").val(promotion.promotionNo ?? "");
-                        $("#stage").val(stage.stageNo ?? "");
-                        $("#term").val(term.termNo ?? "");
-
-                        $("#group").val(group.groupName ?? "");
-                        $("#room").val(groupRoom.roomName ?? group.roomName ?? "");
-                        $("#study_time").val(groupRoom.studyTime ?? group.studyTime ?? "");
-                    } else {
-                        alert("Student not found.");
+                    if (!data) {
+                        ShowToastInfo("Student not found.");
+                        return;
                     }
+
+                    const student = data.student ?? {};
+
+                    studentId.val(
+                        student.studentId ?? student_id
+                    );
+
+                    txtStudentId.val(
+                        student.studentId ?? student_id
+                    );
+
+                    txtStudentName.val(
+                        student.studentName ?? ""
+                    );
+
+                    txtStudentNameKhmer.val(
+                        student.studentNameInKhmer ?? ""
+                    );
                 },
-                error: function () {
-                    alert("Error fetching student data.");
+
+                error: function (xhr) {
+                    console.error(xhr);
+
+                    ShowToastError(
+                        xhr.responseText ||
+                        "Error fetching student data."
+                    );
                 }
             });
         }
 
         function getStudentScore(student_id) {
-            tblStudentScore.DataTable().clear().destroy();
-            tblStudentScore.DataTable({
+            if ($.fn.DataTable.isDataTable("#tblStudentResult")) {
+                tblStudentResult.DataTable().clear().destroy();
+            }
+
+            tblStudentResult.find("tbody").empty();
+
+            tblStudentResult.DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                autoWidth: false,
+
                 ajax: {
                     url: "/scores/get-student-score/" + student_id,
-                    type: "POST",
+                    type: "POST"
                 },
+
                 columns: [
-                    {data: "courseId"},
-                    {data: "termNo"},
-                    {data: "courseFullName"},
+                    {
+                        data: "termNo"
+                    },
+                    {
+                        data: "courseFullName",
+                        render: function (data, type, row) {
+                            return data ?? row.courseName ?? "";
+                        }
+                    },
                     {
                         data: "midTermScore",
-                        render: function (data, type, row) {
-                            return `<input type="number" class="form-control form-control-sm form-control form-control-sm-sm is-warning" name="midterm" value="${data ? data.toFixed(2) : 0.00}" readonly/>`;
+                        render: function (data) {
+                            return Number(data ?? 0).toFixed(2);
                         }
                     },
                     {
                         data: "finalScore",
-                        render: function (data, type, row) {
-                            return `<input type="number" class="form-control form-control-sm form-control form-control-sm-sm is-warning" name="final" value="${data ? data.toFixed(2) : 0.00}" readonly/>`;
+                        render: function (data) {
+                            return Number(data ?? 0).toFixed(2);
                         }
                     },
                     {
                         data: null,
                         render: function (data, type, row) {
-                            const mid = parseInt(row.midTermScore);
-                            const fin = parseInt(row.finalScore);
-                            return mid + fin;
+                            const midterm =
+                                Number(row.midTermScore ?? 0);
+
+                            const finalScore =
+                                Number(row.finalScore ?? 0);
+
+                            return (
+                                midterm + finalScore
+                            ).toFixed(2);
                         }
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `<button id="btnEdit" class="btn btn-warning btn-sm"><i class="fa-solid fa-pen-to-square"></i></button>`;
-                        }
-                    }
-                ],
-                columnDefs: [
-                    {
-                        targets: [0],
-                        visible: false,
-                        searchable: false
                     }
                 ]
-            })
+            });
         }
 
-        tblStudentScore.on("click", "tbody tr", function (e) {
-            e.preventDefault();
-            tblStudentScore.find('tbody tr').removeClass('highlight');
-            $(this).addClass('highlight');
-            const $row = $(this).closest('tr');
-            const selectedRow = tblStudentScore.DataTable().row($row).data();
-            GetScoreHistory(studentId.val());
-            GetReStudyHistory(studentId.val(), selectedRow.courseId);
-        });
+        tblStudentResult.on(
+            "click",
+            "tbody tr",
+            function (e) {
+                e.preventDefault();
 
-        async function GetScoreHistory(student_id) {
+                const selectedRow = tblStudentResult
+                    .DataTable()
+                    .row($(this))
+                    .data();
+
+                if (!selectedRow) {
+                    return;
+                }
+
+                tblStudentResult
+                    .find("tbody tr")
+                    .removeClass("highlight");
+
+                $(this).addClass("highlight");
+
+                GetScoreHistory(
+                    studentId.val(),
+                    selectedRow.courseId
+                );
+
+                GetReStudyHistory(
+                    studentId.val(),
+                    selectedRow.courseId
+                );
+            }
+        );
+
+        async function GetScoreHistory(
+            student_id,
+            course_id
+        ) {
             try {
                 const response = await $.ajax({
-                    url: "/scores/get-score-history/" + student_id,
-                    method: 'POST',
-                    data: {isAll: true}
+                    url:
+                        "/scores/get-score-history/"
+                        + student_id
+                        + "/"
+                        + course_id,
+
+                    method: "POST",
+
+                    data: {
+                        isAll: true
+                    }
                 });
+
+                tblExamHistory.find("tbody").empty();
+
                 if (response.status.code === "200") {
-                    tblExamScoreHistory.find("tbody").empty();
-                    response.data.forEach(item => {
-                        tblExamScoreHistory.find("tbody").append(`
+                    response.data.forEach(function (item) {
+                        const midterm =
+                            Number(item.midTermScore ?? 0);
+
+                        const finalScore =
+                            Number(item.finalScore ?? 0);
+
+                        tblExamHistory.find("tbody").append(`
                             <tr>
-                                <td>${item.courseId}</td>
-                                <td>${item.termNo}</td>
-                                <td>${item.midTermScore}</td>
-                                <td>${item.finalScore}</td>
+                                <td>
+                                    ${item.courseFullName ?? item.courseId ?? ""}
+                                </td>
+                                <td>${midterm.toFixed(2)}</td>
+                                <td>${finalScore.toFixed(2)}</td>
+                                <td>
+                                    ${(midterm + finalScore).toFixed(2)}
+                                </td>
+                                <td>${item.termNo ?? ""}</td>
                             </tr>
                         `);
                     });
                 } else {
-                    console.log(response.status.code);
+                    ShowToastInfo(
+                        response.status.message
+                    );
                 }
             } catch (err) {
-                console.log(err?.responseText ?? err);
-            }
+                console.error(
+                    err?.responseText ?? err
+                );
 
+                ShowToastError(
+                    err?.responseText ||
+                    "Unable to load exam history."
+                );
+            }
         }
 
-        async function GetReStudyHistory(studentId,courseId) {
+        async function GetReStudyHistory(
+            student_id,
+            course_id
+        ) {
             try {
                 const response = await $.ajax({
-                    url: `/scores/get-restudy-history/${studentId}/${courseId}`,
-                    method: 'POST',
-                    data: {isAll: true}
+                    url:
+                        "/scores/get-restudy-history/"
+                        + student_id
+                        + "/"
+                        + course_id,
+
+                    method: "POST",
+
+                    data: {
+                        isAll: true
+                    }
                 });
+
+                tblRestudyHistory.find("tbody").empty();
+
                 if (response.status.code === "200") {
-                    tblReStudyScoreHistory.find("tbody").empty();
-                    response.data.forEach(item => {
-                        tblReStudyScoreHistory.find("tbody").append(`
+                    response.data.forEach(function (item) {
+                        const midterm =
+                            Number(item.midTermScore ?? 0);
+
+                        const finalScore =
+                            Number(item.finalScore ?? 0);
+
+                        tblRestudyHistory.find("tbody").append(`
                             <tr>
-                                <td>${item.courseId}</td> 
-                                <td>${item.midTermScore}</td>
-                                <td>${item.finalScore}</td>
+                                <td>${item.termNo ?? ""}</td>
+                                <td>
+                                    ${item.courseFullName ?? item.courseId ?? ""}
+                                </td>
+                                <td>${midterm.toFixed(2)}</td>
+                                <td>${finalScore.toFixed(2)}</td>
+                                <td>
+                                    ${(midterm + finalScore).toFixed(2)}
+                                </td>
                             </tr>
                         `);
                     });
                 } else {
-                    console.log(response.status.code);
+                    ShowToastInfo(
+                        response.status.message
+                    );
                 }
             } catch (err) {
-                console.log(err?.responseText ?? err);
+                console.error(
+                    err?.responseText ?? err
+                );
+
+                ShowToastError(
+                    err?.responseText ||
+                    "Unable to load restudy history."
+                );
             }
         }
-        
-        tblStudentScore.on("click", "#btnEdit", function (event) {
-            event.preventDefault(); 
-            const $row = $(this).closest('tr'); 
-            $row.find('input[name="midterm"]').prop('readonly', false);
-            $row.find('input[name="final"]').prop('readonly', false);
 
-            $(this)
-                .attr('id', 'btnSave')
-                .removeClass('btn-warning')
-                .addClass('btn-success')
-                .html('<i class="fas fa-check"></i>');
-        });
-        tblStudentScore.on("click", "#btnSave", function (event) {
-            event.preventDefault();
-            const $row = $(this).closest('tr'); 
-            $row.find('input[name="midterm"]').prop('readonly', true);
-            $row.find('input[name="final"]').prop('readonly', true);
+        function clearHistoryTables() {
+            tblExamHistory.find("tbody").html(`
+                <tr>
+                    <td colspan="5"
+                        class="empty-message">
+                        Select a course to view exam history.
+                    </td>
+                </tr>
+            `);
 
-            $(this)
-                .attr('id', 'btnEdit')
-                .removeClass('btn-success')
-                .addClass('btn-warning')
-                .html('<i class="fa-solid fa-pen-to-square"></i>');
-        });
+            tblRestudyHistory.find("tbody").html(`
+                <tr>
+                    <td colspan="5"
+                        class="empty-message">
+                        Select a course to view restudy history.
+                    </td>
+                </tr>
+            `);
+        }
+
+        function printStudentScore() {
+            if (!studentId.val()) {
+                ShowToastInfo(
+                    "Please select a student."
+                );
+
+                return;
+            }
+
+            window.open(
+                "/report/student-score/print?studentId="
+                + studentId.val(),
+                "_blank"
+            );
+        }
+
+        function viewStudentContract() {
+            if (!studentId.val()) {
+                ShowToastInfo(
+                    "Please select a student."
+                );
+
+                return;
+            }
+
+            window.open(
+                "/report/student-contract?studentId="
+                + studentId.val(),
+                "_blank"
+            );
+        }
     </script>
 }
