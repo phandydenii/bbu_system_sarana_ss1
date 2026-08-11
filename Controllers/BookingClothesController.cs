@@ -1,12 +1,17 @@
+using BBU_SYSTEM.DTOs;
+using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
+using BBU_SYSTEM.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BBU_SYSTEM.Controllers;
 
 [Authorize]
 [Route("booking-clothes")]
-public class BookingClothesController(ICampusDbContext campusDbContext, IHttpContextAccessor context)
+public class BookingClothesController(ICampusDbContext campusDbContext, IMapper mapper, IHttpContextAccessor context)
     : Controller
 {
     private readonly string _campus = context.HttpContext?.User.FindFirst("CampusKey")?.Value ?? "pp";
@@ -19,11 +24,60 @@ public class BookingClothesController(ICampusDbContext campusDbContext, IHttpCon
     }
 
     [Route("create-booking-clothes")]
-    public IActionResult Create()
+    public IActionResult CreateBookingClothes()
     {
         return View();
     }
-    
+
+    [HttpPost("create-booking-clothes")]
+    public async Task<IActionResult> CreateBookingClothes(
+        [FromBody] BookingTblDto? bookingDto)
+    {
+        try
+        {
+            if (bookingDto == null)
+            {
+                return new ServerResponse().BadRequest("Bad Request!");
+            }
+
+            var db = campusDbContext.DbContext(_campus);
+
+            if (bookingDto.BookingId == 0)
+            {
+                var booking = mapper.Map<BookingTblDto, Booking>(bookingDto);
+
+                await db.TblBooking.AddAsync(booking);
+                await db.SaveChangesAsync();
+
+                return new ServerResponse()
+                    .Success(booking, "Booking created successfully!");
+            }
+
+            var oldBooking = await db.TblBooking
+                .Where(x => x.BookingId == bookingDto.BookingId)
+                .FirstOrDefaultAsync();
+
+            if (oldBooking == null)
+            {
+                return new ServerResponse()
+                    .NotFound("Booking not found!");
+            }
+
+            mapper.Map(bookingDto, oldBooking);
+
+            await db.SaveChangesAsync();
+
+            return new ServerResponse()
+                .Success(oldBooking, "Booking updated successfully!");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+
+            return new ServerResponse()
+                .ErrorInternal(e);
+        }
+    }
     [HttpPost("get-booking-clothes")]
     public IActionResult GetBookingClothes()
     {
@@ -62,7 +116,7 @@ public class BookingClothesController(ICampusDbContext campusDbContext, IHttpCon
         }
     }
 
-    [HttpPost("get-booking-items")]
+    [HttpPost("get-items")]
     public IActionResult GetBookingItems()
     {
         try
@@ -85,12 +139,22 @@ public class BookingClothesController(ICampusDbContext campusDbContext, IHttpCon
             query = query.OrderByDescending(d => d.BookingItemId);
             var data = query.Skip(skip).Take(pageSize).ToList();
 
+            var items = db.TblBookingItem
+                .Select(x => new
+                {
+                    id = x.BookingItemId,
+                    name = x.ItemName,
+                    nameKhmer = x.ItemNameKhmer,
+                    price = x.Price,
+                })
+                .OrderBy(x => x.name)
+                .ToList();
             return Json(new
             {
                 draw,
                 recordsFiltered = recordsTotal,
                 recordsTotal,
-                data
+                data = items
             });
         }
         catch (Exception e)

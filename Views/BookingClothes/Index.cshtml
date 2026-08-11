@@ -10,20 +10,20 @@
             <div class="card-header">
                 <h3 class="card-title">Booking Clothes</h3>
                 <a id="btnNewBooking" class="btn btn-primary float-right"><i class="fas fa-add"></i> New Booking</a>
-                @* <div class="row"> *@
-                @*     <div class="form-group"> *@
-                @*         <label>From Date:</label> *@
-                @*         <input type="date" id="dtpFrom" class="form-control"> *@
-                @*     </div> *@
-                @*     <div class="form-group"> *@
-                @*         <label>To Date:</label> *@
-                @*         <input type="date" id="dtpTo" class="form-control"> *@
-                @*     </div> *@
-                @*     <div class="form-group"> *@
-                @*         <label>#</label> *@
-                @*         <button onclick="OnSearch()" class="btn form-control btn-success">Search</button> *@
-                @*     </div> *@
-                @* </div> *@
+                <div class="row">
+                    <div class="form-group">
+                        <label>From Date:</label>
+                        <input type="date" id="dtpFrom" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>To Date:</label>
+                        <input type="date" id="dtpTo" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>#</label>
+                        <button onclick="OnSearch()" class="btn form-control btn-success">Search</button>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <table id="tblBooking" class="table table-bordered table-striped" style="width: 100%;">
@@ -48,6 +48,7 @@
 </div>
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <partial name="_BookingClothesModal"/>
+<partial name="_ItemModal"/>
 
 @section scripts{
     <script>
@@ -82,7 +83,7 @@
                 serverSide: true,
                 responsive: true,
                 ajax: {
-                    url: "/booking-clothes/get-booking-clothes",
+                    url: "/booking-clothes/get-clothes",
                     type: "POST"
                 },
                 columns: [
@@ -129,7 +130,7 @@
                 serverSide: true,
                 responsive: true,
                 ajax: {
-                    url: "/BookingClothes/GetBookingItems",
+                    url: "/BookingClothes/get-items",
                     type: "POST"
                 },
                 columns: [
