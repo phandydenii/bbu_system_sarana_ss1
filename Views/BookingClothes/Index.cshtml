@@ -1,51 +1,89 @@
-
 @{
     ViewData["OpenMenu"] = "Administration";
     ViewData["Action"] = "BookingClothes";
+    ViewData["HideHeader"] = true;
 }
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Booking Clothes</h3>
-                <a id="btnNewBooking" class="btn btn-primary float-right"><i class="fas fa-add"></i> New Booking</a>
-                <div class="row">
-                    <div class="form-group">
-                        <label>From Date:</label>
-                        <input type="date" id="dtpFrom" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>To Date:</label>
-                        <input type="date" id="dtpTo" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>#</label>
-                        <button onclick="OnSearch()" class="btn form-control btn-success">Search</button>
+<div class="container-fluid px-0 pt-3">
+    <!-- Top Action Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="m-0 font-weight-bold text-dark">Booking Clothes</h3>
+            <small class="text-muted">Manage student clothing bookings and returns</small>
+        </div>
+        <button id="btnNewBooking" class="btn btn-primary shadow-sm">
+            <i class="fas fa-plus-circle mr-1"></i> New Booking
+        </button>
+    </div>
+
+    <!-- Filter Card Bar -->
+    <div class="card card-outline card-primary shadow-sm mb-4">
+        <div class="card-header bg-white py-2">
+            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
+                <i class="fas fa-filter text-primary mr-1"></i> Filter Bookings
+            </h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body bg-light py-3">
+            <div class="row align-items-end">
+                <div class="col-md-4 col-sm-6 mb-2 mb-md-0">
+                    <label for="dtpFrom" class="form-label text-secondary small font-weight-bold">From Date</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white border-right-0"><i class="far fa-calendar-alt text-muted"></i></span>
+                        </div>
+                        <input type="date" id="dtpFrom" class="form-control border-left-0">
                     </div>
                 </div>
-            </div>
-            <div class="card-body">
-                <table id="tblBooking" class="table table-bordered table-striped" style="width: 100%;">
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>date</th>
-                        <th>no</th>
-                        <th>student</th>
-                        <th>pay_khr</th>
-                        <th>pay_usd</th>
-                        <th>return</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+                
+                <div class="col-md-4 col-sm-6 mb-2 mb-md-0">
+                    <label for="dtpTo" class="form-label text-secondary small font-weight-bold">To Date</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white border-right-0"><i class="far fa-calendar-alt text-muted"></i></span>
+                        </div>
+                        <input type="date" id="dtpTo" class="form-control border-left-0">
+                    </div>
+                </div>
+                
+                <div class="col-md-4 col-sm-12 d-flex">
+                    <button onclick="OnSearch()" class="btn btn-success mr-2 flex-fill shadow-sm">
+                        <i class="fas fa-search mr-1"></i> Filter
+                    </button>
+                    <button onclick="OnResetFilter()" class="btn btn-outline-secondary shadow-sm" title="Reset Filters">
+                        <i class="fas fa-redo-alt"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Data Table Card -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table id="tblBooking" class="table table-hover table-striped w-100">
+                <thead class="thead-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Booking No.</th>
+                        <th>Student ID</th>
+                        <th>Pay (USD)</th>
+                        <th>Pay (KHR)</th>
+                        <th>Status</th>
+                        <th class="text-center" style="width: 100px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <partial name="_BookingClothesModal"/>
 <partial name="_ItemModal"/>
@@ -66,7 +104,7 @@
         const btnAssignItem = $("#btnAssignItem");
 
         $(document).ready(function () {
-            fetchStudent();
+            fetchBooking();
         });
 
         btnNewBooking.on("click", function () {
@@ -76,51 +114,66 @@
             $("#BookingClothesModal").attr("action", "/BookingClothes/PostBookingClothes");
         });
 
-        function fetchStudent() {
-            tblBookingDetail.DataTable().clear().destroy();
+        function fetchBooking() {
+            if ($.fn.DataTable.isDataTable('#tblBooking')) {
+                tblBooking.DataTable().destroy();
+            }
             tblBooking.DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
                 ajax: {
-                    url: "/booking-clothes/get-clothes",
-                    type: "POST"
+                    url: "/booking-clothes/get-booking-clothes",
+                    type: "POST",
+                    data: function (d) {
+                        d.fromDate = $("#dtpFrom").val();
+                        d.toDate = $("#dtpTo").val();
+                    }
                 },
                 columns: [
-                    {data: "bookingId"},
+                    { data: "bookingId" },
                     {
                         data: "bookingDate",
-                        render: function (data, type, row) {
+                        render: function (data) {
                             return `${formatDate(data)}`;
                         }
                     },
                     {
                         data: null,
                         render: function (data, type, row) {
-                            return `${row.yearNumber}-${row.bookingNo}`;
+                            return `<span class="font-weight-bold text-dark">${row.yearNumber}-${row.bookingNo}</span>`;
                         }
                     },
-                    {data: "studentId"},
-                    {data: "payDollar"},
-                    {data: "payRieal"},
+                    { data: "studentId" },
+                    { data: "payDollar" },
+                    { data: "payRieal" },
                     {
                         data: null,
                         render: function (data, type, row) {
-                            if (row.returnAlready === "0") {
-                                return `<span class="badge bg-danger"><i class="fas fa-unlock"></i> Not Return</span>`;
-                            } else {
-                                return `<span class="badge bg-primary"><i class="fas fa-check"></i> Return</span>`;
-                            }
+                            if (row.returnAlready === false) 
+                                return `<span class="badge badge-danger px-2 py-1"><i class="fas fa-unlock mr-1"></i> Not Returned</span>`; 
+                            return `<span class="badge badge-success px-2 py-1"><i class="fas fa-check mr-1"></i> Returned</span>`;
                         }
                     },
                     {
                         data: null,
-                        render: function (data, type, row) {
-                            return `<a class="btn btn-success btn-sm" style="display: block;margin:.2rem 0">Manage</a>`;
+                        className: "text-center",
+                        render: function () {
+                            return `<a class="btn btn-outline-primary btn-xs font-weight-bold btn-block">Manage</a>`;
                         }
                     }
                 ]
-            })
+            });
+        }
+
+        function OnSearch() {
+            tblBooking.DataTable().ajax.reload();
+        }
+
+        function OnResetFilter() {
+            $("#dtpFrom").val("");
+            $("#dtpTo").val("");
+            tblBooking.DataTable().ajax.reload();
         }
 
         selectItem.on("click", function () {
@@ -134,46 +187,45 @@
                     type: "POST"
                 },
                 columns: [
-                    {data: "bookingItemId"},
-                    {data: "itemName"},
-                    {data: "price"},
+                    { data: "bookingItemId" },
+                    { data: "itemName" },
+                    { data: "price" },
                     {
                         data: null,
-                        render: function (data, type, row) {
-                            return `<a id="btnChooseItem" class="btn btn-default btn-xs" style="display: block;margin:.2rem 0">Select</a>`;
+                        render: function () {
+                            return `<a id="btnChooseItem" class="btn btn-default btn-xs btn-block">Select</a>`;
                         }
                     },
                 ]
-            })
+            });
             ItemModal.modal("show");
-        })
+        });
 
         tblItem.on("click", "#btnChooseItem", function () {
             const $row = $(this).closest('tr');
             const selectedRow = tblItem.DataTable().row($row).data();
-            console.log(selectedRow);
             if (selectedRow) {
                 const json = selectedRow;
                 const value = json.bookingItemId;
-                const text = value + "-" + json.itemName + "(" + json.price + " $)";
+                const text = `${value}-${json.itemName} (${json.price} $)`;
 
                 if ($('#stateSelect option[value="' + value + '"]').length === 0) {
                     const newOption = new Option(text, value, true, true);
                     $('#stateSelect').append(newOption).trigger('change');
                 }
             }
-        })
+        });
 
         btnCloseBooking.on("click", function () {
             BookingClothesModal.modal("hide");
-        })
+        });
 
         btnCloseItem.on("click", function () {
             ItemModal.modal("hide");
-        })
+        });
 
-        btnassignItem.on("click", function () {
+        btnAssignItem.on("click", function () {
             const ids = $('#stateSelect').val();
-        })
+        });
     </script>
 }

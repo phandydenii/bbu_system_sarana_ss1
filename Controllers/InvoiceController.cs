@@ -55,7 +55,7 @@ public class InvoiceController(ICampusDbContext campusDbContext,IMapper mapper, 
         });
     }
 
-    [HttpPost("get-invoice-by-student-id")]
+    [HttpPost(" get-invoice-by-student-id")]
     public IActionResult GetInvoiceByStudentId(string studentId)
     {
         var draw = Request.Form["draw"].FirstOrDefault();

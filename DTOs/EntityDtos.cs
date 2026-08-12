@@ -229,7 +229,7 @@ public class BookClothesDto
 
 public class BookingTblDto
 {
-    public int BookingId { get; set; }
+    public int? BookingId { get; set; }
     public DateTime? BookingDate { get; set; }
     public int? UserId { get; set; }
     public string? StudentId { get; set; }

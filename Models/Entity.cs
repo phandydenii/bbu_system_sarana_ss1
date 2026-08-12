@@ -714,6 +714,18 @@ public class BookingItem
 
     [Column("PRICE", TypeName = "decimal(18,6)")]
     public decimal? Price { get; set; }
+    
+    [Column("PRICE_KHR", TypeName = "decimal(18,6)")]
+    public decimal? PriceKhr { get; set; }
+    
+    [Column("TYPE")]
+    public string? Type { get; set; }
+    
+    [Column("DEFAULT_PAYMENT")]
+    public string? DefaultPayment { get; set; }
+    
+    [Column("HIDDEND")]
+    public bool? Hidden  { get; set; }
 }
 
 [Table("BOOKINGRETURN_TBL")]

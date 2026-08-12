@@ -172,6 +172,16 @@
         <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\MasterGroup.cshtml" />
         <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\OtherGroup.cshtml" />
         <_ContentIncludedByDefault Remove="Views\Academic\TabAssignGroup\SpecializeGroup.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\BookingClothes\CreateBookingClothes.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\BookingClothes\Index.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\BookingClothes\_BookingClothesModal.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\BookingClothes\_ItemModal.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\BookingClothes\_StudentModal.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Administration\BookingClothes\CreateBookingClothes.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Administration\BookingClothes\Index.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Administration\BookingClothes\_BookingClothesModal.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Administration\BookingClothes\_ItemModal.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\Administration\BookingClothes\_StudentModal.cshtml" />
     </ItemGroup>
     <ItemGroup>
         <UpToDateCheckInput Remove="Views\Report\_TabStudentSkillList.cshtml" />
@@ -191,6 +201,10 @@
       <AdditionalFiles Include="Views\Academic\TabAssignGroup\_OtherGroupForm.cshtml" />
       <AdditionalFiles Include="Views\Academic\TabAssignGroup\_SpecializeGroupForm.cshtml" />
       <AdditionalFiles Include="Views\Academic\TabAssignGroup\_UnPromoteGroupForm.cshtml" />
+      <AdditionalFiles Include="Views\BookingClothes\Index.cshtml" />
+      <AdditionalFiles Include="Views\BookingClothes\_BookingClothesModal.cshtml" />
+      <AdditionalFiles Include="Views\BookingClothes\_ItemModal.cshtml" />
+      <AdditionalFiles Include="Views\BookingClothes\_StudentModal.cshtml" />
       <AdditionalFiles Include="Views\ReportPartial\Academic\TabStudent\_TabMinistryDoc.cshtml" />
       <AdditionalFiles Include="Views\ReportPartial\Admin\TabBooking\_BookingClothes.cshtml" />
       <AdditionalFiles Include="Views\ReportPartial\Admin\TabBooking\_ReturnClothes.cshtml" />
