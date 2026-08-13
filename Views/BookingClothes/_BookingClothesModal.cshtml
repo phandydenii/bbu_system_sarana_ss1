@@ -60,11 +60,11 @@ var invoice = new InvoiceDto();
         border: 1px solid #dee2e6;
     }
     /* table style */
-    #tblInvoiceDetail {
+    #tblBookingDetail {
         margin-bottom: 0;
         white-space: nowrap;
     }
-    #tblInvoiceDetail thead th {
+    #tblBookingDetail thead th {
         position: sticky;
         top: -1px;
         background: #f8f9fa;
@@ -171,44 +171,51 @@ var invoice = new InvoiceDto();
                     <div class="row payment-table-area">
                         <div class="col-12">
                             <div class="invoice-detail-scroll">
-                                <table id="tblInvoiceDetail" class="table table-sm table-bordered table-striped"
-                                       style="width: 100%;">
-                                    <thead>
+                                <table id="tblBookingDetail" class="table table-sm table-bordered table-striped" style="width:100%;">
+
+                                    <thead class="bg-light">
                                     <tr>
-                                        <th class="hide-col">invoice_detail_id</th>
-                                        <th class="hide-col">invoice_id</th>
-                                        <th class="hide-col">product_id</th>
-                                        <th>Item name</th>
-                                        <th class="hide-col">product_name_khmer</th>
-                                        <th>Quantity</th>
-                                        <th>Price</th>
-                                        @* <th>price_usd</th> *@
-                                        <th class="hide-col">total_khr</th>
-                                        <th class="hide-col">total_usd</th>
-                                        <th class="hide-col">type</th>
-                                        <th class="hide-col">vat</th>
-                                        <th>Discount</th>
-                                        <th class="hide-col">discount_khr</th>
-                                        <th class="hide-col">discount_usd</th>
-                                        <th>Owe_price</th>
-                                        @* <th>owe_as_usd</th> *@
-                                        <th>Other_price</th>
-                                        @* <th>other_as_usd</th> *@
-                                        <th class="hide-col">grand_total_khr</th>
-                                        <th class="hide-col">grand_total_usd</th>
-                                        <th class="hide-col">pay_as_khr</th>
-                                        <th class="hide-col">pay_as_usd</th>
-                                        <th class="hide-col">pay_bath</th>
-                                        <th class="hide-col">tuition_fees</th>
-                                        <th class="hide-col">card_certificate</th>
-                                        <th class="hide-col">category_id</th>
-                                        <th class="hide-col">category_id</th>
-                                        <th class="text-center">action</th>
+                                        <th style="display:none;">BookingDetailId</th>
+                                        <th style="display:none;">BookingId</th>
+                                        <th style="display:none;">ClothId</th>
+
+                                        <th>Item</th>
+                                        <th style="width:100px;">Qty</th>
+                                        <th style="width:120px;">Price $</th>
+                                        <th style="width:130px;">Price KHR</th>
+                                        <th style="width:110px;">Discount %</th>
+                                        <th style="width:130px;">Total $</th>
+                                        <th style="width:140px;">Total KHR</th>
+                                        <th style="width:70px;" class="text-center">
+                                            Action
+                                        </th>
                                     </tr>
                                     </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table></div>
+
+                                    <tbody></tbody>
+
+                                    <tfoot>
+                                    <tr class="font-weight-bold bg-light">
+                                        <td colspan="3" style="display:none;"></td>
+
+                                        <td colspan="5" class="text-right">
+                                            Grand Total
+                                        </td>
+
+                                        <td id="lblGrandTotalUsd" class="text-right">
+                                            $0.00
+                                        </td>
+
+                                        <td id="lblGrandTotalKhr" class="text-right">
+                                            0 ៛
+                                        </td>
+
+                                        <td></td>
+                                    </tr>
+                                    </tfoot>
+
+                                </table>
+                            </div>
                         </div>
                     </div>
                     <hr>
@@ -298,30 +305,4 @@ var invoice = new InvoiceDto();
             </div>
         </div>
     </div>
-</div>
-<partial name="_ItemModal"/>
-<script>
-    $("#btnTogglePaymentFullscreen").on("click", function () {
-        const modal = $("#BookingClothesModal");
-        setPaymentFullscreen(!modal.hasClass("fullscreen-modal"));
-    });
-
-    function setPaymentFullscreen(isFullscreen) {
-        const modal = $("#BookingClothesModal");
-        const icon = $("#paymentFullscreenIcon");
-        if (isFullscreen) {
-            modal.addClass("fullscreen-modal");
-            icon.removeClass("fa-expand").addClass("fa-compress");
-            $("#btnTogglePaymentFullscreen").attr("title", "Restore");
-        } else {
-            modal.removeClass("fullscreen-modal");
-            icon.removeClass("fa-compress").addClass("fa-expand");
-            $("#btnTogglePaymentFullscreen").attr("title", "Fullscreen");
-        }
-        setTimeout(function () {
-            if ($.fn.DataTable && $.fn.DataTable.isDataTable("#tblInvoiceDetail")) {
-                $("#tblInvoiceDetail").DataTable().columns.adjust().draw(false);
-            }
-        }, 200);
-    }
-</script>
+</div> 

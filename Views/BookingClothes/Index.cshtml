@@ -10,10 +10,7 @@
         <div>
             <h3 class="m-0 font-weight-bold text-dark">Booking Clothes</h3>
             <small class="text-muted">Manage student clothing bookings and returns</small>
-        </div>
-        <button id="btnNewBooking" class="btn btn-primary shadow-sm">
-            <i class="fas fa-plus-circle mr-1"></i> New Booking
-        </button>
+        </div> 
     </div>
 
     <!-- Filter Card Bar -->
@@ -30,32 +27,40 @@
         </div>
         <div class="card-body bg-light py-3">
             <div class="row align-items-end">
-                <div class="col-md-4 col-sm-6 mb-2 mb-md-0">
-                    <label for="dtpFrom" class="form-label text-secondary small font-weight-bold">From Date</label>
+                <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                    <label for="fromDate" class="form-label text-secondary small font-weight-bold">From Date</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text bg-white border-right-0"><i class="far fa-calendar-alt text-muted"></i></span>
                         </div>
-                        <input type="date" id="dtpFrom" class="form-control border-left-0">
+                        <input type="date" id="fromDate" class="form-control border-left-0">
                     </div>
-                </div>
-                
-                <div class="col-md-4 col-sm-6 mb-2 mb-md-0">
-                    <label for="dtpTo" class="form-label text-secondary small font-weight-bold">To Date</label>
+                </div> 
+                <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                    <label for="toDate" class="form-label text-secondary small font-weight-bold">To Date</label>
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text bg-white border-right-0"><i class="far fa-calendar-alt text-muted"></i></span>
                         </div>
-                        <input type="date" id="dtpTo" class="form-control border-left-0">
+                        <input type="date" id="toDate" class="form-control border-left-0">
                     </div>
+                </div> 
+                <div class="col-md-2 col-sm-12 d-flex">
+                    <div class="btn-group shadow-sm" role="group">
+                        <button type="button" onclick="OnSearch()" class="btn btn-success">
+                            <i class="fas fa-search mr-1"></i>
+                            Filter
+                        </button> 
+                        <button type="button" onclick="OnResetFilter()" class="btn btn-success border-left" title="Reset Filters">
+                            <i class="fas fa-redo-alt"></i>
+                        </button>
+
+                    </div> 
                 </div>
-                
-                <div class="col-md-4 col-sm-12 d-flex">
-                    <button onclick="OnSearch()" class="btn btn-success mr-2 flex-fill shadow-sm">
-                        <i class="fas fa-search mr-1"></i> Filter
-                    </button>
-                    <button onclick="OnResetFilter()" class="btn btn-outline-secondary shadow-sm" title="Reset Filters">
-                        <i class="fas fa-redo-alt"></i>
+                <div class="col-6 d-flex justify-content-end mt-2">
+                    <button id="btnNewBooking" class="btn btn-primary shadow-sm">
+                        <i class="fas fa-plus-circle mr-1"></i>
+                        New Booking
                     </button>
                 </div>
             </div>
@@ -65,7 +70,7 @@
     <!-- Data Table Card -->
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <table id="tblBooking" class="table table-hover table-striped w-100">
+            <table id="tblBooking" class="table table-sm table-hover table-bordered table-striped w-100">
                 <thead class="thead-light">
                     <tr>
                         <th>ID</th>
@@ -88,7 +93,7 @@
 <partial name="_BookingClothesModal"/>
 <partial name="_ItemModal"/>
 
-@section scripts{
+@section scripts{ 
     <script>
         const tblBooking = $("#tblBooking");
         const tblBookingDetail = $("#tblBookingDetail");
@@ -102,6 +107,11 @@
         const btnCloseItem = $("#btnCloseItem");
         const stateSelect = $("#stateSelect");
         const btnAssignItem = $("#btnAssignItem");
+
+        let selectedItems = [];
+        let bookingItems = [];
+        const fromDate = $("#fromDate");
+        const toDate = $("#toDate");
 
         $(document).ready(function () {
             fetchBooking();
@@ -126,8 +136,8 @@
                     url: "/booking-clothes/get-booking-clothes",
                     type: "POST",
                     data: function (d) {
-                        d.fromDate = $("#dtpFrom").val();
-                        d.toDate = $("#dtpTo").val();
+                        d.fromDate = fromDate.val();
+                        d.toDate = toDate.val();
                     }
                 },
                 columns: [
@@ -149,6 +159,7 @@
                     { data: "payRieal" },
                     {
                         data: null,
+                        className: "text-center",
                         render: function (data, type, row) {
                             if (row.returnAlready === false) 
                                 return `<span class="badge badge-danger px-2 py-1"><i class="fas fa-unlock mr-1"></i> Not Returned</span>`; 
@@ -159,18 +170,23 @@
                         data: null,
                         className: "text-center",
                         render: function () {
-                            return `<a class="btn btn-outline-primary btn-xs font-weight-bold btn-block">Manage</a>`;
+                            return `<a class="btn btn-warning btn-sm"><i class="fas fa-pencil"></i> Edit</a>`;
                         }
                     }
-                ]
+                ],
+                initComplete:function (){
+                    MyApp.utils.dataTableDebounceSearch("#tblBooking",500);
+                }
             });
         }
 
         function OnSearch() {
+            if (!fromDate.val() || !toDate.val()) return;
             tblBooking.DataTable().ajax.reload();
         }
 
         function OnResetFilter() {
+            if (!fromDate.val() || !toDate.val()) return;
             $("#dtpFrom").val("");
             $("#dtpTo").val("");
             tblBooking.DataTable().ajax.reload();
@@ -183,37 +199,62 @@
                 serverSide: true,
                 responsive: true,
                 ajax: {
-                    url: "/BookingClothes/get-items",
+                    url: "/booking-clothes/get-items",
                     type: "POST"
                 },
                 columns: [
-                    { data: "bookingItemId" },
-                    { data: "itemName" },
+                    { data: "id" },
+                    { data: "name" },
+                    { data: "nameKhmer" },
                     { data: "price" },
                     {
                         data: null,
                         render: function () {
-                            return `<a id="btnChooseItem" class="btn btn-default btn-xs btn-block">Select</a>`;
+                            return `
+                                <button type="button"
+                                        class="btn btn-default btn-xs btn-block btnChooseItem">
+                                    <i class="fas fa-check mr-1"></i>
+                                    Select
+                                </button>
+                            `;
                         }
-                    },
+                    }
                 ]
             });
             ItemModal.modal("show");
         });
 
-        tblItem.on("click", "#btnChooseItem", function () {
-            const $row = $(this).closest('tr');
+        tblItem.on("click", ".btnChooseItem", function () {
+            const $button = $(this);
+            const $row = $button.closest("tr");
             const selectedRow = tblItem.DataTable().row($row).data();
-            if (selectedRow) {
-                const json = selectedRow;
-                const value = json.bookingItemId;
-                const text = `${value}-${json.itemName} (${json.price} $)`;
 
-                if ($('#stateSelect option[value="' + value + '"]').length === 0) {
-                    const newOption = new Option(text, value, true, true);
-                    $('#stateSelect').append(newOption).trigger('change');
-                }
-            }
+            if (!selectedRow) return;
+
+            const exists = selectedItems.some(function (x) {
+                return String(x.id) === String(selectedRow.id);
+            });
+            if (exists) return;
+            selectedItems.push(selectedRow);
+            const text =
+                `${selectedRow.name} (${formatUsd(selectedRow.price)} $)`;
+
+            const newOption = new Option(
+                text,
+                selectedRow.id,
+                true,
+                true
+            );
+
+            stateSelect
+                .append(newOption)
+                .trigger("change");
+
+            $button
+                .removeClass("btn-default")
+                .addClass("btn-success")
+                .html('<i class="fas fa-check mr-1"></i> Selected')
+                .prop("disabled", true);
         });
 
         btnCloseBooking.on("click", function () {
@@ -225,7 +266,402 @@
         });
 
         btnAssignItem.on("click", function () {
-            const ids = $('#stateSelect').val();
+            if (selectedItems.length === 0) {
+                ShowToastInfo("Please select at least one item."); 
+                return;
+            } 
+            selectedItems.forEach(function (item) { 
+                addBookingItem(item);
+            });
+ 
+            selectedItems = [];  
+            stateSelect.empty().trigger("change"); 
+            ItemModal.modal("hide");
         });
+
+        // ---------------------------------------------------- Booking Item Section ---------------------------------------------------- 
+        function getExchangeRate() { 
+            let rate = $('#txtRateOut').text(); 
+            rate = parseFloat(
+                String(rate).replace(/,/g, '')
+            );
+
+            return rate || 4100;
+        }
+
+
+        // ==========================================
+        // ADD SELECTED ITEM
+        // ==========================================
+        function addBookingItem(item) {
+            let clothId = item.id; 
+            let exists = bookingItems.some(x =>
+                String(x.clothId) === String(clothId)
+            );
+
+            if (exists) {
+                return;
+            }
+
+            let priceUsd = parseFloat(item.price || 0);
+
+            let priceKhr = parseFloat(
+                item.priceKhr || 0
+            );
+
+            if (priceKhr === 0) {
+                priceKhr = priceUsd * getExchangeRate();
+            }
+
+            bookingItems.push({
+                bookingDetailId: 0,
+                bookingId: 0,
+                clothId: clothId,
+                itemName: item.name || item.namekhmer || '',
+                nameKhmer: item.nameKhmer || '',
+                qty: 1,
+                price: priceUsd,
+                priceKhr: priceKhr,
+                discountPercent: 0
+            });
+
+            renderBookingItems();
+        }
+
+
+        // ==========================================
+        // RENDER TABLE
+        // ==========================================
+        function renderBookingItems() {
+
+            let tbody = $('#tblBookingDetail tbody'); 
+            tbody.empty(); 
+            $.each(bookingItems, function(index, item) { 
+                let totalUsd = calculateLineUsd(item);
+                let totalKhr = calculateLineKhr(item); 
+                let row = `<tr data-index="${index}"> 
+                    <td style="display:none;">${item.bookingDetailId}</td>
+                    <td style="display:none;">${item.bookingId}</td>
+                    <td style="display:none;">${item.clothId}</td>
+                    <td>
+                        <strong>${escapeHtml(item.itemName)}</strong>
+                        ${item.nameKhmer ? `<div class="small text-muted"> ${escapeHtml(item.nameKhmer)} </div>` : ''}
+                    </td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm text-right item-qty"
+                               min="1"
+                               step="1"
+                               value="${item.qty}"
+                               data-index="${index}">
+                    </td> 
+                    <td>
+                        <input type="number" class="form-control form-control-sm text-right item-price-usd"
+                               min="0"
+                               step="0.01"
+                               value="${item.price.toFixed(2)}"
+                               data-index="${index}">
+                    </td> 
+                    <td>
+                        <input type="number" class="form-control form-control-sm text-right item-price-khr"
+                               min="0"
+                               step="100"
+                               value="${item.priceKhr.toFixed(0)}"
+                               data-index="${index}">
+                    </td> 
+                    <td>
+                        <div class="input-group input-group-sm">
+                            <input type="number" class="form-control text-right item-discount"
+                                   min="0"
+                                   max="100"
+                                   step="1"
+                                   value="${item.discountPercent}"
+                                   data-index="${index}">
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    %
+                                </span>
+                            </div>
+                        </div>
+                    </td> 
+                    <td class="text-right font-weight-bold line-total-usd">
+                        $${formatUsd(totalUsd)}
+                    </td> 
+                    <td class="text-right font-weight-bold line-total-khr">
+                        ${formatKhr(totalKhr)} ៛
+                    </td> 
+                    <td class="text-center"> 
+                        <button type="button" class="btn btn-danger btn-sm"
+                                onclick="removeBookingItem(${index})"
+                                title="Remove"> 
+                            <i class="fas fa-trash"></i> 
+                        </button> 
+                    </td> 
+                </tr>
+            `; 
+                tbody.append(row);
+            }); 
+            calculateGrandTotal();
+        }
+
+
+        // ==========================================
+        // CALCULATE USD
+        // ==========================================
+        function calculateLineUsd(item) {
+
+            let qty = parseFloat(item.qty || 0);
+            let price = parseFloat(item.price || 0);
+            let discount = parseFloat(
+                item.discountPercent || 0
+            );
+
+            let subTotal = qty * price;
+
+            let discountAmount =
+                subTotal * discount / 100;
+
+            return subTotal - discountAmount;
+        }
+
+
+        // ==========================================
+        // CALCULATE KHR
+        // ==========================================
+        function calculateLineKhr(item) {
+
+            let qty = parseFloat(item.qty || 0);
+            let price = parseFloat(item.priceKhr || 0);
+            let discount = parseFloat(
+                item.discountPercent || 0
+            );
+
+            let subTotal = qty * price;
+
+            let discountAmount =
+                subTotal * discount / 100;
+
+            return subTotal - discountAmount;
+        }
+
+
+        // ==========================================
+        // CHANGE QTY
+        // ==========================================
+        $(document).on(
+            'input',
+            '.item-qty',
+            function () {
+
+                let index = $(this).data('index');
+
+                bookingItems[index].qty =
+                    parseFloat($(this).val()) || 0;
+
+                updateRowTotal(index);
+            }
+        );
+
+
+        // ==========================================
+        // CHANGE USD PRICE
+        // ==========================================
+        $(document).on(
+            'input',
+            '.item-price-usd',
+            function () {
+
+                let index = $(this).data('index');
+
+                let usd =
+                    parseFloat($(this).val()) || 0;
+
+                bookingItems[index].price = usd;
+
+                // automatically update KHR
+                bookingItems[index].priceKhr =
+                    usd * getExchangeRate();
+
+                let row = $(
+                    '#tblBookingDetail tbody tr'
+                ).eq(index);
+
+                row.find('.item-price-khr')
+                    .val(
+                        bookingItems[index]
+                            .priceKhr
+                            .toFixed(0)
+                    );
+
+                updateRowTotal(index);
+            }
+        );
+
+
+        // ==========================================
+        // CHANGE KHR PRICE
+        // ==========================================
+        $(document).on(
+            'input',
+            '.item-price-khr',
+            function () {
+
+                let index = $(this).data('index');
+
+                bookingItems[index].priceKhr =
+                    parseFloat($(this).val()) || 0;
+
+                updateRowTotal(index);
+            }
+        );
+
+
+        // ==========================================
+        // CHANGE DISCOUNT
+        // ==========================================
+        $(document).on(
+            'input',
+            '.item-discount',
+            function () {
+
+                let index = $(this).data('index');
+
+                let discount =
+                    parseFloat($(this).val()) || 0;
+
+                if (discount > 100) {
+                    discount = 100;
+                    $(this).val(100);
+                }
+
+                bookingItems[index]
+                    .discountPercent = discount;
+
+                updateRowTotal(index);
+            }
+        );
+
+
+        // ==========================================
+        // UPDATE ONLY CURRENT ROW
+        // ==========================================
+        function updateRowTotal(index) {
+
+            let item = bookingItems[index];
+
+            let usd = calculateLineUsd(item);
+            let khr = calculateLineKhr(item);
+
+            let row = $('#tblBookingDetail tbody tr')
+                .eq(index);
+
+            row.find('.line-total-usd')
+                .text('$' + formatUsd(usd));
+
+            row.find('.line-total-khr')
+                .text(formatKhr(khr) + ' ៛');
+
+            calculateGrandTotal();
+        }
+
+
+        // ==========================================
+        // GRAND TOTAL
+        // ==========================================
+        function calculateGrandTotal() {
+
+            let grandUsd = 0;
+            let grandKhr = 0;
+
+            $.each(bookingItems, function(_, item) {
+
+                grandUsd += calculateLineUsd(item);
+                grandKhr += calculateLineKhr(item);
+
+            });
+
+            $('#lblGrandTotalUsd')
+                .text('$' + formatUsd(grandUsd));
+
+            $('#lblGrandTotalKhr')
+                .text(formatKhr(grandKhr) + ' ៛');
+
+
+            // Update your existing summary fields
+            $('#invoice_GrandTotalUsd')
+                .val(grandUsd.toFixed(2));
+
+            $('#invoice_GrandTotalKhr')
+                .val(grandKhr.toFixed(0));
+        }
+
+
+        // ==========================================
+        // REMOVE
+        // ==========================================
+        function removeBookingItem(index) {
+
+            bookingItems.splice(index, 1);
+
+            renderBookingItems();
+        }
+
+ 
+        function formatUsd(value) {
+
+            return Number(value || 0)
+                .toLocaleString(
+                    'en-US',
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+        }
+
+
+        function formatKhr(value) {
+
+            return Number(value || 0)
+                .toLocaleString(
+                    'en-US',
+                    {
+                        maximumFractionDigits: 0
+                    }
+                );
+        }
+
+
+        function escapeHtml(value) {
+
+            return $('<div>')
+                .text(value || '')
+                .html();
+        }
+        // ---------------------------------------------------- Booking Item Section ----------------------------------------------------
+        
+        
+        // toggle modal fullscreen or minimize screen
+        $("#btnTogglePaymentFullscreen").on("click", function () {
+            const modal = $("#BookingClothesModal");
+            setPaymentFullscreen(!modal.hasClass("fullscreen-modal"));
+        });
+        function setPaymentFullscreen(isFullscreen) {
+            const modal = $("#BookingClothesModal");
+            const icon = $("#paymentFullscreenIcon");
+            if (isFullscreen) {
+                modal.addClass("fullscreen-modal");
+                icon.removeClass("fa-expand").addClass("fa-compress");
+                $("#btnTogglePaymentFullscreen").attr("title", "Restore");
+            } else {
+                modal.removeClass("fullscreen-modal");
+                icon.removeClass("fa-compress").addClass("fa-expand");
+                $("#btnTogglePaymentFullscreen").attr("title", "Fullscreen");
+            }
+            setTimeout(function () {
+                if ($.fn.DataTable && $.fn.DataTable.isDataTable("#tblBookingDetail")) {
+                    $("#tblBookingDetail").DataTable().columns.adjust().draw(false);
+                }
+            }, 200);
+        }
     </script>
 }
