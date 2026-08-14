@@ -60,6 +60,58 @@ public class BookingClothesController(ICampusDbContext campusDbContext, IMapper 
         }
     }
 
+    
+    [HttpGet("details-booking-clothes/{bookingId}")]
+    public async Task<IActionResult> DetailsBookingClothes(int bookingId)
+    {
+        try
+        { 
+            var db = campusDbContext.DbContext(_campus); 
+            var booking = await db.TblBooking
+                .Where(x => x.BookingId == bookingId)
+                .Select(x => new
+                {
+                    x.BookingId,
+                    x.BookingNo,
+                    x.BookingDate,
+                    x.StudentId,
+                    x.Total, 
+                    x.Vat, 
+                    x.Discount, 
+                    x.PayDollar,
+                    x.PayRieal,
+                    x.Note,
+                    x.Active
+                })
+                .FirstOrDefaultAsync();
+            if (booking == null)
+                return new ServerResponse().NotFound("Booking not found!");
+            var item = await (
+                from detail in db.TblBookingDetail
+                join bookingItem in db.TblBookingItem
+                    on detail.ClothId equals bookingItem.BookingItemId
+                where detail.BookingId == bookingId
+                select new
+                {
+                    detail.BookingDetailId,
+                    detail.BookingId,
+                    detail.ClothId, 
+                    bookingItem.ItemName,
+                    bookingItem.ItemNameKhmer,
+                    bookingItem.Type, 
+                    detail.Qty,
+                    detail.Price
+                }
+            ).ToListAsync(); 
+            var data = new{ booking, item}; 
+            return new ServerResponse().Success(data, "Booking details bind successfully!");
+        }
+        catch (Exception e)
+        { 
+            return new ServerResponse().ErrorInternal(e);
+        }
+    }
+    
     [HttpPost("get-booking-clothes")]
     public IActionResult GetBookingClothes()
     {

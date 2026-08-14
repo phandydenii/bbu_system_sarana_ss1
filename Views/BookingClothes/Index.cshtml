@@ -169,8 +169,14 @@
                     {
                         data: null,
                         className: "text-center",
-                        render: function () {
-                            return `<a class="btn btn-warning btn-sm"><i class="fas fa-pencil"></i> Edit</a>`;
+                        render: function (data, type, row) {
+                            return `
+                                <button type="button"
+                                        class="btn btn-warning btn-sm btnEditBooking"
+                                        data-id="${row.bookingId}">
+                                    <i class="fas fa-pencil"></i> Edit
+                                </button>
+                            `;
                         }
                     }
                 ],
@@ -256,7 +262,64 @@
                 .html('<i class="fas fa-check mr-1"></i> Selected')
                 .prop("disabled", true);
         });
+        tblBooking.on("click", ".btnEditBooking", function () {
 
+            const bookingId = $(this).data("id");
+
+            if (!bookingId) return;
+
+            fetchBookingDetail(bookingId);
+        });
+        function fetchBookingDetail(bookingId) {
+            $.ajax({
+                url: `/booking-clothes/details-booking-clothes/${bookingId}`,
+                type: "GET",  
+                success: function (response) { 
+                    console.log(response); 
+                    const data = response.data; 
+                    if (!data) {
+                        ShowToastInfo("Booking data not found.");
+                        return;
+                    }  
+                    const booking = data.booking;
+                    const items = data.item || []; 
+                    $("#bookingId").val(booking.bookingId);
+                    $("#txtStudentId").val(booking.studentId);
+                    $("#txtBookingNo").val(booking.bookingNo);
+                    $("#txtBookingDate").val(
+                        formatDateForInput(booking.bookingDate)
+                    ); 
+                    $("#txtNote").val(booking.note || "");
+                    $("#txtPayDollar").val(booking.payDollar || 0);
+                    $("#txtPayRieal").val(booking.payRieal || 0); 
+
+                    bookingItems = items.map(function (x) {
+                        return {
+                            bookingDetailId: x.bookingDetailId,
+                            bookingId: x.bookingId,
+                            clothId: x.clothId,
+                            itemName: x.itemName || "",
+                            nameKhmer: x.itemNameKhmer || "",
+                            qty: Number(x.qty || 0),
+                            price: Number(x.price || 0),
+                            priceKhr: Number(x.priceKhr || 0),
+                            discountPercent: Number(x.discountPercent || 0)
+                        };
+
+                    });
+                    renderBookingItems(); 
+                    
+                    selectedItems = [];
+                    stateSelect.empty().trigger("change"); 
+                    $("#BookingClothesModal .modal-title").text("Edit Booking"); 
+                    BookingClothesModal.modal("show");
+                },
+                error: function (xhr) { 
+                    ShowToastInfo(xhr.responseJSON?.error_message || "Unable to load booking details.");
+                }
+            });
+        }
+        
         btnCloseBooking.on("click", function () {
             BookingClothesModal.modal("hide");
         });
@@ -288,31 +351,21 @@
 
             return rate || 4100;
         }
-
-
-        // ==========================================
+        
         // ADD SELECTED ITEM
-        // ==========================================
         function addBookingItem(item) {
             let clothId = item.id; 
             let exists = bookingItems.some(x =>
                 String(x.clothId) === String(clothId)
             );
-
-            if (exists) {
-                return;
-            }
-
+            if (exists) return;
             let priceUsd = parseFloat(item.price || 0);
-
             let priceKhr = parseFloat(
                 item.priceKhr || 0
             );
-
             if (priceKhr === 0) {
                 priceKhr = priceUsd * getExchangeRate();
             }
-
             bookingItems.push({
                 bookingDetailId: 0,
                 bookingId: 0,
@@ -324,16 +377,11 @@
                 priceKhr: priceKhr,
                 discountPercent: 0
             });
-
             renderBookingItems();
         }
-
-
-        // ==========================================
-        // RENDER TABLE
-        // ==========================================
+        
+        // RENDER TABLE 
         function renderBookingItems() {
-
             let tbody = $('#tblBookingDetail tbody'); 
             tbody.empty(); 
             $.each(bookingItems, function(index, item) { 
@@ -403,10 +451,8 @@
             calculateGrandTotal();
         }
 
-
-        // ==========================================
-        // CALCULATE USD
-        // ==========================================
+ 
+        // CALCULATE USD 
         function calculateLineUsd(item) {
 
             let qty = parseFloat(item.qty || 0);
@@ -423,18 +469,14 @@
             return subTotal - discountAmount;
         }
 
-
-        // ==========================================
-        // CALCULATE KHR
-        // ==========================================
-        function calculateLineKhr(item) {
-
+ 
+        // CALCULATE KHR 
+        function calculateLineKhr(item) { 
             let qty = parseFloat(item.qty || 0);
             let price = parseFloat(item.priceKhr || 0);
             let discount = parseFloat(
                 item.discountPercent || 0
-            );
-
+            ); 
             let subTotal = qty * price;
 
             let discountAmount =
@@ -442,108 +484,50 @@
 
             return subTotal - discountAmount;
         }
-
-
-        // ==========================================
-        // CHANGE QTY
-        // ==========================================
-        $(document).on(
-            'input',
-            '.item-qty',
-            function () {
-
+        
+        // CHANGE QTY 
+        $(document).on('input','.item-qty',function () { 
                 let index = $(this).data('index');
-
-                bookingItems[index].qty =
-                    parseFloat($(this).val()) || 0;
-
+                bookingItems[index].qty = parseFloat($(this).val()) || 0;
                 updateRowTotal(index);
             }
         );
-
-
-        // ==========================================
-        // CHANGE USD PRICE
-        // ==========================================
-        $(document).on(
-            'input',
-            '.item-price-usd',
-            function () {
-
+        
+        // CHANGE USD PRICE 
+        $(document).on('input','.item-price-usd',function () {
                 let index = $(this).data('index');
-
-                let usd =
-                    parseFloat($(this).val()) || 0;
-
+                let usd = parseFloat($(this).val()) || 0;
                 bookingItems[index].price = usd;
-
                 // automatically update KHR
-                bookingItems[index].priceKhr =
-                    usd * getExchangeRate();
-
-                let row = $(
-                    '#tblBookingDetail tbody tr'
-                ).eq(index);
-
-                row.find('.item-price-khr')
-                    .val(
-                        bookingItems[index]
-                            .priceKhr
-                            .toFixed(0)
-                    );
-
+                bookingItems[index].priceKhr = usd * getExchangeRate();
+                let row = $('#tblBookingDetail tbody tr').eq(index);
+                row.find('.item-price-khr').val(bookingItems[index].priceKhr.toFixed(0));
                 updateRowTotal(index);
             }
         );
 
-
-        // ==========================================
-        // CHANGE KHR PRICE
-        // ==========================================
-        $(document).on(
-            'input',
-            '.item-price-khr',
-            function () {
-
+        // CHANGE KHR PRICE 
+        $(document).on('input','.item-price-khr',function () {
                 let index = $(this).data('index');
-
-                bookingItems[index].priceKhr =
-                    parseFloat($(this).val()) || 0;
-
+                bookingItems[index].priceKhr = parseFloat($(this).val()) || 0;
                 updateRowTotal(index);
             }
         );
-
-
-        // ==========================================
+        
         // CHANGE DISCOUNT
-        // ==========================================
-        $(document).on(
-            'input',
-            '.item-discount',
-            function () {
-
+        $(document).on('input','.item-discount',function () {
                 let index = $(this).data('index');
-
-                let discount =
-                    parseFloat($(this).val()) || 0;
-
+                let discount = parseFloat($(this).val()) || 0;
                 if (discount > 100) {
                     discount = 100;
                     $(this).val(100);
                 }
-
-                bookingItems[index]
-                    .discountPercent = discount;
-
+                bookingItems[index].discountPercent = discount;
                 updateRowTotal(index);
             }
         );
-
-
-        // ==========================================
+        
         // UPDATE ONLY CURRENT ROW
-        // ==========================================
         function updateRowTotal(index) {
 
             let item = bookingItems[index];
