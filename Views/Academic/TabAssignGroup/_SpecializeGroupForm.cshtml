@@ -1,175 +1,763 @@
 @using BBU_SYSTEM.ViewModel
+
 @{
-    var req = new AssignGroupViewModel();
+var req = new AssignGroupViewModel();
 }
-<div class="row">
+
+<div id="specialize_formRoot" class="row">
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Filter Specialize Group</h3>
             </div>
+
             <div class="card-body" style="height: 500px;">
-                <form id="frmFilter">
-                    <input asp-for="@req.IsAll" type="checkbox" checked="checked" hidden="hidden"/>
+                <form id="specialize_frmFilter">
+                    @Html.AntiForgeryToken()
+
+                    <input asp-for="@req.IsAll"
+                           type="checkbox"
+                           checked="checked"
+                           hidden="hidden" />
+
                     <div class="row">
                         <div class="col-12">
-                            <label aria-required="true" class="required">Degree</label>
-                            <select id="cboDegree" asp-for="@req.DegreeId" class="form-control select2"
+                            <label class="required">Degree</label>
+                            <select id="specialize_cboDegree"
+                                    asp-for="@req.DegreeId"
+                                    class="form-control select2"
                                     disabled="disabled">
                             </select>
                         </div>
-                    </div> 
+                    </div>
+
                     <div class="row">
                         <div class="col-12">
-                            <label>Academic Year</label>
-                            <select id="cboAcademicYear" asp-for="@req.AcademicYear" class="form-control select2">
+                            <label class="required">Academic Year</label>
+                            <select id="specialize_cboAcademicYear"
+                                    asp-for="@req.AcademicYear"
+                                    class="form-control select2">
                             </select>
                         </div>
                     </div>
+
                     <div class="row">
                         <div class="col-12">
                             <label class="required">School</label>
-                            <select id="cboSchool" asp-for="@req.SchoolId" class="form-control select2">
+                            <select id="specialize_cboSchool"
+                                    asp-for="@req.SchoolId"
+                                    class="form-control select2">
                             </select>
                         </div>
                     </div>
+
                     <div class="row">
-                        <div class="col-4">
-                            <label>Promotion</label>
-                            <select id="cboPromotion" asp-for="@req.PromotionId"
+                        <div class="col-6">
+                            <label class="required">Promotion</label>
+                            <select id="specialize_cboPromotion"
+                                    asp-for="@req.PromotionId"
                                     class="form-control select2">
                             </select>
                         </div>
-                        <div class="col-4">
-                            <label>Stage</label>
-                            <select id="cboStage" asp-for="@req.StageId" class="form-control select2">
+
+                        <div class="col-6">
+                            <label class="required">Stage</label>
+                            <select id="specialize_cboStage"
+                                    asp-for="@req.StageId"
+                                    class="form-control select2">
                             </select>
                         </div>
-                        <div class="col-4">
-                            <label>Study Time</label>
-                            <select id="cboStudyTime" asp-for="@req.StudyTime"
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <label class="required">Study Time</label>
+                            <select id="specialize_cboStudyTime"
+                                    asp-for="@req.StudyTime"
                                     class="form-control select2">
-                                <option selected="selected" disabled value="0">Study Time</option>
                             </select>
                         </div>
                     </div>
                 </form>
             </div>
+
             <div class="card-footer">
-                <button class="btn btn-success float-right" id="btnFilter" form="frmFilter"><i
-                                                                                                class="fas fa-filter"></i>
-                    Filter
+                <button type="button"
+                        class="btn btn-success float-right"
+                        id="specialize_btnFilter">
+                    <i class="fas fa-filter"></i> Filter
                 </button>
             </div>
         </div>
     </div>
+
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Students List</h3>
-                <h3 class="card-title float-right">Selected Students: <span id="countStudent">0</span>
+                <h3 class="card-title float-right">
+                    Selected Students: <span id="specialize_countStudent">0</span>
                 </h3>
             </div>
+
             <div class="card-body table-responsive p-0" style="height: 500px;">
-                <table id="tblStudent"
-                       class="table table-sm table-bordered table-striped table-head-fixed text-nowrap">
+                <table id="specialize_tblStudent"
+                       class="table table-sm table-bordered table-striped table-head-fixed text-nowrap"
+                       style="width: 100%;">
                     <thead>
                     <tr>
-                        <th>no</th>
-                        <th>student_id</th>
+                        <th class="text-center" style="width: 36px;">
+                            <button type="button"
+                                    id="specialize_btnSelectAllStudent"
+                                    class="btn btn-sm btn-light p-0"
+                                    title="Select all students"
+                                    style="width: 26px; height: 26px;">
+                                <i class="fas fa-check-double"></i>
+                            </button>
+                        </th>
+                        <th class="text-center">student_id</th>
                         <th>name</th>
-                        <th>gender</th>
-                        <th>dob</th>
+                        <th>name_in_khmer</th>
+                        <th class="text-center">gender</th>
+                        <th class="text-center">dob</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
+
             <div class="card-footer">
-                <div class="row">
-                    <div class="col-sm-2">
-                        <div class="form-group">
-                            <div class="form-group clearfix">
-                                <div class="icheck-primary d-inline">
-                                    <input type="checkbox" id="allStudent" required>
-                                    <label for="allStudent">Select all</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-2">
-                        <div class="form-group clearfix">
-                            <div class="icheck-primary d-inline">
-                                <input type="checkbox" id="chbGroupAllStage">
-                                <label for="chbGroupAllStage">Group all stage</label>
-                            </div>
-                        </div>
-                    </div>
+                <div class="row align-items-center">
                     <div class="col-sm-3">
-                        <div class="form-group clearfix">
-                            <div class="icheck-primary d-inline">
-                                <input type="checkbox" id="chbGroupAllStudyTime">
-                                <label for="chbGroupAllStudyTime">Group all study time</label>
-                            </div>
+                        <div class="icheck-primary d-inline">
+                            <input type="checkbox" id="specialize_chbGroupAllStage">
+                            <label for="specialize_chbGroupAllStage">Group all stage</label>
                         </div>
                     </div>
-                    @* <label class="col-sm-2"> Assign to group</label> *@
+
                     <div class="col-sm-3">
-                        <select id="cboGroup" class="form-control select2">
-                            <option selected="selected" disabled value="-1">Select Group</option>
+                        <div class="icheck-primary d-inline">
+                            <input type="checkbox" id="specialize_chbGroupAllStudyTime">
+                            <label for="specialize_chbGroupAllStudyTime">Group all study time</label>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <select id="specialize_cboGroup" class="form-control select2">
+                            <option value="" selected disabled>Assign to group</option>
                         </select>
                     </div>
-                    <button id="btnAssignGroup" class="btn btn-success btn-sm col-sm-1">
-                        Assign
-                    </button>
+
+                    <div class="col-sm-2">
+                        <button type="button"
+                                id="specialize_btnAssignGroup"
+                                class="btn btn-success btn-sm btn-block">
+                            <i class="fas fa-check"></i> Assign
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script>
-    async function GetDegree() {
-        const cboDegree = $("#cboDegree");
-        cboDegree.empty();
-        cboDegree.append(`<option value='0' disabled>Select Degree</option>`);
-        const degrees = await Degree.GetAllDegree();
-        degrees.forEach(item => {
-            cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
-        });
-        cboDegree.val('2').trigger("change");
-    }
 
-    $(document).ready(function () {
-        $(".select2").select2();
-        GetDegree();
-    });
-    async function filterSpecialize() {
-        //degree, school,academic-year, promotion, stage, study-time
-        $.ajax({
-            url: `/student/get-students-registry-specialize`,
-            type: "POST",
-            data: frmFilter.serialize(),
-            success: function (data) {
-                // console.log(data);
-                // clear old table data
-                tblStudent.find("tbody").empty();
-                // loop and append
-                data.data.forEach(function (item, index) {
-                    tblStudent.find("tbody").append(`
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${item.studentId}</td>
-                                <td>${item.studentName}</td>
-                                <td>${item.sex}</td>
-                                <td>${formatDate(item.dateOfBirth)}</td>
-                            </tr>
-                        `);
+<script>
+    $(document).ready(async function () {
+        const formRoot = $("#specialize_formRoot");
+        const cboDegree = $("#specialize_cboDegree");
+        const cboAcademicYear = $("#specialize_cboAcademicYear");
+        const cboSchool = $("#specialize_cboSchool");
+        const cboPromotion = $("#specialize_cboPromotion");
+        const cboStage = $("#specialize_cboStage");
+        const cboStudyTime = $("#specialize_cboStudyTime");
+        const cboGroup = $("#specialize_cboGroup");
+
+        const tblStudent = $("#specialize_tblStudent");
+        const btnFilter = $("#specialize_btnFilter");
+        const btnAssignGroup = $("#specialize_btnAssignGroup");
+        const btnSelectAllStudent = $("#specialize_btnSelectAllStudent");
+        const chbGroupAllStage = $("#specialize_chbGroupAllStage");
+        const chbGroupAllStudyTime = $("#specialize_chbGroupAllStudyTime");
+
+        const selectedStudentIds = new Set();
+        let dtStudent = null;
+
+        formRoot.find(".select2").select2({
+            width: "100%"
+        });
+
+        btnFilter.prop("disabled", true);
+        btnAssignGroup.prop("disabled", true);
+
+        function getItems(response) {
+            if (Array.isArray(response)) {
+                return response;
+            }
+
+            return response && Array.isArray(response.data)
+                ? response.data
+                : [];
+        }
+
+        function resetSelect(select, placeholder) {
+            select
+                .empty()
+                .append(`<option value="" selected disabled>${placeholder}</option>`)
+                .val("")
+                .trigger("change.select2");
+        }
+
+        function hasFilterValues() {
+            return Boolean(
+                cboDegree.val() &&
+                cboAcademicYear.val() &&
+                cboSchool.val() &&
+                cboPromotion.val() &&
+                cboStage.val() &&
+                cboStudyTime.val()
+            );
+        }
+
+        function updateFilterButton() {
+            btnFilter.prop("disabled", !hasFilterValues());
+        }
+
+        function updateSelectionState() {
+            const checkboxes = tblStudent.find("tbody .chkStudentRow");
+            const allVisibleSelected =
+                checkboxes.length > 0 &&
+                checkboxes.filter(":checked").length === checkboxes.length;
+
+            $("#specialize_countStudent").text(selectedStudentIds.size);
+
+            btnAssignGroup.prop(
+                "disabled",
+                selectedStudentIds.size === 0 || !cboGroup.val()
+            );
+
+            btnSelectAllStudent
+                .find("i")
+                .toggleClass("fa-check-double", !allVisibleSelected)
+                .toggleClass("fa-times", allVisibleSelected);
+
+            btnSelectAllStudent.attr(
+                "title",
+                allVisibleSelected
+                    ? "Unselect all students"
+                    : "Select all students"
+            );
+        }
+
+        async function GetDegree() {
+            resetSelect(cboDegree, "Select Degree");
+
+            const degrees = getItems(await Degree.GetAllDegree());
+
+            degrees.forEach(function (item) {
+                cboDegree.append(
+                    `<option value="${item.degreeId}">${item.degreeName}</option>`
+                );
+            });
+
+            // Foundation/Specialize degree
+            cboDegree.val("2").trigger("change.select2");
+        }
+
+        function GetAcademicYear() {
+            resetSelect(cboAcademicYear, "Select Academic Year");
+
+            const currentYear = new Date().getFullYear();
+
+            for (let year = currentYear + 1; year >= 2000; year--) {
+                cboAcademicYear.append(
+                    `<option value="${year}">${year}-${year + 1}</option>`
+                );
+            }
+
+            // Database currently has Specialize/Foundation data for 2025
+            cboAcademicYear.val("2025").trigger("change");
+        }
+
+        async function GetSchool() {
+            resetSelect(cboSchool, "Select School");
+            resetSelect(cboPromotion, "Promotion");
+            resetSelect(cboStage, "Stage");
+            resetSelect(cboGroup, "Assign to group");
+
+            const degreeId = Number(cboDegree.val()) || 0;
+            const academicYear = Number(cboAcademicYear.val()) || 0;
+
+            if (degreeId <= 0 || academicYear <= 0) {
+                updateFilterButton();
+                return;
+            }
+
+            try {
+                const response = await $.ajax({
+                    url: "/school/get-schools-by-academic-year",
+                    type: "POST",
+                    data: {
+                        degreeId: degreeId,
+                        year: academicYear
+                    }
                 });
-            },
-            error: function (xhr) {
-                console.log(xhr.responseText);
+
+                const schools = getItems(response).filter(function (item) {
+                    const isFoundation =
+                        item.isFoundationSchool ??
+                        item.IsFoundationSchool;
+
+                    return Number(isFoundation) === 1;
+                });
+
+                if (schools.length === 0) {
+                    resetSelect(
+                        cboSchool,
+                        `No school available for ${academicYear}-${academicYear + 1}`
+                    );
+
+                    return;
+                }
+
+                schools.forEach(function (item) {
+                    const schoolId =
+                        item.schoolId ?? item.SchoolId;
+
+                    const schoolName =
+                        item.schoolName ??
+                        item.SchoolName ??
+                        "";
+
+                    cboSchool.append(
+                        `<option value="${schoolId}">${schoolName}</option>`
+                    );
+                });
+
+                // Refresh Select2 after adding the options.
+                cboSchool.trigger("change.select2");
+            } catch (xhr) {
+                console.error("GetSchool error:", xhr);
+
+                resetSelect(cboSchool, "Failed to load schools");
+
+                ShowToastError(
+                    xhr.responseJSON?.status?.message ||
+                    xhr.responseJSON?.message ||
+                    xhr.responseText ||
+                    "Failed to load schools."
+                );
+            } finally {
+                updateFilterButton();
+            }
+        }
+
+        async function GetPromotion() {
+            resetSelect(cboPromotion, "Promotion");
+            resetSelect(cboStage, "Stage");
+            resetSelect(cboGroup, "Assign to group");
+
+            const degreeId = Number(cboDegree.val()) || 0;
+            const schoolId = Number(cboSchool.val()) || 0;
+            const academicYear = Number(cboAcademicYear.val()) || 0;
+
+            if (!degreeId || !schoolId || !academicYear) {
+                updateFilterButton();
+                return;
+            }
+
+            const promotions = getItems(await Promotion.GetPromotions({
+                isSelect2: true,
+                degreeId: degreeId,
+                schoolId: schoolId
+            })).filter(function (item) {
+                const itemYear = Number(
+                    item.academicYearStart ?? item.AcademicYearStart ?? 0
+                );
+
+                // Some Promotion models do not expose AcademicYearStart.
+                return !itemYear || itemYear === academicYear;
+            });
+
+            if (promotions.length === 0) {
+                resetSelect(cboPromotion, "No promotion available");
+                updateFilterButton();
+                return;
+            }
+
+            promotions.forEach(function (item) {
+                cboPromotion.append(
+                    `<option value="${item.promotionId}">${item.promotionNo}</option>`
+                );
+            });
+
+            updateFilterButton();
+        }
+
+        async function GetStage() {
+            resetSelect(cboStage, "Stage");
+            resetSelect(cboGroup, "Assign to group");
+
+            const promotionId = Number(cboPromotion.val()) || 0;
+
+            if (!promotionId) {
+                updateFilterButton();
+                return;
+            }
+
+            const stages = getItems(await Stage.GetStages({
+                promotionId: promotionId
+            }));
+
+            stages.forEach(function (item) {
+                cboStage.append(
+                    `<option value="${item.stageId}">${item.stageNo}</option>`
+                );
+            });
+
+            updateFilterButton();
+        }
+
+        async function GetStudyTime() {
+            resetSelect(cboStudyTime, "Study Time");
+
+            try {
+                const response = await fetch("/study-time/get-study-time");
+                const result = await response.json();
+
+                getItems(result).forEach(function (item) {
+                    cboStudyTime.append(
+                        `<option value="${item.studyTimeValue}">${item.studyTimeValue}</option>`
+                    );
+                });
+            } catch (error) {
+                ShowToastError("Failed to load study times.");
+            }
+
+            updateFilterButton();
+        }
+
+        async function GetGroup() {
+            resetSelect(cboGroup, "Assign to group");
+            updateSelectionState();
+
+            const promotionId = Number(cboPromotion.val()) || 0;
+            const stageNo = cboStage.find("option:selected").text();
+            const studyTime = cboStudyTime.val();
+
+            if (!promotionId || !cboStage.val() || !studyTime) {
+                return;
+            }
+
+            try {
+                const response = await $.ajax({
+                    url: "/group/get-groups-filter",
+                    type: "POST",
+                    data: {
+                        promotionId: promotionId,
+                        stageNo: stageNo,
+                        studyTime: studyTime,
+                        allStage: chbGroupAllStage.is(":checked"),
+                        allTime: chbGroupAllStudyTime.is(":checked")
+                    }
+                });
+
+                getItems(response).forEach(function (item) {
+                    cboGroup.append(
+                        `<option value="${item.groupId}">${item.groupName}</option>`
+                    );
+                });
+
+                cboGroup.trigger("change.select2");
+            } catch (xhr) {
+                ShowToastError(xhr.responseText || "Failed to load groups.");
+            }
+        }
+
+        function getStudentRequest(data) {
+            data.__RequestVerificationToken =
+                $("#specialize_frmFilter input[name='__RequestVerificationToken']").val();
+
+            data.IsAll = true;
+            data.DegreeId = cboDegree.val();
+            data.AcademicYear = cboAcademicYear.val();
+            data.SchoolId = cboSchool.val();
+            data.PromotionId = cboPromotion.val();
+            data.StageId = cboStage.val();
+            data.PromotionNo = cboPromotion.find("option:selected").text();
+            data.StageNo = cboStage.find("option:selected").text();
+            data.StudyTime = cboStudyTime.val();
+
+            return data;
+        }
+
+        function createStudentTable() {
+            return new Promise(function (resolve) {
+                dtStudent = tblStudent.DataTable({
+                    destroy: true,
+                    paging: true,
+                    pageLength: 100,
+                    lengthChange: false,
+                    searching: false,
+                    ordering: false,
+                    info: false,
+                    responsive: false,
+                    autoWidth: false,
+                    scrollX: true,
+                    scrollY: "420px",
+                    scrollCollapse: true,
+                    processing: true,
+                    serverSide: false,
+                    ajax: {
+                        url: "/assign-student-group/get-students-registry-specialize",
+                        type: "POST",
+                        data: getStudentRequest,
+                        dataSrc: function (response) {
+                            return getItems(response);
+                        },
+                        error: function (xhr) {
+                            ShowToastError(
+                                xhr.responseText || "Failed to load students."
+                            );
+                        }
+                    },
+                    columns: [
+                        {
+                            data: null,
+                            className: "text-center",
+                            orderable: false,
+                            searchable: false,
+                            width: 36,
+                            render: function (data, type, row) {
+                                const studentId = String(row.studentId);
+                                const checked = selectedStudentIds.has(studentId)
+                                    ? "checked"
+                                    : "";
+
+                                return `
+                                    <input type="checkbox"
+                                           class="chkStudentRow"
+                                           value="${studentId}"
+                                           ${checked}
+                                           style="width:16px;height:16px;cursor:pointer;">
+                                `;
+                            }
+                        },
+                        {
+                            data: "studentId",
+                            className: "text-center"
+                        },
+                        {
+                            data: "studentName",
+                            defaultContent: ""
+                        },
+                        {
+                            data: "studentNameInKhmer",
+                            defaultContent: ""
+                        },
+                        {
+                            data: "sex",
+                            className: "text-center",
+                            defaultContent: ""
+                        },
+                        {
+                            data: "dateOfBirth",
+                            className: "text-center",
+                            defaultContent: "",
+                            render: function (data) {
+                                return data ? formatDate(data) : "";
+                            }
+                        }
+                    ],
+                    drawCallback: function () {
+                        tblStudent.find("tbody .chkStudentRow").each(function () {
+                            const checkbox = $(this);
+                            const isChecked = selectedStudentIds.has(checkbox.val());
+
+                            checkbox.prop("checked", isChecked);
+                            checkbox.closest("tr").toggleClass("highlight", isChecked);
+                        });
+
+                        updateSelectionState();
+                    },
+                    initComplete: function () {
+                        resolve();
+                    }
+                });
+            });
+        }
+
+        function loadStudentTable() {
+            selectedStudentIds.clear();
+            updateSelectionState();
+
+            if (!dtStudent) {
+                return createStudentTable();
+            }
+
+            return new Promise(function (resolve) {
+                dtStudent.ajax.reload(function () {
+                    resolve();
+                }, true);
+            });
+        }
+
+        cboAcademicYear.on("change", async function () {
+            await GetSchool();
+            updateFilterButton();
+        });
+
+        cboSchool.on("change", async function () {
+            await GetPromotion();
+            updateFilterButton();
+        });
+
+        cboPromotion.on("change", async function () {
+            await GetStage();
+            updateFilterButton();
+        });
+
+        cboStage.on("change", async function () {
+            await GetGroup();
+            updateFilterButton();
+        });
+
+        cboStudyTime.on("change", async function () {
+            await GetGroup();
+            updateFilterButton();
+        });
+
+        chbGroupAllStage.on("change", GetGroup);
+        chbGroupAllStudyTime.on("change", GetGroup);
+        cboGroup.on("change", updateSelectionState);
+
+        btnFilter.on("click", async function (event) {
+            event.preventDefault();
+
+            if (!hasFilterValues()) {
+                ShowToastError("Please select all required filters.");
+                return;
+            }
+
+            showLoading();
+
+            try {
+                await loadStudentTable();
+            } finally {
+                hideLoading(1);
             }
         });
-    }
+
+        tblStudent.on("change", ".chkStudentRow", function () {
+            const checkbox = $(this);
+            const studentId = checkbox.val();
+            const isChecked = checkbox.is(":checked");
+
+            if (isChecked) {
+                selectedStudentIds.add(studentId);
+            } else {
+                selectedStudentIds.delete(studentId);
+            }
+
+            checkbox.closest("tr").toggleClass("highlight", isChecked);
+            updateSelectionState();
+        });
+
+        btnSelectAllStudent.on("click", function (event) {
+            event.preventDefault();
+
+            const checkboxes = tblStudent.find("tbody .chkStudentRow");
+            const shouldSelect =
+                checkboxes.length > 0 &&
+                checkboxes.filter(":checked").length !== checkboxes.length;
+
+            checkboxes.each(function () {
+                const checkbox = $(this);
+                const studentId = checkbox.val();
+
+                checkbox.prop("checked", shouldSelect);
+                checkbox.closest("tr").toggleClass("highlight", shouldSelect);
+
+                if (shouldSelect) {
+                    selectedStudentIds.add(studentId);
+                } else {
+                    selectedStudentIds.delete(studentId);
+                }
+            });
+
+            updateSelectionState();
+        });
+
+        btnAssignGroup.on("click", function (event) {
+            event.preventDefault();
+
+            const groupId = cboGroup.val();
+            const groupName = cboGroup.find("option:selected").text();
+            const studentIds = Array.from(selectedStudentIds);
+
+            if (!groupId) {
+                ShowToastError("Please select a group.");
+                return;
+            }
+
+            if (studentIds.length === 0) {
+                ShowToastError("Please select at least one student.");
+                return;
+            }
+
+            const message = `
+                <h5>
+                    Are you sure you want to assign
+                    <strong>${studentIds.length}</strong> student(s)
+                    to group <strong>${groupName}</strong>?
+                </h5>
+            `;
+
+            ShowBoxConfirm(message, function () {
+                btnAssignGroup.prop("disabled", true);
+                showLoading();
+
+                $.ajax({
+                    url: `/assign-student-group/assign/${encodeURIComponent(groupId)}`,
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(studentIds),
+                    headers: {
+                        RequestVerificationToken:
+                            $("#specialize_frmFilter input[name='__RequestVerificationToken']").val()
+                    },
+                    success: async function (response) {
+                        ShowToastSuccess(
+                            response.message ||
+                            `Assigned ${studentIds.length} student(s) to ${groupName}.`
+                        );
+
+                        await loadStudentTable();
+                    },
+                    error: function (xhr) {
+                        ShowToastError(
+                            xhr.responseJSON?.message ||
+                            xhr.responseText ||
+                            "Failed to assign students."
+                        );
+                    },
+                    complete: function () {
+                        hideLoading(1);
+                        updateSelectionState();
+                    }
+                });
+            });
+        });
+
+        try {
+            await GetDegree();
+            GetAcademicYear();
+            await GetStudyTime();
+        } catch (error) {
+            console.error(error);
+            ShowToastError("Failed to load Specialize form data.");
+        }
+
+        updateFilterButton();
+        updateSelectionState();
+    });
 </script>
