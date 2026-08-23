@@ -34,7 +34,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         return View();
     }
 
-    /*[Route("details/{studentId}")]
+    [Route("details/{studentId}")]
     public ActionResult Details(string? studentId)
     {
         if (studentId == null) return NotFound(new { message = "Student not found" });
@@ -104,7 +104,13 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             StudentJobs = db.TblStudentJob.ToList()
         };
         return View();
-    }*/
+    }
+
+    [HttpPost]
+    public IActionResult GetStudents()
+    {
+        return View();
+    }
 
     [HttpPost("transfer/{groupId:int}/{fromGroupId:int}/{termNo:int}")]
     public async Task<IActionResult> TransferStudents([FromBody] List<string> idList, int groupId, int fromGroupId,int termNo)
@@ -983,7 +989,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     [HttpGet]
     public IActionResult GetStudentDetail(string? studentId)
     {
-        if (studentId == null) return new ServerResponse().NotFound("Student not found");
+        if (studentId == null) return NotFound(new { message = "Student not found" });
         var db = campusDbContext.DbContext(_campus);
         var registry = (from r in db.TblRegistry
             join d in db.TblDegree on r.DegreeId equals d.DegreeId
@@ -1184,7 +1190,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             var studentCheck = await db.TblStudent.FirstOrDefaultAsync(s => s.StudentId == student.StudentId);
             if (studentCheck == null)
             {
-                await tran.RollbackAsync();
+                await db.Database.RollbackTransactionAsync();
                 return new ServerResponse().NotFound("Student not found");
             } 
             //===student 

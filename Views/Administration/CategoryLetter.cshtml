@@ -50,8 +50,10 @@
                 ajax: {
                     url: "/letter-category/get-letter-category",
                     type: "POST",
+                    data:{ isAll:false },
                     error: function (xhr, status, error) {
                         console.log(xhr.responseText);
+                        ShowToastError(error || "Failed to get letter category!");
                     }
                 },
                 columns: [
@@ -86,7 +88,10 @@
                                     <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>`;
                         }
                     }
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblLetterCategory",500);
+                }
             });
         }
 
@@ -120,14 +125,14 @@
             const row = tblLetterCategory.DataTable().row($row).data();
             if (confirm("Are you sure you want to delete this category?")) {
                 $.ajax({
-                    url: `/LetterCategory/delete/${row.categoryId}`,
+                    url: `/letter-category/delete/${row.categoryId}`,
                     type: "POST",
                     success: function (response) {
                         if (response.status.code === "200") {
                             ShowToastSuccess(response.status.message);
                             frmLetterCategory[0].reset();
-                            modalLetterCategory.modal("hide");
                             tblLetterCategory.DataTable().ajax.reload();
+                            modalLetterCategory.modal("hide");
                         } else {
                             ShowToastError(response.status.message);
                         }
@@ -144,7 +149,7 @@
             const form = $(this);
             const formData = form.serialize();
             $.ajax({
-                url: '/LetterCategory/post-letter-category',
+                url: '/letter-category/post-letter-category',
                 method: 'POST',
                 data: formData,
                 success: function (response) {

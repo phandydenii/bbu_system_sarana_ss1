@@ -1,90 +1,579 @@
+@using BBU_SYSTEM.DTOs
 @{
-    var booking = new Booking();
+var booking = new BookingTblDto();
 }
-<div class="modal fade" id="BookingClothesModal" data-backdrop="static" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+
+<style>
+    #BookingClothesModal .modal-content {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        background-color: #f8fafc;
+    }
+
+    #BookingClothesModal.fullscreen-modal .modal-dialog {
+        max-width: 100%;
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+    }
+
+    #BookingClothesModal.fullscreen-modal .modal-content {
+        height: 100vh;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #BookingClothesModal.fullscreen-modal .modal-header,
+    #BookingClothesModal.fullscreen-modal .modal-footer {
+        flex: 0 0 auto;
+    }
+
+    #BookingClothesModal.fullscreen-modal .modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #BookingClothesModal.fullscreen-modal #PaymentForm {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    #BookingClothesModal.fullscreen-modal .payment-table-area {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    #BookingClothesModal.fullscreen-modal .payment-table-area > .col-12 {
+        height: 100%;
+        min-height: 0;
+    }
+
+    #BookingClothesModal.fullscreen-modal .booking-detail-scroll {
+        height: 100%;
+        max-height: none;
+        overflow-y: auto;
+        overflow-x: auto;
+    }
+
+    #BookingClothesModal .modal-body {
+        padding: 1rem;
+        background: #f1f5f9;
+    }
+
+    #BookingClothesModal .modal-header {
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 0.85rem 1rem;
+    }
+
+    /* Rate Box Badge */
+    .rate-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .rate-icon {
+        font-size: 0.9rem;
+        color: #3b82f6;
+    }
+
+    .rate-label {
+        font-size: 0.68rem;
+        color: #64748b;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .rate-values {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.82rem;
+        color: #334155;
+    }
+
+    .rate-values strong {
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .rate-divider {
+        color: #cbd5e1;
+    }
+
+    .booking-info-card,
+    .payment-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .booking-info-card {
+        margin-bottom: 1rem;
+    }
+
+    .card-section-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .booking-info-card label,
+    .payment-summary-area label {
+        font-size: 0.7rem;
+        color: #64748b;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+    }
+
+    .booking-info-card .form-control,
+    .payment-summary-area .form-control {
+        height: 38px;
+        font-size: 0.875rem;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        color: #0f172a;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .booking-info-card .form-control[readonly],
+    .payment-summary-area .form-control[readonly] {
+        background-color: #f8fafc;
+        color: #334155;
+        font-weight: 600;
+    }
+
+    .booking-info-card .form-control:focus,
+    .payment-summary-area .form-control:focus {
+        background-color: #ffffff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Status Custom Switch */
+    .status-toggle-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        height: 100%;
+    }
+
+    .custom-control-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #334155;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .booking-detail-scroll { 
+        max-height: 48vh;
+        overflow-y: auto;
+        overflow-x: auto;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    /* Modern Custom Scrollbar */
+    .booking-detail-scroll::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    .booking-detail-scroll::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+    .booking-detail-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    #tblBookingDetail {
+        margin-bottom: 0;
+        white-space: nowrap;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    #tblBookingDetail thead> th {
+        position: sticky;
+        top: 0;
+        background: #f8fafc;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e2e8f0;
+        border-top: none;
+        padding: 10px 12px;
+        z-index: 2;
+    }
+
+    #tblBookingDetail tbody td {
+        vertical-align: middle;
+        font-size: 0.85rem;
+        color: #1e293b;
+        padding: 8px 12px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    #tblBookingDetail tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    #tblBookingDetail tfoot tr {
+        background-color: #f8fafc;
+        border-top: 2px solid #e2e8f0;
+    }
+
+    #tblBookingDetail tfoot td {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+    .payment-summary-area {
+        margin-top: 0.85rem;
+    }
+
+    .booking-note {
+        min-height: 80px;
+        height: 100% !important;
+        resize: none;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1;
+    }
+
+    /* Modern Accounting Section Enhancements */
+    .acc-summary-container {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.75rem;
+    }
+
+    .acc-input-addon {
+        background-color: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        color: #64748b;
+        font-size: 0.75rem;
+        font-weight: 700;
+        min-width: 42px;
+        justify-content: center;
+    }
+
+    .acc-pay-box {
+        background: #ffffff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 0.75rem;
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.04);
+    }
+
+    .summary-total {
+        color: #1e40af !important;
+        background-color: #eff6ff !important;
+        border-color: #93c5fd !important;
+        font-size: 1rem !important;
+    }
+
+    .summary-payment-usd {
+        color: #15803d !important;
+        background-color: #f0fdf4 !important;
+        border-color: #86efac !important;
+        font-size: 0.95rem !important;
+    }
+
+    .summary-payment-khr {
+        color: #b45309 !important;
+        background-color: #fffbeb !important;
+        border-color: #fde68a !important;
+        font-size: 0.95rem !important;
+    }
+
+    /* Modal Footer */
+    #BookingClothesModal .modal-footer {
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        padding: 0.85rem 1.25rem;
+        gap: 8px;
+    }
+
+    .btn-action {
+        padding: 0.45rem 1.2rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.15s ease-in-out;
+    }
+    /* Smooth Collapse Icon Rotation */
+    [data-toggle="collapse"] .collapse-icon {
+        transition: transform 0.2s ease-in-out;
+    }
+    [data-toggle="collapse"].collapsed .collapse-icon {
+        transform: rotate(180deg);
+    }
+</style>
+
+<div class="modal fade" id="BookingClothesModal" data-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Payment Detail</h4>
-                <button id="btnSelectItem" type="button" class="btn btn-primary btn-sm float-right"><i
-                        class="fa-solid fa-sitemap"></i> Select
-                    Item
-                </button>
+            <!-- HEADER -->
+            <div class="modal-header align-items-center">
+                <div class="d-flex align-items-center">
+                    <div>
+                        <h5 class="modal-title mb-0 font-weight-bold text-dark">Booking Details</h5>
+                        <small class="text-muted">View and manage clothing booking transactions</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <!-- Exchange Rate Box -->
+                    <div class="rate-box mr-3">
+                        <i class="fas fa-arrow-right-arrow-left rate-icon"></i>
+                        <div class="d-flex flex-column">
+                            <span class="rate-label">Exchange Rate</span>
+                            <div class="rate-values">
+                                <span>In: <strong id="txtRateIn">0</strong></span>
+                                <span class="rate-divider">|</span>
+                                <span>Out: <strong id="txtRateOut">0</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Select Item Button -->
+                    <button id="btnSelectItem" type="button" class="btn btn-primary btn-action mr-2" data-toggle="modal" data-target="#ItemModal">
+                        <i class="fa-solid fa-sitemap"></i>
+                        <span>Select Item</span>
+                    </button>
+                    <!-- Fullscreen Toggle Button -->
+                    <button type="button" id="btnTogglePaymentFullscreen" class="btn btn-light border text-secondary" style="width: 38px; height: 38px; border-radius: 8px;" title="Toggle Fullscreen">
+                        <i id="paymentFullscreenIcon" class="fas fa-expand"></i>
+                    </button>
+                </div>
             </div>
+
+            <!-- BODY -->
             <div class="modal-body">
-                <form id="PaymentForm" asp-action="CreatePayment" asp-controller="Invoice">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="row">
-                                <div class="col-3">
-                                    <label>total_khr</label>
-                                    <input type="number" class="form-control edit-mode" readonly value="0"/>
-                                </div>
-                                <div class="col-3">
-                                    <label>discount_khr</label>
-                                    <input type="number" class="form-control edit-mode" value="0">
-                                </div>
-                                <div class="col-3">
-                                    <label>total_pay_khr</label>
-                                    <input type="number" class="form-control edit-mode" readonly value="0"/>
-                                </div>
-                                <div class="col-3">
-                                    <label>pay_khr</label>
-                                    <input type="number" class="form-control edit-mode" value="0">
+                <form id="PaymentForm">
+                    <!-- Hidden Inputs preserved -->
+                    <input type="hidden" asp-for="@booking.BookingId"/>
+                    <input type="hidden" asp-for="@booking.SchoolId"/>
+                    <input type="hidden" asp-for="@booking.FieldId"/>
+                    <input type="hidden" asp-for="@booking.TermNo"/>
+                    <input type="hidden" asp-for="@booking.GroupId"/>
+
+                    <!-- BOOKING INFO SECTION -->
+                    <div class="booking-info-card">
+                        <div class="card-section-title">
+                            <span><i class="fas fa-file-invoice text-primary mr-2"></i>General Information</span>
+                        </div>
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-2 mb-md-0">
+                                <label class="required">Student ID</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" asp-for="@booking.StudentId" readonly/>
+                                    <div class="input-group-append" style="cursor: pointer;" id="btnSearchStudent">
+                                        <span class="input-group-text bg-success border-success text-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-3">
-                                    <label>total_usd</label>
-                                    <input type="number" class="form-control edit-mode" readonly value="0"/>
-                                </div>
-                                <div class="col-3">
-                                    <label>discount_usd</label>
-                                    <input type="number" class="form-control edit-mode" value="0">
-                                </div>
-                                <div class="col-3">
-                                    <label>total_pay_usd</label>
-                                    <input type="number" class="form-control edit-mode" readonly value="0"/>
-                                </div>
-                                <div class="col-3">
-                                    <label>pay_usd</label>
-                                    <input type="number" class="form-control edit-mode" value="0">
+                            <div class="col-md-3 mb-2 mb-md-0">
+                                <label>Booking No.</label>
+                                <input type="text" class="form-control" asp-for="@booking.BookingNo" readonly />
+                            </div>
+                            <div class="col-md-3 mb-2 mb-md-0">
+                                <label>Booking Date</label>
+                                <input type="text" class="form-control" asp-for="@booking.BookingDate" />
+                            </div>
+
+                            <div class="col-md-3 mb-2 mb-md-0">
+                                <div class="status-toggle-wrapper pb-1">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="Active" name="Active" />
+                                        <label class="custom-control-label" for="Active">Active Status</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <hr>
-                    <div class="row">
+
+                    <!-- TABLE SECTION -->
+                    <div class="row payment-table-area">
                         <div class="col-12">
-                            <table id="tblBookingDetail" class="table table-bordered table-striped"
-                                   style="width: 100%;">
-                                <thead>
-                                <tr>
-                                    <th>id</th>
-                                    <th>itemid</th>
-                                    <th>name</th>
-                                    <th>qty</th>
-                                    <th>price</th>
-                                    <th>amount</th>
-                                    <th>action</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
+                            <div class="booking-detail-scroll">
+                                <table id="tblBookingDetail" class="table table-hover" style="width:100%;">
+                                    <thead>
+                                    <tr>
+                                        <th style="display:none;">BookingDetailId</th>
+                                        <th style="display:none;">BookingId</th>
+                                        <th style="display:none;">ClothId</th>
+                                        <th>Item Description</th>
+                                        <th style="width:100px;" class="text-center">Qty</th>
+                                        <th style="width:120px;" class="text-right">Price $</th>
+                                        <th style="width:130px;" class="text-right">Price KHR</th>
+                                        <th style="width:110px;" class="text-center">Discount %</th>
+                                        <th style="width:130px;" class="text-right">Total $</th>
+                                        <th style="width:140px;" class="text-right">Total KHR</th>
+                                        <th style="width:80px;" class="text-center">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                    <tfoot>
+                                    <tr class="font-weight-bold">
+                                        <td colspan="3" style="display:none;"></td>
+                                        <td colspan="5" class="text-right text-uppercase text-muted" style="font-size: 0.8rem;">Grand Total</td>
+                                        <td id="lblGrandTotalUsd" class="text-right text-primary">0.00</td>
+                                        <td id="lblGrandTotalKhr" class="text-right text-primary">0</td>
+                                        <td></td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAYMENT SECTION -->
+                    <div class="payment-summary-area">
+                        <div class="payment-card p-0 overflow-hidden">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center px-3 py-2.5 border-bottom"
+                                 data-toggle="collapse" 
+                                 data-target="#summaryCollapseArea" 
+                                 aria-expanded="true" 
+                                 aria-controls="summaryCollapseArea"
+                                 style="cursor: pointer;">
+                                <span class="font-weight-bold text-dark text-uppercase" style="font-size: 0.85rem; letter-spacing: 0.5px;">
+                                    <i class="fas fa-layer-group text-primary mr-2"></i>Summary
+                                </span>
+                                <i class="fas fa-chevron-up collapse-icon text-muted"></i>
+                            </div>
+                            <div class="collapse show p-3" id="summaryCollapseArea">
+                                <div class="row align-items-stretch">
+                                    <!-- Column 1: Notes -->
+                                    <div class="col-lg-4 col-md-4 mb-3 mb-md-0 border-right d-flex flex-column">
+                                        <div class="card-section-title">
+                                            <span><i class="fas fa-sticky-note text-primary mr-2"></i>Remark / Notes</span>
+                                        </div>
+                                        <textarea class="form-control booking-note flex-grow-1" asp-for="@booking.Note" placeholder="Enter optional notes..."></textarea>
+                                    </div>
+                                    <!-- Column 2: Bill Breakdown -->
+                                    <div class="col-lg-4 col-md-4 mb-3 mb-md-0 border-right">
+                                        <div class="card-section-title">
+                                            <span><i class="fas fa-calculator text-primary mr-2"></i>Bill Breakdown</span>
+                                        </div>
+                                        <div class="acc-summary-container">
+                                            <div class="mb-2">
+                                                <label class="d-flex justify-content-between">
+                                                    <span>Subtotal VAT</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text acc-input-addon">$</span>
+                                                    </div>
+                                                    <input type="number" class="form-control edit-mode text-right font-weight-semibold" asp-for="@booking.Vat" readonly value="0"/>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="d-flex justify-content-between">
+                                                    <span>Total Discount</span>
+                                                </label>
+                                                <div class="input-group input-group-sm">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text acc-input-addon">$</span>
+                                                    </div>
+                                                    <input type="number" class="form-control edit-mode text-right font-weight-semibold text-danger" asp-for="@booking.Discount" readonly value="0"/>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3 pt-2 border-top">
+                                                <label class="text-primary font-weight-bold">Grand Total</label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text bg-primary text-white border-primary font-weight-bold">$</span>
+                                                    </div>
+                                                    <input type="number" class="form-control summary-total text-right font-weight-bold" asp-for="@booking.Total" readonly value="0"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Column 3: Payment Received -->
+                                    <div class="col-lg-4 col-md-4">
+                                        <div class="card-section-title">
+                                            <span><i class="fas fa-wallet text-success mr-2"></i>Payment Received</span>
+                                            <span class="badge badge-soft-success text-success border border-success px-2 py-1" style="font-size: 0.65rem; border-radius:4px;">SETTLEMENT</span>
+                                        </div>
+                                        <div class="acc-pay-box">
+                                            <div class="row">
+                                                <div class="col-12 mb-3">
+                                                    <label class="text-success font-weight-bold">Paid USD ($)</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text bg-success text-white border-success font-weight-bold">$</span>
+                                                        </div>
+                                                        <input type="number" class="form-control summary-payment-usd text-right font-weight-bold" asp-for="@booking.PayDollar" value="0"/>
+                                                    </div>
+                                                </div>
+            
+                                                <div class="col-12">
+                                                    <label class="text-warning font-weight-bold" style="color: #b45309 !important;">Paid KHR (៛)</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text text-white border-warning font-weight-bold" style="background-color: #d97706;">៛</span>
+                                                        </div>
+                                                        <input type="number" class="form-control summary-payment-khr text-right font-weight-bold" asp-for="@booking.PayRieal" value="0"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+            
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
             </div>
+
+            <!-- FOOTER -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-success float-right" id="btnSavePayment"><i
-                        class="fas fa-save"></i> Save Payment
+                <button type="button" class="btn btn-success btn-action px-4" id="btnSaveBooking">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Save Booking</span>
                 </button>
-                <button type="button" id="btnCloseBooking" class="btn btn-danger float-right"><i
-                        class="fas fa-close"></i> Close
+                <button type="button" id="btnCloseBooking" class="btn btn-light btn-action border px-4">
+                    <i class="fas fa-times text-danger"></i>
+                    <span>Close</span>
                 </button>
             </div>
         </div>
     </div>
 </div>
-<partial name="_ItemModal"/>

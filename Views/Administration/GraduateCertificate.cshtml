@@ -1,37 +1,42 @@
 ﻿@{
     ViewData["OpenMenu"] = "Administration";
     ViewData["Action"] = "GraduateLetter";
+    ViewData["HideHeader"] = true;
 }
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            @* <div class="card-header">
-                <div class="margin">
-                    <button class="btn btn-primary" id="btnAddNewGraduateCertificate">Add New</button>
-                </div>
-            </div> *@
-            <div class="card-body">
-                <table id="tblStudent" class="table table-sm table-bordered table-striped" style="width: 100%;">
-                    <thead>
+
+<div class="container-fluid px-0 pt-3">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="m-0 font-weight-bold text-dark">Graduate Letter Management</h3>
+            <small class="text-muted">Manage student graduation letters, certificates, and gown bookings</small>
+        </div>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table id="tblStudent" class="table table-sm table-hover table-bordered table-striped w-100">
+                <thead class="thead-light">
                     <tr>
-                        <th>Student Id</th>
-                        <th>Name English</th>
-                        <th>Name Khmer</th>
+                        <th>Student ID</th>
+                        <th>Name (English)</th>
+                        <th>Name (Khmer)</th>
                         <th>Gender</th>
                         <th>DOB</th>
                         <th>Phone</th>
                         <th>Status</th>
-                        <th>Action</th>
+                        <th class="text-center" style="width: 140px;">Action</th>
                     </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>
-<partial name="_GraduateLetter"/>
+
+<partial name="_GraduateLetter" />
+
 <script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
 
 @section Scripts
@@ -48,7 +53,6 @@
         
         $(document).ready(function () {
             fetchStudent();
-            // btnSave.prop("disabled", true);
             
             $('#formCertificateInfo :input').each(function () {
                 certificateData[this.name] = $(this).val();
@@ -64,7 +68,7 @@
             $('#formCertificateInfo :input').each(function () {
                 if (certificateData[this.name] !== $(this).val()) {
                     changed = true;
-                    return false; // stop loop
+                    return false;
                 }
             });
             return changed;
@@ -75,123 +79,146 @@
             $('#formBookingInfo :input').each(function () {
                 if (bookingData[this.name] !== $(this).val()) {
                     changed = true;
-                    return false; // stop loop
+                    return false; 
                 }
             });
             return changed;
         }
 
         function fetchStudent() {
-            tblStudent.DataTable().clear().destroy();
+            if ($.fn.DataTable.isDataTable('#tblStudent')) {
+                tblStudent.DataTable().destroy();
+            }
+
             tblStudent.DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
                 ajax: {
-                    url: "/student/academic/student-list", // Endpoint to fetch paginated data
+                    url: "/student/academic/student-list/all",
                     type: "POST",
-                    error: function (xhr, status, error) {
-                        console.log(xhr.responseText);
+                    error: function (xhr) {
+                        if (typeof ShowToastError === 'function') {
+                            ShowToastError(xhr.responseText || "Failed to load student list");
+                        } else {
+                            alert(xhr.responseText || "Failed to load student list");
+                        }
                     }
                 },
                 columns: [
-                    {data: "studentId"},
-                    {data: "studentName"},
-                    {data: "studentNameInKhmer"},
-                    {data: "sex"},
+                    { data: "studentId" },
+                    { data: "studentName" },
+                    { data: "studentNameInKhmer" },
+                    { data: "sex" },
                     {
                         data: null,
                         render: function (data, type, row) {
-                            const dt = formatDate(row.dateOfBirth, "DD/MM/YYYY");
-                            return `${dt}`
+                            return formatDate(row.dateOfBirth, "DD/MM/YYYY");
                         }
                     },
-                    {data: "phone"},
+                    { data: "phone" },
                     {
                         data: null,
                         render: function (data, type, row) {
                             if (row.status === "REGISTER") {
-                                return ` <span class="badge badge-warning">${row.status}</span>`;
+                                return `<span class="badge badge-warning px-2 py-1">${row.status}</span>`;
                             } else if (row.status === "ACTIVE") {
-                                return ` <span class="badge badge-primary">${row.status}</span>`;
+                                return `<span class="badge badge-primary px-2 py-1">${row.status}</span>`;
                             } else if (row.status === "QUIT") {
-                                return ` <span class="badge badge-danger">${row.status}</span>`;
+                                return `<span class="badge badge-danger px-2 py-1">${row.status}</span>`;
                             }
-                            return ` <span class="badge badge-secondary">${row.status}</span>`;
+                            return `<span class="badge badge-secondary px-2 py-1">${row.status}</span>`;
                         }
                     },
                     {
                         data: null,
+                        className: "text-center",
                         render: function (data, type, row) {
                             return `
-                            <button class="btn btn-primary btn-sm" id="btnManageLetter"><i class='fas fa-gear'></i> Manage Letter</button>
-                        `;
+                                <button class="btn btn-primary btn-sm btnManageLetter">
+                                    <i class="fas fa-cog mr-1"></i> Manage
+                                </button>
+                            `;
                         }
                     }
-                ]
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblStudent", 500);
+                }
             });
         }
         
-        tblStudent.on("click","#btnManageLetter", function (e) {
-            showLoading();
+        tblStudent.on("click", ".btnManageLetter", function (e) {
             e.preventDefault();
             const $row = $(this).closest("tr");
-            const data = tblStudent.DataTable().row($row).data(); 
-            getStudent(data.studentId);
-            modalGraduateLetter.modal("show");
-            hideLoading();
+            const data = tblStudent.DataTable().row($row).data();
+            getStudent(data.studentId); 
         });
 
-
         function getStudent(student_id) {
+            showLoading();
             $.ajax({
                 url: "/student/academic/student-id/" + student_id,
                 type: "GET",
-                data: {student_id: student_id},
-                success: function (data) { 
-                    if (data) {
-                        const student = data.student; 
-                        // console.log(student);
-                        const degree = data["degree"];
-                        const school = data["school"];
-                        const field = data["field"];
-                        const promotion = data["promotion"];
-                        const stage = data["stage"];
-                        const term = data["term"];
-                        const group = data["group"];
-                        const groupRoom = data["groupRoom"];
-                        const registry = data["registry"];
-                        $("#student_StudentId").val(student.studentId);
-                        $("#student_StudentName").val(student.studentName);
-                        $("#student_StudentNameInKhmer").val(student.studentNameInKhmer);
-                        $("#student_Sex").val(student.sex);
-                        $("#student_Phone").val(student.phone);
-                        $("#student_AcceptDate").val(formatDate(student.acceptDate, "YYYY-MM-DD"));
-                        $("#student_CertificateNo").val(student.certificateNo);
-                        
-                        $("#chbCertificateOut").prop('checked',student.certificateOut).trigger('change');
-                        
-                        $("#student_GraduateLetterNo").val(student.graduateLetterNo);
-                        $("#chbWithdraw").prop('checked',student.isAcceptCertificate);
-                        $("#student_NoteTicket").val(student.noteTicket);
+                data: { student_id: student_id },
+                success: function (response) {
+                    const data = response && response.data ? response.data : response;
+                    if (data && data.student) {
+                        const student = data.student;
+                        const degree = data.degree || {};
+                        const school = data.school || {};
+                        const field = data.field || {};
+                        const promotion = data.promotion || {};
+                        const stage = data.stage || {};
+                        const term = data.term || {};
+                        const group = data.group || {};
+                        const groupRoom = data.groupRoom || {};
+                        // header badge
+                        if (student.status) {
+                            $("#lblNote").text(student.status);
+                        }
+                        // Personal Information Fields
+                        $("#student_StudentId").val(student_id); 
+                        $("#student_StudentName").val(student.studentName || "");
+                        $("#student_StudentNameInKhmer").val(student.studentNameInKhmer || "");
+                        $("#student_Sex").val(student.sex || "");
                         $("#student_DateOfBirth").val(formatDate(student.dateOfBirth));
-                        $("#student_ApprovedDate").val(formatDate(student.approvedDate, "YYYY-MM-DD"));
-                        
-                        $("#txtDegree").val(degree.degreeName);
-                        $("#txtSchool").val(school.schoolName);
-                        $("#txtField").val(field.fieldName);
-                        $("#txtPromotion").val(promotion.promotionNo); 
-                        $("#txtStage").val(stage.stageNo); 
-                        $("#txtTerm").val(term.termNo); 
-                        $("#txtGroup").val(group.groupName);
- 
-                        
+                        $("#student_ApprovedDate").val(formatDate(student.approvedDate));
+                        $("#student_GraduateLetterNo").val(student.graduateLetterNo || "");
+
+                        // Academic Information Fields
+                        $("#txtDegree").val(degree.degreeNameInKhmer || degree.degreeName || "");
+                        $("#txtSchool").val(school.schoolNameInKhmer || school.schoolName || "");
+                        $("#txtField").val(field.fieldNameInKhmer || field.fieldName || "");
+                        $("#txtPromotion").val(promotion.promotionNo || "");
+                        $("#txtStage").val(stage.stageNo || "");
+                        $("#txtTerm").val(term.termNo || "");
+                        $("#txtGroup").val(group.groupName || "");
+                        $("#txtStudyTime").val(group.studyTime || "");
+                        $("#txtRoom").val(groupRoom.roomName || "");
+
+                        // Certificate Out Section
+                        $("#student_CertificateOut").prop("checked", Boolean(student.certificateOut)).trigger("change");
+                        $("#student_MinistryNote").val(student.documentOut || "");
+
+                        // Certificate Information Section
+                        $("#student_IsAcceptCertificate").prop("checked", Boolean(student.isAcceptCertificate));
+                        $("#student_Phone").val(student.phone || "");
+                        $("#student_AcceptDate").val(formatDate(student.acceptDate));
+                        $("#student_CertificateNo").val(student.certificateNo || "");
+                        $("#student_NoteTicket").val(student.noteTicket || "");
+
+                        modalGraduateLetter.modal("show");
                     } else {
-                        alert("Student not found.");
+                        ShowToastInfo("Student record not found.");
                     }
                 },
-                error: function (e) {
-                    console.log(e.responseText);
+                error: function (xhr, status, error) {
+                    console.error("AJAX Error:", error, xhr.responseText);
+                    ShowToastError("Failed to retrieve student record.");
+                },
+                complete: function () { 
+                    hideLoading(1);
                 }
             });
         }
@@ -206,12 +233,15 @@
                     data: formData,
                     success: function (response) {
                         if (response.status.code === "200") {
+                            tblStudent.DataTable().ajax.reload(null, false);
+                            modalGraduateLetter.modal("hide");
+                            formCertificateInfo[0].reset();
                             ShowToastSuccess(response.status.message);
-                        }else {
-                            ShowToastError(response.status.message);
+                        } else {
+                            ShowToastError(response.status.message ?? "Updated successfully.");
                         }
                     },
-                    error: function (xhr, status, error) {
+                    error: function (xhr) {
                         ShowToastError(xhr.responseText);
                     }
                 });

@@ -3,187 +3,264 @@
 @{
     var student = new StudentDto();
 }
-<div class="modal fade" id="modalGraduateLetter" tabindex="-1" role="dialog" aria-labelledby="GraduateLetterModal"
-     aria-hidden="false" data-backdrop="static" data-keyboard="false" style="overflow-y: auto;">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Graduate Letter</h4>
-                <badge class="badge badge-warning float-right" id="lblNote">Owe Certificate</badge>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-6">
-                        <div class="row">
-                            <div class="col-3">
-                                <label>student_id</label>
-                                <input type="text" class="form-control form-control-sm" asp-for="@student.StudentId" readonly/>
-                            </div>
-                            <div class="col-4">
-                                <label>student_name_khmer</label>
-                                <input type="text" class="form-control form-control-sm" asp-for="@student.StudentNameInKhmer"
-                                       readonly/>
-                            </div>
-                            <div class="col-5">
-                                <label>student_name</label>
-                                <input type="text" class="form-control form-control-sm" asp-for="@student.StudentName" readonly/>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-3">
-                                <label>dob</label>
-                                <input type="text" class="form-control form-control-sm" asp-for="@student.DateOfBirth" readonly>
-                            </div>
-                            <div class="col-4">
-                                <label>Gender</label>
-                                <input type="text" class="form-control form-control-sm" asp-for="@student.Sex" readonly/>
-                            </div>
-                            <div class="col-5">
-                                <label>phone</label>
-                                <input type="text" class="form-control form-control-sm" asp-for="@student.Phone" readonly/>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-3">
-                                <label>approved_date</label>
-                                <input type="date" class="form-control form-control-sm" asp-for="@student.ApprovedDate">
-                            </div>
-                            <div class="col-4">
-                                <label>identity_no</label>
-                                <input type="text" class="form-control form-control-sm" asp-for="@student.GraduateLetterNo" readonly/>
-                            </div>
-                           
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="row">
-                            <div class="col-3">
-                                <label>Degree</label>
-                                <input type="text" class="form-control form-control-sm" id="txtDegree" readonly/>
-                            </div>
-                            <div class="col-9">
-                                <label>School</label>
-                                <input type="text" class="form-control form-control-sm" id="txtSchool" readonly/>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-3">
-                                <label>Promotion</label>
-                                <input type="text" class="form-control form-control-sm" id="txtPromotion" readonly/>
-                            </div>
-                            <div class="col-9">
-                                <label>Field</label>
-                                <input type="text" class="form-control form-control-sm" id="txtField" readonly/>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-3">
-                                <label>Stage</label>
-                                <input type="text" class="form-control form-control-sm" id="txtStage" readonly/>
-                            </div>
-                            <div class="col-3">
-                                <label>Term</label>
-                                <input type="text" class="form-control form-control-sm" id="txtTerm" readonly/>
-                            </div>
-                            <div class="col-3">
-                                <label>Group</label>
-                                <input type="text" class="form-control form-control-sm" id="txtGroup" readonly/>
-                            </div>
-                            <div class="col-3">
-                                <label>Study Time</label>
-                                <input type="text" class="form-control form-control-sm" id="txtStudyTime" readonly/>
-                            </div>
-                        </div>
-                    </div>
+<div class="modal fade" id="modalGraduateLetter" tabindex="-1" role="dialog" aria-labelledby="modalGraduateLetterTitle"
+     aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <!-- Modal Header -->
+            <div class="modal-header bg-primary text-white py-2">
+                <div class="d-flex align-items-center justify-content-between w-100 mr-2">
+                    <h5 class="modal-title font-weight-bold m-0" id="modalGraduateLetterTitle" style="font-size: 1.1rem;">
+                        <i class="fas fa-user-graduate mr-2"></i> Graduate Letter
+                    </h5>
+                    <span class="badge badge-warning px-3 py-1 font-weight-bold" id="lblNote">Owe Certificate</span>
                 </div>
-                <hr>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="modal-body bg-light p-3">
                 <div class="row">
-                    <div class="col-6">
-                        <form id="formCertificateInfo">
-                            <div class="card card-outline card-primary">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <label>accept_date</label>
-                                            <input type="date" class="form-control form-control-sm" asp-for="@student.AcceptDate">
-                                        </div>
-                                        <div class="col-2">
-                                            <label>letter no</label>
-                                            <input type="text" class="form-control form-control-sm" asp-for="@student.CertificateNo"
-                                                   readonly>
-                                        </div>
-                                        <div class="col-3">
-                                            <label>Withdraw</label>
-                                            <div class="form-group clearfix">
-                                                <div class="icheck-primary d-inline">
-                                                    <input type="checkbox" id="chbWithdraw" asp-for="@student.IsAcceptCertificate">
-                                                    <label for="chbWithdraw"></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-3">
-                                            <label>submitted</label>
-                                            <div class="form-group clearfix">
-                                                <div class="icheck-primary d-inline">
-                                                    <input type="checkbox" id="chbCertificateOut" asp-for="@student.CertificateOut">
-                                                    <label for="chbCertificateOut"></label>
-                                                </div>
-                                            </div>
-                                        </div>
+                    
+                    <!-- Left Column: Personal Information -->
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100 shadow-sm border-0">
+                            <div class="card-header bg-white py-2">
+                                <h6 class="card-title font-weight-bold text-dark m-0">
+                                    <i class="fas fa-id-card text-primary mr-1"></i> Personal Information
+                                </h6>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="row">
+                                    <div class="col-md-4 form-group mb-2">
+                                        <label class="form-label text-muted small font-weight-bold mb-1">ID</label>
+                                        <input type="text" class="form-control bg-light" asp-for="@student.StudentId" readonly />
                                     </div>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <label>Note ticket</label>
-                                            <input type="text" class="form-control form-control-sm" asp-for="@student.NoteTicket">
+                                    <div class="col-md-8 form-group mb-2">
+                                        <label class="form-label text-muted small font-weight-bold mb-1">Name</label>
+                                        <input type="text" class="form-control form-control-sm bg-light" asp-for="@student.StudentName" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-2">
+                                    <label class="form-label text-muted small font-weight-bold mb-1">Name (in Khmer)</label>
+                                    <input type="text" class="form-control form-control-sm bg-light" asp-for="@student.StudentNameInKhmer" readonly />
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 form-group mb-2">
+                                        <label class="form-label text-muted small font-weight-bold mb-1">Sex</label>
+                                        <input type="text" class="form-control form-control-sm bg-light" asp-for="@student.Sex" readonly />
+                                    </div>
+                                    <div class="col-md-6 form-group mb-2">
+                                        <label class="form-label text-muted small font-weight-bold mb-1">Date of Birth</label>
+                                        <input type="text" class="form-control form-control-sm bg-light" asp-for="@student.DateOfBirth" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 form-group mb-2">
+                                        <label class="form-label text-muted small font-weight-bold mb-1">Approved Date</label>
+                                        <input type="date" class="form-control form-control-sm" asp-for="@student.ApprovedDate" />
+                                    </div>
+                                    <div class="col-md-6 form-group mb-2">
+                                        <label class="form-label text-muted small font-weight-bold mb-1">Letter Identity</label>
+                                        <input type="text" class="form-control form-control-sm" asp-for="@student.GraduateLetterNo" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Academic Information -->
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100 shadow-sm border-0">
+                            <div class="card-header bg-white py-2">
+                                <h6 class="card-title font-weight-bold text-dark m-0">
+                                    <i class="fas fa-graduation-cap text-primary mr-1"></i> Academic Information
+                                </h6>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="form-group row mb-2">
+                                    <label class="col-sm-3 col-form-label col-form-label-sm text-muted font-weight-bold">Degree</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control form-control-sm bg-light" id="txtDegree" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="form-group row mb-2">
+                                    <label class="col-sm-3 col-form-label col-form-label-sm text-muted font-weight-bold">School</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control form-control-sm bg-light" id="txtSchool" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="form-group row mb-2">
+                                    <label class="col-sm-3 col-form-label col-form-label-sm text-muted font-weight-bold">Field</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control form-control-sm bg-light" id="txtField" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4 form-group mb-2">
+                                        <label class="form-label text-muted small font-weight-bold mb-1">Promotion</label>
+                                        <input type="text" class="form-control form-control-sm bg-light" id="txtPromotion" readonly />
+                                    </div>
+                                    <div class="col-md-4 form-group mb-2">
+                                        <label class="form-label text-muted small font-weight-bold mb-1">Stage</label>
+                                        <input type="text" class="form-control form-control-sm bg-light" id="txtStage" readonly />
+                                    </div>
+                                    <div class="col-md-4 form-group mb-2">
+                                        <label class="form-label text-muted small font-weight-bold mb-1">Term</label>
+                                        <input type="text" class="form-control form-control-sm bg-light" id="txtTerm" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 form-group mb-2">
+                                        <label class="form-label text-muted small font-weight-bold mb-1">Group</label>
+                                        <input type="text" class="form-control form-control-sm bg-light" id="txtGroup" readonly />
+                                    </div>
+                                    <div class="col-md-6 form-group mb-2">
+                                        <label class="form-label text-muted small font-weight-bold mb-1">Study Time</label>
+                                        <input type="text" class="form-control form-control-sm bg-light" id="txtStudyTime" value="SAT & SUN" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="form-group row mb-0">
+                                    <label class="col-sm-3 col-form-label col-form-label-sm text-muted font-weight-bold">Room</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control form-control-sm bg-light" id="txtRoom" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                    
+                    <!-- Forms -->
+                    <form id="formCertificateInfo" class="w-100">
+                        <div class="row">
+                            <!-- Certificate Information -->
+                            <div class="col-lg-6 mb-2">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-header bg-white py-2">
+                                        <h6 class="card-title font-weight-bold text-dark m-0">
+                                            <i class="fas fa-certificate text-success mr-1"></i>
+                                            Certificate Information
+                                        </h6>
+                                    </div>
+                                    <div class="card-body py-2">
+                                        <div class="custom-control custom-checkbox mb-2">
+                                            <input type="checkbox"
+                                                   class="custom-control-input"
+                                                   asp-for="@student.IsAcceptCertificate" />
+                                            <label class="custom-control-label font-weight-normal text-dark"
+                                                   for="student_IsAcceptCertificate">
+                                                បានដកយកសញ្ញាបត្ររាល់
+                                            </label>
+                                        </div>
+                                        <div class="form-group row mb-2">
+                                            <label class="col-sm-4 col-form-label col-form-label-sm text-muted font-weight-bold">
+                                                លេខទូរស័ព្ទ
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <input type="text"
+                                                       class="form-control form-control-sm"
+                                                       asp-for="@student.Phone" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-2">
+                                            <label class="col-sm-4 col-form-label col-form-label-sm text-muted font-weight-bold">
+                                                ថ្ងៃដកសញ្ញាបត្រ
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <input type="date"
+                                                       class="form-control form-control-sm"
+                                                       asp-for="@student.AcceptDate" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-2">
+                                            <label class="col-sm-4 col-form-label col-form-label-sm text-muted font-weight-bold">
+                                                លេខខ្នងសំបុត្រ
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           asp-for="@student.CertificateNo" />
+                                                    <div class="input-group-append">
+                                                        <button type="button"
+                                                                class="btn btn-outline-secondary"
+                                                                id="btnAddCertificateNo">
+                                                            Add
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-0">
+                                            <label class="col-sm-4 col-form-label col-form-label-sm text-muted font-weight-bold">
+                                                សម្គាល់
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <input type="text"
+                                                       class="form-control form-control-sm"
+                                                       asp-for="@student.NoteTicket" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                    <div class="col-6">
-                        <form id="formBookingInfo">
-                            <div class="card card-outline card-primary">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-3">
-                                            <label>invoice no</label>
-                                            <input type="text" class="form-control form-control-sm" readonly>
-                                        </div>
-                                        <div class="col-3">
-                                            <label>Book</label>
-                                            <div class="form-group clearfix">
-                                                <div class="icheck-primary d-inline">
-                                                    <input type="checkbox" id="chbBook">
-                                                    <label for="chbBook"></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-3">
-                                            <label>Return</label>
-                                            <div class="form-group clearfix">
-                                                <div class="icheck-primary d-inline">
-                                                    <input type="checkbox" id="chbReturn">
-                                                    <label for="chbReturn"></label>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <!-- Note -->
+                            <div class="col-lg-6 mb-2">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-header bg-white py-2">
+                                        <h6 class="card-title font-weight-bold text-dark m-0">
+                                            <i class="fas fa-paper-plane text-warning mr-1"></i>
+                                            Note (For Certificate Out)
+                                        </h6>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <label>description</label>
-                                            <input type="text" class="form-control form-control-sm">
+                                    <div class="card-body py-2">
+                                        <div class="custom-control custom-checkbox mb-2">
+                                            <input type="checkbox"
+                                                   class="custom-control-input"
+                                                   asp-for="@student.CertificateOut" />
+                                            <label class="custom-control-label font-weight-normal text-dark"
+                                                   for="student_CertificateOut">
+                                                សញ្ញាបត្រត្រូវបានបញ្ជូនទៅក្រសួងរាល់
+                                            </label>
                                         </div>
+                                        <div class="form-group mb-0">
+                                            <label class="form-label text-muted small font-weight-bold mb-1"
+                                                   for="student_MinistryNote">
+                                                ខ្វះ
+                                            </label>
+                                            <input type="text"
+                                                   id="student_MinistryNote"
+                                                   class="form-control form-control-sm"
+                                                   placeholder="..." />
+                                        </div>
+            
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+            
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" id="btnSave">Save changes</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+
+            <!-- Modal Footer Buttons -->
+            <div class="modal-footer bg-white border-top-0 py-2 d-flex justify-content-end">
+                <div>
+                    <button type="button" class="btn btn-secondary shadow-sm px-3" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i> Close
+                    </button>
+                    <button type="submit" class="btn btn-primary shadow-sm px-4" id="btnSave">
+                        <i class="fas fa-save mr-1"></i> Save
+                    </button>
+                </div>
             </div>
         </div>
     </div>
