@@ -1243,24 +1243,13 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
 
 
     [HttpPatch("academic/update-accept-certificate/{studentId}")]
-    public async Task<IActionResult> UpdateStudentAcceptedCertificate(string studentId, StudentDto student)
+    public async Task<IActionResult> UpdateStudentAcceptedCertificate(string studentId,StudentDto student)
     {
         try
         {
             var db = campusDbContext.DbContext(_campus);
             var data = await db.TblStudent.FindAsync(studentId);
-            if (data == null)
-            {
-                return NotFound(new
-                {
-                    data = new { },
-                    status = new
-                    {
-                        code = "404",
-                        message = "Student not found"
-                    }
-                });
-            }
+            if (data == null) return new ServerResponse().NotFound();
 
             data.IsAcceptCertificate = student.IsAcceptCertificate;
             data.AcceptDate = student.AcceptDate;
@@ -1268,33 +1257,16 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             data.CertificateOut = student.CertificateOut;
             data.NoteTicket = student.NoteTicket;
             await db.SaveChangesAsync();
-            return Ok(new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "200",
-                    message = "Student accepted"
-                }
-            });
+            return new ServerResponse().Success();
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "500",
-                    message = "Internal Server Error: " + e.Message
-                }
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 
     [HttpPatch("update-student")]
-    public async Task<IActionResult> UpdateStudentAcceptedCertificate(StudentDto student, RegistryDto registry,
-        ContactPersonDto contactPerson)
+    public async Task<IActionResult> UpdateStudentAcceptedCertificate(StudentDto student, RegistryDto registry, ContactPersonDto contactPerson)
     {
         var db = campusDbContext.DbContext(_campus);
         await db.Database.BeginTransactionAsync();

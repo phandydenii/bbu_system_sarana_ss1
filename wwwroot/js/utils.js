@@ -154,3 +154,24 @@ async function BindSelectOptions1(url, cbo, key, val) {
 function formatDateForInput(dateString) {
     return new Date(dateString).toISOString().slice(0, 10);
 }
+
+function formatUsd(value) {
+    return Number(value || 0)
+        .toLocaleString(
+            'en-US',
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        );
+}
+
+function formatKhr(value) {
+    return Number(value || 0)
+        .toLocaleString(
+            'en-US',
+            {
+                maximumFractionDigits: 0
+            }
+        );
+}

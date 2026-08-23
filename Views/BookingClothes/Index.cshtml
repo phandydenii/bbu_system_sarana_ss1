@@ -5,7 +5,6 @@
 }
 
 <div class="container-fluid px-0 pt-3">
-    <!-- Top Action Header -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h3 class="m-0 font-weight-bold text-dark">Booking Clothes</h3>
@@ -92,6 +91,7 @@
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <partial name="_BookingClothesModal"/>
 <partial name="_ItemModal"/>
+<partial name="_StudentModal"/>
 
 @section scripts{ 
     <script>
@@ -102,12 +102,14 @@
         const tblItem = $("#tblItem");
         const selectItem = $("#btnSelectItem");
         const ItemModal = $("#ItemModal");
+        const modalStudent = $("#StudentModal");
         const btnChooseItem = $("#btnChooseItem");
         const btnCloseBooking = $("#btnCloseBooking");
         const btnCloseItem = $("#btnCloseItem");
         const stateSelect = $("#stateSelect");
         const btnAssignItem = $("#btnAssignItem");
-
+        const btnSearchStudent = $("#btnSearchStudent");
+        const tblSearchStudent = $("#tblSearchStudent");
         let selectedItems = [];
         let bookingItems = [];
         const fromDate = $("#fromDate");
@@ -115,14 +117,7 @@
 
         $(document).ready(function () {
             fetchBooking();
-        });
-
-        btnNewBooking.on("click", function () {
-            BookingClothesModal.modal("show");
-            tblItem.DataTable();
-            $("#BookingClothesModal .modal-title").text("New Booking");
-            $("#BookingClothesModal").attr("action", "/BookingClothes/PostBookingClothes");
-        });
+        }); 
 
         function fetchBooking() {
             if ($.fn.DataTable.isDataTable('#tblBooking')) {
@@ -197,7 +192,84 @@
             $("#dtpTo").val("");
             tblBooking.DataTable().ajax.reload();
         }
+        
+        function fetchBookingDetail(bookingId) {
+            $.ajax({
+                url: `/booking-clothes/details-booking-clothes/${bookingId}`,
+                type: "GET",  
+                success: function (response) { 
+                    console.log(response); 
+                    const data = response.data; 
+                    if (!data) {
+                        ShowToastInfo("Booking data not found.");
+                        return;
+                    }  
+                    const booking = data.booking;
+                    const items = data.item || []; 
+                    $("#booking_bookingId").val(booking.bookingId);
+                    $("#booking_StudentId").val(booking.studentId);
+                    $("#booking_BookingNo").val(booking.bookingNo);
+                    $("#booking_BookingDate").val(formatDateForInput(booking.bookingDate)); 
+                    $("#booking_Note").val(booking.note || "");
+                    $("#booking_PayDollar").val(booking.payDollar || 0);
+                    $("#booking_PayRieal").val(booking.payRieal || 0); 
 
+                    bookingItems = items.map(function (x) {
+                        return {
+                            bookingDetailId: x.bookingDetailId,
+                            bookingId: x.bookingId,
+                            clothId: x.clothId,
+                            itemName: x.itemName || "",
+                            nameKhmer: x.itemNameKhmer || "",
+                            qty: Number(x.qty || 0),
+                            price: Number(x.price || 0),
+                            priceKhr: Number(x.priceKhr || 0),
+                            discountPercent: Number(x.discountPercent || 0)
+                        };
+
+                    });
+                    renderBookingItems(); 
+                    
+                    selectedItems = [];
+                    stateSelect.empty().trigger("change"); 
+                    $("#BookingClothesModal .modal-title").text("Edit Booking"); 
+                    BookingClothesModal.modal("show");
+                },
+                error: function () { 
+                    ShowToastInfo("Unable to load booking details.");
+                }
+            });
+        } 
+
+        //---------------------------------------------------- Event Trigger ----------------------------------------------------
+        btnNewBooking.on("click", function () {
+            BookingClothesModal.modal("show");
+            tblItem.DataTable();
+            $("#BookingClothesModal .modal-title").text("New Booking");
+            setPaymentFullscreen(true);
+        });
+        
+        btnCloseBooking.on("click", function () {
+            BookingClothesModal.modal("hide");
+        });
+
+        btnCloseItem.on("click", function () {
+            ItemModal.modal("hide");
+        });
+
+        btnAssignItem.on("click", function () {
+            if (selectedItems.length === 0) {
+                ShowToastInfo("Please select at least one item.");
+                return;
+            }
+            selectedItems.forEach(function (item) {
+                addBookingItem(item);
+            });
+            selectedItems = [];
+            stateSelect.empty().trigger("change");
+            ItemModal.modal("hide");
+        });
+        
         selectItem.on("click", function () {
             tblItem.DataTable().clear().destroy();
             tblItem.DataTable({
@@ -262,6 +334,7 @@
                 .html('<i class="fas fa-check mr-1"></i> Selected')
                 .prop("disabled", true);
         });
+
         tblBooking.on("click", ".btnEditBooking", function () {
 
             const bookingId = $(this).data("id");
@@ -270,78 +343,71 @@
 
             fetchBookingDetail(bookingId);
         });
-        function fetchBookingDetail(bookingId) {
-            $.ajax({
-                url: `/booking-clothes/details-booking-clothes/${bookingId}`,
-                type: "GET",  
-                success: function (response) { 
-                    console.log(response); 
-                    const data = response.data; 
-                    if (!data) {
-                        ShowToastInfo("Booking data not found.");
-                        return;
-                    }  
-                    const booking = data.booking;
-                    const items = data.item || []; 
-                    $("#bookingId").val(booking.bookingId);
-                    $("#txtStudentId").val(booking.studentId);
-                    $("#txtBookingNo").val(booking.bookingNo);
-                    $("#txtBookingDate").val(
-                        formatDateForInput(booking.bookingDate)
-                    ); 
-                    $("#txtNote").val(booking.note || "");
-                    $("#txtPayDollar").val(booking.payDollar || 0);
-                    $("#txtPayRieal").val(booking.payRieal || 0); 
-
-                    bookingItems = items.map(function (x) {
-                        return {
-                            bookingDetailId: x.bookingDetailId,
-                            bookingId: x.bookingId,
-                            clothId: x.clothId,
-                            itemName: x.itemName || "",
-                            nameKhmer: x.itemNameKhmer || "",
-                            qty: Number(x.qty || 0),
-                            price: Number(x.price || 0),
-                            priceKhr: Number(x.priceKhr || 0),
-                            discountPercent: Number(x.discountPercent || 0)
-                        };
-
-                    });
-                    renderBookingItems(); 
-                    
-                    selectedItems = [];
-                    stateSelect.empty().trigger("change"); 
-                    $("#BookingClothesModal .modal-title").text("Edit Booking"); 
-                    BookingClothesModal.modal("show");
+        
+        btnSearchStudent.on("click", function (e) {
+            e.preventDefault();
+            tblSearchStudent.DataTable().clear().destroy();
+            tblSearchStudent.DataTable({
+                processing: true,
+                serverSide: true,
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: true,
+                scrollCollapse: true,
+                ajax: {
+                    url: "/student/academic/student-list/all",
+                    type: "POST",
+                    error: function (error) {
+                        console.log(error.responseText);
+                    }
                 },
-                error: function (xhr) { 
-                    ShowToastInfo(xhr.responseJSON?.error_message || "Unable to load booking details.");
+                columns: [
+                    {data: "studentId"},
+                    {data: "studentName"},
+                    {data: "studentNameInKhmer"},
+                    {data: "sex"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            if (row.status === "REGISTER") {
+                                return ` <span class="badge badge-warning">${row.status}</span>`;
+                            } else if (row.status === "ACTIVE") {
+                                return ` <span class="badge badge-primary">${row.status}</span>`;
+                            } else if (row.status === "QUIT") {
+                                return ` <span class="badge badge-danger">${row.status}</span>`;
+                            } else {
+                                return `<span class="badge badge-secondary">${row.status}</span>`;
+                            }
+                        },
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `<a id="btnSelectStudent" class="btn btn-success btn-xs btn-block">Select</a>`;
+                        },
+                    },
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblSearchStudent", 500);
                 }
             });
-        }
+            modalStudent.modal("show");
+        })
         
-        btnCloseBooking.on("click", function () {
-            BookingClothesModal.modal("hide");
+        tblSearchStudent.on("click", "#btnSelectStudent", function () {
+            const $row = $(this).closest('tr');
+            const selectedRow = tblSearchStudent.DataTable().row($row).data();
+            if (selectedRow) {
+                $("#booking_StudentId").val(selectedRow.studentId);
+                modalStudent.modal("hide");
+            }
         });
-
-        btnCloseItem.on("click", function () {
-            ItemModal.modal("hide");
-        });
-
-        btnAssignItem.on("click", function () {
-            if (selectedItems.length === 0) {
-                ShowToastInfo("Please select at least one item."); 
-                return;
-            } 
-            selectedItems.forEach(function (item) { 
-                addBookingItem(item);
-            });
- 
-            selectedItems = [];  
-            stateSelect.empty().trigger("change"); 
-            ItemModal.modal("hide");
-        });
-
+        //---------------------------------------------------- Event Trigger ----------------------------------------------------
+        
         // ---------------------------------------------------- Booking Item Section ---------------------------------------------------- 
         function getExchangeRate() { 
             let rate = $('#txtRateOut').text(); 
@@ -392,8 +458,8 @@
                     <td style="display:none;">${item.bookingId}</td>
                     <td style="display:none;">${item.clothId}</td>
                     <td>
-                        <strong>${escapeHtml(item.itemName)}</strong>
-                        ${item.nameKhmer ? `<div class="small text-muted"> ${escapeHtml(item.nameKhmer)} </div>` : ''}
+                        <strong>${item.itemName}</strong>
+                        ${item.nameKhmer ? `<div class="small text-muted"> ${item.nameKhmer} </div>` : ''}
                     </td>
                     <td>
                         <input type="number" class="form-control form-control-sm text-right item-qty"
@@ -432,10 +498,10 @@
                         </div>
                     </td> 
                     <td class="text-right font-weight-bold line-total-usd">
-                        $${formatUsd(totalUsd)}
+                        ${formatUsd(totalUsd)}
                     </td> 
                     <td class="text-right font-weight-bold line-total-khr">
-                        ${formatKhr(totalKhr)} ៛
+                        ${formatKhr(totalKhr)}
                     </td> 
                     <td class="text-center"> 
                         <button type="button" class="btn btn-danger btn-sm"
@@ -454,34 +520,21 @@
  
         // CALCULATE USD 
         function calculateLineUsd(item) {
-
             let qty = parseFloat(item.qty || 0);
             let price = parseFloat(item.price || 0);
-            let discount = parseFloat(
-                item.discountPercent || 0
-            );
-
+            let discount = parseFloat(item.discountPercent || 0);
             let subTotal = qty * price;
-
-            let discountAmount =
-                subTotal * discount / 100;
-
+            let discountAmount = subTotal * discount / 100;
             return subTotal - discountAmount;
         }
-
- 
+        
         // CALCULATE KHR 
         function calculateLineKhr(item) { 
             let qty = parseFloat(item.qty || 0);
             let price = parseFloat(item.priceKhr || 0);
-            let discount = parseFloat(
-                item.discountPercent || 0
-            ); 
+            let discount = parseFloat(item.discountPercent || 0); 
             let subTotal = qty * price;
-
-            let discountAmount =
-                subTotal * discount / 100;
-
+            let discountAmount = subTotal * discount / 100;
             return subTotal - discountAmount;
         }
         
@@ -529,102 +582,41 @@
         
         // UPDATE ONLY CURRENT ROW
         function updateRowTotal(index) {
-
             let item = bookingItems[index];
-
             let usd = calculateLineUsd(item);
             let khr = calculateLineKhr(item);
-
-            let row = $('#tblBookingDetail tbody tr')
-                .eq(index);
-
-            row.find('.line-total-usd')
-                .text('$' + formatUsd(usd));
-
-            row.find('.line-total-khr')
-                .text(formatKhr(khr) + ' ៛');
-
+            let row = $('#tblBookingDetail tbody tr').eq(index);
+            row.find('.line-total-usd').text('$' + formatUsd(usd));
+            row.find('.line-total-khr').text(formatKhr(khr) + ' ៛');
             calculateGrandTotal();
         }
-
-
-        // ==========================================
-        // GRAND TOTAL
-        // ==========================================
+        
+        // CALCULATE TOTAL 
         function calculateGrandTotal() {
-
             let grandUsd = 0;
             let grandKhr = 0;
-
             $.each(bookingItems, function(_, item) {
-
                 grandUsd += calculateLineUsd(item);
                 grandKhr += calculateLineKhr(item);
-
             });
-
-            $('#lblGrandTotalUsd')
-                .text('$' + formatUsd(grandUsd));
-
-            $('#lblGrandTotalKhr')
-                .text(formatKhr(grandKhr) + ' ៛');
-
-
-            // Update your existing summary fields
-            $('#invoice_GrandTotalUsd')
-                .val(grandUsd.toFixed(2));
-
-            $('#invoice_GrandTotalKhr')
-                .val(grandKhr.toFixed(0));
+            $('#lblGrandTotalUsd').text(formatUsd(grandUsd));
+            $('#lblGrandTotalKhr').text(formatKhr(grandKhr));
+            $('#invoice_GrandTotalUsd').val(grandUsd.toFixed(2));
+            $('#invoice_GrandTotalKhr').val(grandKhr.toFixed(0));
         }
-
-
-        // ==========================================
-        // REMOVE
-        // ==========================================
+        
+        // REMOVE 
         function removeBookingItem(index) {
-
             bookingItems.splice(index, 1);
-
             renderBookingItems();
-        }
-
- 
-        function formatUsd(value) {
-
-            return Number(value || 0)
-                .toLocaleString(
-                    'en-US',
-                    {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }
-                );
-        }
-
-
-        function formatKhr(value) {
-
-            return Number(value || 0)
-                .toLocaleString(
-                    'en-US',
-                    {
-                        maximumFractionDigits: 0
-                    }
-                );
-        }
-
-
-        function escapeHtml(value) {
-
-            return $('<div>')
-                .text(value || '')
-                .html();
-        }
+        } 
         // ---------------------------------------------------- Booking Item Section ----------------------------------------------------
         
         
         // toggle modal fullscreen or minimize screen
+        $(document).on('click','.btnEditBooking',function () {
+            setPaymentFullscreen(true);
+        })
         $("#btnTogglePaymentFullscreen").on("click", function () {
             const modal = $("#BookingClothesModal");
             setPaymentFullscreen(!modal.hasClass("fullscreen-modal"));

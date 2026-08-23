@@ -2166,7 +2166,7 @@ public class Letter
 public class LetterCategory
 {
     [Key]
-    [Column("categoryID", TypeName = "int")]
+    [Column("categoryID", TypeName = "smallint")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int CategoryId { get; set; }
 
@@ -2188,7 +2188,8 @@ public class LetterCategory
     [Column("IsShortCourse", TypeName = "bit")]
     public bool? IsShortCourse { get; set; }
     
-    [Column("IsStartNewNumber", TypeName = "bit")]
+    // [Column("IsStartNewNumber", TypeName = "bit")]
+    [NotMapped]
     public bool? IsStartNewNumber { get; set; }
 }
 

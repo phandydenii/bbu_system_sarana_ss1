@@ -1,5 +1,6 @@
 using AutoMapper;
 using BBU_SYSTEM.DTOs;
+using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
 using Microsoft.AspNetCore.Mvc;
 using BBU_SYSTEM.Repository;
@@ -56,15 +57,7 @@ public class LetterCertificateController(
                     .FirstOrDefaultAsync();
                 if (category == null)
                 {
-                    return BadRequest(new
-                    {
-                        data = new { },
-                        status = new
-                        {
-                            code = "400",
-                            message = "Category not found"
-                        }
-                    });
+                    return new ServerResponse().NotFound();
                 }
                 var yearNum = DateTime.Now.Year.ToString();
                 var getMaxLetterCert = db.TblLetterCertifications.OrderByDescending(x=>x.Id).AsQueryable(); 
@@ -159,55 +152,23 @@ public class LetterCertificateController(
                 var data = mapper.Map<LetterCertificationDto, LetterCertification>(letterCertification);
                 await db.TblLetterCertifications.AddAsync(data);
                 await db.SaveChangesAsync();
-                return Ok(new
-                {
-                    data,
-                    status = new
-                    {
-                        code = "200",
-                        message = "Letter Certification saved successfully."
-                    }
-                });
+                return new ServerResponse().Success(msg: "Letter Certification saved successfully.");
             }
 
             var dataExist = db.TblLetterCertifications.Where(x => x.Id == letterCertification.Id)!.FirstOrDefault();
             if (dataExist == null)
             {
-                return BadRequest(new
-                {
-                    data = new { },
-                    status = new
-                    {
-                        code = "400",
-                        message = "Letter Certification not found"
-                    }
-                });
+                return new ServerResponse().NotFound("Letter Certification not found");
             }
 
             mapper.Map<LetterCertificationDto, LetterCertification>(letterCertification);
             db.TblLetterCertifications.Update(dataExist);
             await db.SaveChangesAsync();
-            return Ok(new
-            {
-                data = letterCertification,
-                status = new
-                {
-                    code = "200",
-                    message = "Letter Certification updated successfully."
-                }
-            });
+            return new ServerResponse().Success(msg:"Letter Certification updated successfully.");
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "500",
-                    message = e.Message
-                }
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 }
