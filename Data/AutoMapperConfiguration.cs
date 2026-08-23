@@ -49,5 +49,13 @@ public class AutoMapperConfiguration : Profile
         CreateMap<FieldCertificate,FieldCertificateDto>().ReverseMap();
         CreateMap<SummaryReport,SummaryReportDto>().ReverseMap(); 
         CreateMap<University, UniversityDto>().ReverseMap();
+        CreateMap<ChangeBranch, ChangeBranchDto>().ReverseMap();
+        CreateMap<Quit, QuitDto>().ReverseMap();
+        CreateMap<Suppress, SuppressDto>().ReverseMap(); 
+        CreateMap<Suspend, SuspendDto>().ReverseMap(); 
+        CreateMap<StudentGroup, StudentGroupDto>().ReverseMap(); 
+        CreateMap<StudentDiscount, StudentDiscountDto>().ReverseMap();
+        CreateMap<Student, StudentDto>().ReverseMap();
+        CreateMap<ResumeDto, Resume>().ReverseMap();
     }
 }

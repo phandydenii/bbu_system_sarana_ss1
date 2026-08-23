@@ -17,57 +17,130 @@ public class DisabilityController(ICampusDbContext campusDbContext, IMapper mapp
     private readonly string _campus = context.HttpContext?.User.FindFirst("CampusKey")?.Value ?? "pp";
 
     [HttpPost("get-disabilities")]
-    public IActionResult Gets(bool isAll = false)
+    public IActionResult Gets([FromQuery] bool isAll = false)
     {
         try
         {
-            var draw = Request.Form["draw"].FirstOrDefault();
-            var start = Request.Form["start"].FirstOrDefault();
-            var length = Request.Form["length"].FirstOrDefault();
-            var searchValue = Request.Form["search[value]"].FirstOrDefault();
-            
-            var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
-            var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-            var sortColumn = Request.Form[$"columns[{sortColumnIndex}][data]"].FirstOrDefault();
-
-            var pageSize = length != null ? Convert.ToInt32(length) : 0;
-            var skip = start != null ? Convert.ToInt32(start) : 0;
-
             var db = campusDbContext.DbContext(_campus);
-            var query = db.TblDisability.AsQueryable();
+
+            var query = db.TblDisability
+                .AsNoTracking()
+                .Select(x => new DisabilityDto
+                {
+                    Id = x.Id,
+                    DisabilityName = x.DisabilityName,
+                    DisabilityNameKh = x.DisabilityNameKh
+                });
+
+            // Registry Create dropdown request.
             if (isAll)
             {
-                return new ServerResponse().Success(query.ToList(), "Succeeded!");
+                var disabilities = query
+                    .OrderBy(x => x.DisabilityName)
+                    .ToList();
+
+                return new ServerResponse().Success(
+                    disabilities,
+                    "Succeeded!"
+                );
             }
-            if (!string.IsNullOrEmpty(searchValue))
-                query = query.Where(d =>
-                    d.DisabilityName!.Contains(searchValue) ||
-                    d.DisabilityNameKh!.Contains(searchValue));
+
+            // Disability DataTable request.
+            var draw = 0;
+            var start = 0;
+            var length = 10;
+            var searchValue = string.Empty;
+            var sortColumn = "id";
+            var sortDirection = "desc";
+
+            if (Request.HasFormContentType)
+            {
+                var form = Request.Form;
+
+                int.TryParse(
+                    form["draw"].FirstOrDefault(),
+                    out draw
+                );
+
+                int.TryParse(
+                    form["start"].FirstOrDefault(),
+                    out start
+                );
+
+                if (!int.TryParse(
+                        form["length"].FirstOrDefault(),
+                        out length) ||
+                    length <= 0)
+                {
+                    length = 10;
+                }
+
+                searchValue =
+                    form["search[value]"].FirstOrDefault()?.Trim()
+                    ?? string.Empty;
+
+                var sortColumnIndex =
+                    form["order[0][column]"].FirstOrDefault();
+
+                sortDirection =
+                    form["order[0][dir]"].FirstOrDefault()
+                    ?? "desc";
+
+                if (!string.IsNullOrWhiteSpace(sortColumnIndex))
+                {
+                    sortColumn =
+                        form[$"columns[{sortColumnIndex}][data]"]
+                            .FirstOrDefault()
+                        ?? "id";
+                }
+            }
 
             var recordsTotal = query.Count();
-            //query = query.OrderByDescending(d => d.Id);
-            switch (sortColumn)
+
+            if (!string.IsNullOrWhiteSpace(searchValue))
             {
-                case "disabilityName":
-                    query = sortDirection == "asc" ? query.OrderBy(x => x.DisabilityName):
-                        query.OrderByDescending(x => x.DisabilityName);
-                    break;
-                case "disabilityNameKh":
-                    query = sortDirection == "asc" ? query.OrderBy(x => x.DisabilityNameKh):
-                        query.OrderByDescending(x => x.DisabilityNameKh);
-                    break;
-                default:
-                    query = sortDirection == "asc" ? query.OrderBy(x => x.Id):
-                        query.OrderByDescending(x => x.Id);
-                    break;
+                query = query.Where(x =>
+                    (x.DisabilityName != null &&
+                     x.DisabilityName.Contains(searchValue)) ||
+                    (x.DisabilityNameKh != null &&
+                     x.DisabilityNameKh.Contains(searchValue))
+                );
             }
-            var data = query.Skip(skip).Take(pageSize).ToList();
+
+            var recordsFiltered = query.Count();
+
+            query = sortColumn switch
+            {
+                "disabilityName" =>
+                    sortDirection == "asc"
+                        ? query.OrderBy(x => x.DisabilityName)
+                        : query.OrderByDescending(
+                            x => x.DisabilityName
+                        ),
+
+                "disabilityNameKh" =>
+                    sortDirection == "asc"
+                        ? query.OrderBy(x => x.DisabilityNameKh)
+                        : query.OrderByDescending(
+                            x => x.DisabilityNameKh
+                        ),
+
+                _ =>
+                    sortDirection == "asc"
+                        ? query.OrderBy(x => x.Id)
+                        : query.OrderByDescending(x => x.Id)
+            };
+
+            var data = query
+                .Skip(start)
+                .Take(length)
+                .ToList();
 
             return Json(new
             {
                 draw,
-                recordsFiltered = recordsTotal,
                 recordsTotal,
+                recordsFiltered,
                 data
             });
         }
@@ -76,6 +149,7 @@ public class DisabilityController(ICampusDbContext campusDbContext, IMapper mapp
             return new ServerResponse().ErrorInternal(ex);
         }
     }
+
 
     [HttpPost("SaveChange")]
     public async Task<IActionResult> SaveChange([FromForm] DisabilityDto? disabilityDto)

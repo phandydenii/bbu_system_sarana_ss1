@@ -1,61 +1,101 @@
 ﻿@model BBU_SYSTEM.ViewModel.RegisryDetailViewModel
 @using BBU_SYSTEM.DTOs
 @using BBU_SYSTEM.Models.Req
+@inject AutoMapper.IMapper Mapper
 @{
     ViewData["OpenMenu"] = "Administration";
     ViewData["Action"] = "Register";
 
+    // ---- Null-safety guard -------------------------------------------------
+    if (Model.StudentView?.Student == null ||
+        Model.StudentView.Registry == null ||
+        Model.StudentView.Degree == null ||
+        Model.StudentView.School == null ||
+        Model.ListData == null)
+    {
+        <div class="alert alert-warning m-3">
+            Required student, degree, or school data is missing for this record.
+        </div>
+        return;
+    }
 
-    var registryReq = new RegistryReq();
-
-    var student = Model.StudentView!.Student;
-    var relative = Model.StudentView.ContactPerson;
-    var registry = Model.StudentView.Registry;
+    var student = Model.StudentView.Student;
     var degree = Model.StudentView.Degree;
     var school = Model.StudentView.School;
+    
+    var registry = Model.StudentView.Registry;
     var field = Model.StudentView.Field;
-    var promotion = Model.StudentView.Promotion;
-    var stage = Model.StudentView.Stage;
-    var term = Model.StudentView.Term;
-    var group = Model.StudentView.Group;
-    var groupRoom = Model.StudentView.GroupRoom;
 
-    var studentCertificates = Model.StudentView.StudentCertificates;
-    var schoolarships = Model.StudentView.Schoolarships;
-    var degrees = Model.ListData!.Degrees;
-    var schools = Model.ListData!.Schools;
-    var fields = Model.ListData.Fields!.Where(x => x.DegreeId == degree!.DegreeId && x.SchoolId ==
-        school!.SchoolId).ToList();
-    var promotions = Model.ListData!.Promotions!.Where(x => x.DegreeId == degree!.DegreeId && x.SchoolId ==
-        school!.SchoolId).ToList();
-    var stages = Model.ListData!.Stages!.GroupBy(x => x.StageNo).Select(x => new
+    var degrees = Model.ListData.Degrees!;
+    var schools = Model.ListData.Schools!;
+
+    var fields = Model.ListData.Fields!
+        .Where(x => x.DegreeId == degree.DegreeId && x.SchoolId == school.SchoolId)
+        .ToList();
+    
+    var programs = fields
+        .GroupBy(x => x.DegreeId)
+        .Select(g => g.First())
+        .ToList();
+
+    var promotions = Model.ListData.Promotions!
+        .Where(x => x.DegreeId == degree.DegreeId && x.SchoolId == school.SchoolId)
+        .ToList();
+
+    var stages = Model.ListData.Stages!
+        .GroupBy(x => x.StageNo)
+        .Select(x => new { stage_no = x.First().StageNo })
+        .ToList();
+
+    var terms = Model.ListData.Terms!
+        .GroupBy(x => x.TermNo)
+        .Select(x => new { term_no = x.First().TermNo })
+        .ToList();
+
+    var studyTimes = Model.ListData.StudyTimes!;
+    
+    var registryReq = new RegistryReq
     {
-        stage_no = x.First().StageNo
-    }).ToList();
-    var fields1 = Model.ListData!.Fields;
-    var terms = Model.ListData!.Terms!.GroupBy(x => x.TermNo).Select(x => new { term_no = x.First().TermNo }).ToList();
-    var groups = Model.ListData!.Groups;
-    var studyTimes = Model.ListData!.StudyTimes;
-
-
-    registryReq.Registry = new RegistryDto
-    {
-        DegreeId = degree!.DegreeId,
-        SchoolId = school!.SchoolId,
-        PromotionNo = registry?.PromotionNo ?? 0,
-        StageNo = registry?.StageNo ?? 0,
-        TermNo = registry?.TermNo ?? 0,
-        StudyTime = registry?.StudyTime ?? ""
+        Student = Mapper.Map<StudentDto>(student),
+        Registry = Mapper.Map<RegistryDto>(registry),
+        ContactPerson = Model.StudentView.ContactPerson == null
+            ? new ContactPersonDto()
+            : Mapper.Map<ContactPersonDto>(Model.StudentView.ContactPerson),
+        Scholarships = Model.StudentView.Schoolarships == null
+            ? new List<StudentScholarshipDto>()
+            : Mapper.Map<List<StudentScholarshipDto>>(
+                Model.StudentView.Schoolarships),
+        StudentCertificates = Model.StudentView.StudentCertificates == null
+            ? new List<StudentCertificateDto>()
+            : Mapper.Map<List<StudentCertificateDto>>(
+                Model.StudentView.StudentCertificates),
+        Extend = Model.StudentView.Extend == null
+            ? new ExtendDto()
+            : Mapper.Map<ExtendDto>(Model.StudentView.Extend),
+        Resume = new ResumeDto(),
+        IsContinue = student.IsContinuedStudent == 1,
+        AssToBach = student.AssociateToBachelor == 1,
+        BachToMas = false,
+        ProgramId = field?.DegreeId ?? 0
     };
+    
+    registryReq.Student.IsReceivePhoto =
+        student.IsPhotoReceived == 1;
 
-    registryReq.Student = new StudentDto
-    {
-        FieldId = student?.FieldId ?? 0
-    };
-    registryReq.ProgramId = field?.DegreeId ?? 0;
+    var showResume = registryReq.AssToBach || registryReq.BachToMas;
 
     var schoolarship = false;
-    var extend = false;
+    var extend = registryReq.Extend?.ExtendDate.HasValue == true;
+
+    var studentPhotoSrc =
+        student.Photo != null && student.Photo.Length > 0
+            ? $"data:image/jpeg;base64,{Convert.ToBase64String(student.Photo)}"
+            : Url.Content("~/Images/add_user.png");
+
+    var studentPhotoLabel =
+        student.Photo != null && student.Photo.Length > 0
+            ? "Saved photo"
+            : "Choose file";
 }
 <div class="row">
     <div class="col-12">
@@ -64,7 +104,12 @@
                 <h3 class="card-title">Registry Detail</h3>
             </div>
             <div class="card-body">
-                <form method="post" id="frmRegistry" asp-action="PutRegistry">
+                <form method="post" id="frmRegistry" novalidate
+                      enctype="multipart/form-data"
+                      asp-controller="Registry" asp-action="PutRegistry">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="oldStudentId" value="@student.StudentId" />
+                    <input type="hidden" name="Student.StudentId" value="@student.StudentId" />
                     <div class="row">
                         <div class="col-md-7">
                             <div class="card card-primary card-outline card-outline-tabs">
@@ -94,6 +139,7 @@
                                                aria-controls="custom-tabs-four-4"
                                                aria-selected="false">Relative</a>
                                         </li>
+                                        @* Re-enable once Views/.../_TabSchoolarship.cshtml exists:
                                         @if (schoolarship)
                                         {
                                             <li class="nav-item">
@@ -103,6 +149,7 @@
                                                    aria-selected="false">Schoolarship</a>
                                             </li>
                                         }
+                                        *@
                                         <li class="nav-item">
                                             <a class="nav-link" id="custom-tabs-four-6-tab" data-toggle="pill"
                                                href="#custom-tabs-four-6" role="tab"
@@ -117,7 +164,6 @@
                                                    aria-controls="custom-tabs-four-7" aria-selected="false">Extend</a>
                                             </li>
                                         }
-
                                         <li class="nav-item">
                                             <a class="nav-link" id="custom-tabs-four-8-tab" data-toggle="pill"
                                                href="#custom-tabs-four-8" role="tab"
@@ -141,63 +187,66 @@
                                     <div class="tab-content" id="custom-tabs-four-tabContent">
                                         <div class="tab-pane fade show active" id="custom-tabs-four-1"
                                              role="tabpanel" aria-labelledby="custom-tabs-four-1-tab">
-                                            <partial name="_TabPersonal"/>
+                                            <partial name="_TabPersonal" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-2" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-2-tab">
-                                            <partial name="_TabContactPerson"/>
+                                            <partial name="_TabContactPerson" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-3" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-3-tab">
-                                            <partial name="_TabParent"/>
+                                            <partial name="_TabParent" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-4" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-4-tab">
-                                            <partial name="_TabRelativeContact"/>
+                                            <partial name="_TabRelativeContact" model="registryReq" />
                                         </div>
+                                        @* Re-enable once Views/.../_TabSchoolarship.cshtml exists:
                                         @if (schoolarship)
                                         {
                                             <div class="tab-pane fade" id="custom-tabs-four-5" role="tabpanel"
                                                  aria-labelledby="custom-tabs-four-5-tab">
-                                                <partial name="_TabSchoolarship"/>
+                                                <partial name="_TabSchoolarship" />
                                             </div>
                                         }
-
+                                        *@
                                         <div class="tab-pane fade" id="custom-tabs-four-6" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-6-tab">
-                                            <partial name="_TabCertificate"/>
+                                            <partial name="_TabCertificate" model="registryReq" />
                                         </div>
                                         @if (extend)
                                         {
                                             <div class="tab-pane fade" id="custom-tabs-four-7" role="tabpanel"
                                                  aria-labelledby="custom-tabs-four-7-tab">
-                                                <partial name="_TabExtendFrom"/>
+                                                <partial name="_TabExtendFrom" model="registryReq" />
                                             </div>
                                         }
-
                                         <div class="tab-pane fade" id="custom-tabs-four-8" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-8-tab">
-                                            <partial name="_TabNote"/>
+                                            <partial name="_TabNote" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-9" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-9-tab">
-                                            <partial name="_TabContinueEducation"/>
+                                            <partial name="_TabContinueEducation" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-10" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-10-tab">
-                                            <img src="/Images/add_user.png" alt="user" width="50%" height="50%"
+                                            <img src="@studentPhotoSrc" alt="Student photo" width="50%" height="50%"
                                                  id="imgPreview" style="border: 1px solid #ccc;">
                                             <div class="form-group">
-                                                <label for="exampleInputFile">File input</label>
+                                                <label for="studentPhoto">File input</label>
                                                 <div class="input-group">
                                                     <div class="custom-file">
                                                         <input type="file" class="custom-file-input"
-                                                               id="exampleInputFile">
-                                                        <label class="custom-file-label" for="exampleInputFile">Choose
-                                                            file</label>
+                                                               id="studentPhoto" name="studentPhoto"
+                                                               accept="image/*">
+                                                        <label class="custom-file-label"
+                                                               id="studentPhotoFileName"
+                                                               for="studentPhoto">@studentPhotoLabel</label>
                                                     </div>
                                                     <div class="input-group-append">
-                                                        <span class="input-group-text">Upload</span>
+                                                        <button type="button" id="btnUploadPhoto"
+                                                                class="btn btn-outline-secondary">Upload</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -209,142 +258,170 @@
                         <div class="col-md-5">
                             <div class="card card-outline card-primary">
                                 <div class="card-body" style="display: block;">
-                                    <label>Degree</label>
+                                    <label asp-for="@registryReq.Registry!.DegreeId">Degree</label>
                                     <select asp-for="@registryReq.Registry!.DegreeId"
-                                            class="form-control select2" s>
-                                        <option selected="selected" disabled value="">Degree</option>
+                                            name="Registry.DegreeId"
+                                            class="form-control select2">
+                                        <option value="" disabled selected>Degree</option>
                                         @foreach (var data in degrees!)
                                         {
-                                            <option value=@data.DegreeId>@data.DegreeName</option>
+                                            <option value="@data.DegreeId">@data.DegreeName</option>
                                         }
                                     </select>
-                                    <label>School</label>
+
+                                    <label asp-for="@registryReq.Registry!.SchoolId">School</label>
                                     <select asp-for="@registryReq.Registry!.SchoolId"
+                                            name="Registry.SchoolId"
                                             class="form-control select2">
-                                        <option selected="selected" disabled value="-1">School</option>
-                                        @foreach (var data in Model.ListData!.Schools!)
+                                        <option value="" disabled selected>School</option>
+                                        @foreach (var data in schools!)
                                         {
-                                            <option value=@data.SchoolId>@data.SchoolName</option>
+                                            <option value="@data.SchoolId">@data.SchoolName</option>
                                         }
                                     </select>
-                                    <label>Program</label>
+
+                                    <label asp-for="@registryReq.ProgramId">Program</label>
                                     <select id="cboProgram" asp-for="@registryReq.ProgramId"
-                                            class="form-control select2"
-                                    >
-                                        <option selected="selected">Program</option>
-                                        @foreach (var data in fields)
+                                            name="ProgramId"
+                                            class="form-control select2">
+                                        <option value="" disabled selected>Program</option>
+                                        @foreach (var data in programs)
                                         {
-                                            <option value=@data.DegreeId>@data.DegreeName</option>
+                                            <option value="@data.DegreeId">@data.DegreeName</option>
                                         }
                                     </select>
-                                    <label>Field</label>
+
+                                    <label asp-for="@registryReq.Student!.FieldId">Field</label>
                                     <select asp-for="@registryReq.Student!.FieldId"
-                                            class="form-control select2"
-                                    >
-                                        <option selected="selected">Field</option>
+                                            name="Student.FieldId"
+                                            class="form-control select2">
+                                        <option value="" disabled selected>Field</option>
                                         @foreach (var data in fields)
                                         {
-                                            <option value=@data.FieldId>@data.FieldName</option>
+                                            <option value="@data.FieldId">@data.FieldName</option>
                                         }
                                     </select>
+
                                     <div class="row">
                                         <div class="col-md-3">
-                                            <label>Promotion</label>
+                                            <label asp-for="@registryReq.Registry!.PromotionNo">Promotion</label>
                                             <select asp-for="@registryReq.Registry!.PromotionNo"
+                                                    name="Registry.PromotionNo"
                                                     class="form-control select2">
-                                                <option selected="selected" value="-1">Promotion</option>
+                                                <option value="" disabled selected>Promotion</option>
                                                 @foreach (var data in promotions)
                                                 {
-                                                    <option value=@data.PromotionNo>@data.PromotionNo</option>
+                                                    <option value="@data.PromotionNo">@data.PromotionNo</option>
                                                 }
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <label>Stage</label>
+                                            <label asp-for="@registryReq.Registry!.StageNo">Stage</label>
                                             <select asp-for="@registryReq.Registry!.StageNo"
+                                                    name="Registry.StageNo"
                                                     class="form-control select2">
-                                                <option selected="selected">Stage</option>
+                                                <option value="" disabled selected>Stage</option>
                                                 @foreach (var data in stages)
                                                 {
-                                                    <option value=@data.stage_no>@data.stage_no</option>
+                                                    <option value="@data.stage_no">@data.stage_no</option>
                                                 }
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <label>Term</label>
+                                            <label asp-for="@registryReq.Registry!.TermNo">Term</label>
                                             <select asp-for="@registryReq.Registry!.TermNo"
-                                                    class="form-control select2" s>
-                                                <option selected="selected" disabled>Term</option>
+                                                    name="Registry.TermNo"
+                                                    class="form-control select2">
+                                                <option value="" disabled selected>Term</option>
                                                 @foreach (var data in terms)
                                                 {
-                                                    <option value=@data.term_no>@data.term_no</option>
+                                                    <option value="@data.term_no">@data.term_no</option>
                                                 }
                                             </select>
                                         </div>
                                         <div class="col-md-3">
-                                            <label>Study Time</label>
+                                            <label asp-for="@registryReq.Registry!.StudyTime">Study Time</label>
                                             <select asp-for="@registryReq.Registry!.StudyTime"
+                                                    name="Registry.StudyTime"
                                                     class="form-control select2">
-                                                <option selected="selected">Study Time</option>
-                                                @foreach (var data in Model.ListData!.StudyTimes!)
+                                                <option value="" disabled selected>Study Time</option>
+                                                @foreach (var data in studyTimes)
                                                 {
-                                                    <option value=@data.StudyTimeValue>@data.StudyTimeValue</option>
+                                                    <option value="@data.StudyTimeValue">@data.StudyTimeValue</option>
                                                 }
                                             </select>
                                         </div>
                                     </div>
+
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="custom-control custom-checkbox">
                                                 <input class="custom-control-input" type="checkbox"
                                                        id="chbContinuedStudent"
+                                                       name="IsContinue"
                                                        asp-for="@registryReq.IsContinue">
-                                                <label for="chbContinuedStudent" class="custom-control-label">Continued
-                                                    Student</label>
+                                                <label for="chbContinuedStudent" class="custom-control-label">
+                                                    Continued Student
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="custom-control custom-checkbox">
                                                 <input class="custom-control-input" type="checkbox"
                                                        id="chbAssToBac"
+                                                       name="AssToBach"
                                                        asp-for="@registryReq.AssToBach">
-                                                <label for="chbAssToBac" class="custom-control-label">Associate to
-                                                    Bachelor</label>
+                                                <label for="chbAssToBac" class="custom-control-label">
+                                                    Associate to Bachelor
+                                                </label>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="custom-control custom-checkbox">
                                                 <input class="custom-control-input" type="checkbox"
-                                                       id="chbBacToMas" asp-for="@registryReq.BachToMas">
-                                                <label for="chbBacToMas" class="custom-control-label">Bachelor to
-                                                    Master</label>
+                                                       id="chbBacToMas"
+                                                       name="BachToMas"
+                                                       asp-for="@registryReq.BachToMas">
+                                                <label for="chbBacToMas" class="custom-control-label">
+                                                    Bachelor to Master
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
-                                    <div id="Resume" hidden>
+
+                                    <div id="Resume" @(showResume ? "" : "hidden")>
                                         <hr>
                                         <div class="row">
                                             <div class="col-4">
-                                                <label>Payment Date</label>
+                                                <label asp-for="@registryReq.Resume!.DatePayment">Payment Date</label>
                                                 <input type="date" class="form-control"
-                                                       asp-for="@registryReq!.Resume!.DatePayment">
+                                                       name="Resume.DatePayment"
+                                                       asp-for="@registryReq.Resume!.DatePayment">
                                             </div>
                                             <div class="col-4">
-                                                <label class="required">Promotion</label>
+                                                <label class="required" asp-for="@registryReq.Resume!.CPromotion">
+                                                    Promotion
+                                                </label>
                                                 <input type="number" class="form-control" min="0" value="0"
-                                                       asp-for="@registryReq!.Resume!.CPromotion">
+                                                       name="Resume.CPromotion"
+                                                       asp-for="@registryReq.Resume!.CPromotion">
                                             </div>
                                             <div class="col-2">
-                                                <label class="required">Year</label>
+                                                <label class="required" asp-for="@registryReq.Resume!.CYear">Year</label>
                                                 <input type="number" class="form-control" min="0" max="5" value="0"
-                                                       asp-for="@registryReq!.Resume!.CYear">
+                                                       name="Resume.CYear"
+                                                       asp-for="@registryReq.Resume!.CYear">
                                             </div>
                                             <div class="col-2">
-                                                <label class="required">Semester</label>
+                                                <label class="required" asp-for="@registryReq.Resume!.CSemester">
+                                                    Semester
+                                                </label>
                                                 <input type="number" class="form-control" min="1" max="2" value="0"
-                                                       asp-for="@registryReq!.Resume!.CSemester">
+                                                       name="Resume.CSemester"
+                                                       asp-for="@registryReq.Resume!.CSemester">
                                             </div>
                                         </div>
                                     </div>
@@ -356,18 +433,21 @@
             </div>
             <div class="card-footer">
                 <div class="margin">
-
-                    <button type="submit" class="btn btn-success" form="frmRegistry"><i class="fas fa-refresh"></i>
-                        Update
+                    <button type="submit"
+                            id="btnUpdateRegistry"
+                            class="btn btn-success"
+                            form="frmRegistry"
+                            formnovalidate>
+                        <i class="fas fa-refresh"></i> Update
                     </button>
-                    <a asp-action="Index" asp-controller="Registry" type="button" class="btn btn-danger"><i
-                            class="fas fa-backward"></i> Back to list</a>
+                    <a asp-action="Index" asp-controller="Registry" type="button" class="btn btn-danger">
+                        <i class="fas fa-backward"></i> Back to list
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
 
 @section Scripts{
     <script src="~/function/Degree.js"></script>
@@ -379,6 +459,7 @@
     <script src="~/function/Group.js"></script>
     <script src="~/function/HighSchool.js"></script>
     <script src="~/function/University.js"></script>
+    <script src="~/js/Components.js"></script>
     <script>
         const frmRegistry = $("#frmRegistry");
         const tblSchoolarship = $("#tblSchoolarship");
@@ -392,57 +473,399 @@
         const chbAssToBac = $("#chbAssToBac");
         const chbBacToMas = $("#chbBacToMas");
         const resume = $("#Resume");
+        
+        const currentStudentId = "@student.StudentId";
+        
+        function getStudentControl(propertyName) {
+            return $(
+                `[name="Student.${propertyName}"], ` +
+                `[name="registryReq.Student.${propertyName}"], ` +
+                `#Student_${propertyName}, ` +
+                `#registryReq_Student_${propertyName}`
+            ).first();
+        }
 
+        function getStudentControlId(propertyName) {
+            const control = getStudentControl(propertyName);
 
-        const registerInput = "#registryReq_Registry"
-        const studentInput = "#registryReq_Student"
+            if (!control.length) {
+                console.error(
+                    `Student control was not found: ${propertyName}`
+                );
+                return null;
+            }
 
-        const cboHighSchool = $(`${studentInput}_FromHighSchoolNameInKhmer`);
+            if (!control.attr("id")) {
+                control.attr("id", `Student_${propertyName}`);
+            }
+
+            return control.attr("id");
+        }
+
+        function bindLookup(url, elementId, valueField, textField) {
+            if (typeof Components !== "undefined" &&
+                typeof Components.BindSelectOptions === "function") {
+                return Components.BindSelectOptions(
+                    url,
+                    elementId,
+                    valueField,
+                    textField
+                );
+            }
+
+            if (typeof BindSelectOptions === "function") {
+                return BindSelectOptions(
+                    url,
+                    elementId,
+                    valueField,
+                    textField
+                );
+            }
+
+            console.error("BindSelectOptions is not available:", elementId);
+        }
+
+        function loadDisabilityDropdown(elementId, savedDisabilityId) {
+            const dropdown = $("#" + elementId);
+
+            if (!dropdown.length) {
+                return;
+            }
+
+            dropdown.empty().append(
+                '<option value="0">Select Disability</option>'
+            );
+
+            $.ajax({
+                url: "/disability/get-disabilities?isAll=true",
+                type: "POST",
+                dataType: "json",
+
+                success: function (response) {
+                    const items =
+                        response.data ??
+                        response.result ??
+                        [];
+
+                    items.forEach(function (item) {
+                        dropdown.append(
+                            $("<option>", {
+                                value:
+                                    item.id ??
+                                    item.Id,
+                                text:
+                                    item.disabilityName ??
+                                    item.DisabilityName ??
+                                    item.disabilityNameKh ??
+                                    item.DisabilityNameKh ??
+                                    ""
+                            })
+                        );
+                    });
+
+                    const savedValue =
+                        String(savedDisabilityId ?? "").trim();
+
+                    if (savedValue !== "" && savedValue !== "0") {
+                        const matchingValue = dropdown
+                            .find("option")
+                            .filter(function () {
+                                return Number(this.value) ===
+                                    Number(savedValue);
+                            })
+                            .first()
+                            .val();
+
+                        if (matchingValue !== undefined) {
+                            dropdown
+                                .val(matchingValue)
+                                .trigger("change");
+                        }
+                    } else {
+                        dropdown.val("0").trigger("change");
+                    }
+                },
+
+                error: function (xhr) {
+                    console.error(
+                        "Cannot load disabilities:",
+                        xhr.responseText
+                    );
+                }
+            });
+        }
+
+        function loadPersonalDropdowns() {
+            const placeOfBirthId =
+                getStudentControlId("PlaceOfBirthId");
+            const nationalityId =
+                getStudentControlId("NationalityId");
+            const fromProvinceId =
+                getStudentControlId("FromProvinceId");
+            const raceId =
+                getStudentControlId("RaceId");
+            const jobId =
+                getStudentControlId("JobId");
+            const disabilityId =
+                getStudentControlId("DisabilityId");
+            const highSchoolId =
+                getStudentControlId("FromHighSchoolNameInKhmer");
+
+            if (placeOfBirthId) {
+            bindLookup(
+                "/Province/get-provinces",
+                placeOfBirthId,
+                "provinceId",
+                "provinceName"
+            );
+            }
+
+            if (nationalityId) {
+            bindLookup(
+                "/Nationality/get-nationalities",
+                nationalityId,
+                "nationalityId",
+                "nationalityName"
+            );
+            }
+
+            if (fromProvinceId) {
+            bindLookup(
+                "/Province/get-provinces",
+                fromProvinceId,
+                "provinceId",
+                "provinceName"
+            );
+            }
+
+            if (raceId) {
+            bindLookup(
+                "/race/get-races",
+                raceId,
+                "raceId",
+                "raceName"
+            );
+            }
+
+            if (jobId) {
+            bindLookup(
+                "/student-job/get-student-jobs",
+                jobId,
+                "jobId",
+                "jobName"
+            );
+            }
+
+            if (disabilityId) {
+                loadDisabilityDropdown(
+                    disabilityId,
+                    '@student.DisabilityId'
+                );
+            }
+
+            if (highSchoolId && rdoMasPhD.is(":checked")) {
+                bindLookup(
+                    "/university/get-universities",
+                    highSchoolId,
+                    "universityName",
+                    "universityName"
+                );
+            } else if (highSchoolId) {
+                bindLookup(
+                    "/high-school/get-high-school",
+                    highSchoolId,
+                    "highSchoolNameInKhmer",
+                    "highSchoolNameInKhmer"
+                );
+            }
+        }
 
         $(document).ready(function () {
-            tblSchoolarship.DataTable({
-                "paging": false,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": false,
-                "info": false,
-                "autoWidth": false,
-                "responsive": true,
-            });
-            tblCertificate.DataTable({
-                "paging": false,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": false,
-                "info": false,
-                "autoWidth": false,
-                "responsive": true,
-                columnDefs: [
-                    {targets: [0, 1, 2], visible: false}
-                ]
-            });
+            loadPersonalDropdowns();
+
+            if (tblSchoolarship.length &&
+                !$.fn.DataTable.isDataTable(tblSchoolarship)) {
+                tblSchoolarship.DataTable({
+                    paging: false,
+                    lengthChange: false,
+                    searching: false,
+                    ordering: false,
+                    info: false,
+                    autoWidth: false,
+                    responsive: false
+                });
+            }
+
+            if (tblCertificate.length &&
+                !$.fn.DataTable.isDataTable(tblCertificate)) {
+                tblCertificate.DataTable({
+                    paging: false,
+                    lengthChange: false,
+                    searching: false,
+                    ordering: false,
+                    info: false,
+                    autoWidth: false,
+                    responsive: false,
+                    columnDefs: [
+                        { targets: [0, 1, 2], visible: false }
+                    ]
+                });
+            }
         });
 
-        btnAddSchoolarship.on("click", function (e) {
+        const existingValues = {
+            placeOfBirthId: '@student.PlaceOfBirthId',
+            nationalityId: '@student.NationalityId',
+            provinceId: '@student.FromProvinceId',
+            raceId: '@student.RaceId',
+            jobId: '@student.JobId',
+            disabilityId: '@student.DisabilityId',
+            highSchoolName: @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    student.FromHighSchoolNameInKhmer ?? ""
+                )
+            )
+        };
+
+        function restoreExistingSelectValue(
+            selectorOrElement,
+            value,
+            appendIfMissing = false
+        ) {
+            const element =
+                typeof selectorOrElement === "string"
+                    ? document.querySelector(selectorOrElement)
+                    : selectorOrElement;
+
+            if (!element ||
+                value === null ||
+                value === undefined ||
+                String(value) === "") {
+                return;
+            }
+
+            const select = $(element);
+            const savedValue = String(value).trim();
+
+            function applyValue() {
+                let hasOption = select.find("option").filter(function () {
+                    const optionValue = String(this.value).trim();
+
+                    const optionNumber = Number(optionValue);
+                    const savedNumber = Number(savedValue);
+
+                    if (optionValue !== "" &&
+                        savedValue !== "" &&
+                        Number.isFinite(optionNumber) &&
+                        Number.isFinite(savedNumber)) {
+                        return optionNumber === savedNumber;
+                    }
+
+                    return optionValue === savedValue;
+                }).length > 0;
+
+                if (!hasOption && appendIfMissing) {
+                    select.append(new Option(savedValue, savedValue));
+                    hasOption = true;
+                }
+
+                if (hasOption) {
+                    const matchingOption = select.find("option").filter(function () {
+                        const optionValue = String(this.value).trim();
+                        const optionNumber = Number(optionValue);
+                        const savedNumber = Number(savedValue);
+
+                        if (optionValue !== "" &&
+                            savedValue !== "" &&
+                            Number.isFinite(optionNumber) &&
+                            Number.isFinite(savedNumber)) {
+                            return optionNumber === savedNumber;
+                        }
+
+                        return optionValue === savedValue;
+                    }).first();
+
+                    const valueToSelect = matchingOption.val();
+
+                    if (String(select.val() ?? "") !==
+                        String(valueToSelect ?? "")) {
+                        select
+                            .val(valueToSelect)
+                            .trigger("change.select2");
+                    }
+                }
+            }
+
+            applyValue();
+
+            const observer = new MutationObserver(applyValue);
+            observer.observe(element, {
+                childList: true,
+                subtree: true
+            });
+
+            window.setTimeout(function () {
+                applyValue();
+                observer.disconnect();
+            }, 15000);
+        }
+
+        $(function () {
+            restoreExistingSelectValue(
+                getStudentControl("PlaceOfBirthId").get(0),
+                existingValues.placeOfBirthId
+            );
+            restoreExistingSelectValue(
+                getStudentControl("NationalityId").get(0),
+                existingValues.nationalityId
+            );
+            restoreExistingSelectValue(
+                getStudentControl("FromProvinceId").get(0),
+                existingValues.provinceId
+            );
+            restoreExistingSelectValue(
+                getStudentControl("RaceId").get(0),
+                existingValues.raceId
+            );
+            restoreExistingSelectValue(
+                getStudentControl("JobId").get(0),
+                existingValues.jobId
+            );
+            restoreExistingSelectValue(
+                getStudentControl("DisabilityId").get(0),
+                existingValues.disabilityId
+            );
+            restoreExistingSelectValue(
+                getStudentControl(
+                    "FromHighSchoolNameInKhmer"
+                ).get(0),
+                existingValues.highSchoolName,
+                true
+            );
+        });
+
+        // ---- Scholarship rows --------------------------------------------
+        btnAddSchoolarship.on("click", function () {
             const cboSponsor = $("#cboSponsor");
             const i = tblSchoolarship.DataTable().rows().count();
             const rowData = [
-                `<input type="number" name="registryReq_Schoolarships[${i}].TermNo" value="1" min="1" class="form-control input-sm"/>`,
-                `${cboSponsor.find("option:selected").text()}<input type="text" name="registryReq_Schoolarships[${i}].SponsorId" class="form-control" value="${cboSponsor.val()}" hidden/>`,
-                `<input type="checkbox" name="registryReq_Schoolarships[${i}].IsFull" class="form-control input-sm"/>`,
-                `<input type="number" name="registryReq_Schoolarships[${i}].Amount" value="0" min="0" class="form-control input-sm"/>`,
-                `<a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i></a>
-                 <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></a>`,
+                `<input type="number" name="Scholarships[${i}].TermNo" value="1" min="1" class="form-control input-sm"/>`,
+                `${cboSponsor.find("option:selected").text()}<input type="text" name="Scholarships[${i}].SponsorId" class="form-control" value="${cboSponsor.val()}" hidden/>`,
+                `<input type="checkbox" name="Scholarships[${i}].IsFull" class="form-control input-sm"/>`,
+                `<input type="number" name="Scholarships[${i}].Amount" value="0" min="0" class="form-control input-sm"/>`,
+                `<button type="button" class="btn btn-success btn-sm btn-edit-row"><i class='fas fa-edit'></i></button>
+                 <button type="button" class="btn btn-danger btn-sm btn-delete-row"><i class="fa-solid fa-trash"></i></button>`
             ];
             tblSchoolarship.DataTable().row.add(rowData).draw();
         });
 
-        addRowCertificate.on("click", function (e) {
+        // ---- Certificate rows ----------------------------------------------
+        addRowCertificate.on("click", function () {
             const exists = tblCertificate.DataTable()
                 .column(2)
                 .nodes()
                 .to$()
-                .find('input')
+                .find("input")
                 .filter(function () {
                     return $(this).val() === cboCertificate.val();
                 }).length > 0;
@@ -451,70 +874,331 @@
                 ShowToastError("This certificate already exists!");
                 return;
             }
+
             const i = tblCertificate.DataTable().rows().count();
             const rowData = [
-                `<input type="number" name="registryReq_StudentCertificates[${i}].StudentCertificateId" value="1" min="1" class="form-control input-sm"/>`,
-                `<input type="text" name="registryReq_StudentCertificates[${i}].StudentId" class="form-control" value="${cboCertificate.val()}"/>`,
-                `<input type="number" name="registryReq_StudentCertificates[${i}].CertificateId" value="${cboCertificate.val()}" class="form-control input-sm"/>`,
+                // New row -> no id yet, let the server assign one on save.
+                `<input type="number" name="StudentCertificates[${i}].StudentCertificateId" value="0" min="0" class="form-control input-sm"/>`,
+                `<input type="text" name="StudentCertificates[${i}].StudentId" class="form-control" value="${currentStudentId}"/>`,
+                `<input type="number" name="StudentCertificates[${i}].CertificateId" value="${cboCertificate.val()}" class="form-control input-sm"/>`,
                 `${cboCertificate.find("option:selected").text()}`,
-                `<select name="registryReq_StudentCertificates[${i}].Grade" class="form-control select2">
+                `<select name="StudentCertificates[${i}].Grade" class="form-control select2">
                     <option value="Pass">Pass</option>
                     <option value="Fail">Fail</option>
-                </select>
-            `,
-                `<input type="checkbox" name="registryReq_StudentCertificates[${i}].IsReceived" class="form-control input-sm"/>`,
-                `<input type="number" name="registryReq_StudentCertificates[${i}].CertificateIssueNo" class="form-control input-sm"/>`,
-
-                `<a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i></a>
-             <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></a>`,
+                 </select>`,
+                `<input type="checkbox" name="StudentCertificates[${i}].IsReceived" class="form-control input-sm"/>`,
+                `<input type="number" name="StudentCertificates[${i}].CertificateIssueNo" class="form-control input-sm"/>`,
+                `<button type="button" class="btn btn-success btn-sm btn-edit-row"><i class='fas fa-edit'></i></button>
+                 <button type="button" class="btn btn-danger btn-sm btn-delete-row"><i class="fa-solid fa-trash"></i></button>`
             ];
-            // tblCertificate.DataTable().rows().data().each(function(value, index) {
-            //     console.log('Row ' + value);
-            // });
 
             const newRow = tblCertificate.DataTable().row.add(rowData).draw().node();
-            $(newRow).find('.select2').select2({
-                width: '100%'
-            });
+            $(newRow).find(".select2").select2({ width: "100%" });
         });
 
-        rdoHighSchool.on("change", function (e) {
-            cboHighSchool.empty();
-            cboHighSchool.append($('<option>', {value: '', text: 'Select High School'}));
-            // hightSchools.forEach(function (highSchool) {
-            //     cboHighSchool.append($('<option>', {
-            //         value: highSchool.highSchoolId,
-            //         text: highSchool.highSchoolNameInKhmer
-            //     }))
-            // })
-        })
-        rdoMasPhD.on("change", function (e) {
-            cboHighSchool.empty();
-            cboHighSchool.append($('<option>', {value: '', text: 'Select High School'}));
-            // universities.forEach(function (university) {
-            //     cboHighSchool.append($('<option>', {
-            //         value: university.universityId,
-            //         text: university.universityName
-            //     }))
-            // })
-        })
+        tblSchoolarship.on("click", ".btn-delete-row", function () {
+            tblSchoolarship.DataTable().row($(this).closest("tr")).remove().draw();
+        });
+        tblCertificate.on("click", ".btn-delete-row", function () {
+            tblCertificate.DataTable().row($(this).closest("tr")).remove().draw();
+        });
 
+        // ---- High school / university source toggles -----------------------
+        const studentInput = "#registryReq_Student";
+        const cboHighSchool = $(`${studentInput}_FromHighSchoolNameInKhmer`);
+
+        rdoHighSchool
+            .off("change.registry")
+            .on("change.registry", function () {
+                if (!this.checked) {
+                    return;
+                }
+
+                bindLookup(
+                    "/high-school/get-high-school",
+                    getStudentControlId(
+                        "FromHighSchoolNameInKhmer"
+                    ),
+                    "highSchoolNameInKhmer",
+                    "highSchoolNameInKhmer"
+                );
+            });
+
+        rdoMasPhD
+            .off("change.registry")
+            .on("change.registry", function () {
+                if (!this.checked) {
+                    return;
+                }
+
+                bindLookup(
+                    "/university/get-universities",
+                    getStudentControlId(
+                        "FromHighSchoolNameInKhmer"
+                    ),
+                    "universityName",
+                    "universityName"
+                );
+            });
+
+        // ---- Associate<->Bachelor / Bachelor<->Master exclusivity -----------
         chbAssToBac.on("change", function (e) {
             chbBacToMas.prop("checked", false);
-            if (e.target.checked === true) {
-                resume.removeAttr("hidden");
-            } else {
-                resume.attr("hidden", "hidden");
-            }
+            resume.prop("hidden", !e.target.checked);
         });
         chbBacToMas.on("change", function (e) {
             chbAssToBac.prop("checked", false);
-            if (e.target.checked === true) {
-                resume.removeAttr("hidden");
-            } else {
-                resume.attr("hidden", "hidden");
+            resume.prop("hidden", !e.target.checked);
+        });
+
+        function normalizeFieldPrefixes() {
+            frmRegistry.find("[name]").each(function () {
+                const input = $(this);
+                const currentName = input.attr("name");
+
+                if (!currentName) return;
+
+                input.attr(
+                    "name",
+                    currentName
+                        .replace(/^registryReq\./i, "")
+                        .replace(/^Schoolarships/i, "Scholarships")
+                );
+            });
+        }
+
+        function reindexCollection(table, collectionName) {
+            if (!table.length ||
+                !$.fn.DataTable.isDataTable(table)) {
+                return;
             }
+
+            table.DataTable().rows().every(function (rowIndex) {
+                $(this.node()).find("[name]").each(function () {
+                    const input = $(this);
+                    const currentName = input.attr("name");
+
+                    if (!currentName) return;
+
+                    input.attr(
+                        "name",
+                        currentName.replace(
+                            new RegExp(
+                                `${collectionName}\\[\\d+\\]`,
+                                "i"
+                            ),
+                            `${collectionName}[${rowIndex}]`
+                        )
+                    );
+                });
+            });
+        }
+
+        function showUpdateSuccess(message) {
+            if (typeof ShowToastSuccess === "function") {
+                ShowToastSuccess(message);
+                return;
+            }
+
+            alert(message);
+        }
+
+        function showUpdateError(message) {
+            if (typeof ShowToastError === "function") {
+                ShowToastError(message);
+                return;
+            }
+
+            alert(message);
+        }
+
+        function parseRegistryResponse(response) {
+            if (typeof response !== "string") {
+                return response ?? {};
+            }
+
+            try {
+                return JSON.parse(response);
+            } catch {
+                return {};
+            }
+        }
+
+        let isPhotoUpload = false;
+
+        frmRegistry.on("submit", function (event) {
+            event.preventDefault();
+
+            normalizeFieldPrefixes();
+            reindexCollection(
+                tblSchoolarship,
+                "Scholarships"
+            );
+            reindexCollection(
+                tblCertificate,
+                "StudentCertificates"
+            );
+
+            const formData = new FormData(this);
+            
+            const receivedPhotoCheckbox = $(this)
+                .find(
+                    'input[type="checkbox"]' +
+                    '[name="Student.IsReceivePhoto"]'
+                )
+                .first();
+
+            formData.delete("Student.IsReceivePhoto");
+            formData.set(
+                "Student.IsReceivePhoto",
+                receivedPhotoCheckbox.is(":checked")
+                    ? "true"
+                    : "false"
+            );
+
+            if (tblSchoolarship.length) {
+                formData.set(
+                    "replaceScholarships",
+                    "true"
+                );
+            }
+
+            if (tblCertificate.length) {
+                formData.set(
+                    "replaceCertificates",
+                    "true"
+                );
+            }
+
+            const submitButton =
+                $("[type='submit'][form='frmRegistry']");
+            const originalButtonHtml = submitButton.html();
+
+            submitButton
+                .prop("disabled", true)
+                .html('<i class="fas fa-spinner fa-spin"></i> Updating...');
+
+            $.ajax({
+                url: this.action || "/registry/update",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    response =
+                        parseRegistryResponse(response);
+
+                    const code =
+                        response?.status?.code ??
+                        response?.code ??
+                        200;
+
+                    const message =
+                        response?.status?.message ??
+                        response?.message ??
+                        "Student updated successfully.";
+
+                    if (Number(code) === 200) {
+                        if (isPhotoUpload) {
+                            const photoBytes =
+                                Number(
+                                    response?.photoBytes ??
+                                    response?.data?.photoBytes ??
+                                    0
+                                );
+
+                            if (photoBytes <= 0) {
+                                showUpdateError(
+                                    "The request completed, but the photo was not saved."
+                                );
+                                return;
+                            }
+
+                            const selectedFile =
+                                $("#studentPhoto")[0]
+                                    .files[0];
+
+                            const uploadedFileName =
+                                response?.uploadedFileName ??
+                                selectedFile?.name ??
+                                "Saved photo";
+
+                            $("#studentPhotoFileName")
+                                .text(uploadedFileName);
+
+                            showUpdateSuccess(
+                                "Photo uploaded successfully."
+                            );
+
+                            return;
+                        }
+
+                        showUpdateSuccess(message);
+
+                        const redirectUrl =
+                            response?.redirectUrl ??
+                            "/registry/all-student-register";
+
+                        setTimeout(function () {
+                            window.location.href = redirectUrl;
+                        }, 1500);
+                        return;
+                    }
+
+                    showUpdateError(message);
+                },
+                error: function (xhr) {
+                    const response =
+                        xhr.responseJSON ??
+                        parseRegistryResponse(
+                            xhr.responseText
+                        );
+
+                    const message =
+                        response?.status?.message ??
+                        response?.message ??
+                        (
+                            isPhotoUpload
+                                ? "Cannot upload photo."
+                                : "Cannot update student."
+                        );
+
+                    showUpdateError(message);
+                },
+                complete: function () {
+                    isPhotoUpload = false;
+
+                    submitButton
+                        .prop("disabled", false)
+                        .html(originalButtonHtml);
+                }
+            });
+        });
+
+        // ---- Photo preview ---------------------------------------------------
+        $("#studentPhoto").on("change", function (e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+
+            $(this)
+                .siblings(".custom-file-label")
+                .text(file.name);
+
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                $("#imgPreview").attr("src", ev.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        $("#btnUploadPhoto").on("click", function () {
+            if (!$("#studentPhoto")[0].files.length) {
+                showUpdateError("Please choose a photo first.");
+                return;
+            }
+
+            isPhotoUpload = true;
+            frmRegistry.trigger("submit");
         });
     </script>
 }
-     

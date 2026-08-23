@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using BBU_SYSTEM.Data;
 using BBU_SYSTEM.DTOs;
 using BBU_SYSTEM.Helper;
@@ -14,14 +15,12 @@ namespace BBU_SYSTEM.Controllers;
 
 [Authorize]
 [Route("student")]
-public class StudentController(ICampusDbContext campusDbContext, IMapper mapper, IHttpContextAccessor context)
-    : Controller
+public class StudentController(ICampusDbContext campusDbContext, IMapper mapper, IHttpContextAccessor context) : Controller
 {
     private readonly string _campus = context.HttpContext?.User?.FindFirst("CampusKey")?.Value ?? "pp";
-
-
+    
     [Route("all-students")]
-    public ActionResult Index()
+    public ActionResult Index() 
     {
         return View();
     }
@@ -30,6 +29,8 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     public ActionResult Status(string status)
     {
         ViewData["status"] = status;
+        ViewData["StudentStatusBadgeClasses"] = StudentStatusConstant.BadgeClasses;
+        ViewData["StudentStatusDefaultBadgeClass"] = StudentStatusConstant.DefaultBadgeClass;
         return View();
     }
 
@@ -116,18 +117,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     {
         try
         {
-            if (idList.Count == 0)
-            {
-                return BadRequest(new
-                {
-                    data = new { },
-                    status = new
-                    {
-                        code = "400",
-                        message = "No students selected."
-                    }
-                });
-            } 
+            if (idList.Count == 0) return new ServerResponse().BadRequest("No students selected.");
             var db = campusDbContext.DbContext(_campus); 
             foreach (var id in idList)
             {
@@ -146,15 +136,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                data = new { },
-                status = new
-                {
-                    code = "500",
-                    message = e.Message
-                }
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 
@@ -290,20 +272,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                     s.Email,
                     s.Status
                 };
-
-            if (isAll)
-            {
-                return Ok(new
-                {
-                    data = await query.ToListAsync(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded"
-                    }
-                });
-            }
-
+            if (isAll) return new ServerResponse().Success(await query.ToListAsync());
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
@@ -363,19 +332,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                     s.Email,
                     s.Status
                 }).AsQueryable();
-            if (req.IsAll)
-            {
-                return Ok(new
-                {
-                    data = await query.ToListAsync(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded"
-                    }
-                });
-            }
-
+            if (req.IsAll) return new ServerResponse().Success(await query.ToListAsync());
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
@@ -453,21 +410,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                     s.FieldId,
                     s.Status
                 }).AsQueryable();
-            
-            if (req.IsAll)
-            {
-                var dataAll = await query.ToListAsync();
-                return Ok(new
-                {
-                    data=dataAll,
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded"
-                    }
-                });
-            }
-
+            if (req.IsAll) new ServerResponse().Success(await query.ToListAsync());
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
@@ -601,19 +544,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                     s.Status
                 }).AsQueryable();
 
-            if (req.IsAll)
-            {
-                return Ok(new
-                {
-                    data = await query.ToListAsync(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded"
-                    }
-                });
-            }
-
+            if (req.IsAll) new ServerResponse().Success(await query.ToListAsync());
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
@@ -674,18 +605,7 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
                     s.Status
                 }).AsQueryable();
 
-            if (req.IsAll)
-            {
-                return Ok(new
-                {
-                    data = await query.ToListAsync(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Succeeded"
-                    }
-                });
-            }
+            if (req.IsAll) return new ServerResponse().Success(await query.ToListAsync());
 
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
@@ -1233,31 +1153,26 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                code = "500",
-                message = $"Internal Server Error: {e.Message}"
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 
 
     [HttpPatch("academic/update-accept-certificate/{studentId}")]
-    public async Task<IActionResult> UpdateStudentAcceptedCertificate(string studentId,StudentDto student)
+    public async Task<IActionResult> UpdateStudentAcceptedCertificate(string studentId, StudentDto student)
     {
         try
         {
             var db = campusDbContext.DbContext(_campus);
             var data = await db.TblStudent.FindAsync(studentId);
-            if (data == null) return new ServerResponse().NotFound();
-
+            if (data == null) return new ServerResponse().NotFound(); 
             data.IsAcceptCertificate = student.IsAcceptCertificate;
             data.AcceptDate = student.AcceptDate;
             data.CertificateNo = student.CertificateNo;
             data.CertificateOut = student.CertificateOut;
             data.NoteTicket = student.NoteTicket;
             await db.SaveChangesAsync();
-            return new ServerResponse().Success();
+            return new ServerResponse().Success(msg: "Student accepted");
         }
         catch (Exception e)
         {
@@ -1268,8 +1183,8 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
     [HttpPatch("update-student")]
     public async Task<IActionResult> UpdateStudentAcceptedCertificate(StudentDto student, RegistryDto registry, ContactPersonDto contactPerson)
     {
-        var db = campusDbContext.DbContext(_campus);
-        await db.Database.BeginTransactionAsync();
+        var db = campusDbContext.DbContext(_campus);  
+        await using var tran = await db.Database.BeginTransactionAsync();
         try
         {
             var studentCheck = await db.TblStudent.FirstOrDefaultAsync(s => s.StudentId == student.StudentId);
@@ -1277,59 +1192,272 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             {
                 await db.Database.RollbackTransactionAsync();
                 return new ServerResponse().NotFound("Student not found");
-            }
-
-            contactPerson.ContactPersonId = (int)studentCheck.ContactPersonId!;
+            } 
             //===student 
             var studentUpdate = new StudentUpdateViewModel();
             mapper.Map(student, studentUpdate);
-            mapper.Map(studentUpdate, studentCheck);
-            // db.TblStudent.Update(studentCheck);
+            mapper.Map(studentUpdate, studentCheck); 
             var studentChanged = db.Entry(studentCheck).Properties.Any(p => p.IsModified);
 
             //===registry
             var registryCheck = await db.TblRegistry.FirstOrDefaultAsync(x => x.StudentId == student.StudentId);
             if (registryCheck == null)
             {
-                await db.Database.RollbackTransactionAsync();
+                await tran.RollbackAsync();
                 return new ServerResponse().NotFound("Registry not found");
-            }
-
+            } 
             registryCheck.HighSchoolResult = registry.HighSchoolResult;
-            registryCheck.HighSchoolTableNo = registry.HighSchoolTableNo;
-            // db.TblRegistry.Update(registryCheck);
+            registryCheck.HighSchoolTableNo = registry.HighSchoolTableNo; 
             var registryChanged = db.Entry(registryCheck).Properties.Any(p => p.IsModified);
 
             //===Contact Person
-            var contactCheck =
-                await db.TblContactPerson.FirstOrDefaultAsync(x => x.ContactPersonId == contactPerson.ContactPersonId);
+            contactPerson.ContactPersonId = (int)studentCheck.ContactPersonId!;
+            var contactCheck = await db.TblContactPerson.FirstOrDefaultAsync(x => x.ContactPersonId == contactPerson.ContactPersonId);
             if (contactCheck == null)
             {
-                await db.Database.RollbackTransactionAsync();
-                return new ServerResponse().NotFound("Registry not found");
-            }
-
-            mapper.Map(contactPerson, contactCheck);
-            // db.TblContactPerson.Update(contactCheck);
+                await tran.RollbackAsync();
+                return new ServerResponse().NotFound("Contact person not found");
+            } 
+            mapper.Map(contactPerson, contactCheck); 
             var contactPersonChanged = db.Entry(contactCheck).Properties.Any(p => p.IsModified);
 
-            // ==== SAVE ONLY IF CHANGED ====
-            if (studentChanged || registryChanged || contactPersonChanged)
-            {
-                await db.SaveChangesAsync();
-            }
-
-            await db.Database.CommitTransactionAsync();
-            return new ServerResponse().Success("Student and related data updated successfully");
+            var hasChanges = studentChanged || registryChanged || contactPersonChanged; 
+            if (hasChanges) await db.SaveChangesAsync(); 
+            await tran.CommitAsync();
+            return new ServerResponse().Success(hasChanges ? "Student and related data updated successfully" : "No changes detected");
         }
         catch (Exception e)
         {
-            await db.Database.RollbackTransactionAsync();
+            await tran.RollbackAsync(); 
+            return new ServerResponse().ErrorInternal(e);
+        } 
+    }
+
+    [HttpPost("change-branch")]
+    public async Task<IActionResult> ChangeBranch(ChangeBranchDto dto)
+    {
+        var db = campusDbContext.DbContext(_campus);
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        try
+        {
+            var student = await db.TblStudent.FirstOrDefaultAsync(x => x.StudentId == dto.StudentId);
+            if (student == null) return new ServerResponse().NotFound("Student not found.");
+            student.Status = StudentStatusConstant.ChangeBranch;
+            if (dto.ChangeBranchId == 0)
+            {
+                var data = mapper.Map<ChangeBranch>(dto);
+                await db.TblChangeBranch.AddAsync(data);
+                await db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return new ServerResponse().Success(data);
+            }
+            var oldData = await db.TblChangeBranch.FirstOrDefaultAsync(x => x.ChangeBranchId == dto.ChangeBranchId);
+            if (oldData == null) return new ServerResponse().NotFound("Change branch record not found.");
+            mapper.Map(dto, oldData);
+            await db.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return new ServerResponse().Success(oldData);
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
             return new ServerResponse().ErrorInternal(e);
         }
-        finally
+    }
+    
+    [HttpPost("change-school")]
+    public async Task<IActionResult> ChangeBranch(ChangeSchoolReq req)
+    {
+        var db = campusDbContext.DbContext(_campus);
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        try
         {
-            await db.DisposeAsync();
+            var student = await db.TblStudent.FirstOrDefaultAsync(x => x.StudentId == req.StudentId);
+            if (student == null) return new ServerResponse().NotFound("Student not found.");
+            student.Status = StudentStatusConstant.ChangeBranch;  
+            await db.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return new ServerResponse().Success();
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            return new ServerResponse().ErrorInternal(e);
         }
     }
+    
+    [HttpPost("quit")]
+    public async Task<IActionResult> Quit(QuitDto dto)
+    {
+        var db = campusDbContext.DbContext(_campus);
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        try
+        { 
+            var student = await db.TblStudent.FirstOrDefaultAsync(x => x.StudentId == dto.StudentId);
+            if (student == null) return new ServerResponse().NotFound("Student not found.");
+            student.Status = StudentStatusConstant.Quit;
+            if (dto.QuitId == 0)
+            {
+                var data = mapper.Map<Quit>(dto);
+                await db.TblQuit.AddAsync(data);
+                await db.SaveChangesAsync(); 
+                await transaction.CommitAsync();
+                return new ServerResponse().Success(data);
+            }
+            var oldData = await db.TblQuit.FirstOrDefaultAsync(x => x.QuitId == dto.QuitId);
+            if (oldData == null) return new ServerResponse().NotFound("Record found.");
+            mapper.Map(dto, oldData);
+            await db.SaveChangesAsync(); 
+            await transaction.CommitAsync(); 
+            return new ServerResponse().Success(oldData);
+        }
+        catch (Exception e)
+        { 
+            await transaction.RollbackAsync(); 
+            return new ServerResponse().ErrorInternal(e);
+        }
+    }
+    
+    [HttpPost("adjust-group")]
+    public async Task<IActionResult> AdjustStudentGroup(StudentGroupDto dto)
+    {
+        var db = campusDbContext.DbContext(_campus);
+        try
+        {
+            var student = await db.TblStudent
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.StudentId == dto.StudentId);
+            if (student == null) return new ServerResponse().NotFound("Student not found.");
+            var username = User.FindFirstValue(ClaimTypes.Name);
+            await using var transaction = await db.Database.BeginTransactionAsync();
+            if (dto.StudentGroupId == 0)
+            {
+                await db.Database.ExecuteSqlInterpolatedAsync($@"
+                    UPDATE STUDENT
+                    SET STATUS = {StudentStatusConstant.Active}
+                    WHERE STUDENT_ID = {dto.StudentId}
+                ");
+                await db.Database.ExecuteSqlInterpolatedAsync($@"
+                    INSERT INTO STUDENT_GROUP
+                    (
+                        STUDENT_ID,
+                        TERM_NO,
+                        GROUP_ID
+                    )
+                    VALUES
+                    (
+                        {dto.StudentId},
+                        {dto.TermNo},
+                        {dto.GroupId}
+                    )
+                ");
+                var insertedData = await db.TblStudentGroup
+                    .AsNoTracking()
+                    .Where(x => x.StudentId == dto.StudentId)
+                    .OrderByDescending(x => x.StudentGroupId)
+                    .FirstOrDefaultAsync();
+                await transaction.CommitAsync();
+                return new ServerResponse().Success(insertedData);
+            }
+
+            var oldData = await db.TblStudentGroup
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.StudentGroupId == dto.StudentGroupId);
+            if (oldData == null) return new ServerResponse().NotFound("Record not found.");
+            await db.Database.ExecuteSqlInterpolatedAsync($@"
+                INSERT INTO STUDENT_GROUP_HISTORY
+                (
+                    STUDENT_GROUP_ID,
+                    STUDENT_ID,
+                    TERM_NO,
+                    GROUP_ID,
+                    CHANGE_DATE,
+                    USERNAME
+                )
+                SELECT
+                    STUDENT_GROUP_ID,
+                    STUDENT_ID,
+                    TERM_NO,
+                    GROUP_ID,
+                    GETDATE(),
+                    {username}
+                FROM STUDENT_GROUP
+                WHERE STUDENT_GROUP_ID = {dto.StudentGroupId}
+            ");
+            await db.Database.ExecuteSqlInterpolatedAsync($@"
+                UPDATE STUDENT_GROUP
+                SET
+                    STUDENT_ID = {dto.StudentId},
+                    TERM_NO = {dto.TermNo},
+                    GROUP_ID = {dto.GroupId}
+                WHERE STUDENT_GROUP_ID = {dto.StudentGroupId}
+            ");
+            var updatedData = await db.TblStudentGroup
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.StudentGroupId == dto.StudentGroupId);
+            await transaction.CommitAsync();
+            return new ServerResponse().Success(updatedData);
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
+        }
+    }
+    
+    [HttpPost("suppress")]
+    public async Task<IActionResult> Suppress(SuppressDto dto)
+    {
+        var db = campusDbContext.DbContext(_campus);
+        try
+        { 
+            if (dto.SuppressId == 0)
+            {
+                var data = mapper.Map<Suppress>(dto); 
+                await db.TblSuppress.AddAsync(data);
+                await db.SaveChangesAsync(); 
+                return new ServerResponse().Success(data);
+            }
+            var oldData = await db.TblSuppress.FirstOrDefaultAsync(x => x.SuppressId == dto.SuppressId);
+            if (oldData == null) return new ServerResponse().NotFound("Record found.");
+            mapper.Map(dto, oldData);
+            await db.SaveChangesAsync(); 
+            return new ServerResponse().Success(oldData);
+        }
+        catch (Exception e)
+        { 
+            return new ServerResponse().ErrorInternal(e);
+        }
+    } 
+    
+    [HttpPost("suspend")]
+    public async Task<IActionResult> Suspend(SuspendDto dto)
+    {
+        var db = campusDbContext.DbContext(_campus); 
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        try
+        {
+            var student = await db.TblStudent.FirstOrDefaultAsync(x => x.StudentId == dto.StudentId);
+            if (student == null) return new ServerResponse().NotFound("Student not found.");
+            student.Status = StudentStatusConstant.Suspend;
+            if (dto.SuspendId == 0)
+            {
+                var data = mapper.Map<Suspend>(dto); 
+                await db.TblSuspend.AddAsync(data);
+                await db.SaveChangesAsync(); 
+                await transaction.CommitAsync();
+                return new ServerResponse().Success(data);
+            }
+            var oldData = await db.TblSuspend.FirstOrDefaultAsync(x => x.SuspendId == dto.SuspendId);
+            if (oldData == null) return new ServerResponse().NotFound("Record found.");
+            mapper.Map(dto, oldData);
+            await db.SaveChangesAsync();  
+            await transaction.CommitAsync();
+            return new ServerResponse().Success(oldData);
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            return new ServerResponse().ErrorInternal(e);
+        }
+    } 
 }

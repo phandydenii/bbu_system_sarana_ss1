@@ -1,4 +1,5 @@
 using AutoMapper;
+using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,6 @@ public class StudentLetterController(ICampusDbContext campusDbContext, IMapper m
             var skip = start != null ? Convert.ToInt32(start) : 0;
 
             var db = campusDbContext.DbContext(_campus);
-            // var query = db.TblStudentLetter.Where(x=>x.StudentId == studentId).AsQueryable();
             var query = (from sl in db.TblStudentLetter
                 join l in db.TblLetter on sl.LetterId equals l.LetterId
                 where sl.StudentId == studentId
@@ -57,11 +57,7 @@ public class StudentLetterController(ICampusDbContext campusDbContext, IMapper m
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                code = "500",
-                message = $"Internal Server Error:{e.Message}"
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 }

@@ -1,14 +1,61 @@
-﻿@using BBU_SYSTEM.Models.Req
-@using BBU_SYSTEM.DTOs
-@model BBU_SYSTEM.ViewModel.RegisryDetailViewModel
-@{
-    var registryReq = new RegistryReq();
-}
-<label>Father Name</label>
-<input type="text" class="form-control" asp-for="@registryReq.Student!.FatherNameInKhmer">
-<label>Father Occupation</label>
-<input type="text" class="form-control" asp-for="@registryReq.Student!.FatherOccupationInKhmer">
-<label>Mother Name</label>
-<input type="text" class="form-control" asp-for="@registryReq.Student!.MotherNameInKhmer">
-<label>Mother Occupation</label>
-<input type="text" class="form-control" asp-for="@registryReq.Student!.MotherOccupationInKhmer">
+﻿@model BBU_SYSTEM.Models.Req.RegistryReq
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label asp-for="Student!.FatherNameInKhmer">
+                Father Name
+            </label>
+            <input asp-for="Student!.FatherNameInKhmer"
+                   type="text"
+                   class="form-control"
+                   placeholder="Enter father name" />
+            <span asp-validation-for="Student!.FatherNameInKhmer"
+                  class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <label asp-for="Student!.FatherOccupationInKhmer">
+                Father Occupation
+            </label>
+            <input asp-for="Student!.FatherOccupationInKhmer"
+                   type="text"
+                   class="form-control"
+                   placeholder="Enter father occupation" />
+            <span asp-validation-for="Student!.FatherOccupationInKhmer"
+                  class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label asp-for="Student!.MotherNameInKhmer">
+                Mother Name
+            </label>
+            <input asp-for="Student!.MotherNameInKhmer"
+                   type="text"
+                   class="form-control"
+                   placeholder="Enter mother name" />
+            <span asp-validation-for="Student!.MotherNameInKhmer"
+                  class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <label asp-for="Student!.MotherOccupationInKhmer">
+                Mother Occupation
+            </label>
+            <input asp-for="Student!.MotherOccupationInKhmer"
+                   type="text"
+                   class="form-control"
+                   placeholder="Enter mother occupation" />
+            <span asp-validation-for="Student!.MotherOccupationInKhmer"
+                  class="text-danger"></span>
+        </div>
+    </div>
+</div>
