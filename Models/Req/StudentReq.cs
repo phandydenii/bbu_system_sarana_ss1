@@ -16,4 +16,7 @@ public class StudentFilterReq
 public class ChangeSchoolReq
 {
     public required string StudentId { get; set; }
+    public int TermNo { get; set; }
+    public int GroupId { get; set; }
+    public int FieldId { get; set; }
 }

@@ -1265,27 +1265,6 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
         }
     }
     
-    [HttpPost("change-school")]
-    public async Task<IActionResult> ChangeBranch(ChangeSchoolReq req)
-    {
-        var db = campusDbContext.DbContext(_campus);
-        await using var transaction = await db.Database.BeginTransactionAsync();
-        try
-        {
-            var student = await db.TblStudent.FirstOrDefaultAsync(x => x.StudentId == req.StudentId);
-            if (student == null) return new ServerResponse().NotFound("Student not found.");
-            student.Status = StudentStatusConstant.ChangeBranch;  
-            await db.SaveChangesAsync();
-            await transaction.CommitAsync();
-            return new ServerResponse().Success();
-        }
-        catch (Exception e)
-        {
-            await transaction.RollbackAsync();
-            return new ServerResponse().ErrorInternal(e);
-        }
-    }
-    
     [HttpPost("quit")]
     public async Task<IActionResult> Quit(QuitDto dto)
     {
@@ -1460,4 +1439,67 @@ public class StudentController(ICampusDbContext campusDbContext, IMapper mapper,
             return new ServerResponse().ErrorInternal(e);
         }
     } 
+    
+    [HttpPost("change-school")]
+    public async Task<IActionResult> ChangeSchool(ChangeSchoolReq req)
+    {
+        var db = campusDbContext.DbContext(_campus);  
+        try
+        {
+            var username = User.FindFirstValue(ClaimTypes.Name);
+            var student = await db.TblStudent.FirstOrDefaultAsync(x => x.StudentId == req.StudentId);
+            if (student == null) return new ServerResponse().NotFound("Student not found!");
+            
+            // old record handling
+            var oldStudentGroup = await db.TblStudentGroup
+                .Where(x => x.StudentId == req.StudentId)
+                .OrderByDescending(x => x.StudentGroupId)
+                .FirstOrDefaultAsync();
+            if(oldStudentGroup == null) return new ServerResponse().NotFound("Student group not found");
+            await db.Database.ExecuteSqlInterpolatedAsync($@"
+                INSERT INTO STUDENT_GROUP_HISTORY
+                (
+                    STUDENT_GROUP_ID,
+                    STUDENT_ID,
+                    TERM_NO,
+                    GROUP_ID,
+                    CHANGE_DATE,
+                    USERNAME
+                )
+                SELECT
+                    STUDENT_GROUP_ID,
+                    STUDENT_ID,
+                    TERM_NO,
+                    GROUP_ID,
+                    GETDATE(),
+                    {username}
+                FROM STUDENT_GROUP
+                WHERE STUDENT_GROUP_ID =
+             {oldStudentGroup.StudentGroupId}
+            ");
+            
+            // Update current group
+            await db.Database.ExecuteSqlInterpolatedAsync($@"
+                UPDATE STUDENT_GROUP
+                SET
+                    TERM_NO = {req.TermNo},
+                    GROUP_ID = {req.GroupId}
+                WHERE STUDENT_GROUP_ID =
+               {oldStudentGroup.StudentGroupId}
+            ");
+            
+            // update old record
+            if(req.FieldId > 0)
+            {
+                student.FieldId = req.FieldId;
+            }
+            student.Status = StudentStatusConstant.Active;
+            await db.SaveChangesAsync();
+            return new ServerResponse().Success(msg:"Student change school successfully!");
+        }
+        catch(Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
+        }
+    }
 }

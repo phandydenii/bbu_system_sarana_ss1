@@ -10,7 +10,7 @@ let currentStudentInfo = {
     promotionId:"",
     todayDate: ""
 };
-let isStudentDropdownDoneLoaded = false;
+let isStudentDropdownDoneLoaded = true;
 let needReloadStudentList = false;
 function resetStudentDetailModal() {
     currentStudentInfo = {
@@ -81,9 +81,9 @@ async function LoadStudentDetail(studId) {
     if (!studId) return;
     showLoading();
     $("#txtStudentId").val(studId); 
-    if (!isStudentDropdownDoneLoaded) {
+    if (isStudentDropdownDoneLoaded) {
         await BindData();
-        isStudentDropdownDoneLoaded = true;
+        isStudentDropdownDoneLoaded = false;
     }
     await getStudent(studId);
     await Promise.allSettled([
@@ -101,7 +101,7 @@ async function LoadStudentDetail(studId) {
     ]); 
     $('#student-history-tabs a:visible:first').tab('show');
     $('#frmStudent :input').prop('disabled', true);
-    hideLoading(1);
+    hideLoading(2);
 } 
 
 btnEdit.on("click", function (e) {
@@ -223,15 +223,15 @@ async function getStudent(student_id) {
                 $("#txtStage").val(stage.stageNo);
                 $("#txtTerm").val(term.termNo);
                 $("#txtStudyTime").val(group.studyTime);
-                $("#txtRoom").val(groupRoom.roomName); 
+                $("#txtRoom").val(groupRoom.roomName || ""); 
                 $("#student_StudentId").val(student.studentId);
-                $("#student_StudentName").val(`${student.studentName}`);
-                $("#student_StudentNameInKhmer").val(`${student.studentNameInKhmer}`);
-                $("#student_Sex").val(student.sex);
+                $("#student_StudentName").val(`${student.studentName || ""}`);
+                $("#student_StudentNameInKhmer").val(`${student.studentNameInKhmer || ""}`);
+                $("#student_Sex").val(student.sex || "");
                 $("#student_Phone").val(student.phone); 
                 $("#student_Email").val(student.email).trigger("change");
                 $("#student_Address").val(student.address).trigger("change");
-                $("#student_AddressInKhmer").val(student.addressInKhmer).trigger("change");
+                $("#student_AddressInKhmer").val(student.addressInKhmer || "").trigger("change");
                 $("#student_Note").val(student.note);
                 $("#student_CheckCompleteTerm").val(student.checkCompleteTerm);
                 $("#student_CheckComplete").val(student.checkComplete);
@@ -322,7 +322,7 @@ $(document).on("submit", "#frmSuppress", async function (e) {
             method: "POST",
             data: $("#frmSuppress").serialize()
         }); 
-        if (response.status.code === "200") {
+        if (response?.status?.code === "200") {
             needReloadStudentList = true;
             ShowToastSuccess(suppressId > 0 ? "Express saved successfully." : "Suppress saved successfully."); 
             $("#tblSuppress").DataTable().ajax.reload();
@@ -360,7 +360,7 @@ $(document).on("submit", "#modalSuspend", async function (e) {
             method: "POST",
             data: $("#frmSuspend").serialize()
         });
-        if (response.status.code === "200") {
+        if (response?.status?.code === "200") {
             needReloadStudentList = true;
             ShowToastSuccess("Suspend saved successfully.");
             setStudentStatus("SUSPEND"); 
@@ -398,7 +398,7 @@ $(document).on("submit", "#frmQuit", async function (e) {
             method: "POST",
             data: $("#frmQuit").serialize()
         });
-        if (response.status.code === "200") {
+        if (response?.status?.code === "200") {
             needReloadStudentList = true;
             setStudentStatus("QUIT");
             ShowToastSuccess("Quit saved successfully."); 
@@ -466,7 +466,7 @@ $(document).on("submit", "#frmChangeBranch", async function (e) {
             method: "POST",
             data: $("#frmChangeBranch").serialize()
         });
-        if (response.status.code === "200") {
+        if (response?.status?.code === "200") {
             needReloadStudentList = true;
             if (changeBranchId > 0){
                 ShowToastSuccess("Return change branch saved successfully.");  
@@ -567,7 +567,7 @@ $(document).on("submit", "#modalAdjustGroup", async function (e) {
             method: "POST",
             data: $("#frmAdjustGroup").serialize()
         });
-        if (response.status.code === "200") {
+        if (response?.status?.code === "200") {
             ShowToastSuccess("Adjust saved successfully.");
             await fetchStudentGroup(studentId);
             $("#modalAdjustGroup").modal("hide");
@@ -621,6 +621,68 @@ $(document).on("change", "#cboChangeFieldId", async function () {
         },
         "Select Group"
     );
+});
+$(document).on("submit", "#frmChangeSchool", async function (e) {
+    e.preventDefault();
+    const btn = $(this).find("button[type='submit']");
+    try {
+        // disable button
+        btn.prop("disabled", true);
+        const formData = {
+            StudentId: currentStudentInfo.studentId,
+            DegreeId: $("#cboChangeDegreeId").val(),
+            SchoolId: $("#cboChangeSchoolId").val(),
+            FieldId: $("#cboChangeFieldId").val(),
+            GroupId: $("#cboChangeGroupId").val(),
+            TermNo: $("#changeSchoolTermNo").val()
+        }; 
+        // validation
+        if(!formData.StudentId)
+        {
+            ShowToastWarning("Student not found");
+            return;
+        }
+        
+        if(!formData.GroupId)
+        {
+            ShowToastWarning("Please select group");
+            return;
+        }
+        
+        const response = await $.ajax({
+            url: "/student/change-school",
+            type: "POST",
+            data: formData
+        });
+
+        if(response?.status?.code === "200" )
+        {
+            ShowToastSuccess("Student school changed successfully");
+            $("#modalChangeSchool").modal("hide");
+            
+            // refresh student list/detail
+            if(typeof LoadStudentDetail === "function")
+            {
+                await LoadStudentDetail(formData.StudentId);
+            }
+            if(typeof table !== "undefined")
+            {
+                table.ajax.reload(null,false);
+            }
+        }
+        else
+        {
+            ShowToastError(response.message ?? "Change school failed");
+        }
+    }
+    catch(error)
+    {
+        ShowToastError(error.responseJSON?.message ?? "Something went wrong");
+    }
+    finally
+    {
+        btn.prop("disabled", false);
+    }
 });
 // endregion
 
@@ -1151,7 +1213,7 @@ frmStudent.on("submit", function (event) {
         method: 'PATCH',
         data: formData,
         success: function (response) {
-            if (response.status.code === "200") {
+            if (response?.status?.code === "200") {
                 ShowToastSuccess("Saved successfully!"); 
                 needReloadStudentList = true;
                 $("#studentDetailModal").modal("hide");

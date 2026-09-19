@@ -39,10 +39,7 @@ public class DisabilityController(ICampusDbContext campusDbContext, IMapper mapp
                     .OrderBy(x => x.DisabilityName)
                     .ToList();
 
-                return new ServerResponse().Success(
-                    disabilities,
-                    "Succeeded!"
-                );
+                return new ServerResponse().Success(disabilities, "Succeeded!");
             }
 
             // Disability DataTable request.

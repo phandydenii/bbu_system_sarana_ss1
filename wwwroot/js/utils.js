@@ -107,8 +107,7 @@ function toNum(value) {
     const num = parseFloat(value);
     return isNaN(num) ? 0 : num;
 }
-async function BindSelectOptions(url, cbo, key, val, requestData = { isAll: true }, placeholder = "Select"
-) {
+async function BindSelectOptions(url, cbo, key, val, requestData = { isAll: true }, placeholder = "Select") {
     const selectOptions = $(`#${cbo}`);
     try {
         selectOptions.empty();
@@ -118,12 +117,12 @@ async function BindSelectOptions(url, cbo, key, val, requestData = { isAll: true
             method: "POST",
             data: requestData
         });
-        if (response.status.code === "200" && response.data && response.data.length > 0) {
+        if (response?.status?.code === "200" && response?.data && response?.data.length > 0) {
             response.data.forEach(item => {
                 selectOptions.append(`<option value="${item[key]}">${item[val]}</option>`);
             });
         } else {
-            ShowToastError(response.responseText || "No data");
+            // ShowToastError(response.responseText || "No data");
         }
         selectOptions.val("").trigger("change");
     } catch (err) {
