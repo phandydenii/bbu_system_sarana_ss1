@@ -37,16 +37,30 @@ public class RegistryController(
         return View();
     }
 
-    [Route("create-new-student")]
-    public ActionResult Create()
+    [HttpGet("create-new-student")]
+    public IActionResult Create(bool modal = false)
     {
+        if (modal)
+        {
+            return PartialView(
+                "~/Views/Registry/_CreateRegistryModal.cshtml"
+            );
+        }
+
         return View();
     }
 
+
     [HttpGet("Details/{studentId}")]
-    public ActionResult Details(string? studentId)
+    public ActionResult Details(string? studentId, bool modal = false)
     {
+        if (string.IsNullOrWhiteSpace(studentId))
+        {
+            return BadRequest("Student ID is required.");
+        }
+
         var db = campusDbContext.DbContext(_campus);
+
         var listData = new ListData
         {
             Provinces = db.TblProvince.ToList(),
@@ -68,36 +82,77 @@ public class RegistryController(
             Certificates = db.TblCertificate.ToList(),
             Universities = db.TblUsersity.ToList()
         };
-        var registry = db.TblRegistry.FirstOrDefault(o => o.StudentId == studentId);
-        var student = db.TblStudent.FirstOrDefault(s => s.StudentId == studentId)!;
+
+        var registry = db.TblRegistry
+            .FirstOrDefault(x => x.StudentId == studentId);
+
+        var student = db.TblStudent
+            .FirstOrDefault(x => x.StudentId == studentId);
+
+        if (student == null || registry == null)
+        {
+            return NotFound("The student registry was not found.");
+        }
+
         var group = new Group();
         var groupRoom = new GroupRoom();
         var stage = new Stage();
         var promotion = new Promotion();
         var term = new Term();
         var extend = new Extend();
+
         School school;
         Degree degree;
-        var studentGroup = db.TblStudentGroup.OrderByDescending(t => t.StudentGroupId)
-            .FirstOrDefault(g => g.StudentId == studentId);
-        var field = db.TblField.FirstOrDefault(f => f.FieldId == student.FieldId)!;
+
+        var studentGroup = db.TblStudentGroup
+            .OrderByDescending(x => x.StudentGroupId)
+            .FirstOrDefault(x => x.StudentId == studentId);
+
+        var field = db.TblField
+            .FirstOrDefault(x => x.FieldId == student.FieldId)!;
+
         if (studentGroup != null)
         {
-            group = db.TblGroup.FirstOrDefault(i => i.GroupId == studentGroup.GroupId)!;
-            groupRoom = db.TblGroupRoom.FirstOrDefault(i =>
-                i.GroupId == group.GroupId && i.TermNo == studentGroup.TermNo)!;
-            stage = db.TblStage.FirstOrDefault(g => g.StageId == group.StageId)!;
-            promotion = db.TblPromotion.FirstOrDefault(p => p.PromotionId == stage.PromotionId)!;
-            term = db.TblTerm.FirstOrDefault(t => t.StageId == stage.StageId && t.TermNo == studentGroup.TermNo)!;
-            extend = db.TblExtend.FirstOrDefault(x => x.StudentId == studentId)!;
+            group = db.TblGroup
+                .FirstOrDefault(x => x.GroupId == studentGroup.GroupId)!;
 
-            school = db.TblSchool.FirstOrDefault(s => s.SchoolId == promotion.SchoolId)!;
-            degree = db.TblDegree.FirstOrDefault(d => d.DegreeId == promotion.DegreeId)!;
+            groupRoom = db.TblGroupRoom
+                .FirstOrDefault(x =>
+                    x.GroupId == group.GroupId &&
+                    x.TermNo == studentGroup.TermNo)!;
+
+            stage = db.TblStage
+                .FirstOrDefault(x => x.StageId == group.StageId)!;
+
+            promotion = db.TblPromotion
+                .FirstOrDefault(x =>
+                    x.PromotionId == stage.PromotionId)!;
+
+            term = db.TblTerm
+                .FirstOrDefault(x =>
+                    x.StageId == stage.StageId &&
+                    x.TermNo == studentGroup.TermNo)!;
+
+            extend = db.TblExtend
+                .FirstOrDefault(x => x.StudentId == studentId)!;
+
+            school = db.TblSchool
+                .FirstOrDefault(x =>
+                    x.SchoolId == promotion.SchoolId)!;
+
+            degree = db.TblDegree
+                .FirstOrDefault(x =>
+                    x.DegreeId == promotion.DegreeId)!;
         }
         else
         {
-            school = db.TblSchool.FirstOrDefault(s => s.SchoolId == registry!.SchoolId)!;
-            degree = db.TblDegree.FirstOrDefault(d => d.DegreeId == registry!.DegreeId)!;
+            school = db.TblSchool
+                .FirstOrDefault(x =>
+                    x.SchoolId == registry.SchoolId)!;
+
+            degree = db.TblDegree
+                .FirstOrDefault(x =>
+                    x.DegreeId == registry.DegreeId)!;
         }
 
         var studentView = new StudentViewModel
@@ -113,16 +168,31 @@ public class RegistryController(
             Group = group,
             GroupRoom = groupRoom,
             Extend = extend,
-            ContactPerson = db.TblContactPerson.FirstOrDefault(x => x.ContactPersonId == student.ContactPersonId),
-            StudentCertificates = db.TblStudentCertificate.Where(x => x.StudentId == studentId).ToList(),
-            Schoolarships = db.TblScholarship.Where(x => x.StudentId == studentId).ToList()
+            ContactPerson = db.TblContactPerson
+                .FirstOrDefault(x =>
+                    x.ContactPersonId == student.ContactPersonId),
+            StudentCertificates = db.TblStudentCertificate
+                .Where(x => x.StudentId == studentId)
+                .ToList(),
+            Schoolarships = db.TblScholarship
+                .Where(x => x.StudentId == studentId)
+                .ToList()
         };
-        return View(new RegisryDetailViewModel
+
+        var viewModel = new RegisryDetailViewModel
         {
             ListData = listData,
             StudentView = studentView
-        });
+        };
+
+        if (modal)
+        {
+            return PartialView("_RegistryDetailsModal", viewModel);
+        }
+
+        return View(viewModel);
     }
+
 
     [HttpPost("GetStudentRegistryList")]
     public IActionResult GetStudentRegistryList(
