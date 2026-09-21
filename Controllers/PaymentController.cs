@@ -18,36 +18,86 @@ public class PaymentController(ICampusDbContext campusDbContext, IHttpContextAcc
 
     [Route("all-student-payment")]
     // GET: /<controller>/
+    [HttpGet("")]
+    [HttpGet("all-student-payment")]
     public async Task<IActionResult> Index()
     {
         var db = campusDbContext.DbContext(_campus);
-        
-        var students = await (from s in db.TblStudent
-            select new StudentSearch
+
+        var students = await db.TblStudent
+            .AsNoTracking()
+            .OrderByDescending(s => s.StudentId)
+            .Take(500)
+            .Select(s => new StudentSearch
             {
                 StudentId = s.StudentId,
                 StudentName = s.StudentName,
                 StudentNameInKhmer = s.StudentNameInKhmer
-            }).OrderByDescending(x => x.StudentId).Take(500).ToListAsync();
+            })
+            .ToListAsync();
 
-        var viewmodel = new ListData
+        return View(new ListData
         {
             StudentSearches = students
-        };
-        return View(viewmodel);
+        });
     }
 
-    [Route("create-student-payment")]
-    public IActionResult Create()
+    [HttpGet("create-student-payment")]
+    public IActionResult Create([FromQuery] string? studentId)
     {
-        var db = campusDbContext.DbContext(_campus);
-        ViewData["StudentStatusBadgeClasses"] = StudentStatusConstant.BadgeClasses;
-        ViewData["StudentStatusDefaultBadgeClass"] = StudentStatusConstant.DefaultBadgeClass;
-        var viewmodel = new PaymentViewModel
+        // Redirect an old sidebar link to Payment Index.
+        if (string.IsNullOrWhiteSpace(studentId))
         {
-            Products = db.TblProduct.ToList()
+            return RedirectToAction(nameof(Index));
+        }
+
+        var db = campusDbContext.DbContext(_campus);
+
+        ViewData["StudentStatusBadgeClasses"] =
+            StudentStatusConstant.BadgeClasses;
+
+        ViewData["StudentStatusDefaultBadgeClass"] =
+            StudentStatusConstant.DefaultBadgeClass;
+
+        ViewBag.SelectedStudentId = studentId.Trim();
+
+        return View(new PaymentViewModel
+        {
+            Products = db.TblProduct
+                .AsNoTracking()
+                .ToList()
+        });
+    }
+    [HttpGet("create-student-payment-modal")]
+    public IActionResult CreatePaymentModal(
+        [FromQuery] string? studentId)
+    {
+        if (string.IsNullOrWhiteSpace(studentId))
+        {
+            return BadRequest("Student ID is required.");
+        }
+
+        var db = campusDbContext.DbContext(_campus);
+
+        ViewData["StudentStatusBadgeClasses"] =
+            StudentStatusConstant.BadgeClasses;
+
+        ViewData["StudentStatusDefaultBadgeClass"] =
+            StudentStatusConstant.DefaultBadgeClass;
+
+        ViewBag.SelectedStudentId = studentId.Trim();
+
+        var viewModel = new PaymentViewModel
+        {
+            Products = db.TblProduct
+                .AsNoTracking()
+                .ToList()
         };
-        return View(viewmodel);
+
+        return PartialView(
+            "~/Views/Payment/_CreatePaymentModal.cshtml",
+            viewModel
+        );
     }
 
     [HttpGet("student/{studentId}")]

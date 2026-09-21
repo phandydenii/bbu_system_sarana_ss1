@@ -1,47 +1,164 @@
-﻿<div class="modal fade" id="ProductModal" data-backdrop="static">
-    <div class="modal-dialog modal-lg">
+﻿<style>
+    #ProductModal .modal-dialog {
+        max-width: 1000px;
+    }
+
+    #ProductModal .selected-products-panel {
+        border: 1px solid #cfe2ff;
+        border-radius: .35rem;
+        background: #f8fbff;
+    }
+
+    #ProductModal .selected-products-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: .6rem .75rem;
+        border-bottom: 1px solid #dce8f5;
+        font-weight: 600;
+    }
+
+    #ProductModal .selected-products-list {
+        max-height: 170px;
+        overflow-y: auto;
+        padding: .5rem .75rem;
+    }
+
+    #ProductModal .selected-product-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: .45rem 0;
+        border-bottom: 1px solid #e7edf3;
+    }
+
+    #ProductModal .selected-product-row:last-child {
+        border-bottom: 0;
+    }
+
+    #ProductModal .selected-product-name {
+        min-width: 0;
+        font-weight: 600;
+    }
+
+    #ProductModal .selected-product-price {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: .35rem;
+    }
+
+    #ProductModal .selected-products-empty {
+        padding: .8rem;
+        color: #6c757d;
+        text-align: center;
+    }
+
+    #ProductModal #tblProduct {
+        width: 100% !important;
+    }
+
+    #ProductModal #tblProduct th,
+    #ProductModal #tblProduct td {
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    #ProductModal .hide-col {
+        display: none !important;
+    }
+</style>
+
+<div class="modal fade"
+     id="ProductModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="ProductModalTitle"
+     aria-hidden="true"
+     data-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Product</h4>
-            </div>
-            <div class="modal-body">
-                <div class="select2-primary mb-4" data-select2-id="51">
-                    <select id="stateSelect" class="select2 select2-hidden-accessible" multiple=""
-                            data-placeholder="Select a State" data-dropdown-css-class="select2-purple"
-                            style="width: 100%;" data-select2-id="15" tabindex="-1" aria-hidden="true">
-                    </select>
-                </div>
-                <table id="tblProduct" class="table table-sm table-bordered table-striped" style="width: 100%;">
-                    <thead>
-                    <tr>
-                        <th data-name="product_id">id</th>
-                        <th data-name="product_name" style="width: 60%;">item_name</th>
-                        <th data-name="product_name_khmer" class="hide-col">name khmer</th>
-                        <th data-name="price_khr">price_khr</th>
-                        <th data-name="price">price_usd</th>
-                        <th data-name="degree" class="hide-col">degree</th>
-                        <th data-name="vat" class="hide-col">vat</th>
-                        <th data-name="type" class="hide-col">type</th>
-                        <th data-name="category_id" class="hide-col">category_id</th>
-                        <th data-name="card" class="hide-col">card</th>
-                        <th data-name="fee" class="hide-col">fee</th>
-                        <th data-name="status" class="hide-col">status</th>
-                        <th data-name="action">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="btnAssignProduct" class="btn btn-success"><i class="fas fa-check"></i> Assign
+                <h4 class="modal-title" id="ProductModalTitle">
+                    <i class="fas fa-boxes mr-2"></i>
+                    Product
+                </h4>
+                <button type="button"
+                        class="close"
+                        id="btnCloseProductHeader"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
                 </button>
-                <button type="button" id="btnCloseProduct" class="btn btn-danger float-right"><i
-                        class="fas fa-close"></i> Close
+            </div>
+
+            <div class="modal-body">
+                <div id="selectedProductsPanel"
+                     class="selected-products-panel mb-3">
+                    <div class="selected-products-header">
+                        <span>
+                            <i class="fas fa-check-circle text-success mr-1"></i>
+                            Selected Items
+                        </span>
+                        <span id="selectedProductsCount"
+                              class="badge badge-primary">0</span>
+                    </div>
+
+                    <div id="selectedProductsEmpty"
+                         class="selected-products-empty">
+                        No item selected. Click <strong>Select</strong> below.
+                    </div>
+
+                    <div id="selectedProductsList"
+                         class="selected-products-list d-none"></div>
+                </div>
+
+                <select id="stateSelect"
+                        name="selectedProductIds"
+                        multiple
+                        hidden></select>
+
+                <div class="table-responsive">
+                    <table id="tblProduct"
+                           class="table table-sm table-bordered table-striped"
+                           style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>item_name</th>
+                            <th class="hide-col">item_name_khmer</th>
+                            <th>price_khr</th>
+                            <th>price_usd</th>
+                            <th class="hide-col">degree_id</th>
+                            <th class="hide-col">vat</th>
+                            <th class="hide-col">type</th>
+                            <th class="hide-col">category_id</th>
+                            <th class="hide-col">card_certificate</th>
+                            <th class="hide-col">tuition_fees</th>
+                            <th class="hide-col">status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        id="btnAssignProduct"
+                        class="btn btn-success"
+                        disabled>
+                    <i class="fas fa-check mr-1"></i>
+                    Assign
+                </button>
+                <button type="button"
+                        id="btnCloseProduct"
+                        class="btn btn-danger">
+                    <i class="fas fa-times mr-1"></i>
+                    Close
                 </button>
             </div>
         </div>
     </div>
 </div>
-<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
-<script src="/AdminLTE/plugins/select2/js/select2.full.min.js"></script>

@@ -79,8 +79,10 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a asp-controller="payment" asp-action="create"
-                                   class="nav-link @(ViewData["Action"] as string == "Create" ? "active" : "")">
+                                <a href="/payment/all-student-payment"
+                                   class="nav-link @(ViewData["Action"]?.ToString() == "Payment"
+                                                       ? "active"
+                                                       : "")">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>@Localizer["Payment"]</p>
                                 </a>

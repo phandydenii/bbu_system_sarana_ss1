@@ -1,30 +1,100 @@
-﻿@using BBU_SYSTEM.DTOs
+﻿@model BBU_SYSTEM.ViewModel.ListData
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Student Payment";
     ViewData["TitleContent"] = "Student Payment";
     ViewData["Controller"] = "Payment";
+    ViewData["OpenMenu"] = "Administration";
     ViewData["Action"] = "Payment";
-
-    InvoiceDto invoice;
 }
+
+<style>
+    #tblStudent {
+        width: 100% !important;
+        min-width: 950px;
+    }
+
+    #tblStudent th,
+    #tblStudent td {
+        vertical-align: middle !important;
+        white-space: nowrap;
+    }
+
+    #tblStudent .dt-status-col,
+    #tblStudent .dt-action-col {
+        text-align: center !important;
+    }
+
+    #tblPaymentStudentPicker {
+        width: 100% !important;
+        min-width: 760px;
+    }
+
+    #tblPaymentStudentPicker th,
+    #tblPaymentStudentPicker td {
+        vertical-align: middle !important;
+        white-space: nowrap;
+    }
+
+    #tblPaymentStudentPicker .dt-picker-status-col,
+    #tblPaymentStudentPicker .dt-picker-action-col {
+        text-align: center !important;
+    }
+
+    .payment-table-scroll {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    #tblStudent_wrapper,
+    #tblStudent_wrapper .dataTables_scroll,
+    #tblStudent_wrapper .dataTables_scrollHead,
+    #tblStudent_wrapper .dataTables_scrollBody {
+        width: 100% !important;
+    }
+
+    .payment-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .payment-status-badge {
+        display: inline-block;
+        min-width: 70px;
+        padding: 5px 8px;
+        text-align: center;
+    }
+
+    @@media (max-width: 767.98px) {
+        .payment-toolbar {
+            justify-content: stretch;
+        }
+
+        .payment-toolbar .btn {
+            width: 100%;
+        }
+    }
+</style>
 
 <div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Payment</h3>
-                <button type="submit" class="btn btn-success btn-sm float-right" data-toggle="modal"
-                        data-target="#PaymentModal">
-                    <i class="fas fa-plus"></i>
-                    New Payment
-                </button>
-                <a asp-action="Create" asp-controller="Payment" class="btn btn-primary btn-sm float-right">
-                    <i class="fas fa-plus"></i>
-                    New Payment
-                </a>
+                <div class="payment-toolbar">
+                    <button type="button"
+                            id="btnOpenPaymentStudentPicker"
+                            class="btn btn-success">
+                        <i class="fas fa-plus mr-1"></i>
+                        New Payment
+                    </button>
+                </div>
             </div>
-            <div class="card-body">
-                <table id="tblStudent" class="table table-bordered table-striped" style="width: 100%;">
+
+            <div class="card-body payment-table-scroll">
+                <table id="tblStudent"
+                       class="table table-sm table-bordered table-striped"
+                       style="width: 100%;">
                     <thead>
                     <tr>
                         <th>Student Id</th>
@@ -37,123 +107,527 @@
                         <th>Action</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
-<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
-<partial name="_PaymentModal"/>
-<partial name="_ValidationScriptsPartial"/>
 
-<script>
+<div class="modal fade"
+     id="PaymentStudentPickerModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="PaymentStudentPickerTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="PaymentStudentPickerTitle">
+                    <i class="fas fa-user-check mr-2"></i>
+                    Select Student
+                </h4>
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table id="tblPaymentStudentPicker"
+                           class="table table-sm table-bordered table-striped"
+                           style="width: 100%;">
+                        <thead>
+                        <tr>
+                            <th>Student Id</th>
+                            <th>Name English</th>
+                            <th>Name Khmer</th>
+                            <th>Gender</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Select</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-danger"
+                        data-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i>
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="createPaymentModalHost"></div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/Alert.js"></script>
+    <script src="~/function/Product.js"></script>
+
+    <script>
+    // Keep the jQuery instance that already owns Bootstrap and DataTables.
+    // Some older modal partials load jquery.min.js again and replace it.
+    window.paymentPageJQuery = window.paymentPageJQuery || window.jQuery;
+
+    let paymentModalRequest = null;
+
     $(document).ready(function () {
         fetchStudent();
     });
 
-    function fetchStudent() {
-        $("#tblStudent").DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "/student/academic/studentlist", // Endpoint to fetch paginated data
-                type: "POST"
-            },
-            columns: [
-                {data: "student_id"},
-                {data: "student_name"},
-                {data: "student_name_in_khmer"},
-                {data: "sex"},
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        const dt = formatDate(row.date_of_birth);
-                        return `${dt}`
-                    }
-                },
-                {data: "phone"},
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        if (row.status === "REGISTER") {
-                            return ` <span class="badge badge-warning">${row.status}</span>`;
-                        } else if (row.status === "ACTIVE") {
-                            return ` <span class="badge badge-primary">${row.status}</span>`;
-                        } else if (row.status === "QUIT") {
-                            return ` <span class="badge badge-danger">${row.status}</span>`;
+    $(document)
+        .off("click.openPaymentStudentPicker", "#btnOpenPaymentStudentPicker")
+        .on("click.openPaymentStudentPicker", "#btnOpenPaymentStudentPicker", function () {
+            openPaymentStudentPicker();
+        })
+        .off("click.selectPaymentStudent", ".js-select-payment-student")
+        .on("click.selectPaymentStudent", ".js-select-payment-student", function () {
+            const button = $(this);
+            const studentId = String(button.attr("data-student-id") || "").trim();
+
+            if (!studentId) {
+                showPaymentError("The selected student ID is missing.");
+                return;
+            }
+
+            $("#PaymentStudentPickerModal")
+                .one("hidden.bs.modal.openPayment", function () {
+                    openCreatePaymentModal(studentId, button);
+                })
+                .modal("hide");
+        });
+
+    $(document)
+        .off("click.openPaymentModal", ".js-open-payment-modal")
+        .on("click.openPaymentModal", ".js-open-payment-modal", function () {
+            const button = $(this);
+            const studentId = String(button.attr("data-student-id") || "").trim();
+
+            openCreatePaymentModal(studentId, button);
+        });
+
+    function openCreatePaymentModal(studentId, button) {
+            const triggerButton = button && button.length ? button : $();
+
+            if (!studentId) {
+                showPaymentError("Please select a student first.");
+                return;
+            }
+
+            // Only one modal request may run at a time. This prevents several
+            // rows from remaining in the Loading state after repeated clicks.
+            if (paymentModalRequest && paymentModalRequest.readyState !== 4) {
+                return;
+            }
+
+            if (triggerButton.length) {
+                setPaymentButtonLoading(triggerButton, true);
+            }
+
+            paymentModalRequest = $.ajax({
+                url: "/payment/create-student-payment-modal",
+                type: "GET",
+                cache: false,
+                timeout: 20000,
+                data: {
+                    studentId: studentId
+                }
+            })
+                .done(function (html) {
+                    try {
+                        if (!html || !String(html).trim()) {
+                            throw new Error("The server returned an empty payment form.");
                         }
 
+                        const host = $("#createPaymentModalHost");
+                        host.empty();
+
+                        // The returned partial contains its own initialization
+                        // script, so insertion may throw a JavaScript error.
+                        host.html(html);
+
+                        // Restore the page instance if an older nested partial
+                        // loaded another copy of jQuery during insertion.
+                        if (window.paymentPageJQuery) {
+                            window.jQuery = window.paymentPageJQuery;
+                            window.$ = window.paymentPageJQuery;
+                        }
+
+                        const modal = host.find("#CreateStudentPaymentModal");
+
+                        if (!modal.length) {
+                            throw new Error("The payment modal was not returned by the server.");
+                        }
+
+                        modal.modal({
+                            backdrop: "static",
+                            keyboard: false,
+                            show: true
+                        });
+                    } catch (error) {
+                        console.error("Payment modal initialization error:", error);
+                        $("#createPaymentModalHost").empty();
+                        showPaymentError(
+                            error?.message || "Unable to initialize the payment form."
+                        );
+                    }
+                })
+                .fail(function (xhr, textStatus, errorThrown) {
+                    console.error(
+                        "Cannot load payment modal:",
+                        xhr.status,
+                        textStatus,
+                        errorThrown,
+                        xhr.responseText
+                    );
+
+                    const timedOut = textStatus === "timeout";
+
+                    showPaymentError(
+                        xhr.responseJSON?.status?.message ||
+                        xhr.responseJSON?.message ||
+                        (timedOut
+                            ? "The payment form took too long to load. Please try again."
+                            : "") ||
+                        "Unable to load the payment form."
+                    );
+                })
+                .always(function () {
+                    if (triggerButton.length) {
+                        setPaymentButtonLoading(triggerButton, false);
+                    }
+
+                    paymentModalRequest = null;
+                });
+    }
+
+    function openPaymentStudentPicker() {
+        const picker = $("#PaymentStudentPickerModal");
+        const tableSelector = "#tblPaymentStudentPicker";
+
+        if (!$.fn.DataTable.isDataTable(tableSelector)) {
+            $(tableSelector).DataTable({
+                processing: true,
+                serverSide: true,
+                paging: true,
+                pageLength: 10,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: false,
+                autoWidth: false,
+                searchDelay: 500,
+                ajax: {
+                    url: "/student/academic/student-list/all",
+                    type: "POST",
+                    dataSrc: function (json) {
+                        return json.data || [];
+                    },
+                    error: function (xhr) {
+                        console.error(
+                            "Cannot load students for payment:",
+                            xhr.status,
+                            xhr.responseText
+                        );
+                        showPaymentError("Cannot load the student list.");
+                    }
+                },
+                columns: [
+                    { data: "studentId", defaultContent: "" },
+                    { data: "studentName", defaultContent: "" },
+                    { data: "studentNameInKhmer", defaultContent: "" },
+                    { data: "sex", defaultContent: "" },
+                    { data: "phone", defaultContent: "" },
+                    {
+                        data: "status",
+                        defaultContent: "",
+                        className: "dt-picker-status-col",
+                        render: function (data, type) {
+                            return renderPaymentStatus(data, type);
+                        }
+                    },
+                    {
+                        data: "studentId",
+                        orderable: false,
+                        searchable: false,
+                        className: "dt-picker-action-col",
+                        render: function (studentId) {
+                            const normalizedId = String(studentId || "").trim();
+
+                            if (!normalizedId) {
+                                return "";
+                            }
+
+                            return `
+                                <button type="button"
+                                        class="btn btn-primary btn-sm js-select-payment-student"
+                                        data-student-id="${escapePaymentHtml(normalizedId)}">
+                                    <i class="fas fa-check mr-1"></i>
+                                    Select
+                                </button>
+                            `;
+                        }
+                    }
+                ],
+                columnDefs: [
+                    { targets: 0, width: "110px" },
+                    { targets: 3, width: "90px" },
+                    { targets: 5, width: "100px" },
+                    { targets: 6, width: "100px" }
+                ],
+                initComplete: function () {
+                    this.api().columns.adjust();
+
+                    if (window.MyApp?.utils?.dataTableDebounceSearch) {
+                        MyApp.utils.dataTableDebounceSearch(tableSelector, 500);
+                    }
+                }
+            });
+        } else {
+            $(tableSelector).DataTable().ajax.reload(null, false);
+        }
+
+        picker
+            .off("shown.bs.modal.paymentStudentPicker")
+            .on("shown.bs.modal.paymentStudentPicker", function () {
+                $(tableSelector).DataTable().columns.adjust();
+            })
+            .modal("show");
+    }
+
+    function setPaymentButtonLoading(button, isLoading) {
+        if (isLoading) {
+            button.data("payment-original-html", button.html());
+            button
+                .prop("disabled", true)
+                .attr("aria-busy", "true")
+                .html('<i class="fas fa-spinner fa-spin mr-1"></i>Loading...');
+            return;
+        }
+
+        const originalHtml = button.data("payment-original-html");
+
+        button
+            .prop("disabled", false)
+            .removeAttr("aria-busy")
+            .html(
+                originalHtml ||
+                '<i class="fas fa-dollar-sign mr-1"></i>Payment'
+            );
+
+        button.removeData("payment-original-html");
+    }
+
+    function fetchStudent() {
+        const tblStudent = $("#tblStudent");
+
+        if ($.fn.DataTable.isDataTable("#tblStudent")) {
+            tblStudent.DataTable().clear().destroy();
+        }
+
+        tblStudent.DataTable({
+            processing: true,
+            serverSide: true,
+            paging: true,
+            pageLength: 10,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: false,
+            autoWidth: true,
+            scrollX: false,
+            scrollCollapse: false,
+            searchDelay: 500,
+
+            ajax: {
+                url: "/student/academic/student-list/all",
+                type: "POST",
+                dataSrc: function (json) {
+                    return json.data || [];
+                },
+                error: function (xhr) {
+                    console.error(
+                        "Cannot load payment students:",
+                        xhr.status,
+                        xhr.responseText
+                    );
+
+                    showPaymentError("Cannot load student payment data.");
+                }
+            },
+
+            columns: [
+                {
+                    data: "studentId",
+                    defaultContent: ""
+                },
+                {
+                    data: "studentName",
+                    defaultContent: ""
+                },
+                {
+                    data: "studentNameInKhmer",
+                    defaultContent: "",
+                    render: function (data) {
+                        return data || "";
+                    }
+                },
+                {
+                    data: "sex",
+                    defaultContent: ""
+                },
+                {
+                    data: "dateOfBirth",
+                    defaultContent: "",
+                    render: function (data, type) {
+                        if (type !== "display") {
+                            return data || "";
+                        }
+
+                        return formatPaymentDate(data);
+                    }
+                },
+                {
+                    data: "phone",
+                    defaultContent: ""
+                },
+                {
+                    data: "status",
+                    defaultContent: "",
+                    className: "dt-status-col",
+                    render: function (data, type) {
+                        return renderPaymentStatus(data, type);
                     }
                 },
                 {
                     data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: "dt-action-col",
                     render: function (data, type, row) {
-                        return `<a href="/payment/student/${row.student_id}" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0">Edit</a>`;
-                    }
+                        const studentId = String(row.studentId || "").trim();
 
+                        if (!studentId) {
+                            return "";
+                        }
+
+                        return `
+                            <button type="button"
+                                    class="btn btn-success btn-sm js-open-payment-modal"
+                                    data-student-id="${escapePaymentHtml(studentId)}">
+                                <i class="fas fa-dollar-sign mr-1"></i>
+                                Payment
+                            </button>
+                        `;
+                    }
                 }
-            ]
+            ],
+
+            columnDefs: [
+                { targets: 0, width: "110px" },
+                { targets: 3, width: "90px" },
+                { targets: 4, width: "110px" },
+                { targets: 6, width: "100px" },
+                { targets: 7, width: "110px" }
+            ],
+
+            initComplete: function () {
+                this.api().columns.adjust();
+
+                if (window.MyApp?.utils?.dataTableDebounceSearch) {
+                    MyApp.utils.dataTableDebounceSearch("#tblStudent", 500);
+                }
+            }
         });
     }
 
-    function fetchStudent1() {
-        $("#tblPayment").DataTable().clear().destroy();
-        $("#tblPayment").DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "/payment/getinvoicelist",
-                type: "POST",
-            },
-            columns: [
-                {data: "@nameof(invoice.InvoiceId)"},
-                {data: "@nameof(invoice.InvoiceNo)"},
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        const dt = formatDate(row.invoice_date);
-                        return `${dt}`
-                    }
-                },
-                {data: "student_id"},
-                {data: "student_name"},
-                {data: "degree_id"},
-                {data: "school_id"},
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        if (row.status === "REGISTER") {
-                            return `<span class="badge badge-warning">${row.status}</span>`;
-                        } else if (row.status === "ACTIVE") {
-                            return `<span class="badge badge-primary">${row.status}</span>`;
-                        } else if (row.status === "QUIT") {
-                            return `<span class="badge badge-danger">${row.status}</span>`;
-                        } else {
-                            return `<span class="badge badge-secondary">${row.status}</span>`; // fallback for unknown statuses
-                        }
-                    }
-                },
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        return `
-                                    <div class="input-group-prepend">
-                                        <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
-                                            Action
-                                        </button>
-                                        <div class="dropdown-menu" style="min-width: 8rem;">
-                                            <div class="col-md-12">
-                                                <a href="/registry/details/${row.student_id}" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0rem">Edit</a>
-                                                <a href="/academic/details?student_id=${row.student_id}" class="btn btn-warning btn-sm" style="display: block;margin:.2rem 0rem">View</a>
-                                                <a class="btn btn-danger btn-sm" style="display: block;margin:.2rem 0rem">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    `;
-                    }
-                }
-            ]
-        });
-    }</script>
+    function formatPaymentDate(value) {
+        if (!value) {
+            return "";
+        }
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return value;
+        }
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+    }
+
+    function renderPaymentStatus(value, type) {
+        const status = String(value || "").trim();
+        const normalizedStatus = status.toUpperCase();
+
+        if (type !== "display") {
+            return status;
+        }
+
+        let badgeClass = "badge-secondary";
+
+        if (normalizedStatus === "ACTIVE") {
+            badgeClass = "badge-success";
+        } else if (
+            normalizedStatus === "REGISTER" ||
+            normalizedStatus === "SUSPEND" ||
+            normalizedStatus === "SUSPENDED"
+        ) {
+            badgeClass = "badge-warning";
+        } else if (
+            normalizedStatus === "QUIT" ||
+            normalizedStatus === "SUPPRESS" ||
+            normalizedStatus === "INACTIVE"
+        ) {
+            badgeClass = "badge-danger";
+        }
+
+        return `
+            <span class="badge ${badgeClass} payment-status-badge">
+                ${escapePaymentHtml(status || "N/A")}
+            </span>
+        `;
+    }
+
+    function escapePaymentHtml(value) {
+        return $("<div>").text(value ?? "").html();
+    }
+
+    function showPaymentError(message) {
+        if (typeof ShowToastError === "function") {
+            ShowToastError(message);
+        } else if (window.toastr?.error) {
+            window.toastr.error(message);
+        } else {
+            alert(message);
+        }
+    }
+
+    $(window).on("resize.paymentStudents", function () {
+        if ($.fn.DataTable.isDataTable("#tblStudent")) {
+            $("#tblStudent").DataTable().columns.adjust();
+        }
+
+        if ($.fn.DataTable.isDataTable("#tblPaymentStudentPicker")) {
+            $("#tblPaymentStudentPicker").DataTable().columns.adjust();
+        }
+    });
+    </script>
+}
