@@ -1,7 +1,6 @@
 @using BBU_SYSTEM.ViewModel
-
 @{
-var req = new AssignGroupViewModel();
+    var req = new AssignGroupViewModel();
 }
 
 <div id="specialize_formRoot" class="row">
@@ -301,36 +300,15 @@ var req = new AssignGroupViewModel();
                         year: academicYear
                     }
                 });
-
-                const schools = getItems(response).filter(function (item) {
-                    const isFoundation =
-                        item.isFoundationSchool ??
-                        item.IsFoundationSchool;
-
-                    return Number(isFoundation) === 1;
-                });
-
+                
+                const schools = response.data;
                 if (schools.length === 0) {
-                    resetSelect(
-                        cboSchool,
-                        `No school available for ${academicYear}-${academicYear + 1}`
-                    );
-
+                    resetSelect(cboSchool, `No school available for ${academicYear}-${academicYear + 1}`);
                     return;
                 }
 
                 schools.forEach(function (item) {
-                    const schoolId =
-                        item.schoolId ?? item.SchoolId;
-
-                    const schoolName =
-                        item.schoolName ??
-                        item.SchoolName ??
-                        "";
-
-                    cboSchool.append(
-                        `<option value="${schoolId}">${schoolName}</option>`
-                    );
+                    cboSchool.append(`<option value="${item.schoolId}">${item.schoolName}</option>`);
                 });
 
                 // Refresh Select2 after adding the options.

@@ -534,20 +534,16 @@ var req = new AssignGroupViewModel();
                 });
 
                 const students = getItems(response);
-
-                console.log("Foundation student response:", response);
-                console.log("Foundation students:", students);
-
+                
                 dtStudent.clear();
                 dtStudent.rows.add(students);
                 dtStudent.draw();
 
                 if (students.length === 0) {
-                    ShowToastError("No students matched the selected filters.");
+                    ShowToastInfo("No students matched the selected filters.");
                 }
             } catch (xhr) {
                 dtStudent.clear().draw();
-
                 ShowToastError(
                     xhr.responseJSON?.message ||
                     xhr.responseJSON?.status?.message ||
@@ -588,7 +584,7 @@ var req = new AssignGroupViewModel();
             event.preventDefault();
 
             if (!hasFilterValues()) {
-                ShowToastError("Please select all required filters.");
+                ShowToastInfo("Please select all required filters.");
                 return;
             }
 
@@ -649,12 +645,12 @@ var req = new AssignGroupViewModel();
             const studentIds = Array.from(selectedStudentIds);
 
             if (!groupId) {
-                ShowToastError("Please select a group.");
+                ShowToastInfo("Please select a group.");
                 return;
             }
 
             if (studentIds.length === 0) {
-                ShowToastError("Please select at least one student.");
+                ShowToastInfo("Please select at least one student.");
                 return;
             }
 

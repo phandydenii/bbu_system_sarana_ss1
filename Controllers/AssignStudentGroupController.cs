@@ -1,8 +1,8 @@
+using BBU_SYSTEM.Data;
 using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Repository;
 using BBU_SYSTEM.ViewModel;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +11,9 @@ namespace BBU_SYSTEM.Controllers;
 
 [Authorize]
 [Route("assign-student-group")]
-public class AssignStudentGroupController(
-    ICampusDbContext campusDbContext,
-    IHttpContextAccessor context) : Controller
+public class AssignStudentGroupController(ICampusDbContext campusDbContext, IHttpContextAccessor context) : Controller
 {
-    private readonly string _campus =
-        context.HttpContext?.User.FindFirst("CampusKey")?.Value ?? "pp";
+    private readonly string _campus = context.HttpContext?.User.FindFirst("CampusKey")?.Value ?? "pp";
 
     [HttpGet("")]
     public IActionResult Index()
@@ -25,8 +22,7 @@ public class AssignStudentGroupController(
     }
 
     [HttpPost("get-students-registry-foundation")]
-    public async Task<IActionResult> GetStudentsRegistryFoundation(
-        [FromForm] AssignGroupViewModel req)
+    public async Task<IActionResult> GetStudentsRegistryFoundation([FromForm] AssignGroupViewModel req)
     {
         try
         {
@@ -39,17 +35,8 @@ public class AssignStudentGroupController(
             var stageNo = Convert.ToInt32(req.StageNo);
             var studyTime = (req.StudyTime ?? string.Empty).Trim();
 
-            if (degreeId <= 0 ||
-                schoolId <= 0 ||
-                fieldId <= 0 ||
-                promotionNo <= 0 ||
-                stageNo <= 0 ||
-                string.IsNullOrWhiteSpace(studyTime))
-            {
-                return new ServerResponse().BadRequest(
-                    "Degree, school, field, promotion, stage and study time are required."
-                );
-            }
+            if (degreeId <= 0 || schoolId <= 0 || fieldId <= 0 || promotionNo <= 0 || stageNo <= 0 || string.IsNullOrWhiteSpace(studyTime))
+                return new ServerResponse().BadRequest("Degree, school, field, promotion, stage and study time are required.");
 
             var students = await (
                 from registry in db.TblRegistry.AsNoTracking()
@@ -78,9 +65,7 @@ public class AssignStudentGroupController(
 
             return new ServerResponse().Success(
                 students,
-                students.Count > 0
-                    ? $"Found {students.Count} student(s)."
-                    : "No students matched the selected filters."
+                students.Count > 0 ? $"Found {students.Count} student(s)." : "No students matched the selected filters."
             );
         }
         catch (Exception ex)
@@ -90,8 +75,7 @@ public class AssignStudentGroupController(
     }
 
     [HttpPost("get-students-registry-other")]
-    public Task<IActionResult> GetStudentsRegistryOther(
-        [FromForm] AssignGroupViewModel req)
+    public Task<IActionResult> GetStudentsRegistryOther([FromForm] AssignGroupViewModel req)
     {
         var degreeId = Convert.ToInt32(req.DegreeId);
 
@@ -99,22 +83,18 @@ public class AssignStudentGroupController(
         {
             1 => GetRegularStudents(req, expectedDegreeId: 1),
             4 => GetUnpromotedStudents(req),
-            _ => Task.FromResult<IActionResult>(
-                new ServerResponse().BadRequest(
-                    "This filter only supports Associate or Unpromoted students."))
+            _ => Task.FromResult<IActionResult>(new ServerResponse().BadRequest("This filter only supports Associate or Unpromoted students."))
         };
     }
 
     [HttpPost("get-students-registry-diploma")]
-    public Task<IActionResult> GetStudentsRegistryDiploma(
-        [FromForm] AssignGroupViewModel req)
+    public Task<IActionResult> GetStudentsRegistryDiploma([FromForm] AssignGroupViewModel req)
     {
         return GetRegularStudents(req, expectedDegreeId: 3);
     }
 
     [HttpPost("get-students-registry-master")]
-    public Task<IActionResult> GetStudentsRegistryMaster(
-        [FromForm] AssignGroupViewModel req)
+    public Task<IActionResult> GetStudentsRegistryMaster([FromForm] AssignGroupViewModel req)
     {
         return GetRegularStudents(
             req,
@@ -123,18 +103,13 @@ public class AssignStudentGroupController(
     }
 
     [HttpPost("get-students-registry-doctor")]
-    public Task<IActionResult> GetStudentsRegistryDoctor(
-        [FromForm] AssignGroupViewModel req)
+    public Task<IActionResult> GetStudentsRegistryDoctor([FromForm] AssignGroupViewModel req)
     {
-        return GetRegularStudents(
-            req,
-            expectedDegreeId: 5,
-            filterTermNo: false);
+        return GetRegularStudents(req, expectedDegreeId: 5, filterTermNo: false);
     }
 
     [HttpPost("get-students-registry-specialize")]
-    public async Task<IActionResult> GetStudentsRegistrySpecialize(
-        [FromForm] AssignGroupViewModel req)
+    public async Task<IActionResult> GetStudentsRegistrySpecialize([FromForm] AssignGroupViewModel req)
     {
         try
         {
@@ -144,15 +119,8 @@ public class AssignStudentGroupController(
             var academicYear = Convert.ToInt32(req.AcademicYear);
             var studyTime = (req.StudyTime ?? string.Empty).Trim();
 
-            if (schoolId <= 0 ||
-                promotionId <= 0 ||
-                stageId <= 0 ||
-                academicYear <= 0 ||
-                string.IsNullOrWhiteSpace(studyTime))
-            {
-                return new ServerResponse().BadRequest(
-                    "Academic year, school, promotion, stage and study time are required.");
-            }
+            if (schoolId <= 0 || promotionId <= 0 || stageId <= 0 || academicYear <= 0 || string.IsNullOrWhiteSpace(studyTime))
+                return new ServerResponse().BadRequest("Academic year, school, promotion, stage and study time are required.");
 
             var db = campusDbContext.DbContext(_campus);
 
@@ -180,7 +148,7 @@ public class AssignStudentGroupController(
                       && promotion.AcademicYearStart == academicYear
                       && school.IsFoundationSchool == 1
                       && student.Status != null
-                      && student.Status.Trim() == "REGISTER"
+                      && student.Status.Trim() == StudentStatusConstant.Register
                 select new
                 {
                     student.StudentId,
@@ -202,9 +170,7 @@ public class AssignStudentGroupController(
     }
 
     [HttpPost("assign/{groupId:int}")]
-    public async Task<IActionResult> AssignStudents(
-        [FromBody] List<string>? idList,
-        int groupId)
+    public async Task<IActionResult> AssignStudents([FromBody] List<string>? idList, int groupId)
     {
         try
         {
@@ -215,16 +181,10 @@ public class AssignStudentGroupController(
                 .ToList() ?? new List<string>();
 
             if (studentIds.Count == 0)
-            {
-                return new ServerResponse().BadRequest(
-                    "No students selected.");
-            }
+                return new ServerResponse().BadRequest("No students selected.");
 
             if (groupId <= 0)
-            {
-                return new ServerResponse().BadRequest(
-                    "Please select a valid group.");
-            }
+                return new ServerResponse().BadRequest("Please select a valid group.");
 
             var db = campusDbContext.DbContext(_campus);
 
@@ -247,48 +207,31 @@ public class AssignStudentGroupController(
                 .FirstOrDefaultAsync();
 
             if (groupInfo == null)
-            {
-                return new ServerResponse().BadRequest(
-                    $"GroupId {groupId} was not found.");
-            }
+                return new ServerResponse().BadRequest($"GroupId {groupId} was not found.");
 
-            // Do not filter this query with an in-memory ID collection.
-            // Newer EF Core versions translate that pattern into
-            // OPENJSON(... '$'), which fails on older SQL Server
-            // compatibility levels.
             var invalidStudentIds = new List<string>();
-
             foreach (var studentId in studentIds)
             {
-                var student = await db.TblStudent
-                    .FirstOrDefaultAsync(row =>
+                var student = await db.TblStudent.FirstOrDefaultAsync(row =>
                         row.StudentId == studentId &&
                         row.Status != null &&
-                        row.Status.Trim() == "REGISTER");
+                        row.Status.Trim() == StudentStatusConstant.Register);
 
                 if (student == null)
                 {
                     invalidStudentIds.Add(studentId);
                     continue;
                 }
-
-                // Assigned students should no longer appear in the
-                // REGISTER student-filter results.
-                student.Status = "ACTIVE";
+                student.Status = StudentStatusConstant.Active;
             }
 
             if (invalidStudentIds.Count > 0)
-            {
-                return new ServerResponse().BadRequest(
-                    "These students were not found or are not REGISTER: " +
-                    string.Join(", ", invalidStudentIds));
-            }
+                return new ServerResponse().BadRequest("These students were not found or are not REGISTER: " + string.Join(", ", invalidStudentIds));
+            
 
-            var targetStudyTime =
-                (groupInfo.StudyTime ?? string.Empty).Trim();
+            var targetStudyTime = (groupInfo.StudyTime ?? string.Empty).Trim();
 
-            await using var transaction =
-                await db.Database.BeginTransactionAsync();
+            await using var transaction = await db.Database.BeginTransactionAsync();
 
             foreach (var studentId in studentIds)
             {
@@ -302,29 +245,22 @@ public class AssignStudentGroupController(
                         registry.StageNo == groupInfo.StageNo &&
                         registry.StudyTime != null &&
                         registry.StudyTime.Trim() == targetStudyTime)
-                    .OrderByDescending(registry =>
-                        registry.RegistrationId)
+                    .OrderByDescending(registry => registry.RegistrationId)
                     .Select(registry => registry.TermNo)
                     .FirstOrDefaultAsync();
 
-                var termNo = Convert.ToInt32(
-                    registryTermNoValue);
+                var termNo = Convert.ToInt32(registryTermNoValue);
 
                 if (termNo <= 0)
                 {
-                    var previousTermNoValue =
-                        await db.TblStudentGroup
+                    var previousTermNoValue = await db.TblStudentGroup
                             .AsNoTracking()
-                            .Where(studentGroup =>
-                                studentGroup.StudentId == studentId)
-                            .OrderByDescending(studentGroup =>
-                                studentGroup.StudentGroupId)
-                            .Select(studentGroup =>
-                                studentGroup.TermNo)
+                            .Where(studentGroup => studentGroup.StudentId == studentId)
+                            .OrderByDescending(studentGroup => studentGroup.StudentGroupId)
+                            .Select(studentGroup => studentGroup.TermNo)
                             .FirstOrDefaultAsync();
 
-                    termNo = Convert.ToInt32(
-                        previousTermNoValue);
+                    termNo = Convert.ToInt32(previousTermNoValue);
                 }
 
                 if (termNo <= 0)
@@ -334,9 +270,7 @@ public class AssignStudentGroupController(
 
                 var assignmentExists = await db.TblStudentGroup
                     .AsNoTracking()
-                    .AnyAsync(studentGroup =>
-                        studentGroup.StudentId == studentId &&
-                        studentGroup.TermNo == termNo);
+                    .AnyAsync(studentGroup => studentGroup.StudentId == studentId && studentGroup.TermNo == termNo);
 
                 if (assignmentExists)
                 {
@@ -387,10 +321,7 @@ public class AssignStudentGroupController(
         }
     }
 
-    private async Task<IActionResult> GetRegularStudents(
-        AssignGroupViewModel req,
-        int expectedDegreeId,
-        bool filterTermNo = true)
+    private async Task<IActionResult> GetRegularStudents(AssignGroupViewModel req, int expectedDegreeId, bool filterTermNo = true)
     {
         try
         {
@@ -453,8 +384,7 @@ public class AssignStudentGroupController(
         }
     }
 
-    private async Task<IActionResult> GetUnpromotedStudents(
-        AssignGroupViewModel req)
+    private async Task<IActionResult> GetUnpromotedStudents(AssignGroupViewModel req)
     {
         try
         {
