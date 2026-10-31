@@ -1,6 +1,8 @@
 ﻿@{
+ViewData["Title"] = "Student Registry";
 ViewData["OpenMenu"] = "Administration";
 ViewData["Action"] = "Register";
+ViewData["HideHeader"] = true;
 }
 
 <style>
@@ -27,11 +29,11 @@ ViewData["Action"] = "Register";
         padding: 6px 8px;
     }
 
-    .dataTables_scrollHead {
+    #registryPage .dataTables_scrollHead {
         overflow: hidden !important;
     }
 
-    .dataTables_scrollBody {
+    #registryPage .dataTables_scrollBody {
         overflow-x: auto !important;
     }
 
@@ -83,39 +85,117 @@ ViewData["Action"] = "Register";
     }
 </style>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
+<div id="registryPage" class="container-fluid px-0 pt-3" data-ui-design="booking-clothes-sample">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="m-0 font-weight-bold text-dark">Student Registry</h3>
+            <small class="text-muted">Manage student registrations and academic records</small>
+        </div>
+    </div>
+
+    <!-- Filter card: same layout as the Booking Clothes sample. -->
+    <div class="card card-outline card-primary shadow-sm mb-4">
+        <div class="card-header bg-white py-2">
+            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
+                <i class="fas fa-filter text-primary mr-1"></i>
+                Filter Registrations
+            </h3>
+            <div class="card-tools">
                 <button type="button"
-                        id="btnOpenCreateRegistryModal"
-                        class="btn btn-primary">
-                    <i class="fas fa-plus"></i>
-                    New Register
+                        class="btn btn-tool"
+                        data-card-widget="collapse"
+                        aria-label="Collapse registration filters">
+                    <i class="fas fa-minus"></i>
                 </button>
             </div>
+        </div>
+        <div class="card-body bg-light py-3">
+            <form id="frmRegistryFilters">
+                <div class="row align-items-end">
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="dtpFrom" class="text-secondary small font-weight-bold">
+                            From Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="dtpFrom"
+                                   name="from"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="dtpTo" class="text-secondary small font-weight-bold">
+                            To Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="dtpTo"
+                                   name="to"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12 mb-2 mb-md-0 d-flex">
+                        <div class="btn-group shadow-sm" role="group" aria-label="Registration date filters">
+                            <button type="submit"
+                                    id="btnFilterRegistry"
+                                    class="btn btn-success">
+                                <i class="fas fa-search mr-1"></i>
+                                Filter
+                            </button>
+                            <button type="button"
+                                    id="btnResetRegistryFilter"
+                                    class="btn btn-success border-left"
+                                    title="Reset filters"
+                                    aria-label="Reset registration filters">
+                                <i class="fas fa-redo-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12 d-flex justify-content-md-end mt-2 mt-md-0">
+                        <button type="button"
+                                id="btnOpenCreateRegistryModal"
+                                class="btn btn-primary shadow-sm">
+                            <i class="fas fa-plus-circle mr-1"></i>
+                            New Register
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <div class="card-body">
-                <table id="tblRegistry"
-                       class="table table-sm table-bordered table-striped"
-                       style="width: 100%;">
-                    <thead>
-                    <tr>
-                        <th>Student Id</th>
-                        <th>Name English</th>
-                        <th>Name Khmer</th>
-                        <th>Gender</th>
-                        <th>Date of Birth</th>
-                        <th>Registry Date</th>
-                        <th>Degree</th>
-                        <th>School</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+    <!-- DataTable card: retain all ten columns and the existing modal actions. -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table id="tblRegistry"
+                   class="table table-sm table-hover table-bordered table-striped w-100"
+                   style="width: 100%;">
+                <thead class="thead-light">
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name English</th>
+                    <th>Name Khmer</th>
+                    <th>Gender</th>
+                    <th>Date of Birth</th>
+                    <th>Registry Date</th>
+                    <th>Degree</th>
+                    <th>School</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center" style="width: 105px;">Action</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -176,7 +256,45 @@ ViewData["Action"] = "Register";
     $(function () {
         initializeRegistryTable();
         registerRegistryResizeEvents();
+
+        $("#frmRegistryFilters")
+            .off("submit.registryFilters")
+            .on("submit.registryFilters", function (event) {
+                event.preventDefault();
+                applyRegistryDateFilters();
+            });
+
+        $("#btnResetRegistryFilter")
+            .off("click.registryFilters")
+            .on("click.registryFilters", function () {
+                $("#dtpFrom, #dtpTo").val("");
+
+                if (registryTable) {
+                    registryTable.ajax.reload(null, true);
+                }
+            });
     });
+
+    function applyRegistryDateFilters() {
+        const from = $("#dtpFrom").val();
+        const to = $("#dtpTo").val();
+
+        if (from && to && from > to) {
+            const message = "From Date must not be later than To Date.";
+
+            if (typeof ShowToastError === "function") {
+                ShowToastError(message);
+            } else {
+                alert(message);
+            }
+
+            return;
+        }
+
+        if (registryTable) {
+            registryTable.ajax.reload(null, true);
+        }
+    }
 
     function initializeRegistryTable() {
         const tableSelector = "#tblRegistry";
@@ -205,6 +323,10 @@ ViewData["Action"] = "Register";
             ajax: {
                 url: "@Url.Action("GetStudentRegistryList", "Registry")",
                 type: "POST",
+                data: function (request) {
+                    request.from = $("#dtpFrom").val() || "";
+                    request.to = $("#dtpTo").val() || "";
+                },
                 dataSrc: function (response) {
                     return response?.data ?? [];
                 },
@@ -299,7 +421,7 @@ ViewData["Action"] = "Register";
                             "badge-secondary";
 
                         return `
-                                <span class="badge ${badgeClass}">
+                                <span class="badge ${badgeClass} px-2 py-1">
                                     ${escapeRegistryHtml(status)}
                                 </span>
                             `;
@@ -322,11 +444,11 @@ ViewData["Action"] = "Register";
 
                         return `
                                 <button type="button"
-                                        class="btn btn-success btn-sm js-registry-manage"
+                                        class="btn btn-warning btn-sm js-registry-manage"
                                         data-toggle="modal"
                                         data-target="#RegistryDetailsModal"
                                         data-student-id="${safeStudentId}">
-                                    <i class="fas fa-cog"></i>
+                                    <i class="fas fa-cog mr-1"></i>
                                     Manage
                                 </button>
                             `;
