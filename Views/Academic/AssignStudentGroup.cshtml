@@ -1,35 +1,57 @@
 ﻿@using BBU_SYSTEM.Data
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Assign Group";
     ViewData["OpenMenu"] = "AcademicTask";
     ViewData["Action"] = "AssignGroup"; 
     var campuses = AssignGroupCampusConstant.Campuses;
+    ViewData["HideHeader"] = true;
 }
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="margin" id="rangeButtons">
-                            @foreach (var item in campuses.Select((st, index) => new { st, index }))
-                            {
-                                var btnClass = item.index == 0 ? "btn-primary active" : "btn-outline-primary";
-                                <button type="button" class="btn @btnClass btn-sm" value="@item.st.Key">
-                                    @item.st.Value
-                                </button>
-                            }
-                        </div>
-                    </div>
-                </div>
+
+<div id="assignGroupPage" class="container-fluid px-0 pt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="m-0 font-weight-bold text-dark">Assign Group</h3>
+            <small class="text-muted">Manage student group assignments across campuses</small>
+        </div>
+    </div>
+
+    <div class="card card-outline card-primary shadow-sm mb-4">
+        <div class="card-header bg-white py-2">
+            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
+                <i class="fas fa-building text-primary mr-1"></i>
+                Select Campus
+            </h3>
+            <div class="card-tools">
+                <button type="button"
+                        class="btn btn-tool"
+                        data-card-widget="collapse"
+                        aria-label="Collapse campus filter">
+                    <i class="fas fa-minus"></i>
+                </button>
             </div>
-            <div class="card-body">
-                <div id="formContainer"></div>
+        </div>
+        <div class="card-body bg-light py-3">
+            <div class="margin" id="rangeButtons">
+                @foreach (var item in campuses.Select((st, index) => new { st, index }))
+                {
+                    var btnClass = item.index == 0 ? "btn-primary active" : "btn-outline-primary";
+                    <button type="button" class="btn @btnClass btn-sm mr-1 mb-1" value="@item.st.Key">
+                        @item.st.Value
+                    </button>
+                }
             </div>
         </div>
     </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div id="formContainer"></div>
+        </div>
+    </div>
 </div>
+
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+
 @section Scripts
 {
     <script src="~/function/Degree.js"></script>

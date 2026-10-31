@@ -3,10 +3,16 @@
     ViewData["Title"] = "Index";
     ViewData["OpenMenu"] = "AcademicTask";
     ViewData["Action"] = "OtherBranchScore";
-
+    ViewData["HideHeader"] = true;
     var student = new StudentDto();
     var extend = new ExtendDto();
 }
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="m-0 font-weight-bold text-dark">Score Management</h3>
+        <small class="text-muted">Manage student grades, assessment records, and academic evaluation scores</small>
+    </div>
+</div>
 <div class="row">
     <div class="col-12">
         <div class="card">

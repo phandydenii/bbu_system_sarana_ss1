@@ -3,6 +3,7 @@
     ViewData["Title"] = "Index";
     ViewData["OpenMenu"] = "Dean";
     ViewData["Action"] = "RestudyMark";
+    ViewData["HideHeader"] = true;
 }
 <style>
     .glass-card {
@@ -165,7 +166,12 @@
         }
     }
 </style>
-
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="m-0 font-weight-bold text-dark">Re-study Mark</h3>
+        <small class="text-muted">Record, update, and track student grades for re-study courses and retaken subjects</small>
+    </div>
+</div>
 <div class="py-2">
     <div class="card glass-card">
         <div class="card-body">

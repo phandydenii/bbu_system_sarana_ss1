@@ -2,27 +2,41 @@
     ViewData["Title"] = "Index";
     ViewData["OpenMenu"] = "AcademicTask";
     ViewData["Action"] = "ManageRoom";
+    ViewData["HideHeader"] = true;
 }
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Room List</h3>
-                <button type="button" class="btn btn-success btn-sm float-right" onclick="openAddRoom()">
-                    <i class="fas fa-plus"></i>
+
+<div id="manageRoomPage" class="container-fluid px-0 pt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="m-0 font-weight-bold text-dark">Room Management</h3>
+            <small class="text-muted">Manage campus rooms, capacities, and facilities</small>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
+                <i class="fas fa-door-open text-primary mr-1"></i>
+                Room List
+            </h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-success btn-sm" onclick="openAddRoom()">
+                    <i class="fas fa-plus mr-1"></i>
                     Add New
                 </button>
             </div>
-            <div class="card-body">
-                <table id="tblRoom" class="table table-sm table-bordered table-striped" style="width: 100%;">
-                    <thead>
-                    <tr>
-                        <th>Room Id</th>
-                        <th>Room Name</th>
-                        <th>Capacity</th>
-                        <th>Type</th>
-                        <th>ation</th>
-                    </tr>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tblRoom" class="table table-sm table-hover table-bordered table-striped w-100" style="width: 100%;">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Room Id</th>
+                            <th>Room Name</th>
+                            <th>Capacity</th>
+                            <th>Type</th>
+                            <th class="text-center" style="width: 180px;">Action</th>
+                        </tr>
                     </thead>
                     <tbody>
                     </tbody>
@@ -31,8 +45,10 @@
         </div>
     </div>
 </div>
+
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <partial name="_Room"/>
+
 <script>
     let roomTable = null;
 
@@ -120,10 +136,10 @@
                     render: function () {
                         return `
                         <div class="dt-action">
-                            <button type="button" class="btn btn-warning btn-sm btnEditRoom">
+                            <button type="button" class="btn btn-warning btn-xs btnEditRoom">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button type="button" class="btn btn-danger btn-sm btnDeleteRoom">
+                            <button type="button" class="btn btn-danger btn-xs btnDeleteRoom">
                                 <i class="fa-solid fa-trash"></i> Delete
                             </button>
                         </div>

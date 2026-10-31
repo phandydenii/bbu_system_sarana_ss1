@@ -2,12 +2,19 @@
     ViewData["Title"] = "Index";
     ViewData["OpenMenu"] = "AcademicTask";
     ViewData["Action"] = "RequestQRCode";
+    ViewData["HideHeader"] = true;
     var campuses = new Dictionary<string, string>
     {
         { "request_qrcode", "ស្នើរសុំឃ្យូអរកូដសញ្ញាបត្រ" }, //degree, school,field, promotion, stage, study-time
         { "reset-qrcode", "បោះពុម្ពឃ្យូអរកូដសញ្ញាបត្រ" }, //degree, school,field, promotion, stage, study-time
     };
 }
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="m-0 font-weight-bold text-dark">Request QR Code</h3>
+        <small class="text-muted">Manage and request degree QR codes for students</small>
+    </div>
+</div>
 <div class="row">
     <div class="col-12">
         <div class="card">
