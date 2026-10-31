@@ -1,202 +1,286 @@
 ﻿@{
-    ViewData["Title"] = "Index";
+ViewData["Title"] = "Students";
+ViewData["HideHeader"] = true;
 }
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Branch</h3>
+
+<style>
+    #studentListPage .student-table-scroll {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    #studentListPage #tblStudent,
+    #studentListPage #tblStudent_wrapper {
+        width: 100% !important;
+    }
+
+    #studentListPage #tblStudent th,
+    #studentListPage #tblStudent td {
+        vertical-align: middle;
+    }
+
+    #studentListPage .student-actions {
+        white-space: nowrap;
+    }
+
+    #studentListPage .student-actions .btn {
+        min-height: 32px;
+        margin: 2px 0;
+    }
+</style>
+
+<div id="studentListPage" class="container-fluid px-0 pt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="m-0 font-weight-bold text-dark">Students</h3>
+            <small class="text-muted">Browse student records for the current campus</small>
+        </div>
+    </div>
+
+    <div class="card card-outline card-primary shadow-sm mb-4">
+        <div class="card-header bg-white py-2">
+            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
+                <i class="fas fa-filter text-primary mr-1"></i>
+                Filter Students
+            </h3>
+            <div class="card-tools">
+                <button type="button"
+                        class="btn btn-tool"
+                        data-card-widget="collapse"
+                        aria-label="Collapse student filters">
+                    <i class="fas fa-minus"></i>
+                </button>
             </div>
-            <div class="card-body">
-                <table id="tblStudent" class="table table-bordered table-striped" style="width: 100%;">
-                    <thead>
-                    <tr>
-                        <th>Student Id</th>
-                        <th>Name English</th>
-                        <th>Name Khmer</th>
-                        <th>Gender</th>
-                        <th>DOB</th>
-                        <th>Phone</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
+        </div>
+        <div class="card-body bg-light py-3">
+            <form id="frmStudentFilters">
+                <div class="row align-items-end">
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="studentFromDate" class="text-secondary small font-weight-bold">
+                            From Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="studentFromDate"
+                                   name="fromDate"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="studentToDate" class="text-secondary small font-weight-bold">
+                            To Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="studentToDate"
+                                   name="toDate"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12 d-flex">
+                        <div class="btn-group shadow-sm" role="group" aria-label="Student date filters">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-search mr-1"></i>
+                                Filter
+                            </button>
+                            <button type="button"
+                                    id="btnResetStudentFilters"
+                                    class="btn btn-success border-left"
+                                    title="Reset filters"
+                                    aria-label="Reset student date filters">
+                                <i class="fas fa-redo-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body student-table-scroll">
+            <table id="tblStudent"
+                   class="table table-sm table-hover table-bordered table-striped w-100"
+                   style="width: 100%;">
+                <thead class="thead-light">
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name English</th>
+                    <th>Name Khmer</th>
+                    <th>Gender</th>
+                    <th>DOB</th>
+                    <th>Phone</th>
+                    <th class="text-center" style="width: 220px;">Action</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>
-<!--<div class="modal fade" id="editModal">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">-->
-@* <div class="modal-header">
-                    <h4 class="modal-title">Default Modal</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div> *@
-<!--<div class="modal-body">-->
-@* ======Body===== *@
-<!--<div class="row"> 
-    <div class="col-12 col-sm-7">
-        <div class="card card-primary card-outline card-outline-tabs">
-            <div class="card-header p-0 border-bottom-0">
-                <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="custom-tabs-four-personal-tab" data-toggle="pill"
-                           href="#custom-tabs-four-personal" role="tab"
-                           aria-controls="custom-tabs-four-personal" aria-selected="true">Personal</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="custom-tabs-four-personalcontact-tab" data-toggle="pill"
-                           href="#custom-tabs-four-personalcontact" role="tab"
-                           aria-controls="custom-tabs-four-personalcontact" aria-selected="false">
-                            Persional Contact
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="custom-tabs-four-relativecontact-tab" data-toggle="pill"
-                           href="#custom-tabs-four-relativecontact" role="tab"
-                           aria-controls="custom-tabs-four-relativecontact" aria-selected="false">
-                            Relative Contact
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="custom-tabs-four-parent-tab" data-toggle="pill"
-                           href="#custom-tabs-four-parent" role="tab"
-                           aria-controls="custom-tabs-four-parent" aria-selected="false">Parent</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body">
-                <div class="tab-content" id="custom-tabs-four-tabContent">
-                    <partial name="_Personal" />
-                    <partial name="_PersonalContact" />
-                    <partial name="_RelativeContact" />
-                    <partial name="_Parent" /> 
-                </div>
-            </div> 
-        </div>
-    </div> 
-</div>
-</div>-->
-@* ======Body===== *@
-<!--<div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">Fileter</button>
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">Suppress</button>
-    <button type="button" class="btn btn-dark" data-dismiss="modal">Change Branch</button>
-    <button type="button" class="btn btn-warning" data-dismiss="modal">Quit</button>
-    <button type="button" class="btn btn-primary" data-dismiss="modal">Suspend</button>
-    <button type="button" class="btn btn-info" data-dismiss="modal">Adjust</button>
-    <button type="button" class="btn btn-success" data-dismiss="modal">Update</button>
-    <button type="button"  class="btn btn-danger" data-dismiss="modal">Close</button> 
-</div>
-</div>
-</div>
-</div>-->
-<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
-<script>
-    //const campus = localStorage.getItem("campus")
-    $(document).ready(function () {
-        //$.get(`/api/mis/${campus}/high-schools`, function (data) {
-        //    const dropdown = $('#cboHighSchool');
-        //    $.each(data, function (index, item) {
-        //        console.log(item.high_school_id);
-        //        dropdown.append(`<option value="${item.high_school_id}">${item.high_school_name_in_khmer}</option>`);
-        //    });
-        //});
 
-        $.ajax({
-            url: `/api/mis/${campus()}/high-schools`,
-            type: 'GET',
-            success: function (data) {
-                const dropdown = $('#cboHighSchool');
-                $.each(data["data"], function (index, item) {
-                    dropdown.append(`<option value="${item.high_school_id}">${item.high_school_id}</option>`);
-                });
+<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+
+@section Scripts
+{
+<script>
+    $(document).ready(function () {
+        const tblStudent = $("#tblStudent");
+        const studentDetailsUrl = '@Url.Content("~/student/details")';
+        const studentApiPrefix = '@Url.Content("~/api/mis/")';
+        const appliedDates = { fromDate: "", toDate: "" };
+
+        // This is the existing name-search endpoint from the supplied page.
+        // Use your real all-students endpoint here if the page must list everyone.
+        const existingStudentName = "phan dy";
+
+        const selectedCampus = typeof campus === "function" ? campus() : "";
+
+        if (!selectedCampus) {
+            showStudentError("The current campus is unavailable. Please select a campus and reload.");
+            return;
+        }
+
+        const renderText = $.fn.dataTable.render.text();
+
+        if ($.fn.DataTable.isDataTable("#tblStudent")) {
+            tblStudent.DataTable().clear().destroy();
+        }
+
+        const studentTable = tblStudent.DataTable({
+            processing: true,
+            // The existing GET API returns { data: [...] }, not a
+            // DataTables server-side draw/count/paging response.
+            serverSide: false,
+            responsive: true,
+            lengthChange: true,
+            autoWidth: false,
+            pageLength: 10,
+            searching: true,
+            ajax: {
+                url: `${studentApiPrefix}${encodeURIComponent(selectedCampus)}/students/name/${encodeURIComponent(existingStudentName)}`,
+                type: "GET",
+                data: function (request) {
+                    // The API must implement these optional parameters using
+                    // the intended database date field. This view does not
+                    // assume the filter means date of birth or registration date.
+                    request.fromDate = appliedDates.fromDate;
+                    request.toDate = appliedDates.toDate;
+                },
+                dataSrc: function (response) {
+                    if (Array.isArray(response?.data)) return response.data;
+
+                    showStudentError("The student API did not return the expected data list.");
+                    return [];
+                },
+                error: function (xhr) {
+                    console.error("Student list request failed:", xhr.status, xhr.responseText);
+                    showStudentError(
+                        xhr.responseJSON?.status?.message || "Unable to load student records."
+                    );
+                }
             },
-            error: function (error) {
-                console.error('Error fetching nationalities:', error);
+            columns: [
+                { data: "student_id", defaultContent: "", render: renderText },
+                { data: "student_name", defaultContent: "", render: renderText },
+                { data: "student_name_in_khmer", defaultContent: "", render: renderText },
+                { data: "sex", defaultContent: "", render: renderText },
+                {
+                    data: "date_of_birth",
+                    defaultContent: "",
+                    render: function (data, type) {
+                        if (type !== "display") return data || "";
+                        if (!data) return "";
+
+                        const isoDate = String(data).match(/^(\d{4})-(\d{2})-(\d{2})(?:$|T|\s)/);
+                        if (isoDate) return `${isoDate[3]}/${isoDate[2]}/${isoDate[1]}`;
+
+                        // Retain other date formats without inserting raw HTML.
+                        return $("<span>").text(String(data)).html();
+                    }
+                },
+                { data: "phone", defaultContent: "", render: renderText },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: "text-center student-actions",
+                    render: function (data, type, row) {
+                        if (type !== "display") return "";
+                        if (!row.student_id) return '<span class="text-muted">Unavailable</span>';
+
+                        const studentId = encodeURIComponent(String(row.student_id));
+
+                        // Keep the two route shapes already present in the
+                        // supplied page, but use the selected row's ID.
+                        return `<a href="${studentDetailsUrl}?student_id=${studentId}"
+                                       class="btn btn-primary btn-sm"
+                                       title="Edit student">
+                                        <i class="fas fa-edit mr-1" aria-hidden="true"></i>Edit
+                                    </a>
+                                    <a href="${studentDetailsUrl}/${studentId}"
+                                       class="btn btn-info btn-sm"
+                                       title="View student">
+                                        <i class="fas fa-eye mr-1" aria-hidden="true"></i>View
+                                    </a>
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm"
+                                            disabled
+                                            title="No student delete endpoint was supplied"
+                                            aria-label="Delete unavailable: no delete endpoint supplied">
+                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                    </button>`;
+                    }
+                }
+            ],
+            initComplete: function () {
+                if (typeof MyApp !== "undefined" &&
+                    typeof MyApp.utils?.dataTableDebounceSearch === "function") {
+                    MyApp.utils.dataTableDebounceSearch("#tblStudent", 500);
+                }
             }
         });
 
-        $("#tblStudent")
-            .DataTable({
-                responsive: true,
-                lengthChange: true,
-                autoWidth: true,
-                ajax: {
-                    url: `/api/mis/${campus()}/students/name/phan dy`,
-                    type: "GET",
-                    dataSrc: "data",
-                },
-                columns: [
-                    {data: "student_id"},
-                    {data: "student_name"},
-                    {data: "student_name_in_khmer"},
-                    {data: "sex"},
-                    {data: "date_of_birth"},
-                    {data: "phone"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `
-                            <div class="input-group-prepend">
-                                <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
-                                    Action
-                                </button>
-                                <div class="dropdown-menu" style="min-width: 8rem;">
-                                    <div class="col-md-12">
-                                        <a href"/student/details?student_id=PP47981" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0rem">Edit</a>
-                                         <a href="student/details/${row.student_id}" class="btn btn-warning btn-sm" style="display: block;margin:.2rem 0rem">View</a>
-                                        <a class="btn btn-danger btn-sm" style="display: block;margin:.2rem 0rem">Delete</a>
-                                    </div>
-                                </div>
-                            </div>
-                            `;
-                        }
+        $("#frmStudentFilters").on("submit.studentFilters", function (event) {
+            event.preventDefault();
+            const fromDate = $("#studentFromDate").val() || "";
+            const toDate = $("#studentToDate").val() || "";
 
-                    }
-                ]
-            })
-            .buttons()
-            .container()
-            .appendTo("#example1_wrapper .col-md-6:eq(0)");
-    });
+            if (fromDate && toDate && fromDate > toDate) {
+                showStudentError("From Date must not be later than To Date.");
+                return;
+            }
 
-    // Function to handle Edit
-    function OnEdit(id) {
-        $("#editModal").modal("show");
-        $.get(`/api/mis/${campus()}/students/academics/${id}`, function (result) {
-            var data = result["data"];
-            var student = data["student"];
-            var nationality = data["nationality"];
-            var province = data["province"];
-            var race = data["race"];
-            var degree = data["degree"];
-            var school = data["school"];
-            var field = data["field"];
-            var promotion = data["promotion"];
-            var stage = data["stage"];
-            var term = data["term"];
-            var group = data["group"];
-            var group_room = data["group_room"];
-            $("#txtStudentId").val(student["student_id"]);
-            $("#txtStudentName").val(student["student_name"]);
-            $("#txtStudentNameKhmer").val(student["student_name_in_khmer"]);
-
-            $("#txtSex").val(student["sex"]);
-            var dob = moment(student["date_of_birth"]).format("YYYY-MM-DD");
-            $("#txtDOB").val(dob);
-            $("#txtPOB").val(province["province"]);
-            //$("#txtStatus").val(data["status"]);
+            appliedDates.fromDate = fromDate;
+            appliedDates.toDate = toDate;
+            studentTable.ajax.reload(null, true);
         });
 
-        //window.location.href = `/student/details/${data}`;
-    }
+        $("#btnResetStudentFilters").on("click.studentFilters", function () {
+            $("#studentFromDate, #studentToDate").val("");
+            appliedDates.fromDate = "";
+            appliedDates.toDate = "";
+            // Reset dates only; keep the native DataTables search text.
+            studentTable.ajax.reload(null, true);
+        });
 
-    function OnView(id) {
-        window.location.href = `student/details/${id}`;
-    }
+        function showStudentError(message) {
+            if (typeof ShowToastError === "function") {
+                ShowToastError(message);
+            } else {
+                alert(message);
+            }
+        }
+    });
 </script>
+}

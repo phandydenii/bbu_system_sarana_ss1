@@ -1,108 +1,386 @@
 @{
+ViewData["Title"] = "Payment Items";
 ViewData["OpenMenu"] = "Administration";
 ViewData["Action"] = "Index";
+ViewData["HideHeader"] = true;
 }
 
-<div class="card card-primary card-outline card-outline-tabs">
-    <div class="card-header p-0 border-bottom-0">
-        <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active"
-                   id="custom-tabs-four-1-tab"
-                   data-toggle="pill"
-                   href="#custom-tabs-four-1"
-                   role="tab"
-                   aria-controls="custom-tabs-four-1"
-                   aria-selected="true">
-                    ផលិតផលបង់ថ្លៃសិក្សា
-                </a>
-            </li>
+<style>
+    #paymentProductPage .dataTables_wrapper,
+    #paymentProductPage .product-table-container {
+        width: 100%;
+    }
 
-            <li class="nav-item">
-                <a class="nav-link"
-                   id="custom-tabs-four-2-tab"
-                   data-toggle="pill"
-                   href="#custom-tabs-four-2"
-                   role="tab"
-                   aria-controls="custom-tabs-four-2"
-                   aria-selected="false">
-                    ផលិតផលបង់ថ្លៃសិក្សាលើ WeBill
-                </a>
-            </li>
-        </ul>
+    #tblProduct {
+        width: 100% !important;
+        min-width: 1600px;
+    }
+
+    #tblProductPayOnline {
+        width: 100% !important;
+        min-width: 1300px;
+    }
+
+    #paymentProductPage table.dataTable th,
+    #paymentProductPage table.dataTable td {
+        white-space: nowrap !important;
+        vertical-align: middle !important;
+    }
+
+    #paymentProductPage table.dataTable thead th {
+        padding-right: 24px !important;
+    }
+
+    #paymentProductPage .dataTables_scrollBody {
+        overflow-x: auto !important;
+    }
+
+    #paymentProductPage .dt-action {
+        min-width: 170px !important;
+        width: 170px !important;
+    }
+
+    #paymentProductPage .dt-action-wrap {
+        display: inline-flex;
+        gap: 5px;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    #paymentProductPage .badge {
+        padding: 0.35em 0.65em;
+    }
+
+    #paymentProductPage #custom-tabs-four-tab {
+        gap: 0.65rem;
+    }
+
+    #paymentProductPage #custom-tabs-four-tab .product-tab-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0.65rem 1rem;
+        border: 1px solid #1b1768 !important;
+        border-radius: 0.3rem;
+        background: #ffffff !important;
+        color: #1b1768 !important;
+        font: inherit;
+        font-weight: 600;
+        line-height: 1.5;
+        text-decoration: none;
+        white-space: normal;
+        cursor: pointer;
+        pointer-events: auto;
+        box-shadow: 0 1px 3px rgba(27, 23, 104, 0.12);
+    }
+
+    #paymentProductPage #custom-tabs-four-tab .product-tab-button:hover {
+        background: #f0efff !important;
+    }
+
+    #paymentProductPage #custom-tabs-four-tab .product-tab-button.active {
+        background: #1b1768 !important;
+        color: #ffffff !important;
+    }
+
+    #paymentProductPage #custom-tabs-four-tab .product-tab-button:focus-visible {
+        outline: 3px solid #a6a2f5;
+        outline-offset: 3px;
+    }
+
+    @@media (max-width: 575.98px) {
+        #paymentProductPage #custom-tabs-four-tab .nav-item {
+            width: 100%;
+        }
+
+        #paymentProductPage #custom-tabs-four-tab .product-tab-button {
+            width: 100%;
+        }
+    }
+</style>
+
+<div id="paymentProductPage" class="container-fluid px-0 pt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="m-0 font-weight-bold text-dark">Payment Items</h3>
+            <small class="text-muted">Manage tuition payment products and WeBill payment settings</small>
+        </div>
+    </div>
+
+    <!-- Keep both original tabs and their existing targets. -->
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body p-2">
+            <ul class="nav nav-pills flex-wrap" id="custom-tabs-four-tab" role="tablist">
+                <li class="nav-item">
+                    <button type="button"
+                            class="nav-link product-tab-button active"
+                            id="custom-tabs-four-1-tab"
+                            data-product-tab="custom-tabs-four-1"
+                            role="tab"
+                            aria-controls="custom-tabs-four-1"
+                            aria-selected="true"
+                            tabindex="0">
+                        <i class="fas fa-box mr-2" aria-hidden="true"></i>
+                        ផលិតផលបង់ថ្លៃសិក្សា
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button"
+                            class="nav-link product-tab-button"
+                            id="custom-tabs-four-2-tab"
+                            data-product-tab="custom-tabs-four-2"
+                            role="tab"
+                            aria-controls="custom-tabs-four-2"
+                            aria-selected="false"
+                            tabindex="-1">
+                        <i class="fas fa-globe mr-2" aria-hidden="true"></i>
+                        ផលិតផលបង់ថ្លៃសិក្សាលើ WeBill
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Shared date range; each table keeps its built-in text search. -->
+    <div class="card card-outline card-primary shadow-sm mb-4">
+        <div class="card-header bg-white py-2">
+            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
+                <i class="fas fa-filter text-primary mr-1"></i>
+                Filter Payment Items
+            </h3>
+            <div class="card-tools">
+                <button type="button"
+                        class="btn btn-tool"
+                        data-card-widget="collapse"
+                        aria-label="Collapse product filters">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body bg-light py-3">
+            <form id="frmProductDateFilters">
+                <div class="row align-items-end">
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="productFromDate" class="text-secondary small font-weight-bold">
+                            From Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="productFromDate"
+                                   name="fromDate"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="productToDate" class="text-secondary small font-weight-bold">
+                            To Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="productToDate"
+                                   name="toDate"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12 mb-2 mb-md-0 d-flex">
+                        <div class="btn-group shadow-sm" role="group" aria-label="Product date filters">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-search mr-1"></i>
+                                Filter
+                            </button>
+                            <button type="button"
+                                    id="btnResetProductDateFilters"
+                                    class="btn btn-success border-left"
+                                    title="Reset filters"
+                                    aria-label="Reset product date filters">
+                                <i class="fas fa-redo-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="productCreateAction" class="col-md-6 col-sm-12 mt-2 mt-md-0 text-md-right">
+                        <button type="button" class="btn btn-primary shadow-sm" id="btnAddNewProduct">
+                            <i class="fas fa-plus-circle mr-1"></i>
+                            Add New Product
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="tab-content" id="custom-tabs-four-tabContent">
-
-        <!-- Product Tab -->
         <div class="tab-pane fade show active"
              id="custom-tabs-four-1"
              role="tabpanel"
              aria-labelledby="custom-tabs-four-1-tab">
-
-            <div class="card-header">
-                <button type="button" class="btn btn-primary" id="btnAddNewProduct">
-                    <i class="fas fa-plus"></i> Add New
-                </button>
-            </div>
-
-            <div class="card-body">
-                <div class="table-responsive" style="width: 100%;">
-                    <table id="tblProduct"
-                           class="table table-bordered table-striped table-sm"
-                           style="width: 100%;">
-                        <thead>
-                        <tr>
-                            <th>id</th>
-                            <th>item_name</th>
-                            <th>name khmer</th>
-                            <th>price_khr</th>
-                            <th>price_usd</th>
-                            <th>degree</th>
-                            <th>vat</th>
-                            <th>default_pay</th>
-                            <th>category_id</th>
-                            <th>card</th>
-                            <th>fee</th>
-                            <th>status</th>
-                            <th>Action</th>
-                        </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="product-table-container">
+                        <table id="tblProduct"
+                               class="table table-sm table-hover table-bordered table-striped w-100"
+                               style="width: 100%;">
+                            <thead class="thead-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Item Name</th>
+                                <th>Name Khmer</th>
+                                <th>Price KHR</th>
+                                <th>Price USD</th>
+                                <th>Degree</th>
+                                <th>VAT</th>
+                                <th>Default Pay</th>
+                                <th>Category</th>
+                                <th>Card</th>
+                                <th>Fee</th>
+                                <th>Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- WeBill Product Tab -->
         <div class="tab-pane fade"
              id="custom-tabs-four-2"
              role="tabpanel"
              aria-labelledby="custom-tabs-four-2-tab">
-
-            <div class="card-body">
-                <table id="tblProductPayOnline"
-                       class="table table-bordered table-striped table-sm nowrap"
-                       style="width: 100%;">
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>product</th>
-                        <th>degree</th>
-                        <th>school</th>
-                        <th>price</th>
-                        <th>price_khr</th>
-                        <th>from_promotion</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="product-table-container">
+                        <table id="tblProductPayOnline"
+                               class="table table-sm table-hover table-bordered table-striped w-100 nowrap"
+                               style="width: 100%;">
+                            <thead class="thead-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Product</th>
+                                <th>Degree</th>
+                                <th>School</th>
+                                <th>Price USD</th>
+                                <th>Price KHR</th>
+                                <th>From Promotion</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
 </div>
+
+<script>
+    // Native tab buttons keep working independently of the Bootstrap tab plugin.
+    (function () {
+        const tabList = document.getElementById("custom-tabs-four-tab");
+        if (!tabList) return;
+
+        const buttons = Array.from(
+            tabList.querySelectorAll("button[data-product-tab]")
+        );
+        if (!buttons.length) return;
+
+        function activateProductTab(button, moveFocus) {
+            const selectedId = button.getAttribute("data-product-tab");
+            if (!document.getElementById(selectedId)) return;
+
+            buttons.forEach(function (item) {
+                const isSelected = item === button;
+                const pane = document.getElementById(
+                    item.getAttribute("data-product-tab")
+                );
+
+                item.classList.toggle("active", isSelected);
+                item.setAttribute("aria-selected", String(isSelected));
+                item.tabIndex = isSelected ? 0 : -1;
+
+                if (pane) {
+                    pane.hidden = !isSelected;
+                    pane.classList.toggle("active", isSelected);
+                    pane.classList.toggle("show", isSelected);
+                }
+            });
+
+            const createAction = document.getElementById("productCreateAction");
+            if (createAction) {
+                createAction.classList.toggle(
+                    "d-none",
+                    selectedId !== "custom-tabs-four-1"
+                );
+            }
+
+            if (moveFocus) button.focus();
+
+            // Recalculate the visible table after changing tabs, when available.
+            const jq = window.jQuery;
+            if (typeof jq === "function" && jq.fn?.DataTable?.isDataTable) {
+                const tableSelector = selectedId === "custom-tabs-four-1"
+                    ? "#tblProduct"
+                    : "#tblProductPayOnline";
+
+                window.setTimeout(function () {
+                    if (jq.fn.DataTable.isDataTable(tableSelector)) {
+                        jq(tableSelector).DataTable().columns.adjust();
+                    }
+                }, 200);
+            }
+        }
+
+        tabList.addEventListener("click", function (event) {
+            const button = event.target.closest("button[data-product-tab]");
+            if (!button || !tabList.contains(button)) return;
+
+            event.preventDefault();
+            activateProductTab(button, false);
+        });
+
+        tabList.addEventListener("keydown", function (event) {
+            const button = event.target.closest("button[data-product-tab]");
+            const index = buttons.indexOf(button);
+            if (index < 0) return;
+
+            let nextIndex;
+            if (event.key === "ArrowRight") {
+                nextIndex = (index + 1) % buttons.length;
+            } else if (event.key === "ArrowLeft") {
+                nextIndex = (index - 1 + buttons.length) % buttons.length;
+            } else if (event.key === "Home") {
+                nextIndex = 0;
+            } else if (event.key === "End") {
+                nextIndex = buttons.length - 1;
+            } else {
+                return;
+            }
+
+            event.preventDefault();
+            activateProductTab(buttons[nextIndex], true);
+        });
+
+        activateProductTab(
+            buttons.find(function (button) {
+                return button.classList.contains("active");
+            }) || buttons[0],
+            false
+        );
+    })();
+</script>
 
 <partial name="_ValidationScriptsPartial" />
 <partial name="_ProductModal" />
@@ -112,51 +390,6 @@ ViewData["Action"] = "Index";
 <script src="~/function/Degree.js"></script>
 <script src="~/function/School.js"></script>
 <script src="~/js/Components.js"></script>
-<style>
-    #tblProductPayOnline {
-        min-width: 1300px;
-    }
-
-    #tblProductPayOnline th,
-    #tblProductPayOnline td {
-        white-space: nowrap !important;
-        vertical-align: middle !important;
-    }
-
-    table.dataTable thead th {
-        padding-right: 24px !important;
-    }
-
-    .dataTables_scrollBody {
-        overflow-x: auto !important;
-    }
-    #tblProduct th,
-    #tblProduct td {
-        white-space: nowrap !important;
-        vertical-align: middle !important;
-    }
-
-    #tblProduct {
-        min-width: 1600px;
-    }
-
-    .dt-action {
-        min-width: 170px !important;
-        width: 170px !important;
-    }
-
-    .dt-action-wrap {
-        display: inline-flex;
-        gap: 5px;
-        align-items: center;
-        justify-content: center;
-        white-space: nowrap;
-    }
-
-    table.dataTable thead th {
-        padding-right: 24px !important;
-    }
-</style>
 
 <script>
     const tblProduct = $("#tblProduct");
@@ -180,6 +413,20 @@ ViewData["Action"] = "Index";
         fetchProduct();
         fetchProductPayOnline();
 
+        $("#frmProductDateFilters")
+            .off("submit.productDateFilters")
+            .on("submit.productDateFilters", function (event) {
+                event.preventDefault();
+                applyProductDateFilter();
+            });
+
+        $("#btnResetProductDateFilters")
+            .off("click.productDateFilters")
+            .on("click.productDateFilters", function () {
+                $("#productFromDate, #productToDate").val("");
+                reloadProductDateFilteredTables();
+            });
+
         Components.BindSelectOptions(
             "/product/get-product-category-list",
             "product_CategoryId",
@@ -187,18 +434,43 @@ ViewData["Action"] = "Index";
             "categoryName"
         );
     });
-    $('a[data-toggle="pill"]').on("shown.bs.tab", function () {
-        setTimeout(function () {
-            $.fn.dataTable
-                .tables({ visible: true, api: true })
-                .columns.adjust();
-        }, 200);
-    });
+    function addProductDateParameters(request) {
+        // Both list-controller actions must apply these optional parameters
+        // to the intended date field before counting and paging their queries.
+        request.fromDate = $("#productFromDate").val() || "";
+        request.toDate = $("#productToDate").val() || "";
+    }
+
+    function applyProductDateFilter() {
+        const fromDate = $("#productFromDate").val();
+        const toDate = $("#productToDate").val();
+
+        if (fromDate && toDate && fromDate > toDate) {
+            const message = "From Date must not be later than To Date.";
+
+            if (typeof ShowToastError === "function") {
+                ShowToastError(message);
+            } else {
+                alert(message);
+            }
+            return;
+        }
+
+        reloadProductDateFilteredTables();
+    }
+
+    function reloadProductDateFilteredTables() {
+        ["#tblProduct", "#tblProductPayOnline"].forEach(function (selector) {
+            if ($.fn.DataTable.isDataTable(selector)) {
+                $(selector).DataTable().ajax.reload(null, true);
+            }
+        });
+    }
 
     function fetchProduct() {
         if ($.fn.DataTable.isDataTable("#tblProduct")) {
             tblProduct.DataTable().clear().destroy();
-            tblProduct.empty();
+            tblProduct.find("tbody").empty();
         }
 
         tblProduct.DataTable({
@@ -222,6 +494,7 @@ ViewData["Action"] = "Index";
                 url: "/product/get-product-list",
                 type: "POST",
                 dataType: "json",
+                data: addProductDateParameters,
                 error: function (xhr) {
                     console.log(xhr.responseText);
                     ShowToastError("Cannot load product list.");
@@ -402,6 +675,7 @@ ViewData["Action"] = "Index";
                 url: "/product/get-product-detail-list",
                 type: "POST",
                 dataType: "json",
+                data: addProductDateParameters,
 
                 dataSrc: function (json) {
                     console.log("Product WeBill response:", json);

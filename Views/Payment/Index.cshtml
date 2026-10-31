@@ -6,6 +6,7 @@
     ViewData["Controller"] = "Payment";
     ViewData["OpenMenu"] = "Administration";
     ViewData["Action"] = "Payment";
+    ViewData["HideHeader"] = true;
 }
 
 <style>
@@ -77,39 +78,115 @@
     }
 </style>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <div class="payment-toolbar">
-                    <button type="button"
-                            id="btnOpenPaymentStudentPicker"
-                            class="btn btn-success">
-                        <i class="fas fa-plus mr-1"></i>
-                        New Payment
-                    </button>
-                </div>
-            </div>
+<div id="studentPaymentPage" class="container-fluid px-0 pt-3" data-ui-design="booking-clothes-sample">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="m-0 font-weight-bold text-dark">Student Payment</h3>
+            <small class="text-muted">Find students, view their payments, and create new payments</small>
+        </div>
+    </div>
 
-            <div class="card-body payment-table-scroll">
-                <table id="tblStudent"
-                       class="table table-sm table-bordered table-striped"
-                       style="width: 100%;">
-                    <thead>
-                    <tr>
-                        <th>Student Id</th>
-                        <th>Name English</th>
-                        <th>Name Khmer</th>
-                        <th>Gender</th>
-                        <th>DOB</th>
-                        <th>Phone</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+    <!-- Date filter card; the DataTable keeps its built-in text search. -->
+    <div class="card card-outline card-primary shadow-sm mb-4">
+        <div class="card-header bg-white py-2">
+            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
+                <i class="fas fa-filter text-primary mr-1"></i>
+                Filter by Date
+            </h3>
+            <div class="card-tools">
+                <button type="button"
+                        class="btn btn-tool"
+                        data-card-widget="collapse"
+                        aria-label="Collapse student filters">
+                    <i class="fas fa-minus"></i>
+                </button>
             </div>
+        </div>
+        <div class="card-body bg-light py-3">
+            <form id="frmPaymentStudentFilters">
+                <div class="row align-items-end">
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="paymentFromDate" class="text-secondary small font-weight-bold">
+                            From Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="paymentFromDate"
+                                   name="fromDate"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="paymentToDate" class="text-secondary small font-weight-bold">
+                            To Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="paymentToDate"
+                                   name="toDate"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12 mb-2 mb-md-0 d-flex">
+                        <div class="btn-group shadow-sm" role="group" aria-label="Date filters">
+                            <button type="submit"
+                                    id="btnFilterPaymentStudents"
+                                    class="btn btn-success">
+                                <i class="fas fa-search mr-1"></i>
+                                Filter
+                            </button>
+                            <button type="button"
+                                    id="btnResetPaymentStudentFilter"
+                                    class="btn btn-success border-left"
+                                    title="Reset filters"
+                                    aria-label="Reset date filters">
+                                <i class="fas fa-redo-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12 payment-toolbar mt-2 mt-md-0">
+                        <button type="button"
+                                id="btnOpenPaymentStudentPicker"
+                                class="btn btn-primary shadow-sm">
+                            <i class="fas fa-plus-circle mr-1"></i>
+                            New Payment
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Student payment table: retain the existing columns and Payment action. -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body payment-table-scroll">
+            <table id="tblStudent"
+                   class="table table-sm table-hover table-bordered table-striped w-100"
+                   style="width: 100%;">
+                <thead class="thead-light">
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name English</th>
+                    <th>Name Khmer</th>
+                    <th>Gender</th>
+                    <th>DOB</th>
+                    <th>Phone</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center" style="width: 110px;">Action</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -138,9 +215,9 @@
             <div class="modal-body">
                 <div class="table-responsive">
                     <table id="tblPaymentStudentPicker"
-                           class="table table-sm table-bordered table-striped"
+                           class="table table-sm table-hover table-bordered table-striped w-100"
                            style="width: 100%;">
-                        <thead>
+                        <thead class="thead-light">
                         <tr>
                             <th>Student Id</th>
                             <th>Name English</th>
@@ -185,7 +262,39 @@
 
     $(document).ready(function () {
         fetchStudent();
+
+        $("#frmPaymentStudentFilters")
+            .off("submit.paymentStudentFilters")
+            .on("submit.paymentStudentFilters", function (event) {
+                event.preventDefault();
+                applyPaymentDateFilter();
+            });
+
+        $("#btnResetPaymentStudentFilter")
+            .off("click.paymentStudentFilters")
+            .on("click.paymentStudentFilters", function () {
+                $("#paymentFromDate, #paymentToDate").val("");
+
+                if ($.fn.DataTable.isDataTable("#tblStudent")) {
+                    $("#tblStudent").DataTable().ajax.reload(null, true);
+                }
+            });
+
     });
+
+    function applyPaymentDateFilter() {
+        const fromDate = $("#paymentFromDate").val();
+        const toDate = $("#paymentToDate").val();
+
+        if (fromDate && toDate && fromDate > toDate) {
+            showPaymentError("From Date must not be later than To Date.");
+            return;
+        }
+
+        if ($.fn.DataTable.isDataTable("#tblStudent")) {
+            $("#tblStudent").DataTable().ajax.reload(null, true);
+        }
+    }
 
     $(document)
         .off("click.openPaymentStudentPicker", "#btnOpenPaymentStudentPicker")
@@ -456,6 +565,12 @@
             ajax: {
                 url: "/student/academic/student-list/all",
                 type: "POST",
+                // The server action must apply fromDate/toDate to the intended
+                // database date column before counting and paging its query.
+                data: function (request) {
+                    request.fromDate = $("#paymentFromDate").val() || "";
+                    request.toDate = $("#paymentToDate").val() || "";
+                },
                 dataSrc: function (json) {
                     return json.data || [];
                 },
@@ -600,7 +715,7 @@
         }
 
         return `
-            <span class="badge ${badgeClass} payment-status-badge">
+            <span class="badge ${badgeClass} payment-status-badge px-2 py-1">
                 ${escapePaymentHtml(status || "N/A")}
             </span>
         `;
