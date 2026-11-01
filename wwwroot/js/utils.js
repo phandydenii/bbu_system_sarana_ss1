@@ -39,6 +39,7 @@ MyApp.utils = {
 
 
 function formatDate(dateStr, formart = "DD-MMM-YYYY") {
+    if (!dateStr) return "";
     return moment(dateStr).format(formart);
 }
 
@@ -106,26 +107,26 @@ function toNum(value) {
     const num = parseFloat(value);
     return isNaN(num) ? 0 : num;
 }
-async function BindSelectOptions(url, cbo, key, val) {
+async function BindSelectOptions(url, cbo, key, val, requestData = { isAll: true }, placeholder = "Select") {
+    const selectOptions = $(`#${cbo}`);
     try {
+        selectOptions.empty();
+        selectOptions.append(`<option value="" disabled selected>${placeholder}</option>`);
         const response = await $.ajax({
             url: url,
-            method: 'POST',
-            data: { isAll: true }
+            method: "POST",
+            data: requestData
         });
-        if (response.status.code === "200" && response.data && response.data.length > 0) {
-            const selectOptions = $(`#${cbo}`);
-            selectOptions.empty();
-            selectOptions.append("<option value='' disabled selected>Select</option>");
+        if (response?.status?.code === "200" && response?.data && response?.data.length > 0) {
             response.data.forEach(item => {
-                selectOptions.append(`<option value='${item[key]}'>${item[val]}</option>`);
+                selectOptions.append(`<option value="${item[key]}">${item[val]}</option>`);
             });
-            selectOptions.trigger("change");
-        }else{
-            console.log(response.responseText);
+        } else {
+            // ShowToastError(response.responseText || "No data");
         }
+        selectOptions.val("").trigger("change");
     } catch (err) {
-        console.log(err.responseText);
+        ShowToastError(err.responseText || err);
     }
 }
 
@@ -153,4 +154,25 @@ async function BindSelectOptions1(url, cbo, key, val) {
 }
 function formatDateForInput(dateString) {
     return new Date(dateString).toISOString().slice(0, 10);
+}
+
+function formatUsd(value) {
+    return Number(value || 0)
+        .toLocaleString(
+            'en-US',
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        );
+}
+
+function formatKhr(value) {
+    return Number(value || 0)
+        .toLocaleString(
+            'en-US',
+            {
+                maximumFractionDigits: 0
+            }
+        );
 }

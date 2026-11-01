@@ -25,6 +25,10 @@ public class SchoolController(ICampusDbContext campusDbContext, IMapper mapper, 
             var length = Request.Form["length"].FirstOrDefault();
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
 
+            var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
+            var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var sortColumn = Request.Form[$"columns[{sortColumnIndex}][data]"].FirstOrDefault();
+
             var pageSize = length != null ? Convert.ToInt32(length) : 0;
             var skip = start != null ? Convert.ToInt32(start) : 0;
             var db = campusDbContext.DbContext(_campus);
@@ -40,7 +44,31 @@ public class SchoolController(ICampusDbContext campusDbContext, IMapper mapper, 
                     d.SchoolNameInKhmer!.Contains(searchValue));
 
             var recordsTotal = query.Count();
-            query = query.OrderByDescending(d => d.SchoolId);
+            //query = query.OrderByDescending(d => d.SchoolId);
+            
+            switch (sortColumn)
+            {
+                case "schoolName":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.SchoolName):
+                        query.OrderByDescending(x => x.SchoolName);
+                    break;
+                case "schoolNameInKhmer":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.SchoolNameInKhmer):
+                        query.OrderByDescending(x => x.SchoolNameInKhmer);
+                    break;
+                case "schoolCode":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.SchoolCode):
+                        query.OrderByDescending(x => x.SchoolCode);
+                    break;
+                case "facultyId":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.FacultyId):
+                        query.OrderByDescending(x => x.FacultyId);
+                    break;
+                default:
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.SchoolId):
+                        query.OrderByDescending(x => x.SchoolId);
+                    break;
+            }
             var data = query.Skip(skip).Take(pageSize).ToList();
 
             return Json(new
@@ -57,6 +85,26 @@ public class SchoolController(ICampusDbContext campusDbContext, IMapper mapper, 
         }
     }
 
+    [HttpGet("get-faculties")]
+    public async Task<IActionResult> GetFaculties()
+    {
+        try
+        {
+            var db = campusDbContext.DbContext(_campus);
+            var faculty = await db.TblFaculty.Select(x => new
+            {
+                id = x.FacultyId,
+                name = x.FacultyName,
+            }).ToListAsync();
+            
+            return new ServerResponse().Success(faculty, "Succeeded!");
+        }
+        catch (Exception e)
+        {
+            return new ServerResponse().ErrorInternal(e);
+        }
+    }
+    
     [HttpPost("get-schools-by-academic-year")]
     public IActionResult GetSchoolByAcademicYear(int degreeId, int year)
     {
@@ -93,30 +141,36 @@ public class SchoolController(ICampusDbContext campusDbContext, IMapper mapper, 
             }
 
             var db = campusDbContext.DbContext(_campus);
-
+          
             if (schoolDto.SchoolId == 0)
             {
                 var newSchool = mapper.Map<SchoolDto, School>(schoolDto);
-
-                await db.TblSchool.AddAsync(newSchool);
-                await db.SaveChangesAsync();
-
+                 await db.TblSchool.AddAsync(newSchool);
+                 await db.SaveChangesAsync();
                 return new ServerResponse().Success(newSchool, "Saved successfully!");
             }
-            
+            // var oldData = await db.TblSchool
+            //     .FirstOrDefaultAsync(x => x.SchoolId == schoolDto.SchoolId);
+            //
+            // if (oldData == null)
+            //     return new ServerResponse().BadRequest("School not found!");
+            //
+            // oldData.SchoolName = schoolDto.SchoolName;
+            // oldData.SchoolNameInKhmer = schoolDto.SchoolNameInKhmer;
+            // oldData.SchoolCode = schoolDto.SchoolCode;
+            // oldData.FacultyId = schoolDto.FacultyId;
+            // oldData.IsFoundationSchool = schoolDto.IsFoundationSchool;
+            //
+            await db.SaveChangesAsync();
             var oldData = await db.TblSchool
                 .FirstOrDefaultAsync(x => x.SchoolId == schoolDto.SchoolId);
-
             if (oldData == null)
             {
                 return new ServerResponse().BadRequest("School not found!");
             }
-
             mapper.Map(schoolDto, oldData);
-
             db.TblSchool.Update(oldData);
             await db.SaveChangesAsync();
-
             return new ServerResponse().Success(oldData, "Updated successfully!");
         }
         catch (Exception ex)
@@ -124,6 +178,7 @@ public class SchoolController(ICampusDbContext campusDbContext, IMapper mapper, 
             return new ServerResponse().ErrorInternal(ex);
         }
     }
+    
     [HttpDelete("delete/{schoolId:int}")]
     public async Task<IActionResult> Delete(int schoolId)
     {

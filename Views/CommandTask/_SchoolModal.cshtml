@@ -1,6 +1,8 @@
 @using BBU_SYSTEM.DTOs
+@using School = BBU_SYSTEM.Modelsss.School
 @{
-    var school = new SchoolDto();
+    @model SchoolDto
+    //var school = new SchoolDto();
 }
 <div class="modal fade" id="SchoolModal" data-backdrop="static">
     <div class="modal-dialog">
@@ -13,44 +15,35 @@
             </div>
             <div class="modal-body">
                 <form id="schoolForm">
-                    <input type="hidden" id="school_SchoolId" name="SchoolId" value="0" />
-
+                    <input asp-for="SchoolId" hidden readonly class="form-control" value="0" />
                     <div class="form-group">
-                        <label class="required">Name</label>
+                        <label>Name</label>
                         <input type="text"
-                               id="school_SchoolName"
-                               name="SchoolName"
+                               asp-for="SchoolName"
                                class="form-control"
                                placeholder="Enter name" required/>
                     </div>
-
                     <div class="form-group">
                         <label>Name Khmer</label>
                         <input type="text"
-                               id="school_SchoolNameInKhmer"
-                               name="SchoolNameInKhmer"
+                               asp-for="SchoolNameInKhmer"
                                class="form-control"
-                               placeholder="Enter name khmer"/>
+                               placeholder="Enter name khmer" required/>
                     </div>
-
                     <div class="row">
                         <div class="col-3">
                             <div class="form-group">
-                                <label class="required">Code</label>
+                                <label>Code</label>
                                 <input type="text"
-                                       id="school_SchoolCode"
-                                       name="SchoolCode"
+                                       asp-for="SchoolCode"
                                        class="form-control"
                                        placeholder="Enter code" required/>
                             </div>
                         </div>
-
                         <div class="col-9">
                             <div class="form-group">
-                                <label class="required">Faculty</label>
-                                <select id="school_FacultyId"
-                                        name="FacultyId"
-                                        class="form-control select2" required>
+                                <label>Faculty</label>
+                                <select asp-for="FacultyId" class="form-control" required>
                                     <option value="">Select Faculty</option>
                                 </select>
                             </div>
@@ -58,13 +51,9 @@
                     </div>
 
                     <div class="form-group">
-                        <input type="checkbox" id="chkFoundation" />
-                        <label>is foundation</label>
-
-                        <input type="hidden"
-                               id="school_IsFoundationSchool"
-                               name="IsFoundationSchool"
-                               value="0" />
+                        <input type="checkbox" id="chkFoundation"/>
+                        <label for="chkFoundation"> Foundation</label>
+                        <input hidden id="IsFoundationSchool" name="IsFoundationSchool" value="0" />
                     </div>
                 </form>
             </div>
@@ -73,7 +62,7 @@
                     <i class="fas fa-save"></i>
                     Save changes
                 </button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
+                <button id="btnClose" type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
                 </button>
             </div>
         </div>

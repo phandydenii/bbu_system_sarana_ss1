@@ -1,0 +1,1309 @@
+﻿@using BBU_SYSTEM.Models.Req
+@{
+    var registryReq = new RegistryReq();
+}
+
+<style>
+    #CreateRegistryModal {
+        padding-right: 0 !important;
+    }
+
+    #CreateRegistryModal .create-registry-dialog {
+        width: calc(100vw - 40px);
+        max-width: 1420px;
+        margin: 20px auto;
+    }
+
+    #CreateRegistryModal .create-registry-content {
+        height: calc(100vh - 40px);
+        max-height: calc(100vh - 40px);
+        overflow: hidden;
+    }
+
+    #CreateRegistryModal .create-registry-body {
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 10px;
+    }
+
+    #CreateRegistryModal.create-registry-fullscreen .create-registry-dialog {
+        width: 100vw;
+        max-width: none;
+        height: 100vh;
+        margin: 0;
+    }
+
+    #CreateRegistryModal.create-registry-fullscreen .create-registry-content {
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    @@media (max-width: 767.98px) {
+        #CreateRegistryModal .create-registry-dialog {
+            width: calc(100vw - 16px);
+            margin: 8px auto;
+        }
+
+        #CreateRegistryModal .create-registry-content {
+            height: calc(100vh - 16px);
+            max-height: calc(100vh - 16px);
+        }
+    }
+</style>
+
+<div class="modal fade create-registry-fullscreen"
+     id="CreateRegistryModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="CreateRegistryModalLabel"
+     aria-hidden="true"
+     data-backdrop="static"
+     data-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered create-registry-dialog"
+         role="document">
+        <div class="modal-content create-registry-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="CreateRegistryModalLabel">
+                    <i class="fas fa-user-plus mr-1"></i>
+                    New Student Registration
+                </h4>
+                <div class="d-flex align-items-center">
+                    <button type="button"
+                            id="btnToggleCreateRegistrySize"
+                            class="btn btn-sm btn-link text-secondary mr-1"
+                            title="Exit full screen"
+                            aria-label="Toggle full screen">
+                        <i class="fas fa-compress"></i>
+                    </button>
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body create-registry-body">
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Registry Detail</h3>
+            </div>
+            <div class="card-body">
+                <form id="frmRegistry" novalidate>
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="card card-primary card-outline card-outline-tabs">
+                                <div class="card-header p-0 border-bottom-0">
+                                    <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" id="custom-tabs-four-1-tab"
+                                               data-toggle="pill" href="#custom-tabs-four-1" role="tab"
+                                               aria-controls="custom-tabs-four-1"
+                                               aria-selected="true">Personal</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-2-tab"
+                                               data-toggle="pill" href="#custom-tabs-four-2" role="tab"
+                                               aria-controls="custom-tabs-four-2" aria-selected="false">
+                                                Contact
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-3-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-3" role="tab"
+                                               aria-controls="custom-tabs-four-3" aria-selected="false">Parent</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-4-tab"
+                                               data-toggle="pill" href="#custom-tabs-four-4" role="tab"
+                                               aria-controls="custom-tabs-four-4"
+                                               aria-selected="false">Relative</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-5-tab"
+                                               data-toggle="pill" href="#custom-tabs-four-5" role="tab"
+                                               aria-controls="custom-tabs-four-5"
+                                               aria-selected="false">Scholarship</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-6-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-6" role="tab"
+                                               aria-controls="custom-tabs-four-6"
+                                               aria-selected="false">Certificate</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-7-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-7" role="tab"
+                                               aria-controls="custom-tabs-four-7" aria-selected="false">Extend</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-8-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-8" role="tab"
+                                               aria-controls="custom-tabs-four-8" aria-selected="false">Note</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="custom-tabs-four-9-tab" data-toggle="pill"
+                                               href="#custom-tabs-four-9" role="tab"
+                                               aria-controls="custom-tabs-four-9"
+                                               aria-selected="false">Continue</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="card-body">
+                                    <div class="tab-content" id="custom-tabs-four-tabContent">
+                                        <div class="tab-pane fade show active" id="custom-tabs-four-1"
+                                             role="tabpanel" aria-labelledby="custom-tabs-four-1-tab">
+                                            <partial name="_TabPersonal" model="registryReq" />
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-2" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-2-tab">
+                                            <partial name="_TabContactPerson" model="registryReq" />
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-3" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-3-tab">
+                                            <partial name="_TabParent" model="registryReq" />
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-4" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-4-tab">
+                                            <partial name="_TabRelativeContact" model="registryReq" />
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-5" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-5-tab">
+                                            <partial name="_TabScholarship" model="registryReq" />
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-6" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-6-tab">
+                                            <partial name="_TabCertificate" model="registryReq" />
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-7" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-7-tab">
+                                            <partial name="_TabExtendFrom" model="registryReq" />
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-8" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-8-tab">
+                                            <partial name="_TabNote" model="registryReq" />
+                                        </div>
+                                        <div class="tab-pane fade" id="custom-tabs-four-9" role="tabpanel"
+                                             aria-labelledby="custom-tabs-four-9-tab">
+                                            <partial name="_TabContinueEducation" model="registryReq" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="card card-outline card-primary">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <label class="required">Degree</label>
+                                            <select asp-for="@registryReq.Registry!.DegreeId" class="form-control select2" style="width: 100%;">
+                                                <option selected="selected" disabled value="">Degree</option>
+
+                                            </select>
+                                        </div>
+                                        <div class="col-8">
+                                            <label class="required">School</label>
+                                            <select asp-for="@registryReq.Registry!.SchoolId"
+                                                    class="form-control select2" style="width: 100%;">
+                                                <option selected="selected" disabled value="-1">School</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <label class="required">Program</label>
+                                    <select id="cboProgram" class="form-control select2" style="width: 100%;">
+                                        <option selected="selected">Program</option>
+                                    </select>
+                                    <label class="required">Field</label>
+                                    <select asp-for="@registryReq.Student!.FieldId"
+                                            class="form-control select2" style="width: 100%;">
+                                        <option selected="selected">Field</option>
+                                    </select>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="required">Promotion</label>
+                                            <select asp-for="@registryReq.Registry!.PromotionNo"
+                                                    class="form-control select2" style="width: 100%;">
+                                                <option selected="selected">Promotion</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="required">Stage</label>
+                                            <select asp-for="@registryReq.Registry!.StageNo"
+                                                    class="form-control select2" style="width: 100%;">
+                                                <option selected="selected">Stage</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="required">Term</label>
+                                            <input type="number" class="form-control" min="1" value="1"
+                                                   asp-for="@registryReq.Registry!.TermNo">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="required">Study Time</label>
+                                            <select asp-for="@registryReq.Registry!.StudyTime"
+                                                    class="form-control select2" style="width: 100%;">
+                                                <option selected="selected" disabled>Time</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox"
+                                                       id="chbContinuedStudent"
+                                                       asp-for="@registryReq.IsContinue">
+                                                <label for="chbContinuedStudent" class="custom-control-label">Continued
+                                                    Student</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox"
+                                                       id="chbAssToBac"
+                                                       asp-for="@registryReq.AssToBach">
+                                                <label for="chbAssToBac" class="custom-control-label">Associate to
+                                                    Bachelor</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox"
+                                                       id="chbBacToMas" asp-for="@registryReq.BachToMas">
+                                                <label for="chbBacToMas" class="custom-control-label">Bachelor to
+                                                    Master</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="Resume" hidden>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <label>Payment Date</label>
+                                                <input type="date" class="form-control"
+                                                       asp-for="@registryReq!.Resume!.DatePayment">
+                                            </div>
+                                            <div class="col-4">
+                                                <label class="required">Promotion</label>
+                                                <input type="number" class="form-control" min="0" value="0"
+                                                       asp-for="@registryReq!.Resume!.CPromotion">
+                                            </div>
+                                            <div class="col-2">
+                                                <label class="required">Year</label>
+                                                <input type="number" class="form-control" min="0" max="5" value="0"
+                                                       asp-for="@registryReq!.Resume!.CYear">
+                                            </div>
+                                            <div class="col-2">
+                                                <label class="required">Semester</label>
+                                                <input type="number"
+                                                       class="form-control"
+                                                       min="1"
+                                                       max="2"
+                                                       value="1"
+                                                       asp-for="@registryReq.Resume.CSemester">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-end align-items-center">
+                    <button type="submit"
+                            id="btnSaveRegistry"
+                            class="btn btn-success mr-2"
+                            form="frmRegistry">
+                        <i class="fas fa-save mr-1"></i> Registry
+                    </button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+    const registerInput = "#registryReq_Registry"
+    const studentInput = "#registryReq_Student"
+    const frmRegistry = $("#frmRegistry");
+    const createRegistryModal = $("#CreateRegistryModal");
+    const toggleCreateRegistrySize = $("#btnToggleCreateRegistrySize");
+
+    const cboDegree = $(`${registerInput}_DegreeId`);
+    const cboSchool = $(`${registerInput}_SchoolId`);
+    const cboProgram = $(`#cboProgram`);
+    const cboField = $(`${studentInput}_FieldId`);
+    const cboPromotion = $(`${registerInput}_PromotionNo`);
+    const cboStage = $(`${registerInput}_StageNo`);
+    const cboTerm = $(`${registerInput}_TermNo`);
+    const cboStudyTime = $(`${registerInput}_StudyTime`);
+
+    const chbAssToBac = $("#chbAssToBac");
+    const chbBacToMas = $("#chbBacToMas");
+    const resume = $("#Resume");
+
+
+    const tblScholarship = $("#tblScholarship");
+    const tblCertificate = $("#tblCertificate");
+
+    const btnAddScholarship = $("#btnAddScholarship");
+    const btnAddCertificate = $("#btnAddCertificate");
+
+    let certificates = [], scholarships = [];
+
+    function initializeCreateRegistrySelect2() {
+        if (!$.fn.select2) {
+            return;
+        }
+
+        createRegistryModal.find(".select2").each(function () {
+            const select = $(this);
+
+            if (select.hasClass("select2-hidden-accessible")) {
+                select.select2("destroy");
+            }
+
+            select.select2({
+                width: "100%",
+                dropdownParent: createRegistryModal
+            });
+        });
+    }
+
+    createRegistryModal
+        .off("shown.bs.modal.createRegistry")
+        .on("shown.bs.modal.createRegistry", function () {
+            initializeCreateRegistrySelect2();
+        });
+
+    toggleCreateRegistrySize
+        .off("click.createRegistrySize")
+        .on("click.createRegistrySize", function () {
+            createRegistryModal.toggleClass(
+                "create-registry-fullscreen"
+            );
+
+            const isFullscreen = createRegistryModal.hasClass(
+                "create-registry-fullscreen"
+            );
+
+            $(this)
+                .attr(
+                    "title",
+                    isFullscreen ? "Exit full screen" : "Full screen"
+                )
+                .find("i")
+                .toggleClass("fa-expand", !isFullscreen)
+                .toggleClass("fa-compress", isFullscreen);
+        });
+
+    $(document).ready(function () {
+        initializeCreateRegistrySelect2();
+        showLoading();
+        GetDegree();
+        GetSchool();
+
+        GetStudyTime();
+        Components.BindSelectOptions(
+            "/Province/get-provinces",
+            "registryReq_Student_PlaceOfBirthId",
+            "provinceId",
+            "provinceName"
+        );
+        Components.BindSelectOptions("/Nationality/get-nationalities", "registryReq_Student_NationalityId", "nationalityId", "nationalityName");
+        Components.BindSelectOptions(
+            "/Province/get-provinces",
+            "registryReq_Student_FromProvinceId",
+            "provinceId",
+            "provinceName"
+        );
+        Components.BindSelectOptions(
+            "/high-school/get-high-school",
+            "registryReq_Student_FromHighSchoolNameInKhmer",
+            "highSchoolNameInKhmer",
+            "highSchoolNameInKhmer"
+        );
+        Components.BindSelectOptions("/student-job/get-student-jobs", "registryReq_Student_JobId", "jobId", "jobName");
+        const disabilityControl = $("#frmRegistry")
+            .find(
+                'select[name="Student.DisabilityId"],' +
+                'select[name="registryReq.Student.DisabilityId"],' +
+                'select[id$="_DisabilityId"]'
+            )
+            .first();
+
+        if (disabilityControl.length) {
+            disabilityControl.attr({
+                id: "registryReq_Student_DisabilityId",
+                name: "registryReq.Student.DisabilityId"
+            });
+
+            disabilityControl
+                .empty()
+                .append(
+                    '<option value="" selected>' +
+                    'Select Disability</option>'
+                );
+            $.ajax({
+                url: "/disability/get-disabilities?isAll=true",
+                type: "POST",
+                success: function (response) {
+                    const items =
+                        response?.data ??
+                        response?.result ??
+                        response ??
+                        [];
+
+                    items.forEach(function (item) {
+                        const id =
+                            item.disabilityId ??
+                            item.disabilityid ??
+                            item.DisabilityId ??
+                            item.DISABILITYID ??
+                            item.id ??
+                            item.Id;
+
+                        const name =
+                            item.disabilityName ??
+                            item.disabilityname ??
+                            item.DisabilityName ??
+                            item.DISABILITYNAME ??
+                            item.name ??
+                            item.Name;
+
+                        if (id === undefined ||
+                            id === null ||
+                            id === "") {
+                            return;
+                        }
+
+                        disabilityControl.append(
+                            $("<option>", {
+                                value: id,
+                                text: name ?? id
+                            })
+                        );
+                    });
+                },
+                error: function () {
+                    ShowToastError(
+                        "Cannot load disabilities."
+                    );
+                }
+            });
+        } else {
+            console.error(
+                "Disability dropdown was not found in #frmRegistry."
+            );
+        }
+
+
+
+        Components.BindSelectOptions(
+            "/race/get-races",
+            "registryReq_Student_RaceId",
+            "raceId",
+            "raceName"
+        );
+        
+
+        fetchCertificate();
+        fetchScholarship();
+        hideLoading();
+        toggleResumeForm();
+    });
+
+    async function fetchCertificate() {
+        try {
+            const response = await $.ajax({
+                url: "/certificate/get-certificate",
+                method: 'POST',
+                data: {isAll: true}
+            });
+            if (response.status.code === "200" && response.data && response.data.length > 0) {
+                certificates = response.data;
+            } else {
+                console.log(response.responseText);
+            }
+        } catch (err) {
+            console.log(err.responseText);
+        }
+    }
+
+    async function fetchScholarship() {
+        try {
+            const response = await $.ajax({
+                url: "/sponsor/get-sponsor",
+                method: 'POST',
+                data: {isAll: true}
+            });
+            if (response.status.code === "200" && response.data && response.data.length > 0) {
+                scholarships = response.data;
+            } else {
+                console.log(response.responseText);
+            }
+        } catch (err) {
+            console.log(err.responseText);
+        }
+    }
+
+    async function loadFieldAndPromotion() {
+        const degreeId = Number(cboDegree.val()) || 0;
+        const schoolId = Number(cboSchool.val()) || 0;
+
+        cboField.empty().append(`
+        <option value="" disabled selected>
+            Select Field
+        </option>
+    `);
+
+        cboProgram.empty().append(`
+        <option value="" disabled selected>
+            Select Program
+        </option>
+    `);
+
+        cboPromotion
+            .off("change.registry")
+            .on("change.registry", async function () {
+                const promotionId =
+                    Number(cboPromotion.val()) || 0;
+
+                console.log(
+                    "Selected promotion ID:",
+                    promotionId
+                );
+
+                if (promotionId <= 0) {
+                    cboStage.empty().append(`
+                <option value="" disabled selected>
+                    Select Stage
+                </option>
+            `);
+
+                    cboTerm.val("");
+                    return;
+                }
+
+                showLoading();
+
+                try {
+                    await GetStage();
+                } finally {
+                    hideLoading(1);
+                }
+            });
+
+        cboStage
+            .off("change.registry")
+            .on("change.registry", async function () {
+                const stageId =
+                    Number(cboStage.val()) || 0;
+
+                if (stageId <= 0) {
+                    cboTerm.val("");
+                    return;
+                }
+
+                showLoading();
+
+                try {
+                    await GetTerm();
+                } finally {
+                    hideLoading(1);
+                }
+            });
+
+        cboTerm.val("");
+
+        if (degreeId <= 0 || schoolId <= 0) {
+            return;
+        }
+
+        showLoading();
+
+        try {
+            await Promise.all([
+                GetField(),
+                GetPromotion()
+            ]);
+        } catch (error) {
+            console.log("Field and promotion error:", error);
+            ShowToastError("Cannot load field or promotion.");
+        } finally {
+            hideLoading(1);
+        }
+}
+
+    cboDegree
+        .off("change.registry")
+        .on("change.registry", loadFieldAndPromotion);
+
+    cboSchool
+        .off("change.registry")
+        .on("change.registry", loadFieldAndPromotion);
+
+    cboPromotion
+        .off("change.registry")
+        .on("change.registry", async function () {
+            showLoading();
+
+            try {
+                await GetStage();
+            } finally {
+                hideLoading(1);
+            }
+        });
+
+    cboStage
+        .off("change.registry")
+        .on("change.registry", async function () {
+            const stageId =
+                Number(cboStage.val()) || 0;
+
+            console.log("Selected stage ID:", stageId);
+
+            if (stageId <= 0) {
+                cboTerm.val("");
+                return;
+            }
+
+            showLoading();
+
+            try {
+                await GetTerm();
+            } finally {
+                hideLoading(1);
+            }
+        });
+
+    async function GetDegree() {
+        cboDegree.empty();
+        cboDegree.append("<option value='' disabled>Select Degree</option>");
+        const degrees = await Degree.GetAllDegree();
+        degrees.forEach(item => {
+            cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
+        });
+        cboDegree.val('').trigger("change");
+    }
+
+    async function GetSchool() {
+        cboSchool.empty();
+        cboSchool.append("<option value='' disabled>Select School</option>");
+        const schools = await School.GetSchool()
+        schools.forEach(function (item) {
+            cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
+        });
+        cboSchool.val('').trigger("change");
+    }
+
+    async function GetField() {
+        const degreeId = parseInt(cboDegree.val());
+        const schoolId = parseInt(cboSchool.val());
+        if (!degreeId || !schoolId) {
+            return;
+        }
+        cboField.empty();
+        cboProgram.empty();
+
+        cboField.append("<option value='' disabled>Select Field</option>");
+        cboProgram.append("<option value='' disabled>Select Program</option>");
+        const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
+        fields.forEach(item => {
+            cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
+            cboProgram.append(`<option value='${item.fieldId}'>${item.degreeName}</option>`);
+        });
+        cboField.val('').trigger("change");
+    }
+
+    async function GetPromotion() {
+        const degreeId = Number(cboDegree.val()) || 0;
+        const schoolId = Number(cboSchool.val()) || 0;
+
+        cboPromotion.empty().append(`
+        <option value="" disabled selected>
+            Select Promotion
+        </option>
+    `);
+
+        // Clear dependent controls
+        cboStage.empty().append(`
+        <option value="" disabled selected>
+            Select Stage
+        </option>
+    `);
+
+        cboTerm.val("");
+
+        if (degreeId <= 0 || schoolId <= 0) {
+            return;
+        }
+
+        try {
+            const promotions = await Promotion.GetPromotions({
+                isSelect2: true,
+                degreeId: degreeId,
+                schoolId: schoolId
+            });
+
+            (promotions || []).forEach(function (item) {
+                cboPromotion.append(`
+                <option value="${item.promotionId}">
+                    ${item.promotionNo}
+                </option>
+            `);
+            });
+
+            cboPromotion.val("").trigger("change.select2");
+        } catch (error) {
+            console.log("GetPromotion error:", error);
+            ShowToastError("Cannot load promotions.");
+        }
+}
+
+    async function GetStage() {
+        const promotionId = Number(cboPromotion.val()) || 0;
+
+        // Reset Stage and Term
+        cboStage.empty().append(`
+        <option value="" disabled selected>
+            Select Stage
+        </option>
+    `);
+
+        cboTerm.val("");
+
+        if (promotionId <= 0) {
+            console.log("Promotion ID is empty.");
+            return;
+        }
+
+        try {
+            const response = await Stage.GetStages({
+                isSelect2: true,
+                promotionId: promotionId
+            });
+
+            console.log("Stage response:", response);
+
+            const stages =
+                response?.data ??
+                response?.result ??
+                response ??
+                [];
+
+            if (!Array.isArray(stages)) {
+                console.log("Stage response is not an array:", stages);
+
+                cboStage.empty().append(`
+                <option value="">
+                    Invalid stage data
+                </option>
+            `);
+
+                return;
+            }
+
+            let stageFound = false;
+
+            stages.forEach(function (item) {
+                const itemPromotionId =
+                    item.promotionId ??
+                    item.PromotionId ??
+                    item.promotion_id ??
+                    item.promotion;
+
+                const stageId =
+                    item.stageId ??
+                    item.StageId ??
+                    item.stage_id;
+
+                const stageNo =
+                    item.stageNo ??
+                    item.StageNo ??
+                    item.stage_no;
+
+                if (Number(itemPromotionId) === promotionId) {
+                    cboStage.append(`
+                    <option value="${stageId}">
+                        ${stageNo}
+                    </option>
+                `);
+
+                    stageFound = true;
+                }
+            });
+
+            if (!stageFound) {
+                cboStage.empty().append(`
+                <option value="">
+                    No stage available
+                </option>
+            `);
+
+                console.log(
+                    "No stage found for promotion ID:",
+                    promotionId
+                );
+
+                return;
+            }
+
+            cboStage.val("").trigger("change.select2");
+        } catch (error) {
+            console.log("GetStage error:", error);
+            console.log("Server response:", error.responseText);
+
+            cboStage.empty().append(`
+            <option value="">
+                Cannot load stage
+            </option>
+        `);
+
+            ShowToastError(
+                error.responseJSON?.status?.message ||
+                error.responseJSON?.message ||
+                "Cannot load stages."
+            );
+        }
+    }
+
+    async function GetTerm() {
+        const stageId = Number(cboStage.val()) || 0;
+
+        cboTerm.val("");
+
+        if (stageId <= 0) {
+            console.log("Stage ID is empty.");
+            return;
+        }
+
+        try {
+            const response = await Term.GetTerms({
+                isSelect2: true,
+                stageId: stageId
+            });
+
+            console.log("Term response:", response);
+
+            const terms =
+                response?.data ??
+                response?.result ??
+                response ??
+                [];
+
+            if (!Array.isArray(terms)) {
+                console.log("Invalid term response:", terms);
+                ShowToastError("Invalid term data.");
+                return;
+            }
+
+            const activeTerm = terms.find(function (item) {
+                const itemStageId =
+                    item.stageId ??
+                    item.StageId ??
+                    item.stage_id;
+
+                const status =
+                    item.status ??
+                    item.Status;
+
+                return (
+                    Number(itemStageId) === stageId &&
+                    String(status).toUpperCase() === "ACTIVE"
+                );
+            });
+
+            if (activeTerm) {
+                const termNo =
+                    activeTerm.termNo ??
+                    activeTerm.TermNo ??
+                    activeTerm.term_no;
+
+                cboTerm.val(termNo);
+            } else {
+                console.log(
+                    "No active term found for stage:",
+                    stageId
+                );
+
+                cboTerm.val("");
+            }
+        } catch (error) {
+            console.log("GetTerm error:", error);
+            console.log(
+                "Term server response:",
+                error.responseText
+            );
+
+            ShowToastError("Cannot load terms.");
+        }
+    }
+
+    async function GetStudyTime() {
+        cboStudyTime.empty();
+        cboStudyTime.append("<option value='' disabled selected>Select Study Time</option>");
+        try {
+            const response = await fetch("/study-time/get-study-time", {
+                method: "GET",
+            });
+            const result = await response.json();
+            result.data.forEach(item => {
+                cboStudyTime.append(`<option value='${item.studyTimeValue}'>${item.studyTimeValue}</option>`);
+            });
+            cboStudyTime.trigger("change");
+        } catch (err) {
+            ShowToastError("Failed to load study times.");
+        }
+    }
+
+    $(document)
+        .off("submit.registry", "#frmRegistry")
+        .on("submit.registry", "#frmRegistry", function (e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            const form = this;
+            
+            $(form).find("[name]").each(function () {
+                const fieldName = this.name;
+
+                if (!fieldName ||
+                    fieldName === "__RequestVerificationToken" ||
+                    fieldName.startsWith("registryReq.")) {
+                    return;
+                }
+
+                this.name = `registryReq.${fieldName}`;
+            });
+
+            const formData = new FormData(form);
+            
+            const selectedDisability = $(form)
+                .find(
+                    'select[name="Student.DisabilityId"],' +
+                    'select[name="registryReq.Student.DisabilityId"],' +
+                    'select[id$="_DisabilityId"]'
+                )
+                .first()
+                .val();
+
+            formData.delete("DisabilityId");
+            formData.delete("Student.DisabilityId");
+            formData.delete(
+                "registryReq.Student.DisabilityId"
+            );
+
+            if (selectedDisability !== undefined &&
+                selectedDisability !== null &&
+                selectedDisability !== "") {
+                formData.set(
+                    "registryReq.Student.DisabilityId",
+                    selectedDisability
+                );
+            }
+            
+            const receivedPhotoCheckbox = $(form)
+                .find(
+                    'input[type="checkbox"]' +
+                    '[name="registryReq.Student.IsReceivePhoto"]'
+                )
+                .first();
+
+            formData.delete(
+                "registryReq.Student.IsReceivePhoto"
+            );
+            formData.set(
+                "registryReq.Student.IsReceivePhoto",
+                receivedPhotoCheckbox.is(":checked")
+                    ? "true"
+                    : "false"
+            );
+
+            const saveButton = $("button[form='frmRegistry']");
+
+            $.ajax({
+                url: "/registry/PostRegistry",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+
+                beforeSend: function () {
+                    saveButton
+                        .prop("disabled", true)
+                        .html(`
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                        Saving...
+                    `);
+                },
+
+                // PUT THE SUCCESS CODE HERE
+                success: function (response) {
+                    const code =
+                        response.status?.code ??
+                        response.code;
+
+                    const message =
+                        response.status?.message ??
+                        response.message;
+
+                    if (String(code) === "200") {
+                        const successMessage =
+                            message ||
+                            "Registry created successfully!";
+
+                        if (typeof ShowToastSuccess === "function") {
+                            ShowToastSuccess(successMessage);
+                        } else {
+                            alert(successMessage);
+                        }
+
+                        createRegistryModal.modal("hide");
+
+                        if ($.fn.DataTable &&
+                            $.fn.DataTable.isDataTable("#tblRegistry")) {
+                            $("#tblRegistry")
+                                .DataTable()
+                                .ajax.reload(null, false);
+                        }
+
+                        return;
+                    }
+
+                    ShowToastError(
+                        message ||
+                        "Cannot create registry."
+                    );
+                },
+
+                error: function (xhr) {
+                    console.log("PostRegistry error:", xhr.responseJSON);
+                    console.log("PostRegistry text:", xhr.responseText);
+
+                    const message =
+                        xhr.responseJSON?.status?.message ??
+                        xhr.responseJSON?.message ??
+                        xhr.responseJSON?.title ??
+                        "Server error.";
+
+                    ShowToastError(message);
+                },
+
+                complete: function () {
+                    saveButton
+                        .prop("disabled", false)
+                        .html(`
+                        <i class="fas fa-save"></i>
+                        Registry
+                    `);
+                }
+            });
+
+            return false;
+        });
+
+
+    chbAssToBac.on("change", function (e) {
+        chbBacToMas.prop("checked", false);
+        if (e.target.checked === true) {
+            resume.removeAttr("hidden");
+        } else {
+            resume.attr("hidden", "hidden");
+        }
+    });
+    chbBacToMas.on("change", function (e) {
+        chbAssToBac.prop("checked", false);
+        if (e.target.checked === true) {
+            resume.removeAttr("hidden");
+        } else {
+            resume.attr("hidden", "hidden");
+        }
+    });
+
+    $("#rdoHighSchool")
+        .off("change.registry")
+        .on("change.registry", function () {
+            if (!this.checked) {
+                return;
+            }
+
+            Components.BindSelectOptions(
+                "/high-school/get-high-school",
+                "registryReq_Student_FromHighSchoolNameInKhmer",
+                "highSchoolNameInKhmer",
+                "highSchoolNameInKhmer"
+            );
+        });
+
+    $("#rdoMasPhD").on("change", function (e) {
+        if (e.target.checked === true) {
+            showLoading();
+            Components.BindSelectOptions(
+                "/university/get-universities",
+                "registryReq_Student_FromHighSchoolNameInKhmer",
+                "universityName",
+                "universityName"
+            );
+            hideLoading(1);
+        }
+    });
+
+    btnAddScholarship.on("click", function (e) {
+        e.preventDefault();
+        AddRowScholarship([
+            null, null, "", "1", false, 0, ""    
+        ]);
+    });
+
+    function buildScholarshipOptions(selectedId) {
+        let html = ``;
+        scholarships.forEach(c => {
+            html += `<option value="${c.sponsorId}" ${c.sponsorId === selectedId ? "selected" : ""}>${c.sponsorName}</option>`;
+        });
+        return html;
+    }
+    function toggleResumeForm() {
+        const shouldShow =
+            chbAssToBac.prop("checked") ||
+            chbBacToMas.prop("checked");
+
+        if (shouldShow) {
+            resume.removeAttr("hidden");
+
+            resume
+                .find("input, select, textarea")
+                .prop("disabled", false);
+
+            $("#registryReq_Resume_CSemester").val(1);
+        } else {
+            resume.attr("hidden", "hidden");
+
+            resume
+                .find("input, select, textarea")
+                .prop("disabled", true);
+        }
+}
+
+    function AddRowScholarship(params) {
+        const index = tblScholarship.find("tbody tr").length;
+        tblScholarship.find("tbody").append(`
+                <tr>
+                    <td class="d-none">
+                        <input value="${params[0]}" type="hidden" name="registryReq.Scholarships[${index}].StudentScholarshipId"/>
+                        <input value="${params[1]}" type="hidden" name="registryReq.Scholarships[${index}].StudentId"/>
+                    </td>
+                    <td>
+                        <select class="form-control form-control-sm select2" name="registryReq.Scholarships[${index}].SponsorId">
+                            ${buildScholarshipOptions(params[2]) }
+                        </select>
+                    </td> 
+                    <td>
+                        <input type="number" value="${params[3]}" class="form-control form-control-sm" name="registryReq.Scholarships[${index}].TermNo"/>
+                    </td>
+                    <td>
+                        <select class="custom-select custom-select-sm" name="registryReq.Scholarships[${index}].IsFullScholarship">
+                          <option value="true" ${params[4]===true ? "selected":""}>True</option>
+                          <option value="false" ${params[4]===true ? "":"selected"}>False</option> 
+                        </select>
+                    </td> 
+                    <td>
+                        <input type="number" value="${params[5]}" class="form-control form-control-sm" name="registryReq.Scholarships[${index}].Amount" min="0"/>
+                    </td>
+                    <td>
+                        <a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i></a>
+                        <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></a>
+                    </td>
+                </tr>
+            `);
+        initializeCreateRegistrySelect2();
+    }
+
+    btnAddCertificate.on("click", function () {
+        AddRowCertificate([
+            null, null, "", "F", "", false, ""
+        ]);
+    });
+    function buildCertificateOptions(selectedId) {
+        let html = ``;
+        certificates.forEach(c => {
+            html += `<option value="${c.certificateId}" ${c.certificateId === selectedId ? "selected" : ""}>${c.certificateName}</option>`;
+        });
+        return html;
+    }
+
+    function AddRowCertificate(params) {
+        const index = tblCertificate.find("tbody tr").length;
+        tblCertificate.find("tbody").append(`
+            <tr>
+                <!-- hidden ids -->
+                <td class="d-none">
+                    <input type="hidden" name="registryReq.StudentCertificates[${index}].StudentCertificateId" value="${params[0] ?? ''}">
+                    <input type="hidden" name="registryReq.StudentCertificates[${index}].StudentId" value="${params[1] ?? ''}">
+                </td>
+                <td>
+                    <select class="form-control form-control-sm select2" name="registryReq.StudentCertificates[${index}].CertificateId">
+                        ${buildCertificateOptions(params[2]) }
+                    </select>
+                </td> 
+                <td>
+                        <select class="custom-select custom-select-sm" name="registryReq.StudentCertificates[${index}].Grade">
+                          <option value="A" ${params[3]==="A" ? "selected":""}>A</option>
+                          <option value="B" ${params[3]==="B" ? "selected":""}>B</option>
+                          <option value="C" ${params[3]==="C" ? "selected":""}>C</option>
+                          <option value="D" ${params[3]==="D" ? "selected":""}>D</option>
+                          <option value="E" ${params[3]==="E" ? "selected":""}>E</option>
+                          <option value="F" ${params[3]==="F" ? "selected":""}>F</option>
+                        </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm" name="registryReq.StudentCertificates[${index}].CertificateIssueNo" value="${params[4] ?? ''}">
+                </td>
+                <td>
+                    <select class="custom-select custom-select-sm" name="registryReq.StudentCertificates[${index}].IsReceived">
+                      <option value="true" ${params[5]===true ? "selected":""}>True</option>
+                      <option value="false" ${params[5]===true ? "":"selected"}>False</option> 
+                    </select>
+                </td> 
+                <td class="text-center">
+                    <a class="btn btn-success btn-sm btnEdit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a class="btn btn-danger btn-sm btnDelete">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            `);
+        initializeCreateRegistrySelect2();
+    }
+
+
+    tblCertificate.on("click", ".btnDelete", function () {
+        $(this).closest("tr").remove();
+        reIndexCertificates();
+    });
+    function reIndexCertificates() {
+        $("#tblCertificate tbody tr").each(function (i) {
+            $(this).find("input, select").each(function () {
+                this.name = this.name.replace(/\[\d+\]/, `[${i}]`);
+            });
+        });
+    }
+    })();
+</script>

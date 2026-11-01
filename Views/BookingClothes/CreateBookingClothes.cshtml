@@ -1,0 +1,1104 @@
+@model BBU_SYSTEM.ViewModel.PaymentViewModel
+@using BBU_SYSTEM.DTOs
+@using BBU_SYSTEM.Models.Req
+@{
+    ViewData["OpenMenu"] = "Administration";
+    ViewData["Action"] = "Create";
+    var student = new Student();
+    var degree = new Degree();
+    var school = new School();
+    var field = new Field();
+    var promotion = new Promotion();
+    var stage = new Stage();
+    var term = new Term();
+    var product = new Product();
+    var group = new GroupDto();
+    var groupRoom = new GroupRoomDto();
+    var invoice = new InvoiceDto();
+}
+
+<form id="bookingForm" method="post">
+    <div class="card">
+        <div class="card-header">
+            <label>Create Booking</label>
+            <button id="btnCreateBooking" type="button" class="btn btn-primary float-right" data-toggle="modal"
+                    data-target="#BookingClothesModal">
+                Create New Booking
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-5">
+                    <div class="row">
+                        <div class="col-3">
+                            <label class="required">student_id</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-sm " asp-for="@invoice.StudentId"
+                                       readonly/>
+                                <div class="input-group-append" style="cursor: pointer;" id="btnSearchStudent">
+                                    <span class="input-group-text" style="background-color: green;"><i
+                                            class="fa-solid fa-magnifying-glass" style="color: white;"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <label>name</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@student.StudentName"
+                                   readonly/>
+                        </div>
+                        <div class="col-4">
+                            <label>gender</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@student.Sex" readonly/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            <label>dob</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@student.DateOfBirth"
+                                   readonly>
+                        </div>
+                        <div class="col-5">
+                            <label>name_khmer</label>
+                            <input type="text" class="form-control form-control-sm"
+                                   asp-for="@student.StudentNameInKhmer" readonly/>
+                        </div>
+                        <div class="col-4">
+                            <label>phone</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@student.Phone" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="row">
+                        <div class="col-2">
+                            <label>degree</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@invoice.DegreeId"
+                                   readonly>
+                        </div>
+                        <div class="col-4">
+                            <label>school</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@invoice.SchoolId"
+                                   readonly>
+                        </div>
+                        <div class="col-4">
+                            <label>field</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@invoice.FieldId" readonly>
+                        </div>
+                        <div class="col-2">
+                            <label>promotion</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@invoice.PromotionId"
+                                   readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-2">
+                            <label>stage</label>
+                            <input type="number" class="form-control form-control-sm" asp-for="@invoice.StageId"
+                                   readonly>
+                        </div>
+                        <div class="col-2">
+                            <label>term</label>
+                            <input type="number" class="form-control form-control-sm" asp-for="@invoice.TermNo"
+                                   readonly>
+                        </div>
+                        <div class="col-2">
+                            <label>group</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@invoice.GroupId" readonly>
+                        </div>
+                        @* <div class="col-2"> *@
+                        @* <label>room</label> *@
+                        <input type="hidden" class="form-control form-control-sm" asp-for="@groupRoom.RoomName"
+                               readonly>
+                        @* </div> *@
+                        <div class="col-2">
+                            <label>study_time</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@group.StudyTime" readonly>
+                        </div>
+                        <div class="col-2">
+                            <label>start_date</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@invoice.StartDate"
+                                   readonly>
+                        </div>
+                        <div class="col-2">
+                            <label>end_date</label>
+                            <input type="text" class="form-control form-control-sm" asp-for="@invoice.EndDate" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <table id="tblInvoice" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>no</th>
+                    <th>invoice_date</th>
+                    <th>term</th>
+                    <th>grand_total</th>
+                    <th>discount</th>
+                    <th>vat</th>
+                    <th>owe</th>
+                    <th>total_pay</th>
+                    <th>pay_khr</th>
+                    <th>pay_usd</th>
+                    <th>action</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+<partial name="_BookingClothesModal"/>
+<partial name="_StudentModal"/>
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<script src="/AdminLTE/plugins/select2/js/select2.full.min.js"></script>
+
+@section Scripts
+{
+    <script src="~/js/Alert.js"></script>
+    <script src="~/function/Booking.js"></script>
+    <script>
+        const btnSearchStudent = $("#btnSearchStudent");
+        const btnCreateBooking = $("#btnCreateBooking");
+        const tblSearchStudent = $("#tblSearchStudent");
+        const btnSaveBooking = $("#btnSaveBooking");
+        const btnNewItem = $("#btnNewItem");
+        const tblInvoice = $("#tblInvoice");
+        const tblInvoiceDetail = $("#tblInvoiceDetail");
+        const btnSelectItem = $("#btnSelectItem");
+        const tblItem = $("#tblItem");
+        const btnSelect = $("#btnSelect");
+        const btnAssignItem = $("#btnAssignItem");
+        const btnCloseItem = $("#btnCloseItem");
+        const btnCloseBooking = $("#btnCloseBooking");
+        const stateSelect = $("#stateSelect");
+
+        const modalBooking = $("#BookingClothesModal");
+        const modalStudent = $("#StudentModal");
+        const modalItem = $("#ItemModal");
+        const formBooking = $("#BookingForm");
+
+        const txtRateIn = $("#txtRateIn");
+        const txtRateOut = $("#txtRateOut");
+
+        $(document).ready(function () {
+            document.getElementById("btnCreateBooking").disabled = false;
+            tblInvoice.DataTable();
+            GetExchangeRate();
+        });
+
+        //1=====Search Student====
+        btnSearchStudent.on("click", function (e) {
+            e.preventDefault();
+            tblSearchStudent.DataTable().clear().destroy();
+            tblSearchStudent.DataTable({
+                processing: true,
+                serverSide: true,
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: true,
+                scrollCollapse: true,
+                ajax: {
+                    url: "/student/academic/student-list/all",
+                    type: "POST",
+                    error: function (error) {
+                        console.log(error.responseText);
+                    }
+                },
+                columns: [
+                    {data: "studentId"},
+                    {data: "studentName"},
+                    {data: "studentNameInKhmer"},
+                    {data: "sex"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            if (row.status === "REGISTER") {
+                                return ` <span class="badge badge-warning">${row.status}</span>`;
+                            } else if (row.status === "ACTIVE") {
+                                return ` <span class="badge badge-primary">${row.status}</span>`;
+                            } else if (row.status === "QUIT") {
+                                return ` <span class="badge badge-danger">${row.status}</span>`;
+                            } else {
+                                return `<span class="badge badge-secondary">${row.status}</span>`;
+                            }
+                        },
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `<a id="btnSelectStudent" class="btn btn-success btn-xs btn-block">Select</a>`;
+                        },
+                    },
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblSearchStudent", 500);
+                }
+            });
+            modalStudent.modal("show");
+        })
+
+        //2====Select Student====
+        tblSearchStudent.on("click", "#btnSelectStudent", function () {
+            const $row = $(this).closest('tr');
+            const selectedRow = tblSearchStudent.DataTable().row($row).data();
+            if (selectedRow) {
+                document.getElementById("BookingClothesModal").disabled = false;
+                getStudent(selectedRow.studentId);
+                getInvoice(selectedRow.studentId);
+                modalStudent.modal("hide");
+            }
+        });
+
+        function getStudent(student_id) {
+            $.ajax({
+                url: "/student/academic/student-id/" + student_id,
+                type: "GET",
+                data: {student_id: student_id},
+                success: function (data) {
+                    if (data) {
+                        data = data.data;
+                        const student = data["student"];
+                        console.log(student);
+                        const degree = data["degree"];
+                        const school = data["school"];
+                        const field = data["field"];
+                        const promotion = data["promotion"];
+                        const stage = data["stage"];
+                        const term = data["term"];
+                        const group = data["group"];
+                        const groupRoom = data["groupRoom"];
+                        const registry = data["registry"];
+                        $("#invoice_StudentId").val(student.studentId);
+                        $("#student_StudentName").val(`${student.studentName}`);
+                        $("#student_StudentNameInKhmer").val(`${student.studentNameInKhmer}`);
+                        $("#student_Sex").val(student.sex);
+                        $("#student_Phone").val(student.phone);
+                        $("#student_DateOfBirth").val(formatDate(student.dateOfBirth, "DD-MMM-YYYY"));
+                        $("#invoice_DegreeId").val(degree.degreeName);
+                        $("#invoice_SchoolId").val(school.schoolName);
+
+                        $("#invoice_FieldId").val(field.fieldName);
+                        if (student.status !== "REGISTER") {
+                            $("#invoice_PromotionId").val(promotion.promotionNo);
+                            $("#invoice_StageId").val(stage.stageNo);
+
+                            $("#invoice_TermNo").val(term.termNo);
+                            $("#group_StudyTime").val(group.studyTime);
+                            $("#invoice_StartDate").val(formatDate(term.startDate, "DD-MMM-YYYY"));
+                            $("#invoice_EndDate").val(formatDate(term.endDate, "DD-MMM-YYYY"));
+                            $("#invoice_GroupId").val(group.groupName);
+                            if (groupRoom) {
+                                $("#groupRoom_RoomName").val(groupRoom.roomName ?? "");
+                            }
+                        } else if (student.status === "REGISTER") {
+                            $("#invoice_PromotionId").val(registry.promotionNo);
+                            $("#invoice_StageId").val(registry.stageNo);
+                            $("#invoice_TermNo").val(registry.termNo);
+                            $("#group_StudyTime").val(registry.studyTime);
+                            $("#invoice_StartDate").val("");
+                            $("#invoice_enddate").val("");
+                            $("#invoice_EndDate").val("");
+                            $("#groupRoom_RoomName").val("");
+                        }
+                    } else {
+                        alert("Student not found.");
+                    }
+                },
+                error: function () {
+                    alert("Error fetching student data.");
+                }
+            });
+        }
+
+        function getInvoice(student_id) {
+            tblInvoice.DataTable().clear().destroy();
+            tblInvoice.DataTable({
+                processing: true,
+                serverSide: true,
+                paging: true,
+                lengthChange: true,
+                searching: false,
+                ordering: false,
+                info: false,
+                responsive: true,
+                autoWidth: true,
+                ajax: {
+                    url: "/invoice/get-invoice-by-student-id",
+                    type: "POST",
+                    data: function (d) {
+                        d.studentId = student_id;
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                },
+                columns: [
+                    {data: "invoiceId"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            const invoiceId = row.invoiceId ?? 0;
+                            const invoiceNo = row.invoiceNo ?? 0;
+                            const year = row.yearNumber ?? 0
+                            return invoiceNo > 0 ? `${invoiceNo}/${year}` : `${invoiceId}/${formatDate(row.invoiceDate, "YYYY")}`
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            const dt = formatDate(row.invoiceDate, "DD-MMM-YYYY");
+                            return `${dt}`
+                        }
+                    },
+                    {data: "termNo"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            const dt = formatDate(row.invoiceDate, "DD-MMM-YYYY");
+                            return row.grandTotalUsd ? `<button type="button" class="btn btn-warning btn-sm btn-block">${row.grandTotalUsd} $</button>`
+                                : `<button type="button" class="btn btn-success btn-sm btn-block">${row.grandTotalKhr} R</button>`;
+                        }
+                    },
+                    {
+                        data: "totalDiscountUsd"
+                    },
+                    {data: "vat"},
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return row.owe > 0 ?
+                                row.owe ?
+                                    `<button type="button" class="btn btn-danger btn-sm btn-block">${row.oweUsd}$</button>`
+                                    : `<button type="button" class="btn btn-default btn-sm btn-block">0 $</button>`
+                                : row.oweKhr ?
+                                    `<button type="button" class="btn btn-danger btn-sm btn-block">${row.oweKhr} R</button>`
+                                    : `<button type="button" class="btn btn-default btn-sm btn-block">0 R</button>`;
+                        }
+                    },
+                    {
+                        //total
+                        data: null,
+                        render: function (data, type, row) {
+                            return row.totalRiel > 0 ? `<button type="button" class="btn btn-info btn-sm btn-block">${parseFloat(row.totalRiel).toFixed(0)} R</button>`
+                                : `<button type="button" class="btn btn-info btn-sm btn-block">${parseFloat(row.totalDollar).toFixed(0)} $</button>`;
+                        }
+                    },
+                    {
+                        //==total pay r
+                        data: null,
+                        render: function (data, type, row) {
+                            return `<button type="button" class="btn btn-default btn-sm btn-block">${parseFloat(row.totalRiel).toFixed(0)} R</button>`;
+                        }
+                    },
+                    {
+                        //==total pay $
+                        data: null,
+                        render: function (data, type, row) {
+                            return `<button type="button" class="btn btn-default btn-sm btn-block">${parseFloat(row.totalDollar).toFixed(2)} $</button>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                                <div class="input-group-prepend">
+                                    <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+                                        Action
+                                    </button>
+                                        <div class="dropdown-menu dropdown-menu-right" style="min-width: 8rem;">
+                                        <div class="col-md-12">
+                                            <a class="btn btn-success btn-sm" style="display: block;margin:.2rem 0"><i class='fas fa-edit'></i> Edit</a>
+                                            ${row.owe <= 0 ?
+                                `<a class="btn btn-warning btn-sm" style="display: block;margin:.2rem 0">Change Student</a>` :
+                                `<a class="btn btn-warning btn-sm" style="display: block;margin:.2rem 0">Return</a>`
+                            }
+                                            <a class="btn btn-danger btn-sm" style="display: block;margin:.2rem 0"><i class="fa-solid fa-trash"></i> Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                ]
+            });
+        }
+
+        ///3=====Create New Payment
+        btnCreateBooking.on("click", function (e) {
+            modalBooking.modal("show");
+            formBooking[0].reset();
+            tblInvoiceDetail.DataTable().clear().destroy();
+            showEmptyInvoiceDetail();
+            btnSaveBooking.prop("disabled", true);
+            //setPaymentFullscreen(true);
+        })
+
+        function showEmptyInvoiceDetail() {
+            const totalColumns = $("#tblInvoiceDetail thead th").length;
+            $("#tblInvoiceDetail tbody").html(`
+                <tr id="emptyInvoiceDetailRow">
+                    <td colspan="${totalColumns}" class="text-center text-muted py-4">
+                        <i class="fa-solid fa-circle-info mr-1"></i>
+                        No item selected. Click <strong>Select Item</strong> to add payment item.
+                    </td>
+                </tr>
+            `);
+        }
+
+        function removeEmptyInvoiceDetail() {
+            $("#emptyInvoiceDetailRow").remove();
+        }
+
+        async function GetExchangeRate() {
+            try {
+                const response = await $.ajax({
+                    url: `/exchange-rates/get-exchange-rates`,
+                    method: 'POST',
+                    data: {isAll: true}
+                });
+                if (response.status.code === "200") {
+                    const data = response.data;
+                    $("#invoice_ExchangeRateId").val(data.exchangeRateId);
+                    txtRateIn.text(data.rateIn);
+                    txtRateOut.text(data.rateOut)
+                }
+            } catch (error) {
+                console.log(error.responseText);
+            }
+        }
+
+        function GetInvoiceDetail(invoice_id) {
+            tblInvoiceDetail.DataTable().clear().destroy();
+            $.ajax({
+                url: "/invoice/get-invoice-detail/" + invoice_id,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    data.forEach(item => {
+                        let list_data = [
+                            item.invoiceDetailId, //0
+                            item.invoiceId, //1
+                            item.productId, //2
+                            item.productName, //3
+                            item.productNameKhmer, //4
+                            item.qty, //5
+                            item.priceKhr, //6
+                            item.priceUsd, //7
+                            item.totalKhr, //8
+                            item.totalUsd, //9
+                            item.type, //10
+                            item.vat, //11
+                            item.discountPercent, //12
+                            item.discountKhr, //13
+                            item.discountUsd, //14
+                            item.oweKhr, //15
+                            item.oweUsd, //16
+                            item.otherKhr, //17
+                            item.otherUsd, //18
+                            item.grandTotalKhr, //19
+                            item.grandTotalUsd, //20
+                            item.payKhr, //21
+                            item.payUsd, //22
+                            item.payBath, //23
+                            item.tuitionFees, //24
+                            item.cardCertificate, //25
+                            item.categoryId, //26
+                        ];
+                        AddItemPayment(list_data);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                }
+            });
+        }
+
+        btnSaveBooking.on("submit", function (e) {
+            e.preventDefault();
+            const form = $(this);
+            const formData = form.serialize();
+            $.ajax({
+                url: '/booking-clothes/create-booking-clothes',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.status.code === "200") {
+                        ShowToastSuccess(response.status.message);
+                        tblInvoice.DataTable().ajax.reload();
+                        tblInvoiceDetail.DataTable().clear().destroy();
+                    } else {
+                        ShowToastError(response.status.message);
+                    }
+                },
+                error: function (error) {
+                    if (error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    }
+                }
+            });
+        })
+        
+        //========Item Modal=====
+        $(document).on("click", "#btnSelectItem", function (e) {
+            e.preventDefault();
+            console.log("SELECT ITEM BUTTON CLICKED");
+            if ($.fn.DataTable.isDataTable("#tblItem")) {
+                $("#tblItem").DataTable().clear().destroy();
+            }
+            $("#tblItem").DataTable({
+                processing: true,
+                serverSide: true,
+
+                ajax: {
+                    url: "/booking-clothes/get-items",
+                    type: "POST",
+
+                    error: function (xhr) {
+                        console.log("API ERROR:");
+                        console.log(xhr.responseText);
+                    }
+                },
+                columns: [
+                    { data: "id" },
+                    { data: "name" },
+                    { data: "nameKhmer" },
+                    { data: "price" },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                        <button type="button"
+                                class="btn btn-primary btn-xs btn-block"
+                                id="btnSelect">
+                            Select
+                        </button>
+                    `;
+                        }
+                    }
+                ],
+                initComplete:function (){
+                    MyApp.utils.dataTableDebounceSearch("#tblItem", 500);
+                }
+            });
+            $("#ItemModal").modal("show");
+        });
+        
+        const selectedBookingItems = {};
+        $("#tblItem").on("click", "#btnSelect", function () {
+            const table = $("#tblItem").DataTable();
+            const row = table
+                .row($(this).closest("tr"))
+                .data();
+
+            if (!row) {
+                return;
+            }
+            console.log("Selected Booking Item:", row);
+            // Save the complete item
+            selectedBookingItems[row.id] = row;
+            // Text displayed in Select2
+            const text = `${row.id}-${row.name}-${row.price}`;
+            // Don't add duplicate
+            if ($('#stateSelect option[value="' + row.id + '"]').length === 0) {
+                const newOption = new Option(
+                    text,
+                    row.id,
+                    true,
+                    true
+                );
+                $("#stateSelect")
+                    .append(newOption)
+                    .trigger("change");
+            }
+        });
+
+        // ===== Assign Booking Item =====
+        btnAssignItem.on("click", function () {
+            const ids = stateSelect.val();
+            if (!ids || ids.length === 0) {
+                return;
+            }
+            ids.forEach(itemIdStr => {
+                const itemId = parseInt(itemIdStr);
+                // Get the booking item we saved when clicking Select
+                const row = selectedBookingItems[itemId];
+                if (!row) return;
+                console.log("Booking Item:", row);
+                const list_data = [
+                    0,              // 0  invoice_detail_id
+                    0,              // 1  invoice_id
+                    row.id,         // 2  ProductId / ItemId
+                    row.name,       // 3  ProductName / ItemName
+                    row.nameKhmer,  // 4  ProductNameKhmer / ItemNameKhmer
+                    1,              // 5  qty
+                    // Price
+                    0,              // 6  PriceKhr
+                    row.price,      // 7  PriceUsd
+                    // Total
+                    0,              // 8  TotalKhr
+                    row.price,      // 9  TotalUsd
+                    0,              // 10 Type
+                    0,              // 11 Vat
+                    0,              // 12 DiscountPercent
+                    0,              // 13 DiscountKhr
+                    0,              // 14 DiscountUsd
+                    0,              // 15 OweKhr
+                    0,              // 16 OweUsd
+                    0,              // 17 OtherKhr
+                    0,              // 18 OtherUsd
+                    0,              // 19 GrandTotalKhr
+                    row.price,      // 20 GrandTotalUsd
+                    0,              // 21 PayKhr
+                    row.price,      // 22 PayUsd
+                    0,              // 23 PayBath
+                    0,              // 24 Tuitionfees
+                    0,              // 25 CardCertificate
+                    0,              // 26 CategoryId
+                    false           // 27 PaymentType (USD)
+                ];
+                AddItemPayment(list_data);
+            });
+            // Clear selected items
+            stateSelect
+                .val([])
+                .trigger("change");
+            modalItem.modal("hide");
+            btnSaveBooking.prop("disabled", false);
+        });
+
+        function AddItemPayment(params) {
+            removeEmptyInvoiceDetail();
+            const tableBody = document.querySelector('#tblInvoiceDetail tbody');
+            let i = document.querySelectorAll('#tblInvoiceDetail tbody tr').length;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="hide-col"><input type="text" name="invoiceDetails[${i}].InvoiceDetailId" value="${params[0]}" /></td>
+                <td class="hide-col"><input type="text" name="invoiceDetails[${i}].InvoiceId" value="${params[1]}" /></td>
+                <td class="hide-col"><input type="text" name="invoiceDetails[${i}].ProductId" value="${params[2]}" /></td>
+                <td>${params[2]}-${params[3]}-${params[27] ? `<badge class="badge badge-info">KHR</badge>` : `<badge class="badge badge-success">USD</badge>`}</td>
+                <td class="hide-col">${params[4]}</td>
+                <td> 
+                    <input type="number" name="invoiceDetails[${i}].Qty" value="${params[5]}" class="form-control form-control-sm"  min="1"/>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <input type="${params[27] ? "number" : "hidden"}" name="invoiceDetails[${i}].PriceKhr" value="${params[6]}" class="form-control form-control-sm"
+                           readonly/>
+                        <input type="${params[27] ? "hidden" : "number"}" name="invoiceDetails[${i}].PriceUsd" value="${params[7]}" class="form-control form-control-sm"
+                           readonly/>
+                        <div class="input-group-append"> 
+                            <span class="input-group-text">${params[27] ? "៛" : "$"}</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="hide-col"> 
+                    <input type="number" name="invoiceDetails[${i}].TotalKhr" value="${params[8]}" class="form-control form-control-sm"  readonly/>
+                </td>
+                <td class="hide-col"> 
+                    <input type="number" name="invoiceDetails[${i}].TotalUsd" value="${params[9]}" class="form-control form-control-sm"  readonly/>
+                </td>
+                <td class="hide-col"> 
+                    <input type="number" name="invoiceDetails[${i}].Type" value="${params[10]}" class="form-control form-control-sm"  readonly/>
+                </td>
+                <td class="hide-col"> 
+                    <input type="number" name="invoiceDetails[${i}].Vat" value="${params[11]}" class="form-control form-control-sm"  readonly/>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <input type="number" name="invoiceDetails[${i}].DiscountPercent" value="${params[12]}" class="form-control form-control-sm"  min="0"/>
+                        <div class="input-group-append"> 
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="hide-col"> 
+                    <input type="number" name="invoiceDetails[${i}].DiscountKhr" value="${params[13]}" class="form-control form-control-sm"  readonly/>
+                </td>
+                <td class="hide-col"> 
+                    <input type="number" name="invoiceDetails[${i}].DiscountUsd" value="${params[14]}" class="form-control form-control-sm"  readonly/>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <input type="${params[27] ? "number" : "hidden"}" name="invoiceDetails[${i}].OweKhr" value="${params[15]}" class="form-control form-control-sm"  min="0"/>
+                        <input type="${params[27] ? "hidden" : "number"}" name="invoiceDetails[${i}].OweUsd" value="${params[16]}" class="form-control form-control-sm"  min="0"/>
+                        <div class="input-group-append"> 
+                            <span class="input-group-text">${params[27] ? "៛" : "$"}</span>
+                        </div>
+                    </div>
+                </td>
+                <td > 
+                    <div class="input-group input-group-sm">
+                        <input type="${params[27] ? "number" : "hidden"}" name="invoiceDetails[${i}].OtherKhr" value="${params[17]}" class="form-control form-control-sm"  min="0"/>
+                        <input type="${params[27] ? "hidden" : "number"}" name="invoiceDetails[${i}].OtherUsd" value="${params[18]}" class="form-control form-control-sm"  min="0"/>
+                        <div class="input-group-append"> 
+                            <span class="input-group-text">${params[27] ? "៛" : "$"}</span>
+                        </div>
+                    </div>
+                </td>
+                <td  class="hide-col"> 
+                    <input type="number" name="invoiceDetails[${i}].GrandTotalKhr" value="${params[19]}" class="form-control form-control-sm"  readonly/>
+                </td>
+                <td  class="hide-col"> 
+                    <input type="number" name="invoiceDetails[${i}].GrandTotalUsd" value="${params[20]}" class="form-control form-control-sm" readonly />
+                </td >
+                <td class="hide-col"> 
+                    <input type="number" name="invoiceDetails[${i}].PayKhr" value="${params[21]}" class="form-control form-control-sm" min="0"/>
+                </td>
+                <td class="hide-col"> 
+                    <input type="number" name="invoiceDetails[${i}].PayUsd" value="${params[22]}" class="form-control form-control-sm" min="0"/>
+                </td>
+                <td  class="hide-col"> 
+                    <input type="text" name="invoiceDetails[${i}].PayBath" value="${params[23]}" class="form-control form-control-sm" readonly/>
+                </td>
+                <td class="hide-col"> 
+                    <input type="text" name="invoiceDetails[${i}].Tuitionfees" value="${params[24]}" class="form-control form-control-sm" readonly/>
+                </td>
+                <td class="hide-col"> 
+                    <input type="text" name="invoiceDetails[${i}].CardCertificate" value="${params[25]}" class="form-control form-control-sm" readonly/>
+                </td>
+                <td  class="hide-col"> 
+                    <input type="text" name="invoiceDetails[${i}].CategoryId" value="${params[26]}" class="form-control form-control-sm" readonly/>
+                </td>
+                <td  class="hide-col"> 
+                    <input type="text" name="invoiceDetails[${i}].PaymentType" value="${params[27]}" class="form-control form-control-sm" readonly/>
+                </td>
+                <td class="text-center"> 
+                    <button type="button" class="btn btn-warning btn-sm" id="btnEdit"><i class="fa-solid fa-pen-to-square"></i></button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+            i += 1;
+            calculateInvoiceTotals();
+        }
+
+        tblInvoiceDetail.on('input', 'input[name*=".Qty"]', function (e) {
+            const row = e.target.closest('tr');
+            const index = row.rowIndex - 1;
+            row.querySelector(`input[name="invoiceDetails[${index}].DiscountPercent"]`).value = 0;
+            row.querySelector(`input[name="invoiceDetails[${index}].DiscountKhr"]`).value = 0;
+            row.querySelector(`input[name="invoiceDetails[${index}].DiscountUsd"]`).value = 0;
+            row.querySelector(`input[name="invoiceDetails[${index}].OweKhr"]`).value = 0;
+            row.querySelector(`input[name="invoiceDetails[${index}].OweUsd"]`).value = 0;
+            row.querySelector(`input[name="invoiceDetails[${index}].OtherKhr"]`).value = 0;
+            row.querySelector(`input[name="invoiceDetails[${index}].OtherUsd"]`).value = 0;
+
+            // Get and validate Qty
+            const qtyInput = row.querySelector(`input[name="invoiceDetails[${index}].Qty"]`);
+            if (qtyInput.value.trim() === "") {
+                qtyInput.value = 1;
+            }
+
+            const qty = parseFloat(qtyInput.value);
+            if (isNotValid(qty)) return;
+
+            const priceKhr = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].PriceKhr"]`).value);
+            const priceUsd = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].PriceUsd"]`).value);
+
+            const grandTotalKhr = (qty * priceKhr).toFixed(0);
+            const grandTotalUsd = (qty * priceUsd).toFixed(2);
+
+            row.querySelector(`input[name="invoiceDetails[${index}].GrandTotalKhr"]`).value = grandTotalKhr;
+            row.querySelector(`input[name="invoiceDetails[${index}].GrandTotalUsd"]`).value = grandTotalUsd;
+
+            row.querySelector(`input[name="invoiceDetails[${index}].TotalKhr"]`).value = grandTotalKhr;
+            row.querySelector(`input[name="invoiceDetails[${index}].TotalUsd"]`).value = grandTotalUsd;
+
+            row.querySelector(`input[name="invoiceDetails[${index}].PayKhr"]`).value = grandTotalKhr;
+            row.querySelector(`input[name="invoiceDetails[${index}].PayUsd"]`).value = grandTotalUsd;
+        });
+
+        tblInvoiceDetail.on('input', 'input[name*=".DiscountPercent"]', function (e) {
+            const row = e.target.closest('tr');
+            const index = row.rowIndex - 1;
+
+            row.querySelector(`input[name="invoiceDetails[${index}].OweKhr"]`).value = 0;
+            row.querySelector(`input[name="invoiceDetails[${index}].OweUsd"]`).value = 0;
+            row.querySelector(`input[name="invoiceDetails[${index}].OtherKhr"]`).value = 0;
+            row.querySelector(`input[name="invoiceDetails[${index}].OtherUsd"]`).value = 0;
+
+            const input = row.querySelector(`input[name="invoiceDetails[${index}].DiscountPercent"]`);
+            if (input.value.trim() === "") {
+                input.value = 0;
+            }
+
+            const discountPercent = parseFloat(input.value);
+            if (isNotValid(discountPercent)) return;
+
+            const grandTotalKhr = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].GrandTotalKhr"]`).value);
+            const grandTotalUsd = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].GrandTotalUsd"]`).value);
+
+            if (isNotValid(grandTotalKhr) || isNotValid(grandTotalUsd)) return;
+
+            const totalDiscountKhr = (grandTotalKhr * discountPercent) / 100;
+            const totalDiscountUsd = (grandTotalUsd * discountPercent) / 100;
+
+            const totalKhr = grandTotalKhr - totalDiscountKhr;
+            const totalUsd = grandTotalUsd - totalDiscountUsd;
+
+            row.querySelector(`input[name="invoiceDetails[${index}].DiscountKhr"]`).value = totalDiscountKhr.toFixed(0);
+            row.querySelector(`input[name="invoiceDetails[${index}].DiscountUsd"]`).value = totalDiscountUsd.toFixed(2);
+
+            row.querySelector(`input[name="invoiceDetails[${index}].TotalKhr"]`).value = totalKhr.toFixed(0);
+            row.querySelector(`input[name="invoiceDetails[${index}].TotalUsd"]`).value = totalUsd.toFixed(2);
+
+            row.querySelector(`input[name="invoiceDetails[${index}].PayKhr"]`).value = totalKhr.toFixed(0);
+            row.querySelector(`input[name="invoiceDetails[${index}].PayUsd"]`).value = totalUsd.toFixed(2);
+        });
+
+        tblInvoiceDetail.on('input', 'input[name*=".OweKhr"]', function (e) {
+            const row = e.target.closest('tr');
+            const index = row.rowIndex - 1;
+
+            const input = row.querySelector(`input[name="invoiceDetails[${index}].OweKhr"]`);
+            if (input.value.trim() === "") {
+                input.value = 0;
+            }
+
+            const oweKhr = parseFloat(input.value);
+            const discountKhr = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].DiscountKhr"]`).value);
+            const grandTotalKhr = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].GrandTotalKhr"]`).value);
+
+            if (isNotValid(oweKhr) || isNotValid(discountKhr) || isNotValid(grandTotalKhr)) return;
+
+            const totalKhr = grandTotalKhr - oweKhr - discountKhr;
+            row.querySelector(`input[name="invoiceDetails[${index}].TotalKhr"]`).value = totalKhr.toFixed(0);
+            row.querySelector(`input[name="invoiceDetails[${index}].PayKhr"]`).value = totalKhr.toFixed(0);
+        });
+
+        tblInvoiceDetail.on('input', 'input[name*=".OweUsd"]', function (e) {
+            const row = e.target.closest('tr');
+            const index = row.rowIndex - 1;
+
+            const input = row.querySelector(`input[name="invoiceDetails[${index}].OweUsd"]`);
+            if (input.value.trim() === "") {
+                input.value = 0;
+            }
+
+            const oweUsd = parseFloat(input.value);
+            const discountUsd = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].DiscountUsd"]`).value);
+            const grandTotalUsd = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].GrandTotalUsd"]`).value);
+
+            if (isNotValid(oweUsd) || isNotValid(discountUsd) || isNotValid(grandTotalUsd)) return;
+
+            const totalUsd = grandTotalUsd - oweUsd - discountUsd;
+            row.querySelector(`input[name="invoiceDetails[${index}].TotalUsd"]`).value = totalUsd.toFixed(0);
+            row.querySelector(`input[name="invoiceDetails[${index}].PayUsd"]`).value = totalUsd.toFixed(0);
+        });
+
+        tblInvoiceDetail.on('input', 'input[name*=".OtherKhr"]', function (e) {
+            const row = e.target.closest('tr');
+            const index = row.rowIndex - 1;
+
+            const input = row.querySelector(`input[name="invoiceDetails[${index}].OtherKhr"]`);
+            if (input.value.trim() === "") {
+                input.value = 0;
+            }
+
+            const otherKhr = parseFloat(input.value);
+
+            const oweKhr = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].OweKhr"]`).value);
+            const discountKhr = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].DiscountKhr"]`).value);
+            const grandTotalKhr = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].GrandTotalKhr"]`).value);
+
+            if (isNotValid(otherKhr) || isNotValid(oweKhr) || isNotValid(discountKhr) || isNotValid(grandTotalKhr)) return;
+            const totalKhr = grandTotalKhr - oweKhr - discountKhr - otherKhr;
+            row.querySelector(`input[name="invoiceDetails[${index}].TotalKhr"]`).value = totalKhr.toFixed(0);
+            row.querySelector(`input[name="invoiceDetails[${index}].PayKhr"]`).value = totalKhr.toFixed(0);
+        });
+
+        tblInvoiceDetail.on('input', 'input[name*=".OtherUsd"]', function (e) {
+            const row = e.target.closest('tr');
+            const index = row.rowIndex - 1;
+
+            const input = row.querySelector(`input[name="invoiceDetails[${index}].OtherUsd"]`);
+            if (input.value.trim() === "") {
+                input.value = 0;
+            }
+
+            const otherUsd = parseFloat(input.value);
+            const oweUsd = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].OweUsd"]`).value);
+            const discountUsd = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].DiscountUsd"]`).value);
+            const grandTotalUsd = parseFloat(row.querySelector(`input[name="invoiceDetails[${index}].GrandTotalUsd"]`).value);
+
+            if (isNotValid(otherUsd) || isNotValid(oweUsd) || isNotValid(discountUsd) || isNotValid(grandTotalUsd)) return;
+            const totalUsd = grandTotalUsd - oweUsd - discountUsd - otherUsd;
+
+            row.querySelector(`input[name="invoiceDetails[${index}].TotalUsd"]`).value = totalUsd.toFixed(0);
+
+            row.querySelector(`input[name="invoiceDetails[${index}].PayUsd"]`).value = totalUsd.toFixed(0);
+        });
+
+        tblInvoiceDetail.on('input', 'input[name*=".PayKhr"]', function (e) {
+            const row = e.target.closest('tr');
+            const index = row.rowIndex - 1;
+
+            const input = row.querySelector(`input[name="invoiceDetails[${index}].PayKhr"]`);
+            if (input.value.trim() === "") {
+                input.value = 0;
+            }
+            let payKhr = 0;
+            const rateIn = parseFloat(txtRateIn.text());
+            const rateOut = parseFloat(txtRateOut.text());
+
+            const totalKhr = row.querySelector(`input[name="invoiceDetails[${index}].TotalKhr"]`);
+            const totalUsd = row.querySelector(`input[name="invoiceDetails[${index}].TotalUsd"]`);
+
+            const paymentType = row.querySelector(`input[name="invoiceDetails[${index}].PaymentType"]`).value;
+            if (isNotValid(payKhr) || isNotValid(rateIn) || isNotValid(totalKhr.value) || isNotValid(totalUsd.value) || isNotValid(paymentType)) return;
+
+            let payUsd = 0;
+            if (paymentType) {
+                if (parseFloat(input.value) >= totalKhr.value) {
+                    input.value = totalKhr.value;
+                }
+                payKhr = parseFloat(input.value);
+                payUsd = (totalKhr.value - payKhr) / rateIn;
+            } else {
+                if (parseFloat(input.value) / rateIn >= totalUsd) {
+                    input.value = totalUsd.value * rateIn;
+                }
+                payKhr = parseFloat(input.value);
+                console.log(`Pay Khr=${payKhr}, Pay Khr/Rate In= ${payKhr / rateIn}, pay usd = ${totalUsd.value}`);
+                payUsd = (totalUsd.value - (payKhr / rateIn));
+                console.log(`Pay Usd=${payUsd}`);
+            }
+            const roundPayUsd = Math.round(payUsd);
+            console.log(`Pay Usd=${roundPayUsd}`);
+            row.querySelector(`input[name="invoiceDetails[${index}].PayUsd"]`).value = roundPayUsd.toString();
+        });
+
+        tblInvoiceDetail.on('input', 'input[name*=".PayUsd"]', function (e) {
+            const row = e.target.closest('tr');
+            const index = row.rowIndex - 1;
+
+            const inputPayUsd = row.querySelector(`input[name="invoiceDetails[${index}].PayUsd"]`);
+            if (inputPayUsd.value.trim() === "") {
+                inputPayUsd.value = 0;
+            }
+            let payUsd = 0;
+
+            const rateIn = parseFloat(txtRateIn.text());
+            const rateOut = parseFloat(txtRateOut.text());
+
+            const totalKhr = row.querySelector(`input[name="invoiceDetails[${index}].TotalKhr"]`);
+            const totalUsd = row.querySelector(`input[name="invoiceDetails[${index}].TotalUsd"]`);
+
+            const paymentType = row.querySelector(`input[name="invoiceDetails[${index}].PaymentType"]`).value;
+
+            if (isNotValid(payUsd) || isNotValid(rateIn) || isNotValid(totalKhr.value) || isNotValid(totalUsd.value) || isNotValid(paymentType)) return;
+
+            let payKhr = 0;
+            if (paymentType) {
+                if (parseFloat(inputPayUsd.value) >= (totalKhr.value / rateIn)) {
+                    inputPayUsd.value = totalKhr.value / rateIn
+                }
+                payUsd = parseFloat(inputPayUsd.value);
+                payKhr = (totalUsd.value - (payUsd * rateIn));
+            } else {
+                if (parseFloat(inputPayUsd.value) >= totalUsd.value) {
+                    inputPayUsd.value = totalUsd.value;
+                }
+                payUsd = parseFloat(inputPayUsd.value);
+                payKhr = (totalUsd.value - payUsd) * rateIn;
+            }
+            const roundPayKhr = Math.round(payKhr / 100) * 100;
+            row.querySelector(`input[name="invoiceDetails[${index}].PayKhr"]`).value = roundPayKhr.toString();
+        });
+
+        tblInvoiceDetail.on('input', 'input', function () {
+            calculateInvoiceTotals();
+        });
+
+        function calculateInvoiceTotals() {
+            let grandTotalUsd = 0;
+            let grandTotalKhr = 0;
+            let totalDiscountKhr = 0;
+            let totalDiscountUsd = 0;
+            let totalOweUsd = 0;
+            let totalOweKhr = 0;
+            let totalOtherUsd = 0;
+            let totalOtherKhr = 0;
+            let totalUsd = 0;
+            let totalKhr = 0;
+            let totalPayUsd = 0;
+            let totalPayKhr = 0;
+
+            const rows = document.querySelectorAll("#tblInvoiceDetail tbody tr");
+
+            rows.forEach((row, i) => {
+                const isKhr = toNum(row.querySelector(`input[name="invoiceDetails[${i}].PaymentType"]`)?.value) === 1;
+
+                const qty = toNum(row.querySelector(`input[name="invoiceDetails[${i}].Qty"]`)?.value);
+                const priceKhr = toNum(row.querySelector(`input[name="invoiceDetails[${i}].PriceKhr"]`)?.value);
+                const priceUsd = toNum(row.querySelector(`input[name="invoiceDetails[${i}].PriceUsd"]`)?.value);
+                const discountPercent = toNum(row.querySelector(`input[name="invoiceDetails[${i}].DiscountPercent"]`)?.value);
+                const oweKhr = toNum(row.querySelector(`input[name="invoiceDetails[${i}].OweKhr"]`)?.value);
+                const oweUsd = toNum(row.querySelector(`input[name="invoiceDetails[${i}].OweUsd"]`)?.value);
+                const otherKhr = toNum(row.querySelector(`input[name="invoiceDetails[${i}].OtherKhr"]`)?.value);
+                const otherUsd = toNum(row.querySelector(`input[name="invoiceDetails[${i}].OtherUsd"]`)?.value);
+                const payKhr = toNum(row.querySelector(`input[name="invoiceDetails[${i}].PayKhr"]`)?.value);
+                const payUsd = toNum(row.querySelector(`input[name="invoiceDetails[${i}].PayUsd"]`)?.value);
+
+
+                // ---- Calculate item totals ----
+                const grandKhr = qty * priceKhr;
+                const grandUsd = qty * priceUsd;
+
+                const discountKhr = (grandKhr * discountPercent) / 100;
+                const discountUsd = (grandUsd * discountPercent) / 100;
+
+                const subTotalKhr = grandKhr - discountKhr - oweKhr - otherKhr;
+                const subTotalUsd = grandUsd - discountUsd - oweUsd - otherUsd;
+
+                // ---- Update row fields ----
+                const grandKhrInput = row.querySelector(`input[name="invoiceDetails[${i}].GrandTotalKhr"]`);
+                const grandUsdInput = row.querySelector(`input[name="invoiceDetails[${i}].GrandTotalUsd"]`);
+                if (grandKhrInput) grandKhrInput.value = grandKhr.toFixed(0);
+                if (grandUsdInput) grandUsdInput.value = grandUsd.toFixed(2);
+
+                // ---- Add to summary totals ----
+                grandTotalKhr += grandKhr;
+                grandTotalUsd += grandUsd;
+                totalDiscountKhr += discountKhr;
+                totalDiscountUsd += discountUsd;
+                totalOweKhr += oweKhr;
+                totalOweUsd += oweUsd;
+                totalOtherKhr += otherKhr;
+                totalOtherUsd += otherUsd;
+                totalKhr += subTotalKhr;
+                totalUsd += subTotalUsd
+                totalPayKhr += payKhr;
+                totalPayUsd += payUsd;
+            });
+            $("#invoice_GrandTotalKhr").val(grandTotalKhr);
+            $("#invoice_TotalDiscountKhr").val(totalDiscountKhr);
+            $("#invoice_OweKhr").val(totalOweKhr);
+            $("#invoice_TotalOtherKhr").val(totalOweKhr);
+            $("#invoice_TotalRiel").val(totalKhr);
+            $("#invoice_TotalPayKhr").val(totalPayKhr);
+
+            $("#invoice_GrandTotalUsd").val(grandTotalUsd);
+            $("#invoice_TotalDiscountUsd").val(totalDiscountUsd);
+            $("#invoice_OweUsd").val(totalOweUsd);
+            $("#invoice_TotalOtherUsd").val(totalOtherUsd);
+            $("#invoice_TotalDollar").val(totalUsd);
+            $("#invoice_TotalPayUsd").val(totalPayUsd);
+        }
+
+        btnCloseBooking.on('click', function () {
+            modalBooking.modal("hide");
+        });
+        btnCloseItem.on("click", function () {
+            modalItem.modal("hide");
+            stateSelect.val('');
+        })
+    </script>
+}

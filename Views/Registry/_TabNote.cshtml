@@ -1,16 +1,23 @@
-﻿@using BBU_SYSTEM.Models.Req
-@model BBU_SYSTEM.ViewModel.RegisryDetailViewModel
-@{
-    var registryReq = new RegistryReq();
-}
+﻿@model BBU_SYSTEM.Models.Req.RegistryReq
 
 <div class="form-group clearfix">
     <div class="icheck-primary d-inline">
-        <input type="checkbox" id="isShort" asp-for="@registryReq.Student!.IsReceivePhoto">
-        <label for="isShort">Revieve</label>
+        <input asp-for="Student!.IsReceivePhoto"
+               type="checkbox"
+               id="isReceivePhoto" />
+
+        <label for="isReceivePhoto">Received Photo</label>
     </div>
 </div>
 
-<label>Note</label>
-<textarea type="text" rows="4" class="form-control"
-          asp-for="@registryReq.Student!.Note" placeholder=""></textarea>
+<div class="form-group">
+    <label asp-for="Student!.Note">Note</label>
+
+    <textarea asp-for="Student!.Note"
+              rows="4"
+              class="form-control"
+              placeholder="Enter note"></textarea>
+
+    <span asp-validation-for="Student!.Note"
+          class="text-danger"></span>
+</div>

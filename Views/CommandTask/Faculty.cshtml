@@ -34,245 +34,144 @@
 <partial name="_FacaltyModal"/>
 
 @section Scripts{
+    <script src="~/function/Faculty.js"></script>
     <script>
     const tblFaculty = $("#tblFaculty");
-    const facultyModal = $("#FacultyModal");
-    const facultyForm = $("#facultyForm");
+    const btnClose = $("#btnClose");
 
-    const facultyIdInput = $("#faculty_FacultyId");
-    const facultyNameInput = $("#faculty_FacultyName");
-    const facultyNameKhmerInput = $("#faculty_FacultyNameInKhmer");
-
-    $(document).ready(function () {
+    $(document).ready(async function () {
         fetchFaculty();
     });
 
     function fetchFaculty() {
         if ($.fn.DataTable.isDataTable("#tblFaculty")) {
             tblFaculty.DataTable().clear().destroy();
-            tblFaculty.empty();
         }
-
-        facultyTable = tblFaculty.DataTable({
-            destroy: true,
+        tblFaculty.DataTable({
             paging: true,
             lengthChange: true,
             searching: true,
             ordering: true,
             info: true,
-
-            responsive: false,
-            autoWidth: false,
-            scrollX: true,
-            scrollCollapse: true,
-
+            responsive: true,
             processing: true,
             serverSide: true,
-            order: [[0, "desc"]],
-
+            order:[[0,"desc"]],
             ajax: {
                 url: "/Faculty/get-faculties",
-                type: "POST",
-                error: function (xhr) {
-                    console.log(xhr.responseText);
-                    ShowToastError("Cannot load faculty data.");
-                }
+                type: "POST"
             },
-
             columns: [
+                { data: "facultyId" },
+                { data: "facultyName" },
+                { data: "facultyNameInKhmer" },
                 {
-                    title: "ID",
-                    data: "facultyId",
-                    width: "70px"
-                },
-                {
-                    title: "Faculty Name",
-                    data: "facultyName",
-                    width: "300px",
-                    render: function (data) {
-                        return renderTruncate(data);
-                    }
-                },
-                {
-                    title: "Faculty Name Khmer",
-                    data: "facultyNameInKhmer",
-                    width: "320px",
-                    render: function (data) {
-                        return renderTruncate(data);
-                    }
-                },
-                {
-                    title: "Action",
                     data: null,
-                    width: "180px",
-                    className: "dt-action",
                     orderable: false,
                     searchable: false,
                     render: function () {
                         return `
-                        <div class="dt-action">
-                            <a href="javascript:void(0)" class="btnEdit btn btn-warning btn-sm">
+                            <a id="btnEdit" class="btnEdit btn btn-success btn-sm">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
-                            <a href="javascript:void(0)" class="btnDelete btn btn-danger btn-sm">
+                            <a id="btnDelete" class="btnDelete btn btn-danger btn-sm">
                                 <i class="fa-solid fa-trash"></i> Delete
                             </a>
-                        </div>
-                    `;
+                        `;
                     }
                 }
             ],
-
-            initComplete: function () {
-                let api = this.api();
+            initComplete: function(){
                 MyApp.utils.dataTableDebounceSearch("#tblFaculty", 500);
-
-                setTimeout(function () {
-                    api.columns.adjust();
-                }, 500);
-            },
-
-            drawCallback: function () {
-                this.api().columns.adjust();
             }
         });
-
-        setTimeout(function () {
-            facultyTable.columns.adjust();
-        }, 1000);
     }
 
-    function clearFacultyForm() {
-        facultyForm[0].reset();
-
-        facultyIdInput.val(0);
-        facultyNameInput.val("");
-        facultyNameKhmerInput.val("");
-    }
-
-    function openAddFaculty() {
-        clearFacultyForm();
-        facultyModal.find(".modal-title").text("Add Faculty");
-        facultyModal.modal("show");
-    }
-
-    tblFaculty.on("click", ".btnEdit", function (event) {
+    tblFaculty.on("click", "#btnEdit", function (event) {
         event.preventDefault();
 
-        let rowElement = $(this).closest("tr");
-
-        if (rowElement.hasClass("child")) {
-            rowElement = rowElement.prev();
+        let $row = $(this).closest('tr');
+        if($row.hasClass('child')){
+            $row = $row.prev();
         }
-
-        const selectedRow = tblFaculty.DataTable().row(rowElement).data();
-
-        if (!selectedRow) {
-            ShowToastError("Cannot get selected faculty data.");
-            return;
-        }
-
-        facultyIdInput.val(selectedRow["facultyId"]);
-        facultyNameInput.val(selectedRow["facultyName"]);
-        facultyNameKhmerInput.val(selectedRow["facultyNameInKhmer"]);
-
-        facultyModal.find(".modal-title").text("Edit Faculty");
-        facultyModal.modal("show");
+        const selectedRow = tblFaculty.DataTable().row($row).data();
+        console.log(selectedRow);
+        const faculty = new Faculty(selectedRow);
+        $("#faculty_FacultyId").val(faculty.facultyId);
+        $("#faculty_FacultyName").val(faculty.facultyName);
+        $("#faculty_FacultyNameInKhmer").val(faculty.facultyNameInKhmer);
+        
+        $("#FacultyModal").modal("show");
     });
 
-    tblFaculty.on("click", ".btnDelete", function (event) {
+    tblFaculty.on("click", "#btnDelete", function (event) {
         event.preventDefault();
 
-        let rowElement = $(this).closest("tr");
-
-        if (rowElement.hasClass("child")) {
-            rowElement = rowElement.prev();
+        let $row = $(this).closest('tr');
+        if($row.hasClass('child')){
+            $row = $row.prev();
         }
-
-        const selectedRow = tblFaculty.DataTable().row(rowElement).data();
-
-        if (!selectedRow) {
-            ShowToastError("Cannot get selected faculty data.");
-            return;
-        }
+        const selectedRow = tblFaculty.DataTable().row($row).data();
+        console.log(selectedRow);
 
         if (!confirm("Are you sure you want to delete this faculty?")) {
             return;
         }
 
         $.ajax({
-            url: "/faculty/delete/" + selectedRow["facultyId"],
+            url: "/faculty/delete/" + selectedRow.facultyId,
             method: "DELETE",
-            success: function (response) {
-                const code = response.status?.code;
-                const message = response.status?.message;
-
-                if (code === "200" || code === 200) {
-                    ShowToastSuccess(message || "Deleted successfully!");
-                    tblFaculty.DataTable().ajax.reload();
-                } else {
-                    ShowToastError(message || "Delete failed.");
+            success:function(response){
+                if(response.status.code === "200"){
+                    ShowToastSuccess("Delete successfully!");
+                    $("#tblFaculty").DataTable().ajax.reload();
+                }else {
+                    ShowToastError(response.message);
                 }
             },
-            error: function (xhr) {
-                const message =
-                    xhr["responseJSON"]?.["status"]?.["message"] ||
-                    xhr["responseJSON"]?.["message"] ||
-                    "Delete failed.";
-
-                ShowToastError(message);
+            error: function (error) {
+                if (error.responseJSON && error.responseJSON.message) {
+                    ShowToastError(error.responseJSON.message);
+                }
             }
         });
     });
 
     $(document).on("submit", "#facultyForm", function (event) {
         event.preventDefault();
-
-        const facultyId = facultyIdInput.val() || "0";
-        const facultyName = (facultyNameInput.val() || "").trim();
-        const facultyNameKhmer = (facultyNameKhmerInput.val() || "").trim();
-        
+        if(!this.checkValidity()){
+            this.reportValidity();
+            return;
+        }
+        const form = $(this);
+        const formData = $(form).serialize();
+        $("#faculty_id").val();
         $.ajax({
             url: "/faculty/SaveChange",
             method: "POST",
-            data: {
-                FacultyId: facultyId,
-                FacultyName: facultyName,
-                FacultyNameInKhmer: facultyNameKhmer
-            },
+            data: formData,
             success: function (response) {
-                const code = response.status?.code;
-                const message = response.status?.message;
-
-                if (code === "200" || code === 200) {
-                    ShowToastSuccess(
-                        message ||
-                        (facultyId !== "0" ? "Updated successfully!" : "Saved successfully!")
-                    );
-
-                    clearFacultyForm();
-                    facultyModal.modal("hide");
-                    tblFaculty.DataTable().ajax.reload();
-                } else {
-                    ShowToastError(message || "Save failed.");
+                if(response.status.code === "200"){
+                    ShowToastSuccess("Save successfully!");
+                    $("#facultyForm")[0].reset();
+                    $("#FacultyModal").modal("hide");
+                    $("#tblFaculty").DataTable().ajax.reload();
+                }else{
+                    ShowToastError(response.message);
                 }
             },
-            error: function (xhr) {
-                const message =
-                    xhr["responseJSON"]?.["status"]?.["message"] ||
-                    xhr["responseJSON"]?.["message"] ||
-                    "Server error.";
-
-                ShowToastError(message);
+            error: function (error) {
+                if (error.responseJSON && error.responseJSON.message) {
+                    ShowToastError(error.responseJSON.message);
+                }
             }
         });
     });
 
     $(document).on("click", "#btnClose", function (event) {
         event.preventDefault();
-
-        clearFacultyForm();
-        facultyModal.modal("hide");
+        $("#facultyForm")[0].reset();
+        $("#FacultyModal").modal("hide");
     });
 </script>
 }

@@ -1,110 +1,1083 @@
 ﻿@{
-    ViewData["OpenMenu"] = "Administration";
-    ViewData["Action"] = "Register";
+ViewData["Title"] = "Student Registry";
+ViewData["OpenMenu"] = "Administration";
+ViewData["Action"] = "Register";
+ViewData["HideHeader"] = true;
 }
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header"> 
-                <a asp-action="Create" asp-controller="Registry" class="btn btn-primary"><i class="fas fa-plus"></i> New Register</a>
+
+<style>
+    #tblRegistry_wrapper {
+        width: 100%;
+    }
+
+    #tblRegistry {
+        width: 100% !important;
+    }
+
+    #tblRegistry th,
+    #tblRegistry td {
+        vertical-align: middle !important;
+        white-space: nowrap;
+    }
+
+    #tblRegistry td.dt-action-col {
+        text-align: center;
+    }
+
+    #tblRegistry .badge {
+        min-width: 75px;
+        padding: 6px 8px;
+    }
+
+    #registryPage .dataTables_scrollHead {
+        overflow: hidden !important;
+    }
+
+    #registryPage .dataTables_scrollBody {
+        overflow-x: auto !important;
+    }
+
+    #RegistryDetailsModal {
+        padding-right: 0 !important;
+    }
+
+    #RegistryDetailsModal .registry-details-dialog {
+        width: calc(100vw - 40px);
+        max-width: 1420px;
+        margin: 20px auto;
+    }
+
+    #RegistryDetailsModal .registry-details-content {
+        height: calc(100vh - 40px);
+        max-height: calc(100vh - 40px);
+        overflow: hidden;
+    }
+
+    #RegistryDetailsModal .registry-details-body {
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 10px;
+    }
+
+    #RegistryDetailsModal.registry-details-fullscreen .registry-details-dialog {
+        width: 100vw;
+        max-width: none;
+        height: 100vh;
+        margin: 0;
+    }
+
+    #RegistryDetailsModal.registry-details-fullscreen .registry-details-content {
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    @@media (max-width: 767.98px) {
+        #RegistryDetailsModal .registry-details-dialog {
+            width: calc(100vw - 16px);
+            margin: 8px auto;
+        }
+
+        #RegistryDetailsModal .registry-details-content {
+            height: calc(100vh - 16px);
+            max-height: calc(100vh - 16px);
+        }
+    }
+</style>
+
+<div id="registryPage" class="container-fluid px-0 pt-3" data-ui-design="booking-clothes-sample">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="m-0 font-weight-bold text-dark">Student Registry</h3>
+            <small class="text-muted">Manage student registrations and academic records</small>
+        </div>
+    </div>
+
+    <!-- Filter card: same layout as the Booking Clothes sample. -->
+    <div class="card card-outline card-primary shadow-sm mb-4">
+        <div class="card-header bg-white py-2">
+            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
+                <i class="fas fa-filter text-primary mr-1"></i>
+                Filter Registrations
+            </h3>
+            <div class="card-tools">
+                <button type="button"
+                        class="btn btn-tool"
+                        data-card-widget="collapse"
+                        aria-label="Collapse registration filters">
+                    <i class="fas fa-minus"></i>
+                </button>
             </div>
-            <div class="card-body">
-                <table id="tblRegistry" class="table table-sm table-bordered table-striped" style="width: 100%;">
-                    <thead>
-                    <tr>
-                        <th>Student Id</th>
-                        <th>Name English</th>
-                        <th>Name Khmer</th>
-                        <th>Gender</th>
-                        <th>Date of Birth</th>
-                        <th>Registry Date</th>
-                        <th>Degree</th>
-                        <th>School</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
+        </div>
+        <div class="card-body bg-light py-3">
+            <form id="frmRegistryFilters">
+                <div class="row align-items-end">
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="dtpFrom" class="text-secondary small font-weight-bold">
+                            From Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="dtpFrom"
+                                   name="from"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="dtpTo" class="text-secondary small font-weight-bold">
+                            To Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="dtpTo"
+                                   name="to"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-12 mb-2 mb-md-0 d-flex">
+                        <div class="btn-group shadow-sm" role="group" aria-label="Registration date filters">
+                            <button type="submit"
+                                    id="btnFilterRegistry"
+                                    class="btn btn-success">
+                                <i class="fas fa-search mr-1"></i>
+                                Filter
+                            </button>
+                            <button type="button"
+                                    id="btnResetRegistryFilter"
+                                    class="btn btn-success border-left"
+                                    title="Reset filters"
+                                    aria-label="Reset registration filters">
+                                <i class="fas fa-redo-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12 d-flex justify-content-md-end mt-2 mt-md-0">
+                        <button type="button"
+                                id="btnOpenCreateRegistryModal"
+                                class="btn btn-primary shadow-sm">
+                            <i class="fas fa-plus-circle mr-1"></i>
+                            New Register
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DataTable card: retain all ten columns and the existing modal actions. -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table id="tblRegistry"
+                   class="table table-sm table-hover table-bordered table-striped w-100"
+                   style="width: 100%;">
+                <thead class="thead-light">
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name English</th>
+                    <th>Name Khmer</th>
+                    <th>Gender</th>
+                    <th>Date of Birth</th>
+                    <th>Registry Date</th>
+                    <th>Degree</th>
+                    <th>School</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center" style="width: 105px;">Action</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>
-<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
-<partial name="_ValidationScriptsPartial"/>
+
+<div id="CreateRegistryModalHost"></div>
+
+<div class="modal fade registry-details-fullscreen"
+     id="RegistryDetailsModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="RegistryDetailsModalLabel"
+     aria-hidden="true"
+     data-backdrop="static"
+     data-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered registry-details-dialog"
+         role="document">
+        <div class="modal-content registry-details-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="RegistryDetailsModalLabel">
+                    Student Information
+                </h4>
+                <div class="d-flex align-items-center">
+                    <button type="button"
+                            id="btnToggleRegistryDetailsSize"
+                            class="btn btn-sm btn-link text-secondary mr-1"
+                            title="Exit full screen"
+                            aria-label="Toggle full screen">
+                        <i class="fas fa-compress"></i>
+                    </button>
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body registry-details-body"
+                 id="RegistryDetailsModalBody"></div>
+        </div>
+    </div>
+</div>
+
 @section Scripts
 {
-    <script>
-        const tblRegistry = $("#tblRegistry");
-        document.addEventListener("DOMContentLoaded", function () {
-            fetchStudent();
-        });
-        
-        function fetchStudent() {
-            tblRegistry.DataTable().clear().destroy();
-            tblRegistry.DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                ajax: {
-                    url: "/Registry/GetStudentRegistryList",
-                    type: "POST",
-                    dataSrc: function (json) {
-                        return json.data;
-                    }
-                },
-                columns: [
-                    {data: "studentId"},
-                    {data: "studentName"},
-                    {data: "studentNameInKhmer"},
-                    {data: "sex"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            const dt = formatDate(row.dateOfBirth);
-                            return `${dt}`
-                        }
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            const dt = formatDate(row.registrationDate);
-                            return `${dt}`
-                        }
-                    },
-                    {data: "degreeName"},
-                    {data: "schoolName"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            if (row.status === "REGISTER") {
-                                return ` <span class="badge badge-warning">${row.status}</span>`;
-                            } else if (row.status === "ACTIVE") {
-                                return ` <span class="badge badge-primary">${row.status}</span>`;
-                            } else if (row.status === "QUIT") {
-                                return ` <span class="badge badge-danger">${row.status}</span>`;
-                            }else if (row.status === "GRADUATED") {
-                                return ` <span class="badge badge-fuchsia">${row.status}</span>`;
-                            }else if (row.status === "COMPLETED") {
-                                return ` <span class="badge badge-pink">${row.status}</span>`;
-                            }else {
-                                return `<span class="badge badge-default">${row.status}</span>`;
-                            }
+<script src="~/function/Degree.js"></script>
+<script src="~/function/School.js"></script>
+<script src="~/function/Field.js"></script>
+<script src="~/function/Promotion.js"></script>
+<script src="~/function/Stage.js"></script>
+<script src="~/function/Term.js"></script>
+<script src="~/function/Group.js"></script>
+<script src="~/js/Components.js"></script>
+<script>
+    let registryTable = null;
+    let registryResizeTimer = null;
 
-                        }
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) { 
-                            return `<a href="/registry/details/${row.studentId}" class="btn btn-success btn-sm"><i class="fas fa-gear"></i> Manage</a>`;
-                        }
-                    }
-                ],
-                initComplete: function () {
-                    MyApp.utils.dataTableDebounceSearch("#tblRegistry", 500);
+    $(function () {
+        initializeRegistryTable();
+        registerRegistryResizeEvents();
+
+        $("#frmRegistryFilters")
+            .off("submit.registryFilters")
+            .on("submit.registryFilters", function (event) {
+                event.preventDefault();
+                applyRegistryDateFilters();
+            });
+
+        $("#btnResetRegistryFilter")
+            .off("click.registryFilters")
+            .on("click.registryFilters", function () {
+                $("#dtpFrom, #dtpTo").val("");
+
+                if (registryTable) {
+                    registryTable.ajax.reload(null, true);
                 }
             });
+    });
+
+    function applyRegistryDateFilters() {
+        const from = $("#dtpFrom").val();
+        const to = $("#dtpTo").val();
+
+        if (from && to && from > to) {
+            const message = "From Date must not be later than To Date.";
+
+            if (typeof ShowToastError === "function") {
+                ShowToastError(message);
+            } else {
+                alert(message);
+            }
+
+            return;
         }
-    </script>
+
+        if (registryTable) {
+            registryTable.ajax.reload(null, true);
+        }
+    }
+
+    function initializeRegistryTable() {
+        const tableSelector = "#tblRegistry";
+
+        if ($.fn.DataTable.isDataTable(tableSelector)) {
+            $(tableSelector).DataTable().destroy();
+            $(tableSelector).find("tbody").empty();
+        }
+
+        registryTable = $(tableSelector).DataTable({
+            processing: true,
+            serverSide: true,
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+
+            order: [[0, "desc"]],
+
+            ajax: {
+                url: "@Url.Action("GetStudentRegistryList", "Registry")",
+                type: "POST",
+                data: function (request) {
+                    request.from = $("#dtpFrom").val() || "";
+                    request.to = $("#dtpTo").val() || "";
+                },
+                dataSrc: function (response) {
+                    return response?.data ?? [];
+                },
+                error: function (xhr, error, thrown) {
+                    console.error(
+                        "Cannot load student registry list:",
+                        xhr.responseText || error || thrown
+                    );
+
+                    if (typeof ShowToastError === "function") {
+                        ShowToastError(
+                            "Cannot load student registry list."
+                        );
+                    }
+                }
+            },
+
+            columns: [
+                {
+                    data: "studentId",
+                    defaultContent: ""
+                },
+                {
+                    data: "studentName",
+                    defaultContent: ""
+                },
+                {
+                    data: "studentNameInKhmer",
+                    defaultContent: ""
+                },
+                {
+                    data: "sex",
+                    defaultContent: ""
+                },
+                {
+                    data: "dateOfBirth",
+                    defaultContent: "",
+                    render: function (data, type) {
+                        if (type !== "display" &&
+                            type !== "filter") {
+                            return data ?? "";
+                        }
+
+                        return formatRegistryDate(data);
+                    }
+                },
+                {
+                    data: "registrationDate",
+                    defaultContent: "",
+                    render: function (data, type) {
+                        if (type !== "display" &&
+                            type !== "filter") {
+                            return data ?? "";
+                        }
+
+                        return formatRegistryDate(data);
+                    }
+                },
+                {
+                    data: "degreeName",
+                    defaultContent: ""
+                },
+                {
+                    data: "schoolName",
+                    defaultContent: ""
+                },
+                {
+                    data: "status",
+                    defaultContent: "",
+                    orderable: false,
+                    searchable: false,
+                    className: "text-center",
+                    render: function (data, type) {
+                        const status = String(data ?? "")
+                            .trim()
+                            .toUpperCase();
+
+                        if (type !== "display") {
+                            return status;
+                        }
+
+                        const badgeClasses = {
+                            REGISTER: "badge-warning",
+                            ACTIVE: "badge-primary",
+                            QUIT: "badge-danger",
+                            GRADUATED: "badge-fuchsia",
+                            COMPLETED: "badge-pink"
+                        };
+
+                        const badgeClass =
+                            badgeClasses[status] ??
+                            "badge-secondary";
+
+                        return `
+                                <span class="badge ${badgeClass} px-2 py-1">
+                                    ${escapeRegistryHtml(status)}
+                                </span>
+                            `;
+                    }
+                },
+                {
+                    data: "studentId",
+                    defaultContent: "",
+                    orderable: false,
+                    searchable: false,
+                    className: "dt-action-col",
+                    render: function (data, type) {
+                        if (type !== "display") {
+                            return data ?? "";
+                        }
+
+                        const studentId = String(data ?? "").trim();
+                        const safeStudentId =
+                            escapeRegistryHtml(studentId);
+
+                        return `
+                                <button type="button"
+                                        class="btn btn-warning btn-sm js-registry-manage"
+                                        data-toggle="modal"
+                                        data-target="#RegistryDetailsModal"
+                                        data-student-id="${safeStudentId}">
+                                    <i class="fas fa-cog mr-1"></i>
+                                    Manage
+                                </button>
+                            `;
+                    }
+                }
+            ],
+
+            columnDefs: [
+                { targets: 0, width: "90px" },
+                { targets: 1, width: "145px" },
+                { targets: 2, width: "145px" },
+                { targets: 3, width: "65px" },
+                { targets: 4, width: "100px" },
+                { targets: 5, width: "105px" },
+                { targets: 6, width: "130px" },
+                { targets: 7, width: "180px" },
+                { targets: 8, width: "85px" },
+                {
+                    targets: 9,
+                    width: "105px",
+                    orderable: false,
+                    searchable: false
+                }
+            ],
+
+            language: {
+                processing: "Loading...",
+                emptyTable: "No student registry found.",
+                zeroRecords: "No matching student found."
+            },
+
+            initComplete: function () {
+                const api = this.api();
+
+                if (typeof MyApp !== "undefined" &&
+                    MyApp.utils &&
+                    typeof MyApp.utils
+                        .dataTableDebounceSearch ===
+                    "function") {
+                    MyApp.utils.dataTableDebounceSearch(
+                        tableSelector,
+                        500
+                    );
+                }
+
+                adjustRegistryColumns(api);
+            },
+
+            drawCallback: function () {
+                adjustRegistryColumns(this.api());
+            }
+        });
+    }
+
+    function adjustRegistryColumns(api) {
+        window.requestAnimationFrame(function () {
+            api.columns.adjust();
+        });
+
+        window.setTimeout(function () {
+            api.columns.adjust();
+        }, 150);
+
+        window.setTimeout(function () {
+            api.columns.adjust();
+        }, 350);
+    }
+
+    function registerRegistryResizeEvents() {
+        $(window)
+            .off("resize.registryTable")
+            .on("resize.registryTable", function () {
+                clearTimeout(registryResizeTimer);
+
+                registryResizeTimer = setTimeout(function () {
+                    if ($.fn.DataTable.isDataTable(
+                        "#tblRegistry"
+                    )) {
+                        registryTable.columns.adjust();
+                    }
+                }, 100);
+            });
+
+        /*
+         * AdminLTE changes the content width when the sidebar opens
+         * or closes. Recalculate after that transition completes.
+         */
+        $(document)
+            .off(
+                "collapsed.lte.pushmenu.registry " +
+                "shown.lte.pushmenu.registry"
+            )
+            .on(
+                "collapsed.lte.pushmenu.registry " +
+                "shown.lte.pushmenu.registry",
+                function () {
+                    setTimeout(function () {
+                        if ($.fn.DataTable.isDataTable(
+                            "#tblRegistry"
+                        )) {
+                            registryTable.columns.adjust();
+                        }
+                    }, 350);
+                }
+            );
+    }
+
+    function formatRegistryDate(value) {
+        if (!value) {
+            return "";
+        }
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return value;
+        }
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1)
+            .padStart(2, "0");
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+    }
+
+    function escapeRegistryHtml(value) {
+        return $("<div>")
+            .text(value ?? "")
+            .html();
+    }
+
+    const createRegistryModalHost = $("#CreateRegistryModalHost");
+    const openCreateRegistryButton = $("#btnOpenCreateRegistryModal");
+    let createRegistryRequest = null;
+
+    openCreateRegistryButton
+        .off("click.createRegistry")
+        .on("click.createRegistry", function () {
+            if (createRegistryRequest) {
+                return;
+            }
+
+            const originalHtml = openCreateRegistryButton.html();
+
+            openCreateRegistryButton
+                .prop("disabled", true)
+                .html(
+                    '<i class="fas fa-spinner fa-spin mr-1"></i>Loading...'
+                );
+
+            createRegistryRequest = $.ajax({
+                url: "/registry/create-new-student?modal=true",
+                type: "GET",
+                cache: false,
+                timeout: 20000
+            })
+                .done(function (html) {
+                    createRegistryModalHost.html(html);
+
+                    const modal = $("#CreateRegistryModal");
+
+                    if (!modal.length) {
+                        const message =
+                            "Create Registry modal was not returned.";
+
+                        if (typeof ShowToastError === "function") {
+                            ShowToastError(message);
+                        } else {
+                            alert(message);
+                        }
+
+                        createRegistryModalHost.empty();
+                        return;
+                    }
+
+                    modal.modal({
+                        backdrop: "static",
+                        keyboard: false,
+                        show: true
+                    });
+                })
+                .fail(function (xhr, status) {
+                    if (status === "abort") {
+                        return;
+                    }
+
+                    const message =
+                        xhr.responseJSON?.status?.message ??
+                        xhr.responseJSON?.message ??
+                        "Unable to load the registration form.";
+
+                    if (typeof ShowToastError === "function") {
+                        ShowToastError(message);
+                    } else {
+                        alert(message);
+                    }
+                })
+                .always(function () {
+                    createRegistryRequest = null;
+                    openCreateRegistryButton
+                        .prop("disabled", false)
+                        .html(originalHtml);
+                });
+        });
+
+    $(document)
+        .off("hidden.bs.modal.createRegistry", "#CreateRegistryModal")
+        .on(
+            "hidden.bs.modal.createRegistry",
+            "#CreateRegistryModal",
+            function () {
+                createRegistryModalHost.empty();
+            }
+        );
+
+    const registryDetailsModal = $("#RegistryDetailsModal");
+    const registryDetailsBody = $("#RegistryDetailsModalBody");
+    let registryDetailsRequest = null;
+
+    $(document)
+        .off("click.registryManage", ".js-registry-manage")
+        .on("click.registryManage", ".js-registry-manage", function () {
+            const studentId = String(
+                $(this).attr("data-student-id") ?? ""
+            ).trim();
+
+            if (!studentId) {
+                if (typeof ShowToastError === "function") {
+                    ShowToastError("Student ID is missing.");
+                }
+                return;
+            }
+
+            loadRegistryDetails(studentId);
+        });
+
+    function loadRegistryDetails(studentId) {
+        if (registryDetailsRequest) {
+            registryDetailsRequest.abort();
+        }
+
+        registryDetailsBody.html(`
+            <div class="d-flex justify-content-center align-items-center h-100">
+                <div class="text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                    <div class="mt-2">Loading student information...</div>
+                </div>
+            </div>
+        `);
+
+        registryDetailsRequest = $.ajax({
+            url: `/registry/details/${encodeURIComponent(studentId)}?modal=true`,
+            type: "GET",
+            cache: false,
+            timeout: 20000
+        })
+            .done(function (html) {
+                registryDetailsBody.html(html);
+                initializeRegistryDetailsContent();
+            })
+            .fail(function (xhr, status) {
+                if (status === "abort") {
+                    return;
+                }
+
+                const message =
+                    xhr.responseJSON?.status?.message ??
+                    xhr.responseJSON?.message ??
+                    "Unable to load registry details.";
+
+                registryDetailsBody.html(`
+                    <div class="alert alert-danger m-3">
+                        ${escapeRegistryHtml(message)}
+                    </div>
+                `);
+
+                if (typeof ShowToastError === "function") {
+                    ShowToastError(message);
+                }
+            })
+            .always(function () {
+                registryDetailsRequest = null;
+            });
+    }
+
+    function initializeRegistryDetailsContent() {
+        const fieldset = $("#registryDetailsFieldset");
+
+        fieldset.prop("disabled", true);
+        fieldset
+            .find("input:not([type='hidden']), select, textarea, button")
+            .prop("disabled", true);
+
+        $("#btnUpdateRegistryDetails").addClass("d-none");
+
+        if ($.fn.select2) {
+            registryDetailsBody.find(".select2").each(function () {
+                const select = $(this);
+
+                if (select.hasClass("select2-hidden-accessible")) {
+                    select.select2("destroy");
+                }
+
+                select.select2({
+                    width: "100%",
+                    dropdownParent: registryDetailsModal
+                });
+            });
+        }
+
+        loadRegistryDetailsPersonalLookups();
+    }
+
+    function getRegistryStudentControl(propertyName) {
+        return registryDetailsBody.find(
+            `[name="Student.${propertyName}"], ` +
+            `[name="registryReq.Student.${propertyName}"], ` +
+            `#Student_${propertyName}, ` +
+            `#registryReq_Student_${propertyName}`
+        ).first();
+    }
+
+    function selectRegistrySavedValue(select, savedValue, appendIfMissing) {
+        if (!select.length) {
+            return;
+        }
+
+        const normalizedValue = String(savedValue ?? "").trim();
+
+        if (!normalizedValue || normalizedValue === "0") {
+            select.val("0").trigger("change.select2");
+            return;
+        }
+
+        let matchingValue;
+
+        select.find("option").each(function () {
+            const optionValue = String(this.value ?? "").trim();
+            const optionNumber = Number(optionValue);
+            const savedNumber = Number(normalizedValue);
+            const numericMatch =
+                optionValue !== "" &&
+                normalizedValue !== "" &&
+                Number.isFinite(optionNumber) &&
+                Number.isFinite(savedNumber) &&
+                optionNumber === savedNumber;
+
+            if (numericMatch || optionValue === normalizedValue) {
+                matchingValue = this.value;
+                return false;
+            }
+        });
+
+        if (matchingValue === undefined && appendIfMissing) {
+            select.append(new Option(normalizedValue, normalizedValue));
+            matchingValue = normalizedValue;
+        }
+
+        if (matchingValue !== undefined) {
+            select.val(matchingValue).trigger("change.select2");
+        }
+    }
+
+    function loadRegistryDetailsPersonalLookups() {
+        const form = $("#frmRegistryDetails");
+
+        if (!form.length) {
+            return;
+        }
+
+        const lookupValues = {
+            PlaceOfBirthId: form.attr("data-place-of-birth-id"),
+            NationalityId: form.attr("data-nationality-id"),
+            FromProvinceId: form.attr("data-province-id"),
+            RaceId: form.attr("data-race-id"),
+            JobId: form.attr("data-job-id"),
+            DisabilityId: form.attr("data-disability-id"),
+            FromHighSchoolNameInKhmer:
+                form.attr("data-high-school-name")
+        };
+
+        Object.keys(lookupValues).forEach(function (propertyName) {
+            const select = getRegistryStudentControl(propertyName);
+            const template = registryDetailsBody.find(
+                `#registryDetailsLookupTemplates ` +
+                `[data-registry-lookup="${propertyName}"]`
+            ).first();
+
+            if (!select.length || !template.length) {
+                return;
+            }
+
+            const wasDisabled = select.prop("disabled");
+            select.html(template.html());
+            selectRegistrySavedValue(
+                select,
+                lookupValues[propertyName],
+                propertyName === "FromHighSchoolNameInKhmer"
+            );
+            select.prop("disabled", wasDisabled);
+            select.trigger("change.select2");
+        });
+    }
+
+    $(document)
+        .off("click.registryDetailsEdit", "#btnEnableRegistryDetailsEdit")
+        .on("click.registryDetailsEdit", "#btnEnableRegistryDetailsEdit", function () {
+            const fieldset = $("#registryDetailsFieldset");
+            const enableEdit = fieldset.prop("disabled");
+
+            fieldset.prop("disabled", !enableEdit);
+            fieldset
+                .find("input:not([type='hidden']), select, textarea, button")
+                .prop("disabled", !enableEdit);
+
+            $("#btnUpdateRegistryDetails")
+                .toggleClass("d-none", !enableEdit);
+
+            $(this)
+                .toggleClass("btn-outline-primary", !enableEdit)
+                .toggleClass("btn-primary", enableEdit)
+                .attr(
+                    "title",
+                    enableEdit
+                        ? "Cancel editing"
+                        : "Edit student information"
+                );
+        });
+
+    $(document)
+        .off("change.registryDetailsPhoto", "#registryDetailsPhoto")
+        .on("change.registryDetailsPhoto", "#registryDetailsPhoto", function () {
+            const file = this.files && this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            $(this).next(".custom-file-label").text(file.name);
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                $("#registryDetailsPhotoPreview").attr(
+                    "src",
+                    event.target.result
+                );
+            };
+            reader.readAsDataURL(file);
+        });
+
+    function buildRegistryDetailsFormData(formElement) {
+        const source = new FormData(formElement);
+        const normalized = new FormData();
+
+        for (const entry of source.entries()) {
+            normalized.append(
+                entry[0].replace(/^registryReq\./i, ""),
+                entry[1]
+            );
+        }
+
+        return normalized;
+    }
+
+    function setRegistryUpdateLoading(isLoading) {
+        const button = $("#btnUpdateRegistryDetails");
+
+        if (!button.length) {
+            return;
+        }
+
+        if (isLoading) {
+            if (!button.data("original-html")) {
+                button.data("original-html", button.html());
+            }
+
+            button
+                .prop("disabled", true)
+                .html(
+                    '<i class="fas fa-spinner fa-spin mr-1"></i>Updating...'
+                );
+            return;
+        }
+
+        button
+            .prop("disabled", false)
+            .html(
+                button.data("original-html") ||
+                '<i class="fas fa-save mr-1"></i>Update'
+            )
+            .removeData("original-html")
+            .removeData("submitting");
+    }
+
+    window.UpdateRegistryDetails = function (button, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        const form = $("#frmRegistryDetails");
+        const updateButton = $(button);
+
+        if (!form.length || updateButton.data("submitting")) {
+            return false;
+        }
+
+        updateButton.data("submitting", true);
+        form.trigger("submit");
+        return false;
+    };
+
+    $(document)
+        .off("submit.registryDetails", "#frmRegistryDetails")
+        .on("submit.registryDetails", "#frmRegistryDetails", function (event) {
+            event.preventDefault();
+
+            const updateButton = $("#btnUpdateRegistryDetails");
+
+            if (!updateButton.data("submitting")) {
+                updateButton.data("submitting", true);
+            }
+
+            setRegistryUpdateLoading(true);
+
+            $.ajax({
+                url: this.action || "/registry/update",
+                type: "POST",
+                data: buildRegistryDetailsFormData(this),
+                processData: false,
+                contentType: false
+            })
+                .done(function (response) {
+                    const code = String(
+                        response?.status?.code ??
+                        response?.code ??
+                        "200"
+                    );
+                    const message =
+                        response?.status?.message ??
+                        response?.message ??
+                        "Student updated successfully.";
+
+                    if (code !== "200") {
+                        if (typeof ShowToastError === "function") {
+                            ShowToastError(message);
+                        } else {
+                            alert(message);
+                        }
+                        return;
+                    }
+
+                    if (typeof ShowToastSuccess === "function") {
+                        ShowToastSuccess(message);
+                    } else {
+                        alert(message);
+                    }
+
+                    registryDetailsModal.modal("hide");
+
+                    if ($.fn.DataTable.isDataTable("#tblRegistry")) {
+                        $("#tblRegistry")
+                            .DataTable()
+                            .ajax.reload(null, false);
+                    }
+                })
+                .fail(function (xhr) {
+                    const message =
+                        xhr.responseJSON?.status?.message ??
+                        xhr.responseJSON?.message ??
+                        "Unable to update the student.";
+
+                    if (typeof ShowToastError === "function") {
+                        ShowToastError(message);
+                    } else {
+                        alert(message);
+                    }
+                })
+                .always(function () {
+                    setRegistryUpdateLoading(false);
+                });
+        });
+
+    $("#btnToggleRegistryDetailsSize")
+        .off("click.registryDetailsSize")
+        .on("click.registryDetailsSize", function () {
+            registryDetailsModal.toggleClass(
+                "registry-details-fullscreen"
+            );
+
+            const isFullscreen = registryDetailsModal.hasClass(
+                "registry-details-fullscreen"
+            );
+
+            $(this)
+                .attr(
+                    "title",
+                    isFullscreen ? "Exit full screen" : "Full screen"
+                )
+                .find("i")
+                .toggleClass("fa-expand", !isFullscreen)
+                .toggleClass("fa-compress", isFullscreen);
+        });
+
+    registryDetailsModal
+        .off("hidden.bs.modal.registryDetails")
+        .on("hidden.bs.modal.registryDetails", function () {
+            if (registryDetailsRequest) {
+                registryDetailsRequest.abort();
+                registryDetailsRequest = null;
+            }
+
+            registryDetailsBody
+                .find(".select2-hidden-accessible")
+                .each(function () {
+                    $(this).select2("destroy");
+                });
+
+            registryDetailsBody.empty();
+            registryDetailsModal.addClass(
+                "registry-details-fullscreen"
+            );
+
+            $("#btnToggleRegistryDetailsSize")
+                .attr("title", "Exit full screen")
+                .find("i")
+                .removeClass("fa-expand")
+                .addClass("fa-compress");
+        });
+</script>
 }

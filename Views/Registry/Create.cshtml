@@ -1,9 +1,9 @@
 ﻿@using BBU_SYSTEM.Models.Req
 @model BBU_SYSTEM.ViewModel.RegisryDetailViewModel
 @{
-    ViewData["OpenMenu"] = "Administration";
-    ViewData["Action"] = "Register";
-    var registryReq = new RegistryReq();
+ViewData["OpenMenu"] = "Administration";
+ViewData["Action"] = "Register";
+var registryReq = new RegistryReq();
 }
 <div class="row">
     <div class="col-12">
@@ -12,7 +12,7 @@
                 <h3 class="card-title">Registry Detail</h3>
             </div>
             <div class="card-body">
-                <form id="frmRegistry">
+                <form id="frmRegistry" novalidate>
                     <div class="row">
                         <div class="col-md-7">
                             <div class="card card-primary card-outline card-outline-tabs">
@@ -76,39 +76,39 @@
                                     <div class="tab-content" id="custom-tabs-four-tabContent">
                                         <div class="tab-pane fade show active" id="custom-tabs-four-1"
                                              role="tabpanel" aria-labelledby="custom-tabs-four-1-tab">
-                                            <partial name="_TabPersonal"/>
+                                            <partial name="_TabPersonal" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-2" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-2-tab">
-                                            <partial name="_TabContactPerson"/>
+                                            <partial name="_TabContactPerson" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-3" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-3-tab">
-                                            <partial name="_TabParent"/>
+                                            <partial name="_TabParent" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-4" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-4-tab">
-                                            <partial name="_TabRelativeContact"/>
+                                            <partial name="_TabRelativeContact" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-5" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-5-tab">
-                                            <partial name="_TabScholarship"/>
+                                            <partial name="_TabScholarship" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-6" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-6-tab">
-                                            <partial name="_TabCertificate"/>
+                                            <partial name="_TabCertificate" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-7" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-7-tab">
-                                            <partial name="_TabExtendFrom"/>
+                                            <partial name="_TabExtendFrom" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-8" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-8-tab">
-                                            <partial name="_TabNote"/>
+                                            <partial name="_TabNote" model="registryReq" />
                                         </div>
                                         <div class="tab-pane fade" id="custom-tabs-four-9" role="tabpanel"
                                              aria-labelledby="custom-tabs-four-9-tab">
-                                            <partial name="_TabContinueEducation"/>
+                                            <partial name="_TabContinueEducation" model="registryReq" />
                                         </div>
                                     </div>
                                 </div>
@@ -220,8 +220,12 @@
                                             </div>
                                             <div class="col-2">
                                                 <label class="required">Semester</label>
-                                                <input type="number" class="form-control" min="1" max="2" value="0"
-                                                       asp-for="@registryReq!.Resume!.CSemester">
+                                                <input type="number"
+                                                       class="form-control"
+                                                       min="1"
+                                                       max="2"
+                                                       value="1"
+                                                       asp-for="@registryReq.Resume.CSemester">
                                             </div>
                                         </div>
                                     </div>
@@ -246,339 +250,844 @@
 
 @section Scripts
 {
-    <script src="~/function/Degree.js"></script>
-    <script src="~/function/School.js"></script>
-    <script src="~/function/Field.js"></script>
-    <script src="~/function/Promotion.js"></script>
-    <script src="~/function/Stage.js"></script>
-    <script src="~/function/Term.js"></script>
-    <script src="~/function/Group.js"></script>
+<script src="~/function/Degree.js"></script>
+<script src="~/function/School.js"></script>
+<script src="~/function/Field.js"></script>
+<script src="~/function/Promotion.js"></script>
+<script src="~/function/Stage.js"></script>
+<script src="~/function/Term.js"></script>
+<script src="~/function/Group.js"></script>
 
-    <script src="~/js/Components.js"></script>
-    <script>
-        const registerInput = "#registryReq_Registry"
-        const studentInput = "#registryReq_Student"
-        const frmRegistry = $("#frmRegistry");
+<script src="~/js/Components.js"></script>
+<script>
+    const registerInput = "#registryReq_Registry"
+    const studentInput = "#registryReq_Student"
+    const frmRegistry = $("#frmRegistry");
 
-        const cboDegree = $(`${registerInput}_DegreeId`);
-        const cboSchool = $(`${registerInput}_SchoolId`);
-        const cboProgram = $(`#cboProgram`);
-        const cboField = $(`${studentInput}_FieldId`);
-        const cboPromotion = $(`${registerInput}_PromotionNo`);
-        const cboStage = $(`${registerInput}_StageNo`);
-        const cboTerm = $(`${registerInput}_TermNo`);
-        const cboStudyTime = $(`${registerInput}_StudyTime`);
+    const cboDegree = $(`${registerInput}_DegreeId`);
+    const cboSchool = $(`${registerInput}_SchoolId`);
+    const cboProgram = $(`#cboProgram`);
+    const cboField = $(`${studentInput}_FieldId`);
+    const cboPromotion = $(`${registerInput}_PromotionNo`);
+    const cboStage = $(`${registerInput}_StageNo`);
+    const cboTerm = $(`${registerInput}_TermNo`);
+    const cboStudyTime = $(`${registerInput}_StudyTime`);
 
-        const chbAssToBac = $("#chbAssToBac");
-        const chbBacToMas = $("#chbBacToMas");
-        const resume = $("#Resume");
+    const chbAssToBac = $("#chbAssToBac");
+    const chbBacToMas = $("#chbBacToMas");
+    const resume = $("#Resume");
 
 
-        const tblScholarship = $("#tblScholarship");
-        const tblCertificate = $("#tblCertificate");
+    const tblScholarship = $("#tblScholarship");
+    const tblCertificate = $("#tblCertificate");
 
-        const btnAddScholarship = $("#btnAddScholarship");
-        const btnAddCertificate = $("#btnAddCertificate");
+    const btnAddScholarship = $("#btnAddScholarship");
+    const btnAddCertificate = $("#btnAddCertificate");
 
-        let certificates = [], scholarships = [];
-        $(document).ready(function () {
-            showLoading();
-            GetDegree();
-            GetSchool();
+    let certificates = [], scholarships = [];
+    $(document).ready(function () {
+        showLoading();
+        GetDegree();
+        GetSchool();
 
-            GetStudyTime();
-            Components.BindSelectOptions("/Province/get-provinces", "registryReq_PlaceOfBirthId", "provinceId", "provinceName");
-            Components.BindSelectOptions("/Nationality/get-nationalities", "registryReq_Student_NationalityId", "nationalityId", "nationalityName");
-            Components.BindSelectOptions("/Province/get-provinces", "registryReq_ProvinceId", "provinceId", "provinceName");
-            Components.BindSelectOptions("/high-school/get-high-school", "registryReq_Student_FromHighSchoolNameInKhmer", "highSchoolId", "highSchoolNameInKhmer");
-            Components.BindSelectOptions("/student-job/get-student-jobs", "registryReq_Student_JobId", "jobId", "jobName");
-            Components.BindSelectOptions("/disability/get-disabilities", "registryReq_Student_DisabilityId", "disabilityId", "disabilityName");
-            
-            
-            
-            BindSelectOptions("/race/get-races", "registryReq_Student_RaceId", "raceId", "raceName");
-            
-            
-            
-            // Components.BindSelectOptions("/sponsor/get-sponsor", "cboSponsor", "sponsorId", "sponsorName");
-            // Components.BindSelectOptions("/certificate/get-certificate","cboCertificate","certificateId","certificateName");
+        GetStudyTime();
+        Components.BindSelectOptions(
+            "/Province/get-provinces",
+            "registryReq_Student_PlaceOfBirthId",
+            "provinceId",
+            "provinceName"
+        );
+        Components.BindSelectOptions("/Nationality/get-nationalities", "registryReq_Student_NationalityId", "nationalityId", "nationalityName");
+        Components.BindSelectOptions(
+            "/Province/get-provinces",
+            "registryReq_Student_FromProvinceId",
+            "provinceId",
+            "provinceName"
+        );
+        Components.BindSelectOptions(
+            "/high-school/get-high-school",
+            "registryReq_Student_FromHighSchoolNameInKhmer",
+            "highSchoolNameInKhmer",
+            "highSchoolNameInKhmer"
+        );
+        Components.BindSelectOptions("/student-job/get-student-jobs", "registryReq_Student_JobId", "jobId", "jobName");
+        const disabilityControl = $("#frmRegistry")
+            .find(
+                'select[name="Student.DisabilityId"],' +
+                'select[name="registryReq.Student.DisabilityId"],' +
+                'select[id$="_DisabilityId"]'
+            )
+            .first();
 
-            fetchCertificate();
-            fetchScholarship();
-            // tblScholarship.DataTable();
-            // tblCertificate.DataTable();
-            hideLoading();
-        });
-
-        async function fetchCertificate() {
-            try {
-                const response = await $.ajax({
-                    url: "/certificate/get-certificate",
-                    method: 'POST',
-                    data: {isAll: true}
-                });
-                if (response.status.code === "200" && response.data && response.data.length > 0) {
-                    certificates = response.data;
-                } else {
-                    console.log(response.responseText);
-                }
-            } catch (err) {
-                console.log(err.responseText);
-            }
-        }
-
-        async function fetchScholarship() {
-            try {
-                const response = await $.ajax({
-                    url: "/sponsor/get-sponsor",
-                    method: 'POST',
-                    data: {isAll: true}
-                });
-                if (response.status.code === "200" && response.data && response.data.length > 0) {
-                    scholarships = response.data;
-                } else {
-                    console.log(response.responseText);
-                }
-            } catch (err) {
-                console.log(err.responseText);
-            }
-        }
-        
-        cboDegree.change(function () {
-            showLoading();
-            GetField();
-            GetPromotion();
-            hideLoading(1);
-        });
-
-        cboSchool.change(function () {
-            showLoading();
-            GetField();
-            GetPromotion();
-            hideLoading(1);
-        });
-
-        cboPromotion.change(function () {
-            showLoading();
-            GetStage();
-            GetTerm();
-            hideLoading(1);
-        });
-        cboStage.change(function () {
-            showLoading();
-            GetTerm();
-            hideLoading(1);
-        });
-
-        async function GetDegree() {
-            cboDegree.empty();
-            cboDegree.append("<option value='' disabled>Select Degree</option>");
-            const degrees = await Degree.GetAllDegree();
-            degrees.forEach(item => {
-                cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
+        if (disabilityControl.length) {
+            disabilityControl.attr({
+                id: "registryReq_Student_DisabilityId",
+                name: "registryReq.Student.DisabilityId"
             });
-            cboDegree.val('').trigger("change");
-        }
 
-        async function GetSchool() {
-            cboSchool.empty();
-            cboSchool.append("<option value='' disabled>Select School</option>");
-            const schools = await School.GetSchool()
-            schools.forEach(function (item) {
-                cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
-            });
-            cboSchool.val('').trigger("change");
-        }
-
-        async function GetField() {
-            const degreeId = parseInt(cboDegree.val());
-            const schoolId = parseInt(cboSchool.val());
-            if (!degreeId || !schoolId) {
-                return;
-            }
-            cboField.empty();
-            cboProgram.empty();
-
-            cboField.append("<option value='' disabled>Select Field</option>");
-            cboProgram.append("<option value='' disabled>Select Program</option>");
-            const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
-            fields.forEach(item => {
-                cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
-                cboProgram.append(`<option value='${item.fieldId}'>${item.degreeName}</option>`);
-            });
-            cboField.val('').trigger("change");
-        }
-
-        async function GetPromotion() {
-            const degreeId = cboDegree.val();
-            const schoolId = cboSchool.val();
-            if (!degreeId || !schoolId) {
-                return;
-            }
-            cboPromotion.empty();
-            cboPromotion.append("<option value='' disabled>Select Promotion</option>");
-            const promotions = await Promotion.GetPromotions();
-            promotions.forEach(item => {
-                if (item.degree === parseInt(degreeId) && item.school === parseInt(schoolId)) {
-                    cboPromotion.append(`<option value='${item.promotionId}'>${item.promotionNo}</option>`);
-                }
-            });
-            cboPromotion.val('').trigger("change");
-        }
-
-        async function GetStage() {
-            const promotionId = cboPromotion.val();
-            if (!promotionId) {
-                return;
-            }
-            cboStage.empty();
-            cboStage.append("<option value='' disabled>Select Stage</option>");
-            const stages = await Stage.GetStages();
-            stages.forEach(item => {
-                if (item.promotionId === parseInt(promotionId)) {
-                    cboStage.append(`<option value='${item.stageId}'>${item.stageNo}</option>`);
-                }
-            });
-            cboStage.val('').trigger("change");
-        }
-
-        async function GetTerm() {
-            const stageId = cboStage.val();
-            if (!stageId) {
-                return;
-            }
-            const terms = await Term.GetTerms();
-            terms.forEach(item => {
-                if (item.stageId === parseInt(stageId) && item.status === "ACTIVE") {
-                    cboTerm.val(item.termNo);
-                }
-            });
-        }
-
-        async function GetStudyTime() {
-            cboStudyTime.empty();
-            cboStudyTime.append("<option value='' disabled selected>Select Study Time</option>");
-            try {
-                const response = await fetch("/study-time/get-study-time", {
-                    method: "GET",
-                });
-                const result = await response.json();
-                result.data.forEach(item => {
-                    cboStudyTime.append(`<option value='${item.studyTimeValue}'>${item.studyTimeValue}</option>`);
-                });
-                cboStudyTime.trigger("change");
-            } catch (err) {
-                ShowToastError("Failed to load study times.");
-            }
-        }
-
-        document.getElementById("frmRegistry").addEventListener("submit", function (e) {
-            e.preventDefault();
-            const form = $(this);
-            const formData = form.serialize();
-            $("#degree_id").val();
+            disabilityControl
+                .empty()
+                .append(
+                    '<option value="" selected>' +
+                    'Select Disability</option>'
+                );
             $.ajax({
-                url: '/Registry/PostRegistry',
-                method: 'POST',
-                data: formData,
+                url: "/disability/get-disabilities?isAll=true",
+                type: "POST",
                 success: function (response) {
-                    if (response.code === "200") {
-                        ShowToastSuccess("Saved successfully!");
-                        $('#degreeForm')[0].reset();
-                        $("#DegreeModal").modal("hide");
-                        $("#tblDegree").DataTable().ajax.reload();
-                    } else {
-                        ShowToastError(response.message);
-                    }
+                    const items =
+                        response?.data ??
+                        response?.result ??
+                        response ??
+                        [];
+
+                    items.forEach(function (item) {
+                        const id =
+                            item.disabilityId ??
+                            item.disabilityid ??
+                            item.DisabilityId ??
+                            item.DISABILITYID ??
+                            item.id ??
+                            item.Id;
+
+                        const name =
+                            item.disabilityName ??
+                            item.disabilityname ??
+                            item.DisabilityName ??
+                            item.DISABILITYNAME ??
+                            item.name ??
+                            item.Name;
+
+                        if (id === undefined ||
+                            id === null ||
+                            id === "") {
+                            return;
+                        }
+
+                        disabilityControl.append(
+                            $("<option>", {
+                                value: id,
+                                text: name ?? id
+                            })
+                        );
+                    });
                 },
-                error: function (error) {
-                    if (error.responseJSON && error.responseJSON.message) {
-                        ShowToastError(error.responseJSON.message);
-                    }
+                error: function () {
+                    ShowToastError(
+                        "Cannot load disabilities."
+                    );
                 }
             });
-        });
-
-
-        chbAssToBac.on("change", function (e) {
-            chbBacToMas.prop("checked", false);
-            if (e.target.checked === true) {
-                resume.removeAttr("hidden");
-            } else {
-                resume.attr("hidden", "hidden");
-            }
-        });
-        chbBacToMas.on("change", function (e) {
-            chbAssToBac.prop("checked", false);
-            if (e.target.checked === true) {
-                resume.removeAttr("hidden");
-            } else {
-                resume.attr("hidden", "hidden");
-            }
-        });
-
-        $("#rdoHighSchool").on("change", function (e) {
-            if (e.target.checked === true) {
-                showLoading();
-                BindSelectOptions("/high-school/get-high-school", "registryReq_Student_FromHighSchoolNameInKhmer", "highSchoolId", "highSchoolNameInKhmer");
-                hideLoading(1);
-            }
-        });
-
-        $("#rdoMasPhD").on("change", function (e) {
-            if (e.target.checked === true) {
-                showLoading();
-                Components.BindSelectOptions("/university/get-universities", "registryReq_Student_FromHighSchoolNameInKhmer", "universityId", "universityName");
-                hideLoading(1);
-            }
-        });
-
-        btnAddScholarship.on("click", function (e) {
-            e.preventDefault();
-            AddRowScholarship([
-                null,   // Student Scholarship Id
-                null,   // Student Id
-                "",     // Sponsor Id
-                "1",     //Term No
-                false,     // Is Full
-                0,  // Amount
-                ""      // Remark
-            ]);
-        });
-        
-        function buildScholarshipOptions(selectedId) {
-            let html = ``;
-            scholarships.forEach(c => {
-                html += `<option value="${c.sponsorId}" ${c.sponsorId === selectedId ? "selected" : ""}>${c.sponsorName}</option>`;
-            });
-            return html;
+        } else {
+            console.error(
+                "Disability dropdown was not found in #frmRegistry."
+            );
         }
-     
 
-        function AddRowScholarship(params) {
-            let index = tblScholarship.find("tr").length;
-            tblScholarship.append(`
+
+
+        Components.BindSelectOptions(
+            "/race/get-races",
+            "registryReq_Student_RaceId",
+            "raceId",
+            "raceName"
+        );
+        
+
+        fetchCertificate();
+        fetchScholarship();
+        hideLoading();
+        toggleResumeForm();
+    });
+
+    async function fetchCertificate() {
+        try {
+            const response = await $.ajax({
+                url: "/certificate/get-certificate",
+                method: 'POST',
+                data: {isAll: true}
+            });
+            if (response.status.code === "200" && response.data && response.data.length > 0) {
+                certificates = response.data;
+            } else {
+                console.log(response.responseText);
+            }
+        } catch (err) {
+            console.log(err.responseText);
+        }
+    }
+
+    async function fetchScholarship() {
+        try {
+            const response = await $.ajax({
+                url: "/sponsor/get-sponsor",
+                method: 'POST',
+                data: {isAll: true}
+            });
+            if (response.status.code === "200" && response.data && response.data.length > 0) {
+                scholarships = response.data;
+            } else {
+                console.log(response.responseText);
+            }
+        } catch (err) {
+            console.log(err.responseText);
+        }
+    }
+
+    async function loadFieldAndPromotion() {
+        const degreeId = Number(cboDegree.val()) || 0;
+        const schoolId = Number(cboSchool.val()) || 0;
+
+        cboField.empty().append(`
+        <option value="" disabled selected>
+            Select Field
+        </option>
+    `);
+
+        cboProgram.empty().append(`
+        <option value="" disabled selected>
+            Select Program
+        </option>
+    `);
+
+        cboPromotion
+            .off("change.registry")
+            .on("change.registry", async function () {
+                const promotionId =
+                    Number(cboPromotion.val()) || 0;
+
+                console.log(
+                    "Selected promotion ID:",
+                    promotionId
+                );
+
+                if (promotionId <= 0) {
+                    cboStage.empty().append(`
+                <option value="" disabled selected>
+                    Select Stage
+                </option>
+            `);
+
+                    cboTerm.val("");
+                    return;
+                }
+
+                showLoading();
+
+                try {
+                    await GetStage();
+                } finally {
+                    hideLoading(1);
+                }
+            });
+
+        cboStage
+            .off("change.registry")
+            .on("change.registry", async function () {
+                const stageId =
+                    Number(cboStage.val()) || 0;
+
+                if (stageId <= 0) {
+                    cboTerm.val("");
+                    return;
+                }
+
+                showLoading();
+
+                try {
+                    await GetTerm();
+                } finally {
+                    hideLoading(1);
+                }
+            });
+
+        cboTerm.val("");
+
+        if (degreeId <= 0 || schoolId <= 0) {
+            return;
+        }
+
+        showLoading();
+
+        try {
+            await Promise.all([
+                GetField(),
+                GetPromotion()
+            ]);
+        } catch (error) {
+            console.log("Field and promotion error:", error);
+            ShowToastError("Cannot load field or promotion.");
+        } finally {
+            hideLoading(1);
+        }
+}
+
+    cboDegree
+        .off("change.registry")
+        .on("change.registry", loadFieldAndPromotion);
+
+    cboSchool
+        .off("change.registry")
+        .on("change.registry", loadFieldAndPromotion);
+
+    cboPromotion
+        .off("change.registry")
+        .on("change.registry", async function () {
+            showLoading();
+
+            try {
+                await GetStage();
+            } finally {
+                hideLoading(1);
+            }
+        });
+
+    cboStage
+        .off("change.registry")
+        .on("change.registry", async function () {
+            const stageId =
+                Number(cboStage.val()) || 0;
+
+            console.log("Selected stage ID:", stageId);
+
+            if (stageId <= 0) {
+                cboTerm.val("");
+                return;
+            }
+
+            showLoading();
+
+            try {
+                await GetTerm();
+            } finally {
+                hideLoading(1);
+            }
+        });
+
+    async function GetDegree() {
+        cboDegree.empty();
+        cboDegree.append("<option value='' disabled>Select Degree</option>");
+        const degrees = await Degree.GetAllDegree();
+        degrees.forEach(item => {
+            cboDegree.append(`<option value='${item.degreeId}'>${item.degreeName}</option>`);
+        });
+        cboDegree.val('').trigger("change");
+    }
+
+    async function GetSchool() {
+        cboSchool.empty();
+        cboSchool.append("<option value='' disabled>Select School</option>");
+        const schools = await School.GetSchool()
+        schools.forEach(function (item) {
+            cboSchool.append(`<option value='${item.schoolId}'>${item.schoolName}</option>`);
+        });
+        cboSchool.val('').trigger("change");
+    }
+
+    async function GetField() {
+        const degreeId = parseInt(cboDegree.val());
+        const schoolId = parseInt(cboSchool.val());
+        if (!degreeId || !schoolId) {
+            return;
+        }
+        cboField.empty();
+        cboProgram.empty();
+
+        cboField.append("<option value='' disabled>Select Field</option>");
+        cboProgram.append("<option value='' disabled>Select Program</option>");
+        const fields = await Field.GetFields({isAll: true, degreeId, schoolId});
+        fields.forEach(item => {
+            cboField.append(`<option value='${item.fieldId}'>${item.fieldName}</option>`);
+            cboProgram.append(`<option value='${item.fieldId}'>${item.degreeName}</option>`);
+        });
+        cboField.val('').trigger("change");
+    }
+
+    async function GetPromotion() {
+        const degreeId = Number(cboDegree.val()) || 0;
+        const schoolId = Number(cboSchool.val()) || 0;
+
+        cboPromotion.empty().append(`
+        <option value="" disabled selected>
+            Select Promotion
+        </option>
+    `);
+
+        // Clear dependent controls
+        cboStage.empty().append(`
+        <option value="" disabled selected>
+            Select Stage
+        </option>
+    `);
+
+        cboTerm.val("");
+
+        if (degreeId <= 0 || schoolId <= 0) {
+            return;
+        }
+
+        try {
+            const promotions = await Promotion.GetPromotions({
+                isSelect2: true,
+                degreeId: degreeId,
+                schoolId: schoolId
+            });
+
+            (promotions || []).forEach(function (item) {
+                cboPromotion.append(`
+                <option value="${item.promotionId}">
+                    ${item.promotionNo}
+                </option>
+            `);
+            });
+
+            cboPromotion.val("").trigger("change.select2");
+        } catch (error) {
+            console.log("GetPromotion error:", error);
+            ShowToastError("Cannot load promotions.");
+        }
+}
+
+    async function GetStage() {
+        const promotionId = Number(cboPromotion.val()) || 0;
+
+        // Reset Stage and Term
+        cboStage.empty().append(`
+        <option value="" disabled selected>
+            Select Stage
+        </option>
+    `);
+
+        cboTerm.val("");
+
+        if (promotionId <= 0) {
+            console.log("Promotion ID is empty.");
+            return;
+        }
+
+        try {
+            const response = await Stage.GetStages({
+                isSelect2: true,
+                promotionId: promotionId
+            });
+
+            console.log("Stage response:", response);
+
+            const stages =
+                response?.data ??
+                response?.result ??
+                response ??
+                [];
+
+            if (!Array.isArray(stages)) {
+                console.log("Stage response is not an array:", stages);
+
+                cboStage.empty().append(`
+                <option value="">
+                    Invalid stage data
+                </option>
+            `);
+
+                return;
+            }
+
+            let stageFound = false;
+
+            stages.forEach(function (item) {
+                const itemPromotionId =
+                    item.promotionId ??
+                    item.PromotionId ??
+                    item.promotion_id ??
+                    item.promotion;
+
+                const stageId =
+                    item.stageId ??
+                    item.StageId ??
+                    item.stage_id;
+
+                const stageNo =
+                    item.stageNo ??
+                    item.StageNo ??
+                    item.stage_no;
+
+                if (Number(itemPromotionId) === promotionId) {
+                    cboStage.append(`
+                    <option value="${stageId}">
+                        ${stageNo}
+                    </option>
+                `);
+
+                    stageFound = true;
+                }
+            });
+
+            if (!stageFound) {
+                cboStage.empty().append(`
+                <option value="">
+                    No stage available
+                </option>
+            `);
+
+                console.log(
+                    "No stage found for promotion ID:",
+                    promotionId
+                );
+
+                return;
+            }
+
+            cboStage.val("").trigger("change.select2");
+        } catch (error) {
+            console.log("GetStage error:", error);
+            console.log("Server response:", error.responseText);
+
+            cboStage.empty().append(`
+            <option value="">
+                Cannot load stage
+            </option>
+        `);
+
+            ShowToastError(
+                error.responseJSON?.status?.message ||
+                error.responseJSON?.message ||
+                "Cannot load stages."
+            );
+        }
+    }
+
+    async function GetTerm() {
+        const stageId = Number(cboStage.val()) || 0;
+
+        cboTerm.val("");
+
+        if (stageId <= 0) {
+            console.log("Stage ID is empty.");
+            return;
+        }
+
+        try {
+            const response = await Term.GetTerms({
+                isSelect2: true,
+                stageId: stageId
+            });
+
+            console.log("Term response:", response);
+
+            const terms =
+                response?.data ??
+                response?.result ??
+                response ??
+                [];
+
+            if (!Array.isArray(terms)) {
+                console.log("Invalid term response:", terms);
+                ShowToastError("Invalid term data.");
+                return;
+            }
+
+            const activeTerm = terms.find(function (item) {
+                const itemStageId =
+                    item.stageId ??
+                    item.StageId ??
+                    item.stage_id;
+
+                const status =
+                    item.status ??
+                    item.Status;
+
+                return (
+                    Number(itemStageId) === stageId &&
+                    String(status).toUpperCase() === "ACTIVE"
+                );
+            });
+
+            if (activeTerm) {
+                const termNo =
+                    activeTerm.termNo ??
+                    activeTerm.TermNo ??
+                    activeTerm.term_no;
+
+                cboTerm.val(termNo);
+            } else {
+                console.log(
+                    "No active term found for stage:",
+                    stageId
+                );
+
+                cboTerm.val("");
+            }
+        } catch (error) {
+            console.log("GetTerm error:", error);
+            console.log(
+                "Term server response:",
+                error.responseText
+            );
+
+            ShowToastError("Cannot load terms.");
+        }
+    }
+
+    async function GetStudyTime() {
+        cboStudyTime.empty();
+        cboStudyTime.append("<option value='' disabled selected>Select Study Time</option>");
+        try {
+            const response = await fetch("/study-time/get-study-time", {
+                method: "GET",
+            });
+            const result = await response.json();
+            result.data.forEach(item => {
+                cboStudyTime.append(`<option value='${item.studyTimeValue}'>${item.studyTimeValue}</option>`);
+            });
+            cboStudyTime.trigger("change");
+        } catch (err) {
+            ShowToastError("Failed to load study times.");
+        }
+    }
+
+    $(document)
+        .off("submit.registry", "#frmRegistry")
+        .on("submit.registry", "#frmRegistry", function (e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            const form = this;
+            
+            $(form).find("[name]").each(function () {
+                const fieldName = this.name;
+
+                if (!fieldName ||
+                    fieldName === "__RequestVerificationToken" ||
+                    fieldName.startsWith("registryReq.")) {
+                    return;
+                }
+
+                this.name = `registryReq.${fieldName}`;
+            });
+
+            const formData = new FormData(form);
+            
+            const selectedDisability = $(form)
+                .find(
+                    'select[name="Student.DisabilityId"],' +
+                    'select[name="registryReq.Student.DisabilityId"],' +
+                    'select[id$="_DisabilityId"]'
+                )
+                .first()
+                .val();
+
+            formData.delete("DisabilityId");
+            formData.delete("Student.DisabilityId");
+            formData.delete(
+                "registryReq.Student.DisabilityId"
+            );
+
+            if (selectedDisability !== undefined &&
+                selectedDisability !== null &&
+                selectedDisability !== "") {
+                formData.set(
+                    "registryReq.Student.DisabilityId",
+                    selectedDisability
+                );
+            }
+            
+            const receivedPhotoCheckbox = $(form)
+                .find(
+                    'input[type="checkbox"]' +
+                    '[name="registryReq.Student.IsReceivePhoto"]'
+                )
+                .first();
+
+            formData.delete(
+                "registryReq.Student.IsReceivePhoto"
+            );
+            formData.set(
+                "registryReq.Student.IsReceivePhoto",
+                receivedPhotoCheckbox.is(":checked")
+                    ? "true"
+                    : "false"
+            );
+
+            const saveButton = $("button[form='frmRegistry']");
+
+            $.ajax({
+                url: "/registry/PostRegistry",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+
+                beforeSend: function () {
+                    saveButton
+                        .prop("disabled", true)
+                        .html(`
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                        Saving...
+                    `);
+                },
+
+                // PUT THE SUCCESS CODE HERE
+                success: function (response) {
+                    const code =
+                        response.status?.code ??
+                        response.code;
+
+                    const message =
+                        response.status?.message ??
+                        response.message;
+
+                    if (String(code) === "200") {
+                        ShowToastSuccess(
+                            message ||
+                            "Registry created successfully!"
+                        );
+
+                        setTimeout(function () {
+                            window.location.href =
+                                response.redirectUrl ||
+                                "/registry/all-student-register";
+                        }, 700);
+
+                        return;
+                    }
+
+                    ShowToastError(
+                        message ||
+                        "Cannot create registry."
+                    );
+                },
+
+                error: function (xhr) {
+                    console.log("PostRegistry error:", xhr.responseJSON);
+                    console.log("PostRegistry text:", xhr.responseText);
+
+                    const message =
+                        xhr.responseJSON?.status?.message ??
+                        xhr.responseJSON?.message ??
+                        xhr.responseJSON?.title ??
+                        "Server error.";
+
+                    ShowToastError(message);
+                },
+
+                complete: function () {
+                    saveButton
+                        .prop("disabled", false)
+                        .html(`
+                        <i class="fas fa-save"></i>
+                        Registry
+                    `);
+                }
+            });
+
+            return false;
+        });
+
+
+    chbAssToBac.on("change", function (e) {
+        chbBacToMas.prop("checked", false);
+        if (e.target.checked === true) {
+            resume.removeAttr("hidden");
+        } else {
+            resume.attr("hidden", "hidden");
+        }
+    });
+    chbBacToMas.on("change", function (e) {
+        chbAssToBac.prop("checked", false);
+        if (e.target.checked === true) {
+            resume.removeAttr("hidden");
+        } else {
+            resume.attr("hidden", "hidden");
+        }
+    });
+
+    $("#rdoHighSchool")
+        .off("change.registry")
+        .on("change.registry", function () {
+            if (!this.checked) {
+                return;
+            }
+
+            Components.BindSelectOptions(
+                "/high-school/get-high-school",
+                "registryReq_Student_FromHighSchoolNameInKhmer",
+                "highSchoolNameInKhmer",
+                "highSchoolNameInKhmer"
+            );
+        });
+
+    $("#rdoMasPhD").on("change", function (e) {
+        if (e.target.checked === true) {
+            showLoading();
+            Components.BindSelectOptions(
+                "/university/get-universities",
+                "registryReq_Student_FromHighSchoolNameInKhmer",
+                "universityName",
+                "universityName"
+            );
+            hideLoading(1);
+        }
+    });
+
+    btnAddScholarship.on("click", function (e) {
+        e.preventDefault();
+        AddRowScholarship([
+            null, null, "", "1", false, 0, ""    
+        ]);
+    });
+
+    function buildScholarshipOptions(selectedId) {
+        let html = ``;
+        scholarships.forEach(c => {
+            html += `<option value="${c.sponsorId}" ${c.sponsorId === selectedId ? "selected" : ""}>${c.sponsorName}</option>`;
+        });
+        return html;
+    }
+    function toggleResumeForm() {
+        const shouldShow =
+            chbAssToBac.prop("checked") ||
+            chbBacToMas.prop("checked");
+
+        if (shouldShow) {
+            resume.removeAttr("hidden");
+
+            resume
+                .find("input, select, textarea")
+                .prop("disabled", false);
+
+            $("#registryReq_Resume_CSemester").val(1);
+        } else {
+            resume.attr("hidden", "hidden");
+
+            resume
+                .find("input, select, textarea")
+                .prop("disabled", true);
+        }
+}
+
+    function AddRowScholarship(params) {
+        const index = tblScholarship.find("tbody tr").length;
+        tblScholarship.find("tbody").append(`
                 <tr>
                     <td class="d-none">
-                        <input value="${params[0]}" type="hidden" name="registryReq.StudentScholarship[${index}].StudentScholarshipId"/>
-                        <input value="${params[1]}" type="hidden" name="registryReq.StudentScholarship[${index}].StudentId"/>
+                        <input value="${params[0]}" type="hidden" name="registryReq.Scholarships[${index}].StudentScholarshipId"/>
+                        <input value="${params[1]}" type="hidden" name="registryReq.Scholarships[${index}].StudentId"/>
                     </td>
                     <td>
-                        <select class="form-control form-control-sm select2" name="registryReq.StudentScholarship[${index}].SponsorId">
+                        <select class="form-control form-control-sm select2" name="registryReq.Scholarships[${index}].SponsorId">
                             ${buildScholarshipOptions(params[2]) }
                         </select>
                     </td> 
                     <td>
-                        <input type="number" value="${params[3]}" class="form-control form-control-sm" name="registryReq.StudentScholarship[${index}].TermNo"/>
+                        <input type="number" value="${params[3]}" class="form-control form-control-sm" name="registryReq.Scholarships[${index}].TermNo"/>
                     </td>
                     <td>
-                        <select class="custom-select custom-select-sm" name="registryReq.StudentScholarship[${index}].IsFullScholarship">
-                          <option value="1" ${params[4]===true ? "selected":""}>True</option>
-                          <option value="0" ${params[4]===true ? "":"selected"}>False</option> 
+                        <select class="custom-select custom-select-sm" name="registryReq.Scholarships[${index}].IsFullScholarship">
+                          <option value="true" ${params[4]===true ? "selected":""}>True</option>
+                          <option value="false" ${params[4]===true ? "":"selected"}>False</option> 
                         </select>
                     </td> 
                     <td>
-                        <input type="number" value="${params[5]}" class="form-control form-control-sm" name="registryReq.StudentScholarship[${index}].Amount" min="0"/>
+                        <input type="number" value="${params[5]}" class="form-control form-control-sm" name="registryReq.Scholarships[${index}].Amount" min="0"/>
                     </td>
                     <td>
                         <a id="btnEdit" class="btn btn-success btn-sm"><i class='fas fa-edit'></i></a>
@@ -586,45 +1095,38 @@
                     </td>
                 </tr>
             `);
-            $(".select2").select2();
-        }
+        $(".select2").select2();
+    }
 
-        btnAddCertificate.on("click", function () {
-            // empty params for new row
-            AddRowCertificate([
-                null,   // Student Certificate Id
-                null,   // Student Id
-                "",     // CertificateId
-                "F",     //grade
-                "",     // IssueNo
-                false,  // Receive
-                ""      // Remark
-            ]);
+    btnAddCertificate.on("click", function () {
+        AddRowCertificate([
+            null, null, "", "F", "", false, ""
+        ]);
+    });
+    function buildCertificateOptions(selectedId) {
+        let html = ``;
+        certificates.forEach(c => {
+            html += `<option value="${c.certificateId}" ${c.certificateId === selectedId ? "selected" : ""}>${c.certificateName}</option>`;
         });
-        function buildCertificateOptions(selectedId) {
-            let html = ``;
-            certificates.forEach(c => {
-                html += `<option value="${c.certificateId}" ${c.certificateId === selectedId ? "selected" : ""}>${c.certificateName}</option>`;
-            });
-            return html;
-        }
+        return html;
+    }
 
-        function AddRowCertificate(params) {
-            const index = tblCertificate.find("tbody tr").length;
-            tblCertificate.find("tbody").append(`
+    function AddRowCertificate(params) {
+        const index = tblCertificate.find("tbody tr").length;
+        tblCertificate.find("tbody").append(`
             <tr>
                 <!-- hidden ids -->
                 <td class="d-none">
-                    <input type="hidden" name="registryReq.Certificates[${index}].StudentCertificateId" value="${params[0] ?? ''}">
-                    <input type="hidden" name="registryReq.Certificates[${index}].StudentId" value="${params[1] ?? ''}">
+                    <input type="hidden" name="registryReq.StudentCertificates[${index}].StudentCertificateId" value="${params[0] ?? ''}">
+                    <input type="hidden" name="registryReq.StudentCertificates[${index}].StudentId" value="${params[1] ?? ''}">
                 </td>
                 <td>
-                    <select class="form-control form-control-sm select2" name="registryReq.Certificates[${index}].CertificateId">
+                    <select class="form-control form-control-sm select2" name="registryReq.StudentCertificates[${index}].CertificateId">
                         ${buildCertificateOptions(params[2]) }
                     </select>
                 </td> 
                 <td>
-                        <select class="custom-select custom-select-sm" name="registryReq.Certificates[${index}].Grade">
+                        <select class="custom-select custom-select-sm" name="registryReq.StudentCertificates[${index}].Grade">
                           <option value="A" ${params[3]==="A" ? "selected":""}>A</option>
                           <option value="B" ${params[3]==="B" ? "selected":""}>B</option>
                           <option value="C" ${params[3]==="C" ? "selected":""}>C</option>
@@ -634,12 +1136,12 @@
                         </select>
                 </td>
                 <td>
-                    <input type="text" class="form-control form-control-sm" name="registryReq.Certificates[${index}].CertificateIssueNo" value="${params[4] ?? ''}">
+                    <input type="text" class="form-control form-control-sm" name="registryReq.StudentCertificates[${index}].CertificateIssueNo" value="${params[4] ?? ''}">
                 </td>
                 <td>
-                    <select class="custom-select custom-select-sm" name="registryReq.Certificates[${index}].IsReceived">
-                      <option value="1" ${params[5]===true ? "selected":""}>True</option>
-                      <option value="0" ${params[5]===true ? "":"selected"}>False</option> 
+                    <select class="custom-select custom-select-sm" name="registryReq.StudentCertificates[${index}].IsReceived">
+                      <option value="true" ${params[5]===true ? "selected":""}>True</option>
+                      <option value="false" ${params[5]===true ? "":"selected"}>False</option> 
                     </select>
                 </td> 
                 <td class="text-center">
@@ -652,20 +1154,20 @@
                 </td>
             </tr>
             `);
-            $(".select2").select2();
-        }
+        $(".select2").select2();
+    }
 
 
-        tblCertificate.on("click", ".btnDelete", function () {
-            $(this).closest("tr").remove();
-            reIndexCertificates();
-        });
-        function reIndexCertificates() {
-            $("#tblCertificate tbody tr").each(function (i) {
-                $(this).find("input, select").each(function () {
-                    this.name = this.name.replace(/\[\d+\]/, `[${i}]`);
-                });
+    tblCertificate.on("click", ".btnDelete", function () {
+        $(this).closest("tr").remove();
+        reIndexCertificates();
+    });
+    function reIndexCertificates() {
+        $("#tblCertificate tbody tr").each(function (i) {
+            $(this).find("input, select").each(function () {
+                this.name = this.name.replace(/\[\d+\]/, `[${i}]`);
             });
-        }
-    </script>
+        });
+    }
+</script>
 }

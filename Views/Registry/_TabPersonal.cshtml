@@ -1,30 +1,30 @@
 ﻿@using BBU_SYSTEM.DTOs
-@using BBU_SYSTEM.Models.Req
-@model BBU_SYSTEM.ViewModel.RegisryDetailViewModel
+@model BBU_SYSTEM.Models.Req.RegistryReq
 @{
-    var registryReq = new RegistryReq();
+
 }
 <div class="tab-pane fade show active" id="custom-tabs-four-personal" role="tabpanel"
      aria-labelledby="custom-tabs-four-personal-tab">
     <div class="row">
         <div class="col-3">
             <label>Student Id</label>
-            <input type="text" class="form-control" asp-for="@registryReq!.Student!.StudentId" placeholder="Auto generate" readonly>
+            <input type="text" class="form-control" asp-for="Student!.StudentId"
+                   placeholder="Auto generate" readonly>
         </div>
         <div class="col-4">
             <label class="required">Student Name</label>
-            <input type="text" class="form-control" asp-for="@registryReq!.Student!.StudentName" required
+            <input type="text" class="form-control" asp-for="Student!.StudentName" required
                    placeholder="Enter student name">
         </div>
         <div class="col-3">
             <label class="required">Student Name Khmer</label>
-            <input type="text" class="form-control" asp-for="@registryReq!.Student!.StudentNameInKhmer" required
+            <input type="text" class="form-control" asp-for="Student!.StudentNameInKhmer" required
                    placeholder="Enter student name khmer">
         </div>
         <div class="col-2">
             <label>Sex</label>
-            <select asp-for="@registryReq!.Student!.Sex" class="custom-select" style="width: 100%;">
-                <option selected="selected" value="Male">Male</option>
+            <select asp-for="Student!.Sex" class="custom-select" style="width: 100%;">
+                <option value="Male">Male</option>
                 <option value="Female">Female</option>
             </select>
         </div>
@@ -33,35 +33,40 @@
         <div class="col-3">
             <label class="required">Date Of Birth</label>
             <input type="date" class="form-control"
-                   asp-for="@registryReq!.Student!.DateOfBirth"/>
+                   asp-for="Student!.DateOfBirth"
+                   asp-format="{0:yyyy-MM-dd}" />
         </div>
         <div class="col-4">
             <label class="required">Place Of Birth</label>
-            <select asp-for="@registryReq.PlaceOfBirthId" class="form-control select2" required style="width: 100%;">
-                <option selected="selected" disabled>Select Place of Birth</option>
+            <select asp-for="Student!.PlaceOfBirthId"
+                    id="registryReq_Student_PlaceOfBirthId"
+                    class="form-control select2"
+                    style="width: 100%;">
+                <option value="" disabled>Select Place of Birth</option>
             </select>
         </div>
         <div class="col-3">
             <label class="required">Nationality</label>
-            <select asp-for="@registryReq.Student!.NationalityId" class="form-control select2" style="width: 100%;">
-                <option selected="selected">Select Nationality</option>
+            <select asp-for="Student!.NationalityId"
+                    id="registryReq_Student_NationalityId"
+                    class="form-control select2" style="width: 100%;">
+                <option value="" disabled>Select Nationality</option>
             </select>
         </div>
         <div class="col-2">
             <label>Table No</label>
-            <input type="number" asp-for="@registryReq.Registry!.HighSchoolTableNo" class="form-control">
+            <input type="number" asp-for="Registry!.HighSchoolTableNo" class="form-control">
         </div>
     </div>
     <div class="row">
         <div class="col-3">
             <label class="required">Material Status</label>
-            <select asp-for="@registryReq.Student!.MaritalStatus" class="custom-select" style="width: 100%;"
-                    required>
-                <option selected="selected" value="Single">Single</option>
-                <option value="Marred">Marred</option>
+            <select asp-for="Student!.MaritalStatus" class="custom-select" style="width: 100%;" required>
+                <option value="Single">Single</option>
+                <option value="Married">Married</option>
             </select>
         </div>
-        <div class="col-4"> 
+        <div class="col-4">
             <div class="form-group">
                 <div class="row">
                     <div class="col-6">
@@ -74,50 +79,65 @@
                     <div class="col-6">
                         <div class="custom-control custom-radio">
                             <input class="custom-control-input" type="radio" id="rdoMasPhD" name="customRadio">
-                            <label for="rdoMasPhD" class="custom-control-label">Mass & PhD</label>
+                            <label for="rdoMasPhD" class="custom-control-label">Mass &amp; PhD</label>
                         </div>
                     </div>
                 </div>
             </div>
-            <select asp-for="@registryReq.Student!.FromHighSchoolNameInKhmer" class="form-control select2" required style="width: 100%;">
-                <option selected="selected">Select High School</option>
+            <select asp-for="Student!.FromHighSchoolNameInKhmer"
+                    id="registryReq_Student_FromHighSchoolNameInKhmer"
+                    class="form-control select2" required style="width: 100%;">
+                <option value="" disabled>Select High School</option>
             </select>
         </div>
         <div class="col-3">
             <label class="required">Province</label>
-            <select asp-for="@registryReq.ProvinceId" class="form-control select2" style="width: 100%;">
-                <option selected="selected">Select Province</option>
+            <select asp-for="Student!.FromProvinceId"
+                    id="registryReq_Student_FromProvinceId"
+                    class="form-control select2"
+                    style="width: 100%;">
+                <option value="" disabled>Select Province</option>
             </select>
         </div>
         <div class="col-2">
             <label>HS-Year</label>
-            <input type="number" class="form-control" asp-for="@registryReq.Student!.HighSchoolGraduatedYear">
+            <input type="number" class="form-control" asp-for="Student!.HighSchoolGraduatedYear">
         </div>
     </div>
     <div class="row">
         <div class="col-3">
             <label>Race</label>
-            <select asp-for="@registryReq.Student!.RaceId" class="form-control select2" style="width: 100%;">
-                <option selected="selected" disabled>Select Race</option>
+            <select asp-for="Student!.RaceId"
+                    id="registryReq_Student_RaceId"
+                    class="form-control select2" style="width: 100%;">
+                <option value="" disabled>Select Race</option>
             </select>
         </div>
         <div class="col-4">
             <label>Job</label>
-            <select asp-for="@registryReq.Student!.JobId" class="form-control select2" style="width: 100%;">
-                <option selected="selected">Select Job</option>
+            <select asp-for="Student!.JobId"
+                    id="registryReq_Student_JobId"
+                    class="form-control select2" style="width: 100%;">
+                <option value="" disabled>Select Job</option>
             </select>
         </div>
         <div class="col-3">
-            <label>Disability</label>
-            <select asp-for="@registryReq!.Student!.DisabilityId" class="form-control select2" style="width: 100%;">
-                <option selected="selected" value="">Select Disability</option>
+            <label for="registryReq_Student_DisabilityId">
+                Disability
+            </label>
+
+            <select asp-for="Student!.DisabilityId"
+                    id="registryReq_Student_DisabilityId"
+                    class="form-control select2"
+                    style="width: 100%;">
+                <option value="0">Select Disability</option>
             </select>
         </div>
         <div class="col-2">
             <div class="form-group">
-                <label>Result</label> 
-                <select class="custom-select" asp-for="@registryReq!.Registry!.HighSchoolResult" >
-                    <option selected="selected" value="Pass">Pass</option>
+                <label>Result</label>
+                <select class="custom-select" asp-for="Registry!.HighSchoolResult">
+                    <option value="Pass">Pass</option>
                     <option value="Fail">Fail</option>
                 </select>
             </div>

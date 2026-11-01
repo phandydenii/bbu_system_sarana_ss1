@@ -1,33 +1,142 @@
 ﻿@{
+    ViewData["Title"] = "Letter Types";
     ViewData["OpenMenu"] = "Administration";
     ViewData["Action"] = "LetterType";
+    ViewData["HideHeader"] = true;
 }
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <button class="btn btn-primary" id="btnAddNew"><i class="fas fa-add"></i> Add New</button>
+
+<style>
+    #letterTypePage .letter-type-table-scroll {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    #letterTypePage #tblLetterCategory,
+    #letterTypePage #tblLetterCategory_wrapper {
+        width: 100% !important;
+    }
+
+    #letterTypePage #tblLetterCategory th,
+    #letterTypePage #tblLetterCategory td {
+        vertical-align: middle;
+    }
+
+    #letterTypePage .letter-type-actions {
+        white-space: nowrap;
+    }
+
+    #letterTypePage .letter-type-actions .btn {
+        min-width: 34px;
+        min-height: 32px;
+    }
+</style>
+
+<div id="letterTypePage" class="container-fluid px-0 pt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="m-0 font-weight-bold text-dark">Letter Types</h3>
+            <small class="text-muted">Manage letter categories, pricing, and numbering settings</small>
+        </div>
+    </div>
+
+    <div class="card card-outline card-primary shadow-sm mb-4">
+        <div class="card-header bg-white py-2">
+            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
+                <i class="fas fa-filter text-primary mr-1"></i>
+                Filter Letter Types
+            </h3>
+            <div class="card-tools">
+                <button type="button"
+                        class="btn btn-tool"
+                        data-card-widget="collapse"
+                        aria-label="Collapse letter type filters">
+                    <i class="fas fa-minus"></i>
+                </button>
             </div>
-            <div class="card-body">
-                <table id="tblLetterCategory" class="table table-sm table-bordered table-striped" style="width: 100%;">
-                    <thead>
-                    <tr>
-                        <th>id</th>
-                        <th>name</th>
-                        <th>price</th>
-                        <th>type</th>
-                        <th>status</th>
-                        <th>action</th>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
+        </div>
+        <div class="card-body bg-light py-3">
+            <form id="frmLetterTypeFilters">
+                <div class="row align-items-end">
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="letterTypeFromDate" class="text-secondary small font-weight-bold">
+                            From Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="letterTypeFromDate"
+                                   name="fromDate"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
+                        <label for="letterTypeToDate" class="text-secondary small font-weight-bold">
+                            To Date
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white border-right-0">
+                                    <i class="far fa-calendar-alt text-muted"></i>
+                                </span>
+                            </div>
+                            <input type="date"
+                                   id="letterTypeToDate"
+                                   name="toDate"
+                                   class="form-control border-left-0" />
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12 mb-2 mb-md-0">
+                        <div class="btn-group shadow-sm" role="group" aria-label="Letter type date filters">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-search mr-1"></i>
+                                Filter
+                            </button>
+                            <button type="button"
+                                    id="btnResetLetterTypeFilters"
+                                    class="btn btn-success border-left"
+                                    title="Reset filters"
+                                    aria-label="Reset letter type date filters">
+                                <i class="fas fa-redo-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-sm-12 text-md-right">
+                        <button type="button" class="btn btn-primary shadow-sm" id="btnAddNew">
+                            <i class="fas fa-plus-circle mr-1"></i>
+                            Add New
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body letter-type-table-scroll">
+            <table id="tblLetterCategory"
+                   class="table table-sm table-hover table-bordered table-striped w-100"
+                   style="width: 100%;">
+                <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th class="text-center" style="width: 105px;">Action</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 </div>
-<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
 
+<script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <partial name="_LetterCategoryModal"/>
 
 @section Scripts
@@ -36,131 +145,236 @@
         const tblLetterCategory = $("#tblLetterCategory");
         const modalLetterCategory = $("#modalLetterCategory");
         const frmLetterCategory = $("#frmLetterCategory");
+        let letterCategoryTable = null;
 
         $(document).ready(function () {
             fetchLetterCategory();
+
+            $("#frmLetterTypeFilters").on("submit.letterTypeFilters", function (event) {
+                event.preventDefault();
+
+                const fromDate = $("#letterTypeFromDate").val();
+                const toDate = $("#letterTypeToDate").val();
+
+                if (fromDate && toDate && fromDate > toDate) {
+                    ShowToastError("From Date must not be later than To Date.");
+                    return;
+                }
+
+                letterCategoryTable.ajax.reload(null, true);
+            });
+
+            $("#btnResetLetterTypeFilters").on("click.letterTypeFilters", function () {
+                $("#letterTypeFromDate, #letterTypeToDate").val("");
+                letterCategoryTable.ajax.reload(null, true);
+            });
+
+            $("#btnAddNew").on("click.letterCategory", function () {
+                resetLetterCategoryForm();
+                modalLetterCategory.find(".modal-title").text("Add New Letter Category");
+                modalLetterCategory.modal("show");
+            });
+
+            tblLetterCategory.on("click", ".js-letter-category-edit", function (event) {
+                event.preventDefault();
+                const row = getLetterCategoryRow(this);
+                if (!row) return;
+
+                resetLetterCategoryForm();
+                $("#letterCategory_CategoryId").val(row.categoryId);
+                $("#letterCategory_CategoryName").val(row.categoryName);
+                $("#letterCategory_UnitPrice").val(row.unitPrice);
+                $("#isAdmin").prop("checked", row.isAdmin === true);
+                $("#isFoundation").prop("checked", row.isFoundation === true);
+                $("#isShort").prop("checked", row.isShortCourse === true);
+                $("#isStartNewNumber").prop("checked", row.isStartNewNumber === true);
+
+                modalLetterCategory.find(".modal-title").text("Edit Letter Category");
+                modalLetterCategory.modal("show");
+            });
+
+            tblLetterCategory.on("click", ".js-letter-category-delete", function (event) {
+                event.preventDefault();
+                const row = getLetterCategoryRow(this);
+                if (!row) return;
+
+                if (!confirm("Are you sure you want to delete this category?")) return;
+
+                $.ajax({
+                    url: `/letter-category/delete/${encodeURIComponent(row.categoryId)}`,
+                    type: "POST",
+                    data: letterCategoryAntiForgeryData(),
+                    success: function (response) {
+                        if (String(response?.status?.code) === "200") {
+                            ShowToastSuccess(response.status.message || "Letter category deleted successfully.");
+                            resetLetterCategoryForm();
+                            modalLetterCategory.modal("hide");
+                            letterCategoryTable.ajax.reload(null, false);
+                        } else {
+                            ShowToastError(response?.status?.message || "Failed to delete letter category.");
+                        }
+                    },
+                    error: function (xhr) {
+                        showLetterCategoryError(xhr, "Failed to delete letter category.");
+                    }
+                });
+            });
+
+            frmLetterCategory.on("submit.letterCategory", function (event) {
+                event.preventDefault();
+
+                if (typeof frmLetterCategory.valid === "function" && !frmLetterCategory.valid()) {
+                    return;
+                }
+
+                const submitButtons = frmLetterCategory.find(":submit");
+                submitButtons.prop("disabled", true);
+
+                $.ajax({
+                    url: "/letter-category/post-letter-category",
+                    method: "POST",
+                    data: frmLetterCategory.serialize(),
+                    success: function (response) {
+                        if (String(response?.status?.code) === "200") {
+                            ShowToastSuccess(response.status.message || "Letter category saved successfully.");
+                            resetLetterCategoryForm();
+                            modalLetterCategory.modal("hide");
+                            letterCategoryTable.ajax.reload(null, false);
+                        } else {
+                            ShowToastError(response?.status?.message || "Failed to save letter category.");
+                        }
+                    },
+                    error: function (xhr) {
+                        showLetterCategoryError(xhr, "Failed to save letter category.");
+                    },
+                    complete: function () {
+                        submitButtons.prop("disabled", false);
+                    }
+                });
+            });
         });
 
+        function resetLetterCategoryForm() {
+            frmLetterCategory[0].reset();
+            // An Add operation must never reuse the ID from the previous edit.
+            $("#letterCategory_CategoryId").val("0");
+
+            const validator = frmLetterCategory.data("validator");
+            if (validator && typeof validator.resetForm === "function") {
+                validator.resetForm();
+            }
+        }
+
+        function getLetterCategoryRow(button) {
+            let tableRow = $(button).closest("tr");
+
+            // DataTables Responsive can put action buttons in a child row.
+            if (tableRow.hasClass("child")) {
+                tableRow = tableRow.prev();
+            }
+
+            return letterCategoryTable.row(tableRow).data();
+        }
+
+        function letterCategoryAntiForgeryData() {
+            const token = frmLetterCategory.find('input[name="__RequestVerificationToken"]').val();
+            return token ? { __RequestVerificationToken: token } : {};
+        }
+
+        function showLetterCategoryError(xhr, fallbackMessage) {
+            console.error("Letter category request failed:", xhr.status, xhr.responseText);
+            const response = xhr.responseJSON;
+            ShowToastError(response?.status?.message || response?.detail || fallbackMessage);
+        }
+
         function fetchLetterCategory() {
-            tblLetterCategory.DataTable().clear().destroy();
-            tblLetterCategory.DataTable({
+            if ($.fn.DataTable.isDataTable("#tblLetterCategory")) {
+                tblLetterCategory.DataTable().clear().destroy();
+            }
+
+            const renderText = $.fn.dataTable.render.text();
+
+            letterCategoryTable = tblLetterCategory.DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                autoWidth: false,
+                pageLength: 10,
+                searching: true,
                 ajax: {
                     url: "/letter-category/get-letter-category",
                     type: "POST",
-                    error: function (xhr, status, error) {
-                        console.log(xhr.responseText);
+                    data: function (request) {
+                        request.isAll = false;
+                        // The controller must apply these optional values to
+                        // the correct database date field before paging.
+                        request.fromDate = $("#letterTypeFromDate").val() || "";
+                        request.toDate = $("#letterTypeToDate").val() || "";
+
+                        Object.assign(request, letterCategoryAntiForgeryData());
+                    },
+                    error: function (xhr) {
+                        showLetterCategoryError(xhr, "Failed to get letter categories.");
                     }
                 },
                 columns: [
+                    { data: "categoryId", defaultContent: "", render: renderText },
+                    { data: "categoryName", defaultContent: "", render: renderText },
+                    { data: "unitPrice", defaultContent: "", render: renderText },
                     {
                         data: null,
                         render: function (data, type, row) {
-                            return `${row.categoryId}`;
-                        }
-                    },
-                    {data: "categoryName"},
-                    {data: "unitPrice"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            let badges = [];
-                            badges.push(row.isAdmin ? '<span class="badge bg-success">Admin</span>' : '');
-                            badges.push(row.isFoundation ? '<span class="badge bg-info">Foundation</span>' : '');
-                            badges.push(row.isShortCourse ? '<span class="badge bg-primary">Short Course</span>' : '');
-                            return badges.filter(b => b).join(' ');
-                        }
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `${row.isStartNewNumber ? '<span class="badge bg-indigo">New Number</span>' : '<span class="badge bg-secondary">Continue Number</span>'}`;
+                            const names = [];
+                            if (row.isAdmin) names.push("Admin");
+                            if (row.isFoundation) names.push("Foundation");
+                            if (row.isShortCourse) names.push("Short Course");
+
+                            if (type !== "display") return names.join(", ");
+
+                            const badges = [];
+                            if (row.isAdmin) badges.push('<span class="badge badge-success">Admin</span>');
+                            if (row.isFoundation) badges.push('<span class="badge badge-info">Foundation</span>');
+                            if (row.isShortCourse) badges.push('<span class="badge badge-primary">Short Course</span>');
+                            return badges.join(" ") || '<span class="text-muted">—</span>';
                         }
                     },
                     {
+                        data: "isStartNewNumber",
+                        render: function (data, type) {
+                            const label = data ? "New Number" : "Continue Number";
+                            if (type !== "display") return label;
+
+                            return data
+                                ? '<span class="badge bg-indigo">New Number</span>'
+                                : '<span class="badge badge-secondary">Continue Number</span>';
+                        }
+                    },
+                    {
                         data: null,
-                        render: function (data, type, row) {
-                            return `<a id="btnEdit" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
-                                    <a id="btnDelete" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>`;
+                        orderable: false,
+                        searchable: false,
+                        className: "text-center letter-type-actions",
+                        render: function (data, type) {
+                            if (type !== "display") return "";
+
+                            return `<button type="button" class="btn btn-warning btn-sm js-letter-category-edit"
+                                            title="Edit category" aria-label="Edit category">
+                                        <i class="fas fa-edit" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm js-letter-category-delete"
+                                            title="Delete category" aria-label="Delete category">
+                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                    </button>`;
                         }
                     }
-                ]
-            });
-        }
-
-        document.getElementById("btnAddNew").addEventListener("click", function () {
-            modalLetterCategory.modal("show");
-            modalLetterCategory.find(".modal-title").text("Add New Letter Category");
-        });
-
-        tblLetterCategory.on("click", "#btnEdit", function (e) {
-            e.preventDefault();
-            const $row = $(this).closest("tr");
-            const row = tblLetterCategory.DataTable().row($row).data();
-
-            frmLetterCategory[0].reset();
-            modalLetterCategory.modal("show");
-            modalLetterCategory.find(".modal-title").text("Edit Letter Category");
-
-            document.getElementById("letterCategory_CategoryId").value = row.categoryId;
-            document.getElementById("letterCategory_CategoryName").value = row.categoryName;
-            document.getElementById("letterCategory_UnitPrice").value = row.unitPrice;
-
-            document.getElementById("isAdmin").checked = row.isAdmin;
-            document.getElementById("isFoundation").checked = row.isFoundation;
-            document.getElementById("isShort").checked = row.isShortCourse;
-            document.getElementById("isStartNewNumber").checked = row.isStartNewNumber;
-        });
-
-        tblLetterCategory.on("click", "#btnDelete", function (e) {
-            e.preventDefault();
-            const $row = $(this).closest("tr");
-            const row = tblLetterCategory.DataTable().row($row).data();
-            if (confirm("Are you sure you want to delete this category?")) {
-                $.ajax({
-                    url: `/LetterCategory/delete/${row.categoryId}`,
-                    type: "POST",
-                    success: function (response) {
-                        if (response.status.code === "200") {
-                            ShowToastSuccess(response.status.message);
-                            frmLetterCategory[0].reset();
-                            modalLetterCategory.modal("hide");
-                            tblLetterCategory.DataTable().ajax.reload();
-                        } else {
-                            ShowToastError(response.status.message);
-                        }
-                    },
-                    error: function (error, status, xhr) {
-                        ShowToastError(error.responseText);
+                ],
+                initComplete: function () {
+                    if (typeof MyApp !== "undefined" &&
+                        typeof MyApp.utils?.dataTableDebounceSearch === "function") {
+                        MyApp.utils.dataTableDebounceSearch("#tblLetterCategory", 500);
                     }
-                });
-            }
-        });
-
-        document.getElementById("frmLetterCategory").addEventListener("submit", function (e) {
-            e.preventDefault();
-            const form = $(this);
-            const formData = form.serialize();
-            $.ajax({
-                url: '/LetterCategory/post-letter-category',
-                method: 'POST',
-                data: formData,
-                success: function (response) {
-                    if (response.status.code === "200") {
-                        ShowToastSuccess(response.status.message);
-                        frmLetterCategory[0].reset();
-                        modalLetterCategory.modal("hide");
-                        tblLetterCategory.DataTable().ajax.reload();
-                    } else {
-                        ShowToastError(response.status.message);
-                    }
-                },
-                error: function (error, status, xhr) {
-                    ShowToastError(error.responseText);
                 }
             });
-        });
+        }
     </script>
 }

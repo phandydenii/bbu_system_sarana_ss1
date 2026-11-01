@@ -3,7 +3,14 @@
     ViewData["Title"] = "Index";
     ViewData["OpenMenu"] = "Dean";
     ViewData["Action"] = "DeanCourse";
+    ViewData["HideHeader"] = true;
 }
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="m-0 font-weight-bold text-dark">Dean Course Management</h3>
+        <small class="text-muted">Manage school-level course assignments, subject allocations, and curriculum distribution across faculties</small>
+    </div>
+</div>
 <div class="row">
     <div class="col-6">
         <div class="card">
@@ -185,7 +192,8 @@
                 data: JSON.stringify(req),
                 success: function (res) { 
                     if (res.status.code === "200"){
-                        tblSchool.DataTable().ajax.reload();
+                        tblCourse.DataTable().ajax.reload();
+                        $("#stateSelect").val(null).trigger("change");
                         $("#AssignCourseModal").modal("hide");
                         return ShowToastSuccess(res.status.message); 
                     }

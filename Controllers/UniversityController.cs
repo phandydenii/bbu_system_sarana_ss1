@@ -5,6 +5,8 @@ using BBU_SYSTEM.Models;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace BBU_SYSTEM.Controllers;
 
@@ -13,8 +15,7 @@ namespace BBU_SYSTEM.Controllers;
 public class UniversityController(ICampusDbContext campusDbContext, IMapper mapper, IHttpContextAccessor context)
     : Controller
 {
-    private readonly string _campus = context.HttpContext?.User?.FindFirst("CampusKey")?.Value ?? "pp";
-
+    private readonly string _campus = context.HttpContext?.User.FindFirst("CampusKey")?.Value ?? "pp";
     [HttpPost("get-universities")]
     public IActionResult GetUniversities(bool isAll = false)
     {
@@ -25,6 +26,10 @@ public class UniversityController(ICampusDbContext campusDbContext, IMapper mapp
             var length = Request.Form["length"].FirstOrDefault();
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
 
+            var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
+            var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var sortColumn = Request.Form[$"columns[{sortColumnIndex}][data]"].FirstOrDefault();
+            
             var pageSize = length != null ? Convert.ToInt32(length) : 0;
             var skip = start != null ? Convert.ToInt32(start) : 0;
             //var campus = HttpContext.Session.GetString("campus");
@@ -41,7 +46,26 @@ public class UniversityController(ICampusDbContext campusDbContext, IMapper mapp
                     d.UniversityNameInKhmer!.Contains(searchValue));
 
             var recordsTotal = query.Count();
-            query = query.OrderByDescending(d => d.UniversityId);
+            // query = query.OrderByDescending(d => d.UniversityId);
+            switch (sortColumn)
+            {
+                case "universityName":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.UniversityName):
+                        query.OrderByDescending(x => x.UniversityName);
+                    break;
+                case "universityNameInKhmer":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.UniversityNameInKhmer):
+                        query.OrderByDescending(x => x.UniversityNameInKhmer);
+                    break;
+                case "abbreviationName":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.AbbreviationName):
+                        query.OrderByDescending(x => x.AbbreviationName);
+                    break;
+                default:
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.UniversityId):
+                        query.OrderByDescending(x => x.UniversityId);
+                    break;
+            }
             var data = query.Skip(skip).Take(pageSize).ToList();
 
             return Json(new
@@ -57,51 +81,56 @@ public class UniversityController(ICampusDbContext campusDbContext, IMapper mapp
             return new ServerResponse().ErrorInternal(ex);
         }
     }
-
+    
+    [HttpGet("get-university/{universityId:int}")]
+    public async Task<IActionResult> GetUniversity(int universityId)
+    {
+        var db = campusDbContext.DbContext(_campus);
+        var data = await db.TblUsersity.Where(x => x.UniversityId == universityId).FirstOrDefaultAsync();
+        if (data == null)
+        {
+            return new ServerResponse().NotFound("University not found");
+        }
+        return new ServerResponse().Success(data);
+    }
+    
    [HttpPost("SaveChange")]
-public async Task<IActionResult> SaveChange([FromForm] UniversityDto? universityDto)
+public async Task<IActionResult> SaveChange([FromForm] UniversityDto? university)
 {
     try
     {
-        if (universityDto == null)
+        if (university == null)
         {
             return new ServerResponse().BadRequest("Bad Request!");
         }
 
         var db = campusDbContext.DbContext(_campus);
-
-        var university = db.TblUsersity
-            .FirstOrDefault(x => x.UniversityId == universityDto.UniversityId);
-
-        if (university != null)
+        //university.UniversityId = 0;
+        if (university.UniversityId == 0)
         {
-            university.UniversityName = universityDto.UniversityName?.Trim();
-            university.UniversityNameInKhmer = universityDto.UniversityNameInKhmer?.Trim();
-            university.AbbreviationName = universityDto.AbbreviationName?.Trim();
-
-            db.TblUsersity.Update(university);
+            var data = mapper.Map<UniversityDto, University>(university);
+            await db.TblUsersity.AddAsync(data);
             await db.SaveChangesAsync();
-
-            return new ServerResponse().Success(university, "Updated successfully!");
+            return new ServerResponse().Success(data, "Saved successfully!");
         }
-
-        var newUniversity = new University
-        {
-            UniversityName = universityDto.UniversityName?.Trim(),
-            UniversityNameInKhmer = universityDto.UniversityNameInKhmer?.Trim(),
-            AbbreviationName = universityDto.AbbreviationName?.Trim()
-        };
-
-        await db.TblUsersity.AddAsync(newUniversity);
+        var oldData = await db.TblUsersity.Where(x => x.UniversityId == university.UniversityId).FirstOrDefaultAsync();
+        if(oldData == null) return new ServerResponse().NotFound("UniversityId not found");
+            
+        mapper.Map(university, oldData);
         await db.SaveChangesAsync();
-
-        return new ServerResponse().Success(newUniversity, "Saved successfully!");
+        return new ServerResponse().Success(oldData, "Updated successfully!");
     }
     catch (Exception ex)
     {
-        return new ServerResponse().ErrorInternal(ex);
+        return StatusCode(500, new
+        {
+            ex.Message,
+            InnerException = ex.InnerException?.Message,
+            ex.StackTrace
+        });
     }
 }
+
 [HttpDelete("delete/{universityId:int}")]
 public async Task<IActionResult> Delete(int universityId)
 {

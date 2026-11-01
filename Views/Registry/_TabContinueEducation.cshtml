@@ -1,24 +1,50 @@
-﻿@using BBU_SYSTEM.Models.Req
-@{
-    var registryReq = new RegistryReq();
-}
+﻿@model BBU_SYSTEM.Models.Req.RegistryReq
+
 <div class="row">
     <div class="col-6">
-        <label>Term</label>
-        <input type="number" asp-for="@registryReq.Student!.CheckCompleteTerm" value="1" min="1"
-               class="form-control input-sm"/>
+        <div class="form-group">
+            <label asp-for="Student!.CheckCompleteTerm">Term</label>
+
+            <input asp-for="Student!.CheckCompleteTerm"
+                   type="number"
+                   min="1"
+                   class="form-control input-sm" />
+
+            <span asp-validation-for="Student!.CheckCompleteTerm"
+                  class="text-danger"></span>
+        </div>
     </div>
+
     <div class="col-6">
-        <label>Status</label>
-        <div class="form-group clearfix">
-            <div class="icheck-primary d-inline">
-                <input type="checkbox" id="CheckComplete" asp-for="@registryReq.Student!.CheckComplete">
-                <label for="CheckComplete">Revieve</label>
+        <div class="form-group">
+            <label>Status</label>
+
+            <div class="clearfix">
+                <div class="icheck-primary d-inline">
+                    <input asp-for="Student!.CheckComplete"
+                           type="checkbox"
+                           id="checkComplete" />
+
+                    <label for="checkComplete">
+                        Received
+                    </label>
+                </div>
             </div>
+
+            <span asp-validation-for="Student!.CheckComplete"
+                  class="text-danger"></span>
         </div>
     </div>
 </div>
 
-<label>Note</label>
-<textarea type="text" rows="4" class="form-control"
-          asp-for="@registryReq.Student!.CheckCompleteNote" placeholder=""></textarea>
+<div class="form-group">
+    <label asp-for="Student!.CheckCompleteNote">Note</label>
+
+    <textarea asp-for="Student!.CheckCompleteNote"
+              rows="4"
+              class="form-control"
+              placeholder="Enter note"></textarea>
+
+    <span asp-validation-for="Student!.CheckCompleteNote"
+          class="text-danger"></span>
+</div>

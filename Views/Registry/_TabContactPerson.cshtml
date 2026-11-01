@@ -1,17 +1,55 @@
-@using BBU_SYSTEM.DTOs
-@using BBU_SYSTEM.Models.Req
- @{
-    var registryReq = new RegistryReq();
-}
-<label>Phone</label>
-<input type="text" class="form-control" asp-for="@registryReq!.Student!.Phone"
-       placeholder="">
-<label>Email</label>
-<input type="text" class="form-control" asp-for="@registryReq!.Student!.Email"
-       placeholder="">
-<label>Address</label>
-<textarea type="text" rows="4" class="form-control"
-          asp-for="@registryReq.Student!.Address" placeholder=""></textarea>
-<label>Address Khmer</label>
-<textarea type="text" rows="4" class="form-control"
-          asp-for="@registryReq.Student!.AddressInKhmer" placeholder=""></textarea>
+@model BBU_SYSTEM.Models.Req.RegistryReq
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label asp-for="Student!.Phone">Phone</label>
+            <input asp-for="Student!.Phone"
+                   type="tel"
+                   class="form-control"
+                   placeholder="Enter phone number" />
+            <span asp-validation-for="Student!.Phone"
+                  class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <label asp-for="Student!.Email">Email</label>
+            <input asp-for="Student!.Email"
+                   type="email"
+                   class="form-control"
+                   placeholder="Enter email address" />
+            <span asp-validation-for="Student!.Email"
+                  class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label asp-for="Student!.Address">Address</label>
+            <textarea asp-for="Student!.Address"
+                      rows="4"
+                      class="form-control"
+                      placeholder="Enter address"></textarea>
+            <span asp-validation-for="Student!.Address"
+                  class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <label asp-for="Student!.AddressInKhmer">
+                Address Khmer
+            </label>
+            <textarea asp-for="Student!.AddressInKhmer"
+                      rows="4"
+                      class="form-control"
+                      placeholder="បញ្ចូលអាសយដ្ឋានជាភាសាខ្មែរ"></textarea>
+            <span asp-validation-for="Student!.AddressInKhmer"
+                  class="text-danger"></span>
+        </div>
+    </div>
+</div>

@@ -9,15 +9,15 @@
                 <h4 class="modal-title">Nationality</h4>
             </div>
             <div class="modal-body">
-                <form id="formNationality">
+                <form id="nationalityForm">
                     <input asp-for="@nationality.NationalityId" hidden readonly class="form-control" value="0"/>
                     <div class="form-group">
-                        <label class="required">Name</label>
+                        <label>Name</label>
                         <input type="text" asp-for="@nationality.NationalityName" class="form-control"
                                placeholder="Enter name" required>
                     </div>
                     <div class="form-group">
-                        <label class="required">Name Khmer</label>
+                        <label>Name Khmer</label>
                         <input type="text" asp-for="@nationality.NationalityInKhmer" class="form-control"
                                placeholder="Enter name khmer" required>
                     </div>
@@ -25,11 +25,11 @@
             </div>
             <div class="modal-footer">
                 <div class="modal-footer">
-                    <button type="submit" form="formNationality" class="btn btn-success">
+                    <button type="submit" form="nationalityForm" class="btn btn-success">
                         <i class="fas fa-save"></i> Save
                     </button>
 
-                    <button type="button" class="btn btn-danger btnCloseNationality">
+                    <button id="btnClose" type="button" class="btn btn-danger">
                         Close
                     </button>
                 </div>

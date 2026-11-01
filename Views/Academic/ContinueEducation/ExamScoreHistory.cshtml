@@ -7,10 +7,15 @@
 }
 <div class="card-body">
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-6">
             <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Student List</h3>
+                <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                    <h3 class="card-title font-weight-bold text-primary m-0">Student List</h3>
+
+                    <h4 id="studentReExamHistoryCountText"
+                        class="text-muted mb-0 ml-auto text-right"
+                        style="font-size: 18px; font-weight: 500;">
+                    </h4>
                 </div>
                 <div class="card-body">
                     <table id="tblExamScoreHistory" class="table table-sm table-bordered table-striped"
@@ -29,7 +34,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-7">
+        <div class="col-md-6">
             <div class="card card-outline card-primary">
                 <div class="card-header">
                     <h3 class="card-title">Student Mark</h3>
@@ -81,97 +86,214 @@
     </div>
 </div>
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
-<script>
-    $(document).ready(function () {
-        // fetchStudentExamScoreHistory();
-        // $("#tblOtherBranchScore").DataTable();
-    });
+@* <script> *@
+@*     $(document).ready(function () { *@
+@*         // fetchStudentExamScoreHistory(); *@
+@*         // $("#tblOtherBranchScore").DataTable(); *@
+@*     }); *@
+@* *@
+@*     function fetchStudentExamScoreHistory() { *@
+@*         const tblStudent = $("#tblExamScoreHistory"); *@
+@*         tblStudent.DataTable().clear().destroy(); *@
+@*         tblStudent.DataTable({ *@
+@*             processing: true, *@
+@*             serverSide: true, *@
+@*             responsive: true, *@
+@*             ajax: { *@
+@*                 url: `/scores/GetAllFailedStudents`, *@
+@*                 type: "POST", *@
+@*             }, *@
+@*             columns: [ *@
+@*                 {data: "studentId"}, *@
+@*                 {data: "studentName"}, *@
+@*                 {data: "sex"}, *@
+@*                 { *@
+@*                     data: "dateOfBirth", *@
+@*                     render: function (data, type, row) { *@
+@*                         return `${formatDate(data)}` *@
+@*                     } *@
+@*                 } *@
+@*             ] *@
+@*         }) *@
+@*     } *@
+@* *@
+@*     $('#tblStudent tbody').on('click', 'tr', function () { *@
+@*         $('#tblStudent tbody tr').removeClass('highlight'); *@
+@*         $(this).addClass('highlight'); *@
+@*         const table = $('#tblStudent').DataTable(); *@
+@*         const data = table.row(this).data(); *@
+@*         GetOtherBanchScore(data.studentId); *@
+@*         getStudent(data.studentId) *@
+@*     }); *@
+@* *@
+@*     function GetOtherBanchScore(studentId) { *@
+@*         if (!studentId) return; *@
+@*         const tblOtherBranchScore = $("#tblOtherBranchScore"); *@
+@*         tblOtherBranchScore.DataTable().clear().destroy(); *@
+@*         tblOtherBranchScore.DataTable({ *@
+@*             processing: true, *@
+@*             serverSide: true, *@
+@*             responsive: true, *@
+@*             ajax: { *@
+@*                 url: `/scores/get-other-brand-score/${studentId}`, *@
+@*                 type: "POST", *@
+@*                 dataSrc: function (json) { *@
+@*                     return json.data; *@
+@*                 } *@
+@*             }, *@
+@*             columns: [ *@
+@*                 {data: "otherBranchScoreId", visible: false}, *@
+@*                 {data: "courseId", visible: false}, *@
+@*                 {data: "termNo"}, *@
+@*                 {data: "courseName"}, *@
+@*                 { *@
+@*                     data: "midTermScore", *@
+@*                     render: function (data, type, row) { *@
+@*                         return data ? `<input type="number" class="form-control form-control-sm is-warning" name="otherBranchScore_MidTermScore" value="${data.toFixed(2)}" readonly/>` : 'N/A'; *@
+@*                     } *@
+@*                 }, *@
+@*                 { *@
+@*                     data: "finalScore", *@
+@*                     render: function (data, type, row) { *@
+@*                         return data ? `<input type="number" class="form-control form-control-sm is-warning" name="otherBranchScore_FinalScore" value="${data.toFixed(2)}" readonly/>` : 'N/A'; *@
+@*                     } *@
+@*                 }, *@
+@*                 { *@
+@*                     data: null, *@
+@*                     render: function (data, type, row) { *@
+@*                         const totalScore = (row.midTermScore || 0) + (row.finalScore || 0); *@
+@*                         if (totalScore >= 60) { *@
+@*                             return `<button class="btn btn-success btn-sm">Pass</button>`; *@
+@*                         } else { *@
+@*                             return `<button class="btn btn-danger btn-sm">Fail</button>`; *@
+@*                         } *@
+@*                     } *@
+@*                 }, *@
+@*                 { *@
+@*                     data: null, *@
+@*                     render: function (data, type, row) { *@
+@*                         const rows = JSON.stringify(row).replace(/"/g, '&quot;'); *@
+@*                         return `<button class="btn btn-warning btn-sm" onclick="OnEdit(${rows})"><i class="fa-solid fa-pen-to-square"></i></button>`; *@
+@*                     } *@
+@*                 } *@
+@*             ] *@
+@*         }); *@
+@*     } *@
+@* </script> *@
+<div class="modal fade" id="StudentMarkModal" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
 
-    function fetchStudentExamScoreHistory() {
-        const tblStudent = $("#tblExamScoreHistory");
-        tblStudent.DataTable().clear().destroy();
-        tblStudent.DataTable({
-            processing: true,
-            serverSide: true,
-            responsive: true,
-            ajax: {
-                url: `/scores/GetAllFailedStudents`,
-                type: "POST",
-            },
-            columns: [
-                {data: "studentId"},
-                {data: "studentName"},
-                {data: "sex"},
-                {
-                    data: "dateOfBirth",
-                    render: function (data, type, row) {
-                        return `${formatDate(data)}`
-                    }
-                }
-            ]
-        })
-    }
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Student Mark</h4>
+            </div>
 
-    $('#tblStudent tbody').on('click', 'tr', function () {
-        $('#tblStudent tbody tr').removeClass('highlight');
-        $(this).addClass('highlight');
-        const table = $('#tblStudent').DataTable();
-        const data = table.row(this).data();
-        GetOtherBanchScore(data.studentId);
-        getStudent(data.studentId)
-    });
+            <div class="modal-body">
+                <form id="studentMarkForm">
+                    <input type="hidden" id="studentMark_ComplementFailedCourseScoreId" name="ComplementFailedCourseScoreId" value="0" />
+                    <input type="hidden" id="studentMark_StudentId" name="StudentId" />
+                    <input type="hidden" id="studentMark_CourseId" name="CourseId" />
+                    <input type="hidden" id="studentMark_TermNo" name="TermNo" />
 
-    function GetOtherBanchScore(studentId) {
-        if (!studentId) return;
-        const tblOtherBranchScore = $("#tblOtherBranchScore");
-        tblOtherBranchScore.DataTable().clear().destroy();
-        tblOtherBranchScore.DataTable({
-            processing: true,
-            serverSide: true,
-            responsive: true,
-            ajax: {
-                url: `/scores/get-other-brand-score/${studentId}`,
-                type: "POST",
-                dataSrc: function (json) {
-                    return json.data;
-                }
-            },
-            columns: [
-                {data: "otherBranchScoreId", visible: false},
-                {data: "courseId", visible: false},
-                {data: "termNo"},
-                {data: "courseName"},
-                {
-                    data: "midTermScore",
-                    render: function (data, type, row) {
-                        return data ? `<input type="number" class="form-control form-control-sm is-warning" name="otherBranchScore_MidTermScore" value="${data.toFixed(2)}" readonly/>` : 'N/A';
-                    }
-                },
-                {
-                    data: "finalScore",
-                    render: function (data, type, row) {
-                        return data ? `<input type="number" class="form-control form-control-sm is-warning" name="otherBranchScore_FinalScore" value="${data.toFixed(2)}" readonly/>` : 'N/A';
-                    }
-                },
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        const totalScore = (row.midTermScore || 0) + (row.finalScore || 0);
-                        if (totalScore >= 60) {
-                            return `<button class="btn btn-success btn-sm">Pass</button>`;
-                        } else {
-                            return `<button class="btn btn-danger btn-sm">Fail</button>`;
-                        }
-                    }
-                },
-                {
-                    data: null,
-                    render: function (data, type, row) {
-                        const rows = JSON.stringify(row).replace(/"/g, '&quot;');
-                        return `<button class="btn btn-warning btn-sm" onclick="OnEdit(${rows})"><i class="fa-solid fa-pen-to-square"></i></button>`;
-                    }
-                }
-            ]
-        });
-    }
-</script>
+                    <div class="row">
+                        <div class="col-12">
+                            <label>Course</label>
+                            <input type="text" id="studentMark_CourseName" class="form-control" readonly />
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-4">
+                            <label>Term</label>
+                            <input type="number" id="studentMark_TermNoDisplay" class="form-control" readonly />
+                        </div>
+
+                        <div class="col-4">
+                            <label>Midterm</label>
+                            <input type="number" id="studentMark_MidTermScore" name="MidTermScore" class="form-control" step="0.01" min="0" />
+                        </div>
+
+                        <div class="col-4">
+                            <label>Final</label>
+                            <input type="number" id="studentMark_FinalScore" name="FinalScore" class="form-control" step="0.01" min="0" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" form="studentMarkForm" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Change
+                </button>
+                <button type="button" id="btnCloseStudentMark" class="btn btn-danger">
+                    <i class="fas fa-close"></i> Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ScoreHistoryModal" data-backdrop="static">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Score History</h4>
+            </div>
+
+            <div class="modal-body">
+                <form id="scoreHistoryForm">
+                    <input type="hidden" id="scoreHistory_ScoreHistoryId" name="ScoreHistoryId" value="0" />
+                    <input type="hidden" id="scoreHistory_StudentId" name="StudentId" />
+                    <input type="hidden" id="scoreHistory_CourseId" name="CourseId" />
+                    <input type="hidden" id="scoreHistory_TermNo" name="TermNo" />
+                    <input type="hidden" id="scoreHistory_Time" name="Time" />
+                    <div class="row">
+                        <div class="col-12">
+                            <label>Course</label>
+                            <input type="text" id="scoreHistory_CourseName" class="form-control" readonly />
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-4">
+                            <label>Term</label>
+                            <input type="number" id="scoreHistory_TermNoDisplay" class="form-control" readonly />
+                        </div>
+
+                        <div class="col-4">
+                            <label>Midterm Score</label>
+                            <input type="number"
+                                   id="scoreHistory_MidTermScore"
+                                   name="MidTermScore"
+                                   class="form-control"
+                                   step="0.01"
+                                   min="0" />
+                        </div>
+
+                        <div class="col-4">
+                            <label>Final Score</label>
+                            <input type="number"
+                                   id="scoreHistory_FinalScore"
+                                   name="FinalScore"
+                                   class="form-control"
+                                   step="0.01"
+                                   min="0" />
+                        </div>
+                    </div>
+                </form>
+                
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" form="scoreHistoryForm" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Change
+                </button>
+
+                <button type="button" id="btnCloseScoreHistory" class="btn btn-danger">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

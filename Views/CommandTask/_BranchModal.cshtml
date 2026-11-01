@@ -15,34 +15,34 @@
                 <form id="branchForm">
                     <input asp-for="@branch.BranchId" hidden readonly class="form-control" value="0"/>
                     <div class="form-group">
-                        <label class="required">Name</label>
+                        <label>Name</label>
                         <input type="text" asp-for="@branch.BranchName" class="form-control"
                                placeholder="Enter name" required>
                     </div>
                     <div class="form-group">
                         <label>Name Khmer</label>
                         <input type="text" asp-for="@branch.BranchNameInKhmer" class="form-control"
-                               placeholder="Enter name khmer">
+                               placeholder="Enter name khmer" required>
                     </div>
                     <div class="row">
                         <div class="col-3">
                             <div class="form-group">
                                 <label>Short Name</label>
                                 <input type="text" asp-for="@branch.ShortName" class="form-control"
-                                       placeholder="Enter short name">
+                                       placeholder="Enter short name" required>
                             </div>
                         </div>
                         <div class="col-9">
                             <div class="form-group">
                                 <label>Phone</label>
                                 <input type="text" asp-for="@branch.Phone" class="form-control"
-                                       placeholder="Enter phone">
+                                       placeholder="Enter phone" required>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Address</label>
-                        <textarea asp-for="@branch.Address" class="form-control" placeholder="Enter address"></textarea>
+                        <textarea asp-for="@branch.Address" class="form-control" placeholder="Enter address" required></textarea>
 
                     </div>
                 </form>
@@ -50,7 +50,7 @@
             <div class="modal-footer justify-content-between">
                 <button type="submit" form="branchForm" class="btn btn-primary"><i class="fas fa-save"></i> Save changes
                 </button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
+                <button id="btnClose" type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-close"></i> Close
                 </button>
             </div>
         </div>

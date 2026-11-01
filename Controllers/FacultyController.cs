@@ -21,42 +21,47 @@ public class FacultyController(ICampusDbContext campusDbContext,IMapper mapper, 
     {
         try
         {
-            var db = campusDbContext.DbContext(_campus);
-            var query = db.TblFaculty.AsQueryable();
-            if (isAll)
-            {
-                var faculties = query
-                    .OrderBy(x => x.FacultyName)
-                    .Select(x => new
-                    {
-                        facultyId = x.FacultyId,
-                        facultyName = x.FacultyName,
-                        facultyNameInKhmer = x.FacultyNameInKhmer
-                    })
-                    .ToList();
-
-                return new ServerResponse().Success(faculties, "Succeeded!");
-            }
-
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
 
-            var pageSize = length != null ? Convert.ToInt32(length) : 10;
+            var sortColumnIndex = Request.Form["order[0][column]"].FirstOrDefault();
+            var sortDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var sortColumn = Request.Form[$"columns[{sortColumnIndex}][data]"].FirstOrDefault();
+            
+            var pageSize = length != null ? Convert.ToInt32(length) : 0;
             var skip = start != null ? Convert.ToInt32(start) : 0;
-
-            if (!string.IsNullOrEmpty(searchValue))
+            
+            var db = campusDbContext.DbContext(_campus);
+            var query = db.TblFaculty.AsQueryable();
+            if (isAll)
             {
+                return new ServerResponse().Success(query.ToList(), "Succeeded!");
+            }
+            if (!string.IsNullOrEmpty(searchValue))
                 query = query.Where(x =>
                     x.FacultyName!.Contains(searchValue) ||
                     x.FacultyNameInKhmer!.Contains(searchValue));
-            }
-
+            
             var recordsTotal = query.Count();
 
+            switch (sortColumn)
+            {
+                case "facultyName":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.FacultyName):
+                        query.OrderByDescending(x => x.FacultyName);
+                    break;
+                case "facultyNameInKhmer":
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.FacultyNameInKhmer):
+                        query.OrderByDescending(x => x.FacultyNameInKhmer);
+                    break;
+                default:
+                    query = sortDirection == "asc" ? query.OrderBy(x => x.FacultyId):
+                        query.OrderByDescending(x => x.FacultyId);
+                    break;
+            }
             var data = query
-                .OrderByDescending(x => x.FacultyId)
                 .Skip(skip)
                 .Take(pageSize)
                 .ToList();
@@ -105,10 +110,8 @@ public class FacultyController(ICampusDbContext campusDbContext,IMapper mapper, 
             }
 
             mapper.Map(faculty, oldData);
-
             db.TblFaculty.Update(oldData);
             await db.SaveChangesAsync();
-
             return new ServerResponse().Success(oldData, "Updated successfully!");
         }
         catch (Exception ex)

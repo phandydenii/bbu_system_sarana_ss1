@@ -1,0 +1,66 @@
+﻿<div class="modal fade student-action-modal" data-backdrop="static" data-keyboard="false" id="modalChangeSchool" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-warning py-2">
+                <h5 class="modal-title">
+                    <i class="fas fa-retweet mr-1"></i> Change School
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <form id="frmChangeSchool">
+                <div class="modal-body bg-light">
+                    <input type="hidden" id="changeSchoolStudentId" name="StudentId" />
+
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label font-weight-bold">Degree</label>
+                        <div class="col-sm-9">
+                            <select id="cboChangeDegreeId" name="DegreeId" class="form-control select2 w-100">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label font-weight-bold">School</label>
+                        <div class="col-sm-9">
+                            <select id="cboChangeSchoolId" name="SchoolId" class="form-control select2 w-100">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label font-weight-bold">Field</label>
+                        <div class="col-sm-9">
+                            <select id="cboChangeFieldId" name="FieldId" class="form-control select2 w-100">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label font-weight-bold">Group</label>
+                        <div class="col-sm-5">
+                            <select id="cboChangeGroupId" name="GroupId" class="form-control select2 w-100">
+                            </select>
+                        </div>
+
+                        <label class="col-sm-1 col-form-label font-weight-bold">Term</label>
+                        <div class="col-sm-3">
+                            <input type="text" id="changeSchoolTermNo" name="TermNo" class="form-control text-center font-weight-bold" readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer py-2">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-check"></i> OK
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

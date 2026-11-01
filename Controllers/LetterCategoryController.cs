@@ -1,5 +1,6 @@
 using AutoMapper;
 using BBU_SYSTEM.DTOs;
+using BBU_SYSTEM.Helper;
 using BBU_SYSTEM.Models;
 using BBU_SYSTEM.Repository;
 using Microsoft.AspNetCore.Authorization;
@@ -34,22 +35,10 @@ public class LetterCategoryController(
             var query = db.TblLetterCategory.AsQueryable();
 
             if (isAll)
-            {
-                return Ok(new
-                {
-                    data = query.ToList(),
-                    status = new
-                    {
-                        code = "200",
-                        message = "Success"
-                    }
-                });
-            }
+                return new ServerResponse().Success(query.ToList());
 
             if (!string.IsNullOrEmpty(searchValue))
-                query = query
-                    .Where(x => x.CategoryId == int.Parse(searchValue) || x.CategoryName!.Contains(searchValue))
-                    .AsQueryable();
+                query = query.Where(x => x.CategoryName!.Contains(searchValue)).AsQueryable();
             var recordsTotal = query.Count();
             var data = query.Skip(skip).Take(pageSize).ToList();
 
@@ -63,15 +52,7 @@ public class LetterCategoryController(
         }
         catch (Exception e)
         {
-            return StatusCode(500, new
-            {
-                data = new {},
-                status = new
-                {
-                    code = "500",
-                    message = e.Message
-                }
-            });
+            return new ServerResponse().ErrorInternal(e);
         }
     }
 
@@ -79,15 +60,7 @@ public class LetterCategoryController(
     public async Task<IActionResult> Post(LetterCategoryDto? letterCategory)
     {
         if (letterCategory == null)
-            return BadRequest(new
-            {
-                data = new{},
-                status = new
-                {
-                    code = "400",
-                    message = "Bad Request!"
-                }
-            });
+            return new ServerResponse().BadRequest();
         try
         {
             var db = campusDbContext.DbContext(_campus);
@@ -96,52 +69,20 @@ public class LetterCategoryController(
                 var data = mapper.Map<LetterCategoryDto, LetterCategory>(letterCategory);
                 await db.TblLetterCategory.AddAsync(data);
                 await db.SaveChangesAsync();
-                return Ok(new
-                {   
-                    data = new{},
-                    status = new
-                    {
-                        code = "200",
-                        message = "Insert Succeeded!"
-                    }
-                });
+                return new ServerResponse().Success();
             }
             var dataExist = await db.TblLetterCategory.Where(x => x.CategoryId == letterCategory.CategoryId)
                 .FirstOrDefaultAsync();
             if (dataExist == null)
-                return BadRequest(new
-                {
-                    data = new{},
-                    status = new
-                    {
-                        code = "400",
-                        message = "Bad Request!"
-                    }
-                });
+                return new ServerResponse().BadRequest();
             mapper.Map(letterCategory, dataExist);
             db.TblLetterCategory.Update(dataExist);
             await db.SaveChangesAsync();
-            return Ok(new
-            {
-                data = new{},
-                status = new
-                {
-                    code = "200",
-                    message = "Update Succeeded!"
-                }
-            });
+            return new ServerResponse().Success();
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new
-            {
-                data = new{},
-                status = new
-                {
-                    code = "500",
-                    message = $"Internal Server Error:{ex.Message}"
-                }
-            });
+            return new ServerResponse().ErrorInternal(ex);
         }
     }
 }

@@ -14,12 +14,15 @@ public class AutoMapperConfiguration : Profile
         CreateMap<Faculty, FacultyDto>().ReverseMap();
         CreateMap<Field, FieldDto>().ReverseMap();
         CreateMap<Faculty, FacultyDto>().ReverseMap();
+        CreateMap<Nationality, NationalityDto>().ReverseMap();
+        CreateMap<Race, RaceDto>().ReverseMap();
         CreateMap<CourseDto, Course>().ReverseMap();
         CreateMap<CoursetermDto, CourseTerm>().ReverseMap();
         CreateMap<Group, GroupDto>().ReverseMap();
         CreateMap<GroupRoom, GroupRoomDto>().ReverseMap();
         CreateMap<Promotion, PromotionDto>().ReverseMap();
         CreateMap<School, SchoolDto>().ReverseMap();
+        CreateMap<Province, ProvinceDto>().ReverseMap();
         CreateMap<Stage, StageDto>().ReverseMap();
         CreateMap<Term, TermDto>().ReverseMap();
         CreateMap<User, UserDto>().ReverseMap();
@@ -46,5 +49,13 @@ public class AutoMapperConfiguration : Profile
         CreateMap<FieldCertificate,FieldCertificateDto>().ReverseMap();
         CreateMap<SummaryReport,SummaryReportDto>().ReverseMap(); 
         CreateMap<University, UniversityDto>().ReverseMap();
+        CreateMap<ChangeBranch, ChangeBranchDto>().ReverseMap();
+        CreateMap<Quit, QuitDto>().ReverseMap();
+        CreateMap<Suppress, SuppressDto>().ReverseMap(); 
+        CreateMap<Suspend, SuspendDto>().ReverseMap(); 
+        CreateMap<StudentGroup, StudentGroupDto>().ReverseMap(); 
+        CreateMap<StudentDiscount, StudentDiscountDto>().ReverseMap();
+        CreateMap<Student, StudentDto>().ReverseMap();
+        CreateMap<ResumeDto, Resume>().ReverseMap();
     }
 }

@@ -8,7 +8,7 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Nationality</h3>
-                <button type="button" id="btnNewNationality" class="btn btn-success btn-sm float-right">
+                <button type="button" class="btn btn-success btn-sm float-right" data-toggle="modal" data-target="#nationalityModal">
                     <i class="fas fa-plus"></i>
                     Add New
                 </button>
@@ -32,140 +32,97 @@
 </div>
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <partial name="_NationalityModal"/>
-<script>
-    $(document).ready(function () {
-        fetchNationality();
 
-        $("#btnNewNationality").on("click", function (e) {
-            e.preventDefault();
-
-            clearNationalityForm();
-
-            $("#nationalityModal").find(".modal-title").text("Add Nationality");
-            $("#nationalityModal").modal("show");
+@section Scripts
+{
+    <script src="~/function/Nationality.js"></script>
+    <script>
+        const  tblNationality = $("#tblNationality");
+        $(document).ready(function () {
+            fetchNationality();
         });
 
-        $(document).on("click", ".btnCloseNationality", function () {
-            clearNationalityForm();
-            $("#nationalityModal").modal("hide");
-        });
-    });
-
-    function fetchNationality() {
-        if ($.fn.DataTable.isDataTable("#tblNationality")) {
-            $("#tblNationality").DataTable().clear().destroy();
-        }
-
-        $("#tblNationality").DataTable({
-            paging: true,
-            lengthChange: true,
-            searching: true,
-            ordering: true,
-            info: true,
-            responsive: true,
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "/Nationality/get-nationalities",
-                type: "POST"
-            },
-            columns: [
-                { data: "nationalityId" },
-                { data: "nationalityName" },
-                { data: "nationalityInKhmer" },
-                {
-                    title: "Action",
-                    data: null,
-                    width: "180px",
-                    className: "dt-action",
-                    orderable: false,
-                    searchable: false,
-                    render: function () {
-                        return `
-                            <a href="javascript:void(0)" class="btnEdit btn btn-warning btn-sm">
+        function fetchNationality() {
+            tblNationality.DataTable().clear().destroy();
+            tblNationality.DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                order:[[0, "desc"]],
+                ajax: {
+                    url: "/Nationality/get-nationalities",
+                    type: "POST"
+                },
+                columns: [
+                    {data: "nationalityId"},
+                    {data: "nationalityName"},
+                    {data: "nationalityInKhmer"},
+                    {
+                        data: null,
+                        render: function () {
+                            return `
+                            <a id="btnEdit" class="btn btn-success btn-sm">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                         `;
+                        }
                     }
+                ],
+                initComplete: function(){
+                    MyApp.utils.dataTableDebounceSearch("#tblNationality", 500);
                 }
-            ],
-            initComplete: function () {
-                MyApp.utils.dataTableDebounceSearch("#tblNationality", 500);
+            });
+        }
+
+        tblNationality.on("click", "#btnEdit", function (e) {
+            e.preventDefault();
+            let row = $(this).closest("tr");
+            if (row.hasClass("child")) {
+                row = row.prev();
             }
+            const selectedRow = tblNationality.DataTable().row(row).data();
+            const nationality = new Nationality(selectedRow);
+            $("#nationality_NationalityId").val(nationality.nationalityId);
+            $("#nationality_NationalityName").val(nationality.nationalityName);
+            $("#nationality_NationalityInKhmer").val(nationality.nationalityInKhmer);
+
+            $("#nationalityModal").modal("show");
         });
-    }
 
-    function clearNationalityForm() {
-        $("#formNationality")[0].reset();
-
-        $("#nationality_NationalityId").val(0);
-        $("#nationality_NationalityName").val("");
-        $("#nationality_NationalityInKhmer").val("");
-    }
-
-    $("#tblNationality").on("click", ".btnEdit", function () {
-        let row = $(this).closest("tr");
-
-        if (row.hasClass("child")) {
-            row = row.prev();
-        }
-
-        const selectedRow = $("#tblNationality").DataTable().row(row).data();
-
-        if (!selectedRow) {
-            ShowToastError("Cannot get selected nationality data.");
-            return;
-        }
-
-        $("#nationality_NationalityId").val(selectedRow.nationalityId);
-        $("#nationality_NationalityName").val(selectedRow.nationalityName);
-        $("#nationality_NationalityInKhmer").val(selectedRow.nationalityInKhmer);
-
-        $("#nationalityModal").find(".modal-title").text("Edit Nationality");
-        $("#nationalityModal").modal("show");
-    });
-
-    $("#formNationality").on("submit", function (e) {
-        e.preventDefault();
-
-        const nationalityId = $("#nationality_NationalityId").val() || "0";
-        const nationalityName = ($("#nationality_NationalityName").val() || "").trim();
-        const nationalityKhmer = ($("#nationality_NationalityInKhmer").val() || "").trim();
-
-        $.ajax({
-            url: "/Nationality/SaveChange",
-            method: "POST",
-            data: {
-                NationalityId: nationalityId,
-                NationalityName: nationalityName,
-                NationalityInKhmer: nationalityKhmer
-            },
-            success: function (response) {
-                const code = response["status"]?.["code"] || response["code"];
-                const message = response["status"]?.["message"] || response["message"];
-
-                if (code === "200" || code === 200) {
-                    if (nationalityId !== "0") {
-                        ShowToastSuccess(message || "Updated successfully!");
+        $("#nationalityForm").on("submit", function (e) {
+            e.preventDefault();
+            
+            const form = $(this);
+            const formData = form.serialize();
+            $.ajax({
+                url: "/Nationality/SaveChange",
+                method: "POST",
+                data: formData,
+                success: function(response){
+                    if(response.status.code === "200"){
+                        ShowToastSuccess("Saved Successfully");
+                        $("#nationalityForm")[0].reset();
+                        $("#nationalityModal").modal("hide");
+                        $("#tblNationality").DataTable().ajax.reload();
                     } else {
-                        ShowToastSuccess(message || "Saved successfully!");
+                        ShowToastError(response.message);
                     }
-
-                    clearNationalityForm();
-                    $("#nationalityModal").modal("hide");
-                    $("#tblNationality").DataTable().ajax.reload();
-                } else {
-                    ShowToastError(message || "Save failed.");
+                },
+                error: function (error) {
+                    if (error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    }
                 }
-            },
-            error: function (xhr) {
-                const message =
-                    xhr["responseJSON"]?.["status"]?.["message"] ||
-                    xhr["responseJSON"]?.["message"] ||
-                    "Server error.";
-
-                ShowToastError(message);
-            }
+            });
         });
-    });
-</script>
+        $("#btnClose").on("click", function(){
+            $("#nationalityForm")[0].reset();
+            $("#nationalityModal").modal("hide");
+        });
+    </script>
+}

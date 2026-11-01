@@ -6,7 +6,6 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                @*<h3 class="card-title">Registry</h3>*@
                 <div class="row">
                     <div class="form-group">
                         <label>From Date:</label>
@@ -54,75 +53,120 @@
 <partial name="_ValidationScriptsPartial"/>
 <partial name="_RegistryModal"/>
 <script>
-    let rowCert = @Model.StudentCertificates!.Count;
-    let rowSh = @Model.Schoolarships!.Count;
     $(document).ready(function () {
         fetchStudent();
-        $("#tblRegistry").DataTable({
-            "responsive": true, "lengthChange": false, "autoWidth": false,
-            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        }).buttons().container().appendTo('#tblRegistry_wrapper .col-md-6:eq(0)');
     });
-    $(function () {
-        $("#tblRegistry").DataTable({
-            "responsive": true, "lengthChange": false, "autoWidth": false,
-            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        }).buttons().container().appendTo('#tblRegistry_wrapper .col-md-6:eq(0)');
-    });
-
     function fetchStudent() {
-        $("#tblRegistry").DataTable().clear().destroy();
-        $("#tblRegistry").DataTable({
+        const tblRegistry = $("#tblRegistry");
+
+        if ($.fn.DataTable.isDataTable("#tblRegistry")) {
+            tblRegistry.DataTable().clear().destroy();
+        }
+
+        tblRegistry.DataTable({
             processing: true,
             serverSide: true,
-            responsive: true,
+
+            paging: true,
+            pageLength: 10,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+
+            responsive: false,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+
             ajax: {
-                url: "/Administration/GetStudentRegistryList",
+                url: "/registry/GetStudentRegistryList",
                 type: "POST",
+
                 data: function (d) {
-                    d.from = $('#dtpFrom').val();
-                    d.to = $('#dtpTo').val();
+                    d.from = $("#dtpFrom").val();
+                    d.to = $("#dtpTo").val();
+                },
+
+                dataSrc: function (json) {
+                    console.log("Registry response:", json);
+                    return json.data || [];
+                },
+
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    ShowToastError("Cannot load registry data.");
                 }
             },
+
             columns: [
-                {data: "student_id"},
-                {data: "student_name"},
-                {data: "student_name_in_khmer"},
-                {data: "sex"},
+                { data: "studentId" },
+                { data: "studentName" },
                 {
-                    data: null,
-                    render: function (data, type, row) {
-                        const dt = formatDate(row.date_of_birth);
-                        return `${dt}`
+                    data: "studentNameInKhmer",
+                    render: function (data) {
+                        return data || "";
                     }
                 },
-                {data: "registration_date"},
-                {data: "degree"},
-                {data: "school_name"},
+                { data: "sex" },
+                {
+                    data: "dateOfBirth",
+                    render: function (data) {
+                        return formatDate(data);
+                    }
+                },
+                {
+                    data: "registrationDate",
+                    render: function (data) {
+                        return formatDate(data);
+                    }
+                },
+                { data: "degreeName" },
+                { data: "schoolName" },
                 {
                     data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: "text-center",
                     render: function (data, type, row) {
-
                         return `
-                                                                <div class="input-group-prepend">
-                                                                    <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
-                                                                        Action
-                                                                    </button>
-                                                                    <div class="dropdown-menu" style="min-width: 8rem;">
-                                                                        <div class="col-md-12">
-                                                                            <a href="/details/${row.student_id}" class="btn btn-success btn-sm" style="display: block;margin:.2rem 0rem">Edit</a>
-                                                                            <a href="/academic/details?student_id=${row.student_id}" class="btn btn-warning btn-sm" style="display: block;margin:.2rem 0rem">View</a>
-                                                                            <a class="btn btn-danger btn-sm" style="display: block;margin:.2rem 0rem">Delete</a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                `;
+                        <div class="dropdown">
+                            <button type="button"
+                                    class="btn btn-primary btn-sm dropdown-toggle"
+                                    data-toggle="dropdown">
+                                Action
+                            </button>
+
+                            <div class="dropdown-menu">
+                                <a href="/registry/Details/${row.studentId}"
+                                   class="dropdown-item">
+                                    Edit
+                                </a>
+
+                                <a href="/academic/details?studentId=${row.studentId}"
+                                   class="dropdown-item">
+                                    View
+                                </a>
+
+                                <button type="button"
+                                        class="dropdown-item text-danger btnDeleteRegistry"
+                                        data-student-id="${row.studentId}">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    `;
                     }
                 }
             ]
         });
     }
 
+    function OnSearch() {
+        if ($.fn.DataTable.isDataTable("#tblRegistry")) {
+            $("#tblRegistry").DataTable().ajax.reload();
+        }
+    }
 
     function OnSearch() {
         fetchStudent();
@@ -252,26 +296,52 @@
             }
         });
 
-        const cboPromotion = document.getElementById("cboPromotion");
-        cboPromotion.innerText = "";
-        const optionPro = document.createElement("option");
-        optionPro.value = -1;
-        optionPro.text = "Select Promotion";
-        optionPro.disabled = true;
-        cboPromotion.appendChild(optionPro);
-        promotions.forEach(item => {
-            if (item.degree_id == degree_id && item.school_id == school_id) {
-                const option = document.createElement("option");
-                option.value = item.promotion_id;
-                option.text = item.promotion_no;
-                cboPromotion.appendChild(option);
+        const cboPromotion = $("#cboPromotion");
+
+        cboPromotion.empty();
+
+        cboPromotion.append(`
+    <option value="" disabled selected>
+        Select Promotion
+    </option>
+`);
+
+        (promotions || []).forEach(function (item) {
+            const itemDegreeId =
+                item.degreeId ??
+                item.DegreeId ??
+                item.degree_id;
+
+            const itemSchoolId =
+                item.schoolId ??
+                item.SchoolId ??
+                item.school_id;
+
+            const promotionId =
+                item.promotionId ??
+                item.PromotionId ??
+                item.promotion_id;
+
+            const promotionNo =
+                item.promotionNo ??
+                item.PromotionNo ??
+                item.promotion_no;
+
+            if (
+                Number(itemDegreeId) === Number(degree_id) &&
+                Number(itemSchoolId) === Number(school_id)
+            ) {
+                cboPromotion.append(`
+            <option value="${promotionId}">
+                ${promotionNo}
+            </option>
+        `);
             }
         });
-        $("#cboField").val(-1);
-        $("#cboPromotion").val(-1);
-        $("#cboProgram").val(-1);
-    }
 
+        $("#cboField").val("").trigger("change.select2");
+        $("#cboPromotion").val("").trigger("change.select2");
+        $("#cboProgram").val("").trigger("change.select2");
     function PromotionChange() {
         const promotion_id = $("#cboPromotion").val();
         if (!promotion_id) return;
@@ -338,4 +408,6 @@
         });
         $("#cboGroup").val(-1);
     }
+    }
+    
 </script>

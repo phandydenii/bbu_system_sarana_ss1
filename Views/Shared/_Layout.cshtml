@@ -54,6 +54,13 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <style>
+        .paginate_button.previous.disabled,
+        .paginate_button.next.disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
         .sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active {
             background-color: #18196c !important;
             color: #fff;
@@ -117,22 +124,25 @@
 <div class="wrapper">
     <partial name="_Navbar"/>
     <partial name="_Sidebar"/>
-    <div class="content-wrapper">
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">@ViewContext.RouteData.Values["action"]</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a>@ViewContext.RouteData.Values["controller"]</a></li>
-                            <li class="breadcrumb-item active">@ViewContext.RouteData.Values["action"]</li>
-                        </ol>
+    <div class="content-wrapper"> 
+        @if (ViewData["HideHeader"] == null || !(bool)ViewData["HideHeader"])
+        {
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">@ViewContext.RouteData.Values["action"]</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a>@ViewContext.RouteData.Values["controller"]</a></li>
+                                <li class="breadcrumb-item active">@ViewContext.RouteData.Values["action"]</li>
+                            </ol>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        }
 
         
         <section class="content">
@@ -185,10 +195,7 @@
 <script src="/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <script src="/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/AdminLTE/plugins/chart.js/Chart.min.js"></script>
-@* <script src="/AdminLTE/plugins/moment/moment.min.js"></script> *@
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
-
-<script src="/AdminLTE/plugins/daterangepicker/daterangepicker.js"></script>
 <script src="/AdminLTE/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 <script src="/AdminLTE/plugins/summernote/summernote-bs4.min.js"></script>
 <script src="/AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
@@ -207,7 +214,6 @@
 <script src="/AdminLTE/plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
 <script src="/AdminLTE/plugins/moment/moment.min.js"></script>
 <script src="/AdminLTE/plugins/inputmask/jquery.inputmask.min.js"></script>
-<script src="/AdminLTE/plugins/daterangepicker/daterangepicker.js"></script>
 <script src="/AdminLTE/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
 <script src="/AdminLTE/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 <script src="/AdminLTE/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>

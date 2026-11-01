@@ -1,0 +1,106 @@
+﻿@using BBU_SYSTEM.DTOs
+@{
+    var doctoralContractDto = new DoctoralContractDto();
+}
+
+<div class="modal fade" id="DoctoralContractModal" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Doctoral Contract</h4>
+            </div>
+
+            <div class="modal-body">
+                <form id="doctoralContractForm">
+
+                    <input type="hidden"
+                           id="doctoralContract_ContractId"
+                           name="ContractId"
+                           value="0"
+                           class="form-control" />
+
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Student ID</label>
+                            <input type="text"
+                                   id="doctoralContract_StudentId"
+                                   name="StudentId"
+                                   class="form-control"
+                                   placeholder="Enter student ID"
+                                   required />
+                        </div>
+
+                        <div class="col-6">
+                            <label>Term No</label>
+                            <input type="number"
+                                   id="doctoralContract_TermNo"
+                                   name="TermNo"
+                                   class="form-control"
+                                   placeholder="Enter term no"
+                                   min="0"
+                                   value="0"/>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <label>Fee</label>
+                            <input type="number"
+                                   id="doctoralContract_Fee"
+                                   name="Fee"
+                                   class="form-control"
+                                   placeholder="Enter fee"
+                                   min="0"
+                                   step="0.01"
+                                   value="0"/>
+                        </div>
+
+                        <div class="col-6">
+                            <label>Start Date</label>
+                            <input type="date"
+                                   id="doctoralContract_StartDate"
+                                   name="StartDate"
+                                   class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <label>End Date</label>
+                            <input type="date"
+                                   id="doctoralContract_EndDate"
+                                   name="EndDate"
+                                   class="form-control" />
+                        </div>
+
+                        <div class="col-6">
+                            <label>Note</label>
+                            <input type="text"
+                                   id="doctoralContract_Note"
+                                   name="Note"
+                                   class="form-control"
+                                   placeholder="Enter note" />
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit"
+                        form="doctoralContractForm"
+                        class="btn btn-primary float-right">
+                    <i class="fas fa-save"></i> Save Change
+                </button>
+
+                <button type="button"
+                        id="btnCloseDoctoralContract"
+                        class="btn btn-danger float-right">
+                    <i class="fas fa-close"></i> Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

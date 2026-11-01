@@ -7,13 +7,13 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Race</h3>
-                <button type="button" id="btnNewRace" class="btn btn-success btn-sm float-right" >
+                <button type="button" class="btn btn-success btn-sm float-right" data-toggle="modal" data-target="#raceModal">
                     <i class="fas fa-plus"></i>
                     Add New
                 </button>
             </div>
             <div class="card-body">
-                <table id="tblSchool" class="table table-sm table-bordered table-striped" style="width: 100%;">
+                <table id="tblRace" class="table table-sm table-bordered table-striped" style="width: 100%;">
                     <thead>
                     <tr>
                         <th>Id</th>
@@ -31,136 +31,98 @@
 </div>
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
 <partial name="_RaceModal"/>
-<script>
-    $(document).ready(function () {
-        fetchRace();
 
-        $("#btnNewRace").on("click", function (e) {
-            e.preventDefault();
+@section Scripts
+{
+    <script src="~/function/Race.js"></script>
+    <script>
+        const tblRace = $("#tblRace");
 
-            clearRaceForm();
-
-            $("#raceModal").find(".modal-title").text("Add Race");
-            $("#raceModal").modal("show");
+        $(document).ready(function () {
+            fetchRace();
         });
 
-        $(document).on("click", ".btnCloseRace", function () {
-            clearRaceForm();
-            $("#raceModal").modal("hide");
-        });
-    });
-
-    function fetchRace() {
-        if ($.fn.DataTable.isDataTable("#tblSchool")) {
-            $("#tblSchool").DataTable().clear().destroy();
-        }
-
-        $("#tblSchool").DataTable({
-            paging: true,
-            lengthChange: true,
-            searching: true,
-            ordering: true,
-            info: true,
-            responsive: true,
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "/Race/get-races",
-                type: "POST"
-            },
-            columns: [
-                { data: "raceId" },
-                { data: "raceName" },
-                { data: "raceInKhmer" },
-                {
-                    title: "Action",
-                    data: null,
-                    width: "180px",
-                    className: "dt-action",
-                    orderable: false,
-                    searchable: false,
-                    render: function () {
-                        return `
-                            <a href="javascript:void(0)" class="btnEdit btn btn-warning btn-sm">
+        function fetchRace() {
+            tblRace.DataTable().clear().destroy();
+            tblRace.DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                order: [[0, "desc"]],
+                ajax: {
+                    url: "/Race/get-races",
+                    type: "POST"
+                },
+                columns: [
+                    {data: "raceId"},
+                    {data: "raceName"},
+                    {data: "raceInKhmer"},
+                    {
+                        data: null,
+                        render: function () {
+                            return `
+                            <a id="btnEdit" class="btn btn-success btn-sm">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                         `;
+                        }
                     }
+                ],
+                initComplete: function () {
+                    MyApp.utils.dataTableDebounceSearch("#tblRace", 500);
                 }
-            ],
-            initComplete: function () {
-                MyApp.utils.dataTableDebounceSearch("#tblSchool", 500);
+            });
+        }
+
+        tblRace.on("click", "#btnEdit", function () {
+            let row = $(this).closest("tr");
+            if (row.hasClass("child")) {
+                row = row.prev();
             }
+            const selectedRow = $("#tblSchool").DataTable().row(row).data();
+            const race = new Race(selectedRow);
+            $("#race_RaceId").val(race.raceId);
+            $("#race_RaceName").val(race.raceName);
+            $("#race_RaceInKhmer").val(race.raceInKhmer);
+
+            $("#raceModal").modal("show");
         });
-    }
 
-    function clearRaceForm() {
-        $("#formRace")[0].reset();
-
-        $("#race_RaceId").val(0);
-        $("#race_RaceName").val("");
-        $("#race_RaceInKhmer").val("");
-    }
-
-    $("#tblSchool").on("click", ".btnEdit", function () {
-        let row = $(this).closest("tr");
-
-        if (row.hasClass("child")) {
-            row = row.prev();
-        }
-
-        const selectedRow = $("#tblSchool").DataTable().row(row).data();
-
-        if (!selectedRow) {
-            ShowToastError("Cannot get selected race data.");
-            return;
-        }
-
-        $("#race_RaceId").val(selectedRow.raceId);
-        $("#race_RaceName").val(selectedRow.raceName);
-        $("#race_RaceInKhmer").val(selectedRow.raceInKhmer);
-
-        $("#raceModal").find(".modal-title").text("Edit Race");
-        $("#raceModal").modal("show");
-    });
-
-    $("#formRace").on("submit", function (e) {
-        e.preventDefault();
-
-        const raceId = $("#race_RaceId").val() || "0";
-
-        const formData = $("#formRace").serialize();
-
-        $.ajax({
-            url: "/Race/SaveChange",
-            method: "POST",
-            data: formData,
-            success: function (response) {
-                const code = response.status?.code;
-                const message = response.status?.message;
-
-                if (code === "200" || code === 200) {
-                    if (raceId !== "0") {
-                        ShowToastSuccess(message || "Updated successfully!");
+        $("#raceForm").on("submit", function (e) {
+            e.preventDefault();
+            const form = $(this);
+            const formData = form.serialize();
+            $.ajax({
+                url: "/race/SaveChange",
+                method: "POST",
+                data: formData,
+                success: function (response) {
+                    if (response.status === "200") {
+                        ShowToastSuccess("Save successfully");
+                        $("#raceForm")[0].reset();
+                        $("#raceModal").modal("hide");
+                        $("#tblRace").dataTable().ajax.reload();
                     } else {
-                        ShowToastSuccess(message || "Saved successfully!");
+                        ShowToastError(response.message);
                     }
-
-                    clearRaceForm();
-                    $("#raceModal").modal("hide");
-                    $("#tblSchool").DataTable().ajax.reload();
-                } else {
-                    ShowToastError(message || "Save failed.");
+                },
+                error: function (error) {
+                    if (error.responseJSON && error.responseJSON.message) {
+                        ShowToastError(error.responseJSON.message);
+                    }
                 }
-            },
-            error: function (xhr) {
-                const message =
-                    xhr["responseJSON"]?.["status"]?.["message"] ||
-                    xhr["responseJSON"]?.["message"] ||
-                    "Server error.";
-
-                ShowToastError(message);
-            }
+            });
         });
-    });
-</script>
+        
+        $("#btnClose").on("click", function (event) {
+            event.preventDefault();
+            $("#raceForm")[0].reset();
+            $("#raceModal").modal("hide");
+        });
+    </script>
+}

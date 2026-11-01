@@ -714,6 +714,18 @@ public class BookingItem
 
     [Column("PRICE", TypeName = "decimal(18,6)")]
     public decimal? Price { get; set; }
+    
+    [Column("PRICE_KHR", TypeName = "decimal(18,6)")]
+    public decimal? PriceKhr { get; set; }
+    
+    [Column("TYPE")]
+    public string? Type { get; set; }
+    
+    [Column("DEFAULT_PAYMENT")]
+    public string? DefaultPayment { get; set; }
+    
+    [Column("HIDDEND")]
+    public bool? Hidden  { get; set; }
 }
 
 [Table("BOOKINGRETURN_TBL")]
@@ -2154,7 +2166,7 @@ public class Letter
 public class LetterCategory
 {
     [Key]
-    [Column("categoryID", TypeName = "int")]
+    [Column("categoryID", TypeName = "smallint")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int CategoryId { get; set; }
 
@@ -2176,7 +2188,8 @@ public class LetterCategory
     [Column("IsShortCourse", TypeName = "bit")]
     public bool? IsShortCourse { get; set; }
     
-    [Column("IsStartNewNumber", TypeName = "bit")]
+    // [Column("IsStartNewNumber", TypeName = "bit")]
+    [NotMapped]
     public bool? IsStartNewNumber { get; set; }
 }
 
@@ -2545,7 +2558,7 @@ public class Province
     [Column("PROVINCE", TypeName = "varchar(30)")]
     public string? ProvinceName { get; set; }
 
-    [Column("PROVINCE_IN_KHMER", TypeName = "varchar(30)")]
+    [Column("PROVINCE_IN_KHMER", TypeName = "nvarchar(100)")]
     public string? ProvinceInKhmer { get; set; }
 
     [Column("IS_CITY", TypeName = "int")] public int IsCity { get; set; }
@@ -2788,12 +2801,14 @@ public class Quit
 [Table("RACE")]
 public class Race
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Column("RACE_ID", TypeName = "int")] public int? RaceId { get; set; }
 
     [Column("RACE", TypeName = "varchar(30)")]
     public string? RaceName { get; set; }
 
-    [Column("RACE_IN_KHMER", TypeName = "varchar(30)")]
+    [Column("RACE_IN_KHMER", TypeName = "nvarchar(100)")]
     public string? RaceInKhmer { get; set; }
 }
 
@@ -3718,9 +3733,9 @@ public class StudentComplementalPayment
 public class StudentDiscount
 {
     [Key]
-    [Column("STUDENT_DISCOUNT_ID", TypeName = "int")]
+    [Column("STUDENT_DISCOUNT_ID")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int? StudentDiscountId { get; set; }
+    public int StudentDiscountId { get; set; }
 
     [Column("STUDENT_ID", TypeName = "varchar(50)")]
     public string? StudentId { get; set; }
@@ -3739,7 +3754,7 @@ public class StudentDiscount
 public class StudentGroup
 {
     [Key]
-    [Column("STUDENT_GROUP_ID", TypeName = "int")]
+    [Column("STUDENT_GROUP_ID")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int? StudentGroupId { get; set; }
 
@@ -4330,9 +4345,9 @@ public class StudentStatisticByAcademicYear2Type2
 public class Suppress
 {
     [Key]
-    [Column("SUPPRESS_ID", TypeName = "int")]
+    [Column("SUPPRESS_ID")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int? SuppressId { get; set; }
+    public int SuppressId { get; set; }
 
     [Column("STUDENT_ID", TypeName = "varchar(10)")]
     public string? StudentId { get; set; }
@@ -4378,11 +4393,11 @@ public class SuppressNew
 
 [Table("SUSPEND")]
 public class Suspend
-{
+{ 
     [Key]
-    [Column("SUSPEND_ID", TypeName = "int")]
+    [Column("SUSPEND_ID")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int? SuspendId { get; set; }
+    public int SuspendId { get; set; }
 
     [Column("STUDENT_ID", TypeName = "varchar(10)")]
     public string? StudentId { get; set; }
