@@ -668,16 +668,10 @@ var selectedStudentId = (ViewBag.SelectedStudentId as string ?? "").Trim();
     const selectedProductsList = $("#selectedProductsList");
     const selectedProductsEmpty = $("#selectedProductsEmpty");
     const selectedProductsCount = $("#selectedProductsCount");
-
     const modalPayment = $("#PaymentModal");
     const modalProduct = $("#ProductModal");
     const modalCreateStudentPayment = $("#CreateStudentPaymentModal");
-    // _PaymentModal should use PaymentForm. The fallback keeps the page
-    // working if the partial still uses the older lowercase id.
-    const formPayment = $("#PaymentForm").length
-        ? $("#PaymentForm")
-        : $("#paymentForm");
-
+    const formPayment = $("#PaymentForm").length ? $("#PaymentForm") : $("#paymentForm");
     const txtRateIn = $("#txtRateIn");
     const txtRateOut = $("#txtRateOut");
     let savePaymentRequest = null;
@@ -691,42 +685,18 @@ var selectedStudentId = (ViewBag.SelectedStudentId as string ?? "").Trim();
             formPayment.attr("novalidate", "novalidate");
             btnCreateNewPayment.prop("disabled", true);
 
-            const studentId = String(
-                $("#selectedStudentId").val() || ""
-            ).trim();
-
-            // When this partial is loaded through AJAX, document.ready has
-            // already fired. Initialize the partial directly and load the
-            // selected student before any optional payment setup.
+            const studentId = String($("#selectedStudentId").val() || "").trim();
             if (studentId) {
                 loadSelectedStudent(studentId);
             } else if (!$.fn.DataTable.isDataTable("#tblInvoice")) {
                 tblInvoice.DataTable();
             }
         } catch (error) {
-            console.error("Create payment modal initialization error:", error);
-            showCreatePaymentError(
-                error?.message || "Unable to initialize the payment form."
-            );
-        }
-
-        // Exchange-rate failure must not prevent student information from
-        // loading into the modal.
-        try {
-            const exchangeRateRequest = GetExchangeRate();
-
-            if (exchangeRateRequest?.catch) {
-                exchangeRateRequest.catch(function (error) {
-                    console.error("Cannot load exchange rate:", error);
-                });
-            }
-        } catch (error) {
-            console.error("Cannot start exchange-rate request:", error);
+            showCreatePaymentError(error?.message || "Unable to initialize the payment form.");
         }
     }
 
     window.setTimeout(initializeCreatePaymentModal, 0);
-
     modalCreateStudentPayment
         .off("hidden.bs.modal.createPayment")
         .on("hidden.bs.modal.createPayment", function () {
@@ -768,18 +738,11 @@ var selectedStudentId = (ViewBag.SelectedStudentId as string ?? "").Trim();
 
     function loadSelectedStudent(studentId) {
         const normalizedStudentId = String(studentId || "").trim();
-
-        if (!normalizedStudentId) {
-            return;
-        }
+        if (!normalizedStudentId) return;
 
         $("#selectedStudentId").val(normalizedStudentId);
         btnCreateNewPayment.prop("disabled", true);
-
-        if (typeof showLoading === "function") {
-            showLoading();
-        }
-
+        showLoading();
         getStudent(normalizedStudentId);
         getInvoice(normalizedStudentId);
     }
@@ -932,11 +895,8 @@ var selectedStudentId = (ViewBag.SelectedStudentId as string ?? "").Trim();
             responsive: true,
             autoWidth: true,
             ajax: {
-                url: "/invoice/get-invoice-by-student-id",
+                url: `/invoice/get-invoice-by-student-id/${student_id}`,
                 type: "POST",
-                data: function (d) {
-                    d.studentId = student_id;
-                },
                 error: function (xhr, status, error) {
                     console.log(xhr.responseText);
                 }

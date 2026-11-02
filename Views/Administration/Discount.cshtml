@@ -29,6 +29,29 @@
     #tblStudentDiscountDetail tbody tr.highlight > td {
         background-color: #e8f0fe;
     }
+
+    /* True Floating Popover Styling */
+    .filter-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .filter-popover-card {
+        position: absolute;
+        top: calc(100% + 5px);
+        right: 0;
+        z-index: 1050;
+        display: none;
+        width: 360px;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,.15);
+        border-radius: 0.375rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        padding: 1rem;
+    }
+    .filter-popover-card.show {
+        display: block;
+    }
 </style>
 
 <div id="studentDiscountPage" class="container-fluid px-0 pt-3">
@@ -37,75 +60,70 @@
             <h3 class="m-0 font-weight-bold text-dark">Student Discount</h3>
             <small class="text-muted">Manage student discounts and term-based discount records</small>
         </div>
-    </div>
 
-    <div class="card card-outline card-primary shadow-sm mb-4">
-        <div class="card-header bg-white py-2">
-            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
-                <i class="fas fa-filter text-primary mr-1"></i>
-                Filter by Date
-            </h3>
-            <div class="card-tools">
-                <button type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                        aria-label="Collapse discount filters">
-                    <i class="fas fa-minus"></i>
+        <!-- Floating Popover Filter Wrapper -->
+        <div class="filter-wrapper">
+            <div class="d-flex align-items-center">
+                <button type="button" id="btnToggleFilterPopover" class="btn btn-outline-secondary shadow-sm">
+                    <i class="fas fa-filter text-primary mr-1"></i>
+                    <span id="filterButtonLabel">Filter by Date</span>
+                </button>
+                <button type="button" id="btnClearActiveFilter" class="btn btn-outline-danger btn-sm ml-1" style="display: none;" title="Clear filter">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-        </div>
-        <div class="card-body bg-light py-3">
-            <form id="frmStudentDiscountFilters">
-                <div class="row align-items-end">
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="discountFromDate" class="text-secondary small font-weight-bold">
-                            From Date
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
-                            </div>
+
+            <!-- Floating Popover Panel -->
+            <div id="studentDiscountFilterPopover" class="filter-popover-card">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="font-weight-bold text-secondary text-sm">Filter by Date Range</span>
+                    <button type="button" class="close text-dark" id="btnCloseFilterPopover" aria-label="Close" style="outline: none;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- Quick Preset Buttons -->
+                <div class="mb-3">
+                    <div class="small text-muted mb-1">Quick Presets:</div>
+                    <div class="btn-group btn-group-sm w-100" role="group">
+                        <button type="button" class="btn btn-outline-secondary js-preset-filter" data-preset="today">Today</button>
+                        <button type="button" class="btn btn-outline-secondary js-preset-filter" data-preset="last7">Last 7 Days</button>
+                        <button type="button" class="btn btn-outline-secondary js-preset-filter" data-preset="thisMonth">This Month</button>
+                    </div>
+                </div>
+
+                <form id="frmStudentDiscountFilters">
+                    <div class="form-row">
+                        <div class="col-6 mb-2">
+                            <label for="discountFromDate" class="small text-muted font-weight-bold mb-1">From Date</label>
                             <input type="date"
                                    id="discountFromDate"
                                    name="fromDate"
-                                   class="form-control border-left-0" />
+                                   class="form-control form-control-sm" />
                         </div>
-                    </div>
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="discountToDate" class="text-secondary small font-weight-bold">
-                            To Date
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
-                            </div>
+                        <div class="col-6 mb-2">
+                            <label for="discountToDate" class="small text-muted font-weight-bold mb-1">To Date</label>
                             <input type="date"
                                    id="discountToDate"
                                    name="toDate"
-                                   class="form-control border-left-0" />
+                                   class="form-control form-control-sm" />
                         </div>
                     </div>
-                    <div class="col-md-2 col-sm-12 d-flex">
-                        <div class="btn-group shadow-sm" role="group" aria-label="Discount date filters">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-search mr-1"></i>
-                                Filter
-                            </button>
-                            <button type="button"
-                                    id="btnResetStudentDiscountFilters"
-                                    class="btn btn-success border-left"
-                                    title="Reset filters"
-                                    aria-label="Reset discount date filters">
-                                <i class="fas fa-redo-alt"></i>
-                            </button>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                        <button type="button"
+                                id="btnResetStudentDiscountFilters"
+                                class="btn btn-link btn-sm text-danger p-0 text-decoration-none"
+                                title="Reset filters">
+                            <i class="fas fa-redo-alt mr-1"></i> Reset
+                        </button>
+                        <div>
+                            <button type="button" id="btnCancelFilter" class="btn btn-secondary btn-sm mr-1">Cancel</button>
+                            <button type="submit" class="btn btn-success btn-sm">Apply Filter</button>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -152,6 +170,49 @@
             );
             tblStudentDiscountDetail.find("thead").addClass("thead-light");
 
+            // Toggle Popover open/close
+            $("#btnToggleFilterPopover").on("click", function (e) {
+                e.stopPropagation();
+                $("#studentDiscountFilterPopover").toggleClass("show");
+            });
+
+            $("#btnCloseFilterPopover, #btnCancelFilter").on("click", function () {
+                $("#studentDiscountFilterPopover").removeClass("show");
+            });
+
+            // Close popover when clicking outside
+            $(document).on("click", function (e) {
+                if (!$(e.target).closest(".filter-wrapper").length) {
+                    $("#studentDiscountFilterPopover").removeClass("show");
+                }
+            });
+
+            // Quick Preset Selection Logic
+            $(".js-preset-filter").on("click", function () {
+                const preset = $(this).data("preset");
+                const today = new Date();
+                let from = "", to = "";
+
+                const formatDateString = (d) => d.toISOString().split('T')[0];
+
+                if (preset === "today") {
+                    from = to = formatDateString(today);
+                } else if (preset === "last7") {
+                    let past = new Date();
+                    past.setDate(today.getDate() - 7);
+                    from = formatDateString(past);
+                    to = formatDateString(today);
+                } else if (preset === "thisMonth") {
+                    let firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                    let lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                    from = formatDateString(firstDay);
+                    to = formatDateString(lastDay);
+                }
+
+                $("#discountFromDate").val(from);
+                $("#discountToDate").val(to);
+            });
+
             $("#frmStudentDiscountFilters")
                 .off("submit.studentDiscountFilters")
                 .on("submit.studentDiscountFilters", function (event) {
@@ -163,11 +224,27 @@
                 .off("click.studentDiscountFilters")
                 .on("click.studentDiscountFilters", function () {
                     $("#discountFromDate, #discountToDate").val("");
+                    $("#filterButtonLabel").text("Filter by Date");
+                    $("#btnToggleFilterPopover").removeClass("btn-primary text-white").addClass("btn-outline-secondary");
+                    $("#btnClearActiveFilter").hide();
+                    $("#studentDiscountFilterPopover").removeClass("show");
 
                     if ($.fn.DataTable.isDataTable("#tblStudentDiscount")) {
                         tblStudentDiscount.DataTable().ajax.reload(null, true);
                     }
                 });
+
+            $("#btnClearActiveFilter").on("click", function () {
+                $("#discountFromDate, #discountToDate").val("");
+                $("#filterButtonLabel").text("Filter by Date");
+                $("#btnToggleFilterPopover").removeClass("btn-primary text-white").addClass("btn-outline-secondary");
+                $("#btnClearActiveFilter").hide();
+                $("#studentDiscountFilterPopover").removeClass("show");
+
+                if ($.fn.DataTable.isDataTable("#tblStudentDiscount")) {
+                    tblStudentDiscount.DataTable().ajax.reload(null, true);
+                }
+            });
         });
 
         function applyStudentDiscountDateFilter() {
@@ -178,6 +255,14 @@
                 showStudentDiscountError("From Date must not be later than To Date.");
                 return;
             }
+
+            if (fromDate || toDate) {
+                $("#filterButtonLabel").text(`Filter: ${fromDate || '...'} to ${toDate || '...'}`);
+                $("#btnToggleFilterPopover").removeClass("btn-outline-secondary").addClass("btn-primary text-white");
+                $("#btnClearActiveFilter").show();
+            }
+
+            $("#studentDiscountFilterPopover").removeClass("show");
 
             if ($.fn.DataTable.isDataTable("#tblStudentDiscount")) {
                 tblStudentDiscount.DataTable().ajax.reload(null, true);
@@ -199,8 +284,6 @@
                 ajax: {
                     url: "/student-discount/gets",
                     type: "POST",
-                    // The controller must apply these optional parameters to
-                    // the intended database date column before count/paging.
                     data: function (request) {
                         request.fromDate = $("#discountFromDate").val() || "";
                         request.toDate = $("#discountToDate").val() || "";
@@ -398,7 +481,7 @@
 
         tblStudentDiscountDetail.on("click", ".js-discount-delete", function (event) {
             event.preventDefault();
-            const row = getStudentDiscountTableRow(tblStudentDiscountDetail, this);
+            const row = getStatisticalDiscountTableRow ? getStatisticalDiscountTableRow(tblStudentDiscountDetail, this) : getStudentDiscountTableRow(tblStudentDiscountDetail, this);
             const json = row.data;
             if (!json) return;
 

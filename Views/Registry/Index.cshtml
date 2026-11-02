@@ -370,7 +370,7 @@ ViewData["HideHeader"] = true;
                             return data ?? "";
                         }
 
-                        return formatRegistryDate(data);
+                        return formatDate(data);
                     }
                 },
                 {
@@ -382,7 +382,7 @@ ViewData["HideHeader"] = true;
                             return data ?? "";
                         }
 
-                        return formatRegistryDate(data);
+                        return formatDate(data);
                     }
                 },
                 {
@@ -482,18 +482,7 @@ ViewData["HideHeader"] = true;
 
             initComplete: function () {
                 const api = this.api();
-
-                if (typeof MyApp !== "undefined" &&
-                    MyApp.utils &&
-                    typeof MyApp.utils
-                        .dataTableDebounceSearch ===
-                    "function") {
-                    MyApp.utils.dataTableDebounceSearch(
-                        tableSelector,
-                        500
-                    );
-                }
-
+                MyApp.utils.dataTableDebounceSearch(tableSelector,500);
                 adjustRegistryColumns(api);
             },
 
@@ -522,7 +511,6 @@ ViewData["HideHeader"] = true;
             .off("resize.registryTable")
             .on("resize.registryTable", function () {
                 clearTimeout(registryResizeTimer);
-
                 registryResizeTimer = setTimeout(function () {
                     if ($.fn.DataTable.isDataTable(
                         "#tblRegistry"
@@ -532,47 +520,16 @@ ViewData["HideHeader"] = true;
                 }, 100);
             });
 
-        /*
-         * AdminLTE changes the content width when the sidebar opens
-         * or closes. Recalculate after that transition completes.
-         */
-        $(document)
-            .off(
-                "collapsed.lte.pushmenu.registry " +
-                "shown.lte.pushmenu.registry"
-            )
-            .on(
-                "collapsed.lte.pushmenu.registry " +
-                "shown.lte.pushmenu.registry",
+        $(document).off("collapsed.lte.pushmenu.registry " + "shown.lte.pushmenu.registry")
+            .on("collapsed.lte.pushmenu.registry " + "shown.lte.pushmenu.registry",
                 function () {
                     setTimeout(function () {
-                        if ($.fn.DataTable.isDataTable(
-                            "#tblRegistry"
-                        )) {
+                        if ($.fn.DataTable.isDataTable("#tblRegistry")) {
                             registryTable.columns.adjust();
                         }
                     }, 350);
                 }
             );
-    }
-
-    function formatRegistryDate(value) {
-        if (!value) {
-            return "";
-        }
-
-        const date = new Date(value);
-
-        if (Number.isNaN(date.getTime())) {
-            return value;
-        }
-
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1)
-            .padStart(2, "0");
-        const year = date.getFullYear();
-
-        return `${day}/${month}/${year}`;
     }
 
     function escapeRegistryHtml(value) {
@@ -588,39 +545,28 @@ ViewData["HideHeader"] = true;
     openCreateRegistryButton
         .off("click.createRegistry")
         .on("click.createRegistry", function () {
-            if (createRegistryRequest) {
-                return;
-            }
-
+            if (createRegistryRequest) return;
             const originalHtml = openCreateRegistryButton.html();
-
             openCreateRegistryButton
                 .prop("disabled", true)
                 .html(
                     '<i class="fas fa-spinner fa-spin mr-1"></i>Loading...'
                 );
-
             createRegistryRequest = $.ajax({
                 url: "/registry/create-new-student?modal=true",
                 type: "GET",
                 cache: false,
                 timeout: 20000
-            })
-                .done(function (html) {
+            }).done(function (html) {
                     createRegistryModalHost.html(html);
-
                     const modal = $("#CreateRegistryModal");
-
                     if (!modal.length) {
-                        const message =
-                            "Create Registry modal was not returned.";
-
+                        const message = "Create Registry modal was not returned.";
                         if (typeof ShowToastError === "function") {
                             ShowToastError(message);
                         } else {
                             alert(message);
                         }
-
                         createRegistryModalHost.empty();
                         return;
                     }

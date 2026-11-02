@@ -25,7 +25,6 @@ public class InvoiceController(ICampusDbContext campusDbContext,IMapper mapper, 
 
         var pageSize = length != null ? Convert.ToInt32(length) : 0;
         var skip = start != null ? Convert.ToInt32(start) : 0;
-        //var campus = HttpContext.Session.GetString("campus");
         var db = campusDbContext.DbContext(_campus);
 
         var students = db.TblStudent.AsQueryable();
@@ -55,20 +54,17 @@ public class InvoiceController(ICampusDbContext campusDbContext,IMapper mapper, 
         });
     }
 
-    [HttpPost(" get-invoice-by-student-id")]
+    [HttpPost("get-invoice-by-student-id/{studentId}")]
     public IActionResult GetInvoiceByStudentId(string studentId)
     {
         var draw = Request.Form["draw"].FirstOrDefault();
         var start = Request.Form["start"].FirstOrDefault();
         var length = Request.Form["length"].FirstOrDefault();
         var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-        //var pageSize = length != null ? Convert.ToInt32(length) : 0;
         var pageSize = length != null ? int.Parse(length) != -1 ? Convert.ToInt32(length) : 10 : 10;
         var skip = start != null ? Convert.ToInt32(start) : 0;
         var db = campusDbContext.DbContext(_campus);
 
-        //var students = db.tbl_student.AsQueryable();
         var query = (from i in db.TblInvoice
                 join s in db.TblStudent on i.StudentId equals s.StudentId
                 where i.StudentId == studentId
