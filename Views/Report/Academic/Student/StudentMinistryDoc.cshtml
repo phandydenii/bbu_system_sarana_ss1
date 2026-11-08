@@ -1,0 +1,396 @@
+﻿@using BBU_SYSTEM.ViewModel
+@{
+    ViewData["Title"] = "MoEYS Student";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AcademicReport";
+    ViewData["Action"] = "StudentReport";
+    var req = new QueryReportViewModel();
+} 
+<style>
+    .moeys-report-page .card-body {
+        padding: 10px;
+    } 
+    .moeys-report-page .filter-panel {
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .moeys-report-page .form-group {
+        margin-bottom: 8px;
+    }
+
+    .moeys-report-page label {
+        margin-bottom: 3px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    .moeys-report-page .form-control {
+        min-height: 36px;
+        font-size: 13px;
+    }
+
+    .moeys-report-page .filter-actions {
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+    }
+
+    .moeys-report-page .preview-panel {
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        overflow: hidden;
+        background: #f8f9fa;
+        min-height: 700px;
+    }
+
+    .moeys-report-page .preview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .moeys-report-page .preview-empty {
+        min-height: 650px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        color: #6c757d;
+        text-align: center;
+    }
+
+    .moeys-report-page .preview-empty i {
+        margin-bottom: 10px;
+        font-size: 42px;
+        opacity: .45;
+    }
+
+    .moeys-report-page #reportContainer {
+        display: none;
+        width: 100%;
+        height: 820px;
+        border: 0;
+        background: #fff;
+    }
+
+    @@media (max-width: 991.98px) {
+        .moeys-report-page .preview-panel {
+            min-height: 450px;
+            margin-top: 10px;
+        }
+
+        .moeys-report-page .preview-empty {
+            min-height: 400px;
+        }
+
+        .moeys-report-page #reportContainer {
+            height: 650px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .moeys-report-page .filter-actions {
+            flex-direction: column;
+        }
+
+        .moeys-report-page .filter-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="card moeys-report-page">
+    <div class="card-header">
+        <div class="margin">
+            <a asp-controller="Report" asp-action="Student" class="btn btn-outline-primary btn-sm"> 
+                Student List
+            </a>
+            <a asp-controller="Report"
+               asp-action="StudentSkillList"
+               class="btn btn-outline-primary btn-sm">
+                Skill Student List
+            </a>
+            <a asp-controller="Report"
+               asp-action="StudentScoreList"
+               class="btn btn-outline-primary btn-sm">
+                Student Score List
+            </a>
+            <a asp-controller="Report" asp-action="StudentMinistryDoc" class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                MoEYS Student
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">MoEYS Student Report</h5> 
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-4 col-lg-3 mb-2 mb-md-0">
+                <div class="filter-panel">
+                    <div class="form-group">
+                        <label class="required">Degree</label>
+                        <select asp-for="@req.DegreeId" id="cboDegree" class="form-control select2">
+                            <option value="">Select Degree</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">School</label>
+                        <select asp-for="@req.SchoolId" id="cboSchool" class="form-control select2">
+                            <option value="">Select School</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Field</label>
+                        <select asp-for="@req.FieldId" id="cboField" class="form-control select2">
+                            <option value="">Select Field</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Promotion</label>
+                        <select asp-for="@req.PromotionId" id="cboPromotion" class="form-control select2">
+                            <option value="">Select Promotion</option>
+                        </select>
+                    </div> 
+
+                    <div class="form-group">
+                        <label>Type</label> 
+                        <select asp-for="@req.Filter" id="cboFilter" class="form-control select2">
+                            <option value="all">All</option>
+                            <option value="document_in">Document In</option>
+                            <option value="document_out">Document Out</option>
+                            <option value="authenticated">High School Clarification</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-actions"> 
+                        <button type="button" id="btnPreviewMoeys" onclick="loadStudentMoeys()" class="btn btn-primary flex-fill">
+                            <i class="fas fa-eye mr-1"></i>
+                            Preview
+                        </button>  
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="preview-panel">
+                    <div class="preview-header">
+                        <span>
+                            <i class="fas fa-file-pdf mr-1"></i>
+                            MoEYS Report Preview
+                        </span> 
+                        <a id="btnOpenNewTab"
+                           href="#"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-outline-primary btn-sm"
+                           style="display:none;">
+                            <i class="fas fa-external-link-alt mr-1"></i>
+                            Open
+                        </a>
+                    </div> 
+                    <div id="previewEmpty" class="preview-empty">
+                        <i class="far fa-file-pdf"></i>
+                        <strong>No report generated</strong>
+                        <span>Filters and click preview.</span>
+                    </div>
+                    <iframe id="reportContainer"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script> 
+<script>
+    const cboDegree = $("#cboDegree");
+    const cboSchool = $("#cboSchool");
+    const cboField = $("#cboField");
+    const cboPromotion = $("#cboPromotion"); 
+    
+
+    $(document).ready(async function () { 
+        $(".select2").select2({
+            width: "100%",
+            placeholder: "Select an option",
+            allowClear: true
+        });
+        $("#btnOpenNewTab").on("click", function () {
+            if (!window.studentMoeysPdfUrl) {
+                ShowToastInfo("Please preview the report first.");
+                return;
+            } 
+            window.open(window.studentMoeysPdfUrl, "_blank");
+        });  
+        await getDegree();
+        await getSchool();
+    }); 
+    cboDegree.on("change", async function () {
+        await getField();
+        await getPromotion();
+    });
+    cboSchool.on("change", async function (){
+        await getField();
+        await getPromotion();
+    });
+
+    async function getDegree() { 
+        cboDegree.empty();
+        cboDegree.append("<option value=''>Select Degree</option>"); 
+        try { 
+            const degrees = await Degree.GetAllDegree(); 
+            degrees.forEach(function (item) {
+                cboDegree.append(
+                    `<option value="${item.degreeId}">
+                        ${item.degreeName}
+                    </option>`
+                );
+            }); 
+            cboDegree.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Degree API error:", error);
+        }
+    }
+
+    async function getSchool() { 
+        cboSchool.empty();
+        cboSchool.append("<option value=''>Select School</option>"); 
+        try {
+            const schools = await School.GetSchool(); 
+            schools.forEach(function (item) {
+                cboSchool.append(
+                    `<option value="${item.schoolId}">
+                        ${item.schoolName}
+                    </option>`
+                );
+            }); 
+            cboSchool.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("School API error:", error);
+        }
+    }
+
+    async function getField() {
+        const degreeId = $("#cboDegree").val();
+        const schoolId = $("#cboSchool").val(); 
+        cboField.empty();
+        cboField.append("<option value=''>Select Field</option>"); 
+        if (!degreeId || !schoolId) {
+            cboField.val("").trigger("change.select2");
+            return;
+        } 
+        try {
+            const fields = await Field.GetFields({
+                isAll: true,
+                degreeId: degreeId,
+                schoolId: schoolId
+            }); 
+            fields.forEach(function (item) {
+                cboField.append(
+                    `<option value="${item.fieldId}">
+                        ${item.fieldName}
+                    </option>`
+                );
+            }); 
+            cboField.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Field API error:", error);
+        }
+    }
+
+    async function getPromotion() {
+        const degreeId = $("#cboDegree").val(); 
+        const schoolId = $("#cboSchool").val();  
+        cboPromotion.empty();
+        cboPromotion.append("<option value=''>Select Promotion</option>"); 
+        if (!degreeId || !schoolId) {
+            cboPromotion.val("").trigger("change.select2");
+            return;
+        } 
+        try {
+            const promotions = await Promotion.GetPromotions({
+                schoolId: schoolId,
+                degreeId: degreeId
+            });
+
+            promotions.forEach(function (item) {
+                cboPromotion.append(
+                    `<option value="${item.promotionId}">
+                        ${item.promotionNo}
+                    </option>`
+                );
+            });
+
+            cboPromotion.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Promotion API error:", error);
+        }
+    }
+
+    function loadStudentMoeys() {
+        const degreeId = $("#cboDegree").val();
+        const schoolId = $("#cboSchool").val();
+        const fieldId = $("#cboField").val();
+        const promotionId = $("#cboPromotion").val();
+        const filter = $("#cboFilter").val(); 
+        if (!degreeId || !schoolId || !fieldId || !promotionId) {
+            ShowToastInfo("Please select Degree, School, and Promotion."); 
+            return;
+        } 
+        showLoading(); 
+        $.ajax({
+            url: "/report/student-moeys",
+            type: "POST", 
+            data: {
+                degreeId: degreeId,
+                schoolId: schoolId,
+                fieldId: fieldId,
+                promotionId: promotionId,
+                filter: filter
+            },
+            xhrFields: {
+                responseType: "blob"
+            },
+            success: function (blob) {
+                if (window.studentMoeysPdfUrl) {
+                    URL.revokeObjectURL(window.studentMoeysPdfUrl);
+                } 
+                window.studentMoeysPdfUrl = URL.createObjectURL(blob); 
+                $("#previewEmpty").hide(); 
+                $("#reportContainer")
+                    .attr("src", window.studentMoeysPdfUrl)
+                    .show();
+
+                $("#btnOpenNewTab")
+                    .attr("href", window.studentMoeysPdfUrl)
+                    .show();
+            },
+            error: function (xhr) {
+                console.error("Report error:", xhr); 
+            },
+            complete: function () {
+                hideLoading(1); 
+            }
+        });
+    }
+</script>
+}

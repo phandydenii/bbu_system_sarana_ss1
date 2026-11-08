@@ -1089,7 +1089,7 @@
                         @* console.log(data.responseText); *@
                     }
                 }); 
-                 if (response.code === "200" && response.data !== "") {
+                 if (response.status.code === "200" && response.data !== "") {
                     cboRoom.empty();
                     cboRoom.append("<option value='' disabled selected>Select study time</option>");
                     response.data.forEach(item => {

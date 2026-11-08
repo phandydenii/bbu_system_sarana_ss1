@@ -1,0 +1,682 @@
+@model BBU_SYSTEM.ViewModel.Report.Others.GraduateStudentViewModel
+@{
+    ViewData["Title"] = "Graduate Student";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AdminReport";
+    ViewData["Action"] = "OtherReport";
+    ViewContext.RouteData.Values["action"] = "Graduate Student";
+}
+
+<style>
+    .other-report-page .card-body {
+        padding: 10px;
+    }
+
+    .other-report-page .report-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .other-report-page .filter-panel {
+        height: 100%;
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+    }
+
+    .other-report-page .filter-title {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .other-report-page .form-group {
+        margin-bottom: 10px;
+    }
+
+    .other-report-page label {
+        margin-bottom: 3px;
+        color: #343a40;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .other-report-page .form-control {
+        min-height: 34px;
+        font-size: 13px;
+    }
+
+    .other-report-page .report-panel {
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .other-report-page .report-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 42px;
+        padding: 8px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .other-report-page .report-frame {
+        display: none;
+        width: 100%;
+        height: 700px;
+        border: 0;
+        background: #fff;
+    }
+
+    .other-report-page .report-empty,
+    .other-report-page .report-loading {
+        display: flex;
+        height: 700px;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .other-report-page .report-empty {
+        color: #6c757d;
+    }
+
+    .other-report-page .report-empty i {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 42px;
+        opacity: .45;
+    }
+
+    .other-report-page .report-loading {
+        display: none;
+    }
+
+    @@media (max-width: 991.98px) {
+        .other-report-page .filter-panel {
+            margin-bottom: 10px;
+        }
+
+        .other-report-page .report-frame,
+        .other-report-page .report-empty,
+        .other-report-page .report-loading {
+            height: 550px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .other-report-page .report-navigation .btn {
+            width: 100%;
+        }
+
+        .other-report-page .report-frame,
+        .other-report-page .report-empty,
+        .other-report-page .report-loading {
+            height: 450px;
+        }
+    }
+</style>
+
+<div class="card other-report-page">
+    <div class="card-header">
+        <div class="report-navigation">
+            <a asp-controller="Report"
+               asp-action="Other"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                Graduate Student
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentStatistic"
+               class="btn btn-outline-primary btn-sm">
+                Student Statistic
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentLetterList"
+               class="btn btn-outline-primary btn-sm">
+                Student Letter List
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentAcceptCertificate"
+               class="btn btn-outline-primary btn-sm">
+                Accept Certificate
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentFeeCollection"
+               class="btn btn-outline-primary btn-sm">
+                Student Fee Collection
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="filter-panel">
+                    <div class="filter-title">
+                        <i class="fas fa-filter mr-1"></i>
+                        Report Filters
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="DegreeId" class="required">Degree</label>
+                        <select asp-for="DegreeId" id="cboDegree" class="form-control select2">
+                            <option value="">Select Degree</option>
+                        </select>
+                        <span asp-validation-for="DegreeId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="SchoolId" class="required">School</label>
+                        <select asp-for="SchoolId" id="cboSchool" class="form-control select2">
+                            <option value="">Select School</option>
+                        </select>
+                        <span asp-validation-for="SchoolId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="FieldId"
+                               class="required">
+                            Field
+                        </label>
+
+                        <select asp-for="FieldId"
+                                id="cboField"
+                                class="form-control select2">
+                            <option value="">Select Field</option>
+                        </select>
+
+                        <span asp-validation-for="FieldId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="PromotionNo"
+                               class="required">
+                            Promotion
+                        </label>
+
+                        <select asp-for="PromotionNo"
+                                id="cboPromotion"
+                                class="form-control select2">
+                            <option value="">Select Promotion</option>
+                        </select>
+
+                        <span asp-validation-for="PromotionNo"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <button type="button"
+                            id="btnPreview"
+                            class="btn btn-primary btn-block">
+                        <i class="fas fa-eye mr-1"></i>
+                        Preview
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="report-panel">
+                    <div class="report-header">
+                        <span>
+                            <i class="fas fa-user-graduate mr-1"></i>
+                            Graduate Student Report
+                        </span>
+
+                        <a id="btnOpenReport"
+                           href="#"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-outline-primary btn-sm"
+                           style="display: none;">
+                            <i class="fas fa-external-link-alt mr-1"></i>
+                            Open
+                        </a>
+                    </div>
+
+                    <div id="reportEmpty"
+                         class="report-empty">
+                        <div>
+                            <i class="far fa-file-pdf"></i>
+
+                            <strong class="d-block">
+                                No report generated
+                            </strong>
+
+                            <span>
+                                Select all filters and click Preview.
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="reportLoading"
+                         class="report-loading">
+                        <div>
+                            <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+
+                            <div class="mt-2">
+                                Loading report...
+                            </div>
+                        </div>
+                    </div>
+
+                    <iframe id="printFrame"
+                            title="Graduate Student Report"
+                            src="about:blank"
+                            class="report-frame">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+<script src="~/function/Degree.js"></script>
+<script src="~/function/School.js"></script>
+<script src="~/function/Field.js"></script>
+<script src="~/function/Promotion.js"></script>
+
+<script>
+    const cboDegree = $("#cboDegree");
+    const cboSchool = $("#cboSchool");
+    const cboField = $("#cboField");
+    const cboPromotion = $("#cboPromotion");
+
+    const btnPreview = $("#btnPreview");
+    const btnOpenReport = $("#btnOpenReport");
+
+    const reportEmpty = $("#reportEmpty");
+    const reportLoading = $("#reportLoading");
+    const printFrame = $("#printFrame");
+
+    let graduateStudentPdfUrl = null;
+
+    // Add your report endpoint later.
+    const graduateStudentReportUrl = "";
+
+    $(document).ready(async function () {
+        initializeSelect2();
+        bindEvents();
+
+        clearSelect(cboField, "Select Field");
+        clearSelect(cboPromotion, "Select Promotion");
+
+        await getDegree();
+        await getSchool();
+    });
+
+    function initializeSelect2() {
+        cboDegree.select2({
+            width: "100%",
+            placeholder: "Select Degree",
+            allowClear: true
+        });
+
+        cboSchool.select2({
+            width: "100%",
+            placeholder: "Select School",
+            allowClear: true
+        });
+
+        cboField.select2({
+            width: "100%",
+            placeholder: "Select Field",
+            allowClear: true
+        });
+
+        cboPromotion.select2({
+            width: "100%",
+            placeholder: "Select Promotion",
+            allowClear: true
+        });
+    }
+
+    function bindEvents() {
+        cboDegree.on("change", async function () {
+            await reloadDependentFilters();
+        });
+
+        cboSchool.on("change", async function () {
+            await reloadDependentFilters();
+        });
+
+        btnPreview.on("click", function () {
+            previewGraduateStudent();
+        });
+    }
+
+    async function reloadDependentFilters() {
+        clearSelect(cboField, "Select Field");
+        clearSelect(cboPromotion, "Select Promotion");
+
+        const degreeId = parseInt(cboDegree.val());
+        const schoolId = parseInt(cboSchool.val());
+
+        if (!degreeId || !schoolId) {
+            return;
+        }
+
+        await Promise.all([
+            getField(),
+            getPromotion()
+        ]);
+    }
+
+    async function getDegree() {
+        clearSelect(cboDegree, "Select Degree");
+
+        try {
+            const degrees = await Degree.GetAllDegree();
+
+            degrees.forEach(function (item) {
+                cboDegree.append(
+                    `<option value="${item.degreeId}">
+                            ${item.degreeName}
+                        </option>`
+                );
+            });
+
+            cboDegree
+                .val("")
+                .trigger("change.select2");
+        } catch (error) {
+            console.error("Degree API error:", error);
+            ShowToastError("Unable to load degrees.");
+        }
+    }
+
+    async function getSchool() {
+        clearSelect(cboSchool, "Select School");
+
+        try {
+            const schools = await School.GetSchool();
+
+            schools.forEach(function (item) {
+                cboSchool.append(
+                    `<option value="${item.schoolId}">
+                            ${item.schoolName}
+                        </option>`
+                );
+            });
+
+            cboSchool
+                .val("")
+                .trigger("change.select2");
+        } catch (error) {
+            console.error("School API error:", error);
+            ShowToastError("Unable to load schools.");
+        }
+    }
+
+    async function getField() {
+        const degreeId = parseInt(cboDegree.val());
+        const schoolId = parseInt(cboSchool.val());
+
+        clearSelect(cboField, "Select Field");
+
+        if (!degreeId || !schoolId) {
+            return;
+        }
+
+        try {
+            const fields = await Field.GetFields({
+                isAll: true,
+                degreeId: degreeId,
+                schoolId: schoolId
+            });
+
+            fields.forEach(function (item) {
+                cboField.append(
+                    `<option value="${item.fieldId}">
+                            ${item.fieldName}
+                        </option>`
+                );
+            });
+
+            cboField
+                .val("")
+                .trigger("change.select2");
+        } catch (error) {
+            console.error("Field API error:", error);
+            ShowToastError("Unable to load fields.");
+        }
+    }
+
+    async function getPromotion() {
+        const degreeId = parseInt(cboDegree.val());
+        const schoolId = parseInt(cboSchool.val());
+
+        clearSelect(cboPromotion, "Select Promotion");
+
+        if (!degreeId || !schoolId) {
+            return;
+        }
+
+        try {
+            const promotions =
+                await Promotion.GetPromotions({
+                    degreeId: degreeId,
+                    schoolId: schoolId
+                });
+
+            promotions.forEach(function (item) {
+                /*
+                 * PromotionNo is the model property, so the
+                 * option value uses item.promotionNo.
+                 */
+                cboPromotion.append(
+                    `<option value="${item.promotionNo}">
+                            ${item.promotionNo}
+                        </option>`
+                );
+            });
+
+            cboPromotion
+                .val("")
+                .trigger("change.select2");
+        } catch (error) {
+            console.error("Promotion API error:", error);
+            ShowToastError("Unable to load promotions.");
+        }
+    }
+
+    function clearSelect(selectElement, placeholder) {
+        selectElement
+            .empty()
+            .append(
+                `<option value="">${placeholder}</option>`
+            )
+            .val("")
+            .trigger("change.select2");
+    }
+
+    function getReportRequest() {
+        return {
+            DegreeId: cboDegree.val(),
+            SchoolId: cboSchool.val(),
+            FieldId: cboField.val(),
+            PromotionNo: cboPromotion.val()
+        };
+    }
+
+    function previewGraduateStudent() {
+        const request = getReportRequest();
+
+        if (!request.DegreeId) {
+            ShowToastInfo("Please select a degree.");
+            cboDegree.select2("open");
+            return;
+        }
+
+        if (!request.SchoolId) {
+            ShowToastInfo("Please select a school.");
+            cboSchool.select2("open");
+            return;
+        }
+
+        if (!request.FieldId) {
+            ShowToastInfo("Please select a field.");
+            cboField.select2("open");
+            return;
+        }
+
+        if (!request.PromotionNo) {
+            ShowToastInfo("Please select a promotion.");
+            cboPromotion.select2("open");
+            return;
+        }
+
+        if (!graduateStudentReportUrl) {
+            console.log("Graduate Student request:", request);
+
+            ShowToastInfo(
+                "Graduate Student report URL is not configured yet."
+            );
+
+            return;
+        }
+
+        showReportLoading();
+
+        $.ajax({
+            url: graduateStudentReportUrl,
+            type: "GET",
+            data: request,
+
+            xhrFields: {
+                responseType: "blob"
+            },
+
+            success: function (
+                response,
+                textStatus,
+                xhr
+            ) {
+                const contentType =
+                    xhr.getResponseHeader("Content-Type")
+                    || "application/pdf";
+
+                if (graduateStudentPdfUrl) {
+                    URL.revokeObjectURL(
+                        graduateStudentPdfUrl
+                    );
+                }
+
+                const pdfBlob = new Blob(
+                    [response],
+                    {
+                        type: contentType
+                    }
+                );
+
+                graduateStudentPdfUrl =
+                    URL.createObjectURL(pdfBlob);
+
+                reportEmpty.hide();
+                reportLoading.hide();
+
+                printFrame
+                    .attr("src", graduateStudentPdfUrl)
+                    .show();
+
+                btnOpenReport
+                    .attr("href", graduateStudentPdfUrl)
+                    .show();
+            },
+
+            error: function (xhr) {
+                hideReportLoading();
+
+                const response = xhr.response;
+
+                if (response instanceof Blob) {
+                    response.text().then(function (message) {
+                        ShowToastError(
+                            message ||
+                            "Unable to generate Graduate Student report."
+                        );
+                    });
+
+                    return;
+                }
+
+                ShowToastError(
+                    xhr.responseText ||
+                    "Unable to generate Graduate Student report."
+                );
+            },
+
+            complete: function () {
+                btnPreview
+                    .prop("disabled", false)
+                    .html(
+                        '<i class="fas fa-eye mr-1"></i> Preview'
+                    );
+            }
+        });
+    }
+
+    function showReportLoading() {
+        reportEmpty.hide();
+        printFrame.hide();
+        btnOpenReport.hide();
+        reportLoading.css("display", "flex");
+
+        btnPreview
+            .prop("disabled", true)
+            .html(
+                '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+            );
+    }
+
+    function hideReportLoading() {
+        reportLoading.hide();
+
+        btnPreview
+            .prop("disabled", false)
+            .html(
+                '<i class="fas fa-eye mr-1"></i> Preview'
+            );
+
+        if (graduateStudentPdfUrl) {
+            printFrame.show();
+            btnOpenReport.show();
+            return;
+        }
+
+        reportEmpty.css("display", "flex");
+    }
+
+    $(window).on("beforeunload", function () {
+        if (graduateStudentPdfUrl) {
+            URL.revokeObjectURL(
+                graduateStudentPdfUrl
+            );
+        }
+    });
+</script>
+}

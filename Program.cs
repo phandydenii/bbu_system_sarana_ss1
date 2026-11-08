@@ -1,7 +1,5 @@
-﻿using System.Globalization;
-using BBU_SYSTEM;
-using BBU_SYSTEM.Repository;
-using BBU_SYSTEM.Data;
+﻿using System.Globalization; 
+using BBU_SYSTEM.Repository; 
 using BBU_SYSTEM.Service;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;

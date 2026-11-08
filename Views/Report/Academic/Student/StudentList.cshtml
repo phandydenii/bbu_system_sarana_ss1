@@ -1,0 +1,785 @@
+﻿@using BBU_SYSTEM.ViewModel
+@{ 
+    ViewData["Title"] = "Student List"; 
+    ViewData["Action"] = "StudentReport";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AcademicReport";  
+    var req = new QueryReportViewModel();
+}
+
+<style>
+    .student-list-page .card-body {
+        padding: 10px;
+    }
+    .student-list-page .filter-panel {
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+    .student-list-page .form-group {
+        margin-bottom: 8px;
+    }
+    .student-list-page label {
+        margin-bottom: 3px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #343a40;
+    }
+    .student-list-page .form-control {
+        min-height: 36px;
+        font-size: 13px;
+    }
+    .student-list-page .group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 3px;
+    }
+    .student-list-page .group-actions {
+        display: flex;
+        gap: 8px;
+    }
+    .student-list-page .group-actions button {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        font-size: 12px;
+    }
+    .student-list-page .group-list {
+        min-height: 170px;
+        max-height: 230px;
+        padding: 5px;
+        overflow-y: auto;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background: #fff;
+    }
+    .student-list-page .group-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 5px;
+        margin-bottom: 2px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 400;
+    }
+    .student-list-page .group-item:hover {
+        background: #f4f6f9;
+    }
+    .student-list-page .group-item input {
+        margin: 0;
+    }
+    .student-list-page .option-panel {
+        padding: 8px;
+        margin-top: 8px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        background: #f8f9fa;
+    }
+    .student-list-page .option-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 30px;
+        margin: 0;
+        padding: 3px 5px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    .student-list-page .option-item:hover {
+        background: #fff;
+    }
+    .student-list-page .option-item input {
+        margin: 0;
+    }
+    .student-list-page .filter-actions {
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+    }
+    .student-list-page .preview-panel {
+        min-height: 720px;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+    }
+    .student-list-page .preview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .student-list-page .preview-empty {
+        min-height: 665px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        color: #6c757d;
+        text-align: center;
+    }
+    .student-list-page .preview-empty i {
+        margin-bottom: 10px;
+        font-size: 42px;
+        opacity: .45;
+    }
+    .student-list-page #reportContainer {
+        display: none;
+        width: 100%;
+        height: 820px;
+        border: 0;
+        background: #fff;
+    }
+    @@media (max-width: 991.98px) {
+        .student-list-page .preview-panel {
+            min-height: 550px;
+        }
+
+        .student-list-page .preview-empty {
+            min-height: 500px;
+        }
+
+        .student-list-page #reportContainer {
+            height: 650px;
+        }
+    }
+    @@media (max-width: 767.98px) {
+        .student-list-page .preview-panel {
+            margin-top: 10px;
+        }
+
+        .student-list-page .filter-actions {
+            flex-direction: column;
+        }
+
+        .student-list-page .filter-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="card student-list-page">
+    <div class="card-header">
+        <div class="margin">
+            <a asp-controller="Report"
+               asp-action="Student"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                Student List
+            </a>
+            <a asp-controller="Report"
+               asp-action="StudentSkillList"
+               class="btn btn-outline-primary btn-sm">
+                Skill Student List
+            </a>
+            <a asp-controller="Report"
+               asp-action="StudentScoreList"
+               class="btn btn-outline-primary btn-sm">
+                Student Score List
+            </a>
+            <a asp-controller="Report"
+               asp-action="StudentMinistryDoc"
+               class="btn btn-outline-primary btn-sm">
+                MoEYS Student
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <h5 class="mb-0">Student List Report</h5>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="filter-panel">
+                    <div class="form-group">
+                        <label class="required">Degree</label>
+                        <select asp-for="@req.DegreeId"
+                                id="cboDegree"
+                                class="form-control select2">
+                            <option value="">Select Degree</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">School</label>
+                        <select asp-for="@req.SchoolId"
+                                id="cboSchool"
+                                class="form-control select2">
+                            <option value="">Select School</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required">Field</label>
+                        <select asp-for="@req.FieldId"
+                                id="cboField"
+                                class="form-control select2">
+                            <option value="">Select Field</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-12 col-xl-6 pr-xl-1">
+                            <div class="form-group">
+                                <label class="required">Promotion</label>
+                                <select asp-for="@req.PromotionId"
+                                        id="cboPromotion"
+                                        class="form-control select2">
+                                    <option value="">Select Promotion</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-12 col-xl-6 pl-xl-1">
+                            <div class="form-group">
+                                <label>Stage</label>
+                                <select asp-for="@req.StageId"
+                                        id="cboStage"
+                                        class="form-control select2">
+                                    <option value="">Select Stage</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-12 col-xl-6 pr-xl-1">
+                            <div class="form-group">
+                                <label>Year</label>
+                                <input type="text"
+                                       id="txtYear"
+                                       class="form-control"
+                                       readonly
+                                       placeholder="Year" />
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-12 col-xl-6 pl-xl-1">
+                            <div class="form-group">
+                                <label>Semester</label>
+                                <input type="text"
+                                       id="txtSemester"
+                                       class="form-control"
+                                       readonly
+                                       placeholder="Semester" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="group-header">
+                            <label class="mb-0">Groups</label>
+
+                            <div class="group-actions">
+                                <button type="button"
+                                        id="btnSelectAllGroups"
+                                        class="text-primary">
+                                    Select all
+                                </button>
+
+                                <button type="button"
+                                        id="btnClearGroups"
+                                        class="text-danger">
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="groupList" class="group-list">
+                            <div class="text-muted text-center py-4">
+                                Select field and stage.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-panel">
+                        <div class="row no-gutters">
+                            <div class="col-12 col-xl-6">
+                                <label class="option-item">
+                                    <input type="checkbox"
+                                           id="chkShowOther"
+                                           checked />
+                                    <span>Show Other</span>
+                                </label>
+                            </div>
+
+                            <div class="col-12 col-xl-6">
+                                <label class="option-item">
+                                    <input type="checkbox"
+                                           id="chkFoundationYear" />
+                                    <span>Foundation Year</span>
+                                </label>
+                            </div>
+
+                            <div class="col-12 col-xl-6">
+                                <label class="option-item">
+                                    <input type="checkbox"
+                                           id="chkForEditName" />
+                                    <span>For Edit Name</span>
+                                </label>
+                            </div>
+
+                            <div class="col-12 col-xl-6">
+                                <label class="option-item">
+                                    <input type="checkbox"
+                                           id="chkDocumentNumber" />
+                                    <span>Document Number</span>
+                                </label>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="option-item">
+                                    <input type="checkbox"
+                                           id="chkPrintCardOnly" />
+                                    <span>Show Student Print Card Only</span>
+                                </label>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="option-item">
+                                    <input type="checkbox"
+                                           id="chkQuitSuspendChangeBranch" />
+                                    <span>Show Quit, Suspend, Change Branch</span>
+                                </label>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="option-item">
+                                    <input type="checkbox"
+                                           id="chkAuthenticated" />
+                                    <span>Is Authenticated</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button type="button"
+                                id="btnPreviewStudentList"
+                                class="btn btn-primary flex-fill">
+                            <i class="fas fa-eye mr-1"></i>
+                            Preview
+                        </button>
+
+                        <button type="button"
+                                id="btnResetStudentList"
+                                class="btn btn-outline-secondary">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="preview-panel">
+                    <div class="preview-header">
+                        <span>
+                            <i class="fas fa-file-pdf mr-1"></i>
+                            Student List Report Preview
+                        </span>
+
+                        <a id="btnOpenNewTab"
+                           href="#"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-outline-primary btn-sm"
+                           style="display:none;">
+                            <i class="fas fa-external-link-alt mr-1"></i>
+                            Open
+                        </a>
+                    </div>
+
+                    <div id="previewEmpty" class="preview-empty">
+                        <i class="far fa-file-pdf"></i>
+                        <strong>No report generated</strong>
+                        <span>Select the filters and click Preview.</span>
+                    </div>
+
+                    <iframe id="reportContainer"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+    <script src="~/function/Field.js"></script>
+    <script src="~/function/Promotion.js"></script>
+    <script src="~/function/Stage.js"></script>
+    <script src="~/function/Group.js"></script>
+
+    <script>
+        const cboDegree = $("#cboDegree");
+        const cboSchool = $("#cboSchool");
+        const cboField = $("#cboField");
+        const cboPromotion = $("#cboPromotion");
+        const cboStage = $("#cboStage");
+        const txtYear = $("#txtYear");
+        const txtSemester = $("#txtSemester");
+        const groupList = $("#groupList");
+        const reportContainer = $("#reportContainer");
+        const previewEmpty = $("#previewEmpty");
+        const btnOpenNewTab = $("#btnOpenNewTab");
+
+        let studentListPdfUrl = null;
+
+        $(document).ready(async function () {
+            $(".select2").select2({
+                width: "100%",
+                placeholder: "Select an option",
+                allowClear: true
+            });
+            bindEvents();
+            await getDegree();
+            await getSchool();
+            clearSelect(cboField, "Select Field");
+            clearSelect(cboPromotion, "Select Promotion");
+            clearSelect(cboStage, "Select Stage");
+        });
+
+        function bindEvents() {
+            cboDegree.on("change", async function () {
+                await getField();
+                await getPromotion();
+                clearSelect(cboStage, "Select Stage");
+                clearStageInformation();
+                clearGroups();
+            });
+
+            cboSchool.on("change", async function () {
+                await getField();
+                await getPromotion();
+                clearSelect(cboStage, "Select Stage");
+                clearStageInformation();
+                clearGroups();
+            });
+
+            cboField.on("change", async function () {
+                await getGroups();
+            });
+
+            cboPromotion.on("change", async function () {
+                await getStage();
+                clearStageInformation();
+                clearGroups();
+            });
+
+            cboStage.on("change", async function () {
+                setStageInformation();
+                await getGroups();
+            });
+
+            $("#btnSelectAllGroups").on("click", function () {
+                groupList.find(".group-checkbox").prop("checked", true);
+            });
+
+            $("#btnClearGroups").on("click", function () {
+                groupList.find(".group-checkbox").prop("checked", false);
+            });
+
+            $("#btnPreviewStudentList").on("click", function () {
+                loadStudentList();
+            });
+
+            $("#btnResetStudentList").on("click", function () {
+                resetFilters();
+            });
+        }
+
+        async function getDegree() {
+            clearSelect(cboDegree, "Select Degree");
+            try {
+                const degrees = await Degree.GetAllDegree();
+                degrees.forEach(function (item) {
+                    cboDegree.append(
+                        `<option value="${item.degreeId}">${item.degreeName}</option>`
+                    );
+                });
+                cboDegree.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("Degree API error:", error);
+            }
+        }
+
+        async function getSchool() {
+            clearSelect(cboSchool, "Select School");
+            try {
+                const schools = await School.GetSchool();
+                schools.forEach(function (item) {
+                    cboSchool.append(
+                        `<option value="${item.schoolId}">${item.schoolName}</option>`
+                    );
+                });
+                cboSchool.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("School API error:", error);
+            }
+        }
+
+        async function getField() {
+            const degreeId = parseInt(cboDegree.val());
+            const schoolId = parseInt(cboSchool.val());
+            clearSelect(cboField, "Select Field");
+            if (!degreeId || !schoolId) return;
+            try {
+                const fields = await Field.GetFields({
+                    isAll: true,
+                    degreeId: degreeId,
+                    schoolId: schoolId
+                });
+                fields.forEach(function (item) {
+                    cboField.append(
+                        `<option value="${item.fieldId}">${item.fieldName}</option>`
+                    );
+                });
+                cboField.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("Field API error:", error);
+            }
+        }
+
+        async function getPromotion() {
+            const degreeId = parseInt(cboDegree.val());
+            const schoolId = parseInt(cboSchool.val());
+            clearSelect(cboPromotion, "Select Promotion");
+            if (!degreeId || !schoolId) return;
+            try {
+                const promotions = await Promotion.GetPromotions({
+                    degreeId: degreeId,
+                    schoolId: schoolId
+                });
+                promotions.forEach(function (item) {
+                    cboPromotion.append(
+                        `<option value="${item.promotionId}">${item.promotionNo}</option>`
+                    );
+                });
+                cboPromotion.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("Promotion API error:", error);
+            }
+        }
+
+        async function getStage() {
+            const promotionId = parseInt(cboPromotion.val());
+            clearSelect(cboStage, "Select Stage");
+            if (!promotionId) return;
+            try {
+                const stages = await Stage.GetStages({
+                    promotionId: promotionId
+                });
+                stages.forEach(function (item) {
+                    cboStage.append(`
+                        <option value="${item.stageId}"
+                                data-year="${item.year || ""}"
+                                data-semester="${item.semester || item.stageNo || ""}">
+                            ${item.stageNo}
+                        </option>
+                    `);
+                });
+                cboStage.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("Stage API error:", error);
+            }
+        }
+
+        async function getGroups() {
+            const stageId = parseInt(cboStage.val());
+            const fieldId = parseInt(cboField.val());
+            clearGroups();
+            if (!stageId || !fieldId) return;
+            try {
+                const groups = await Group.GetGroups({
+                    stageId: stageId,
+                    fieldId: fieldId
+                });
+                groupList.empty();
+                if (!groups || groups.length === 0) {
+                    groupList.html(
+                        '<div class="text-muted text-center py-4">No groups available.</div>'
+                    );
+                    return;
+                }
+                groups.forEach(function (item) {
+                    groupList.append(`
+                        <label class="group-item">
+                            <input type="checkbox"
+                                   class="group-checkbox"
+                                   value="${item.groupId}" />
+                            <span>${item.groupName}</span>
+                        </label>
+                    `);
+                });
+            } catch (error) {
+                console.error("Group API error:", error);
+            }
+        }
+
+        function setStageInformation() {
+            const option = cboStage.find("option:selected");
+
+            txtYear.val(option.data("year") || "");
+            txtSemester.val(option.data("semester") || "");
+        }
+
+        function clearStageInformation() {
+            txtYear.val("");
+            txtSemester.val("");
+        }
+
+        function clearGroups() {
+            groupList.html(
+                '<div class="text-muted text-center py-4">Select field and stage.</div>'
+            );
+        }
+
+        function clearSelect(select, text) {
+            select.empty().append(`<option value="">${text}</option>`);
+            select.val("").trigger("change.select2");
+        }
+
+        function getSelectedGroupIds() {
+            return groupList.find(".group-checkbox:checked").map(function () {
+                return parseInt($(this).val());
+            }).get();
+        }
+
+        function getReportRequest() {
+            return {
+                degreeId: cboDegree.val(),
+                schoolId: cboSchool.val(),
+                fieldId: cboField.val(),
+                promotionId: cboPromotion.val(),
+                stageId: cboStage.val(),
+                groupIds: getSelectedGroupIds(),
+                showOther: $("#chkShowOther").is(":checked"),
+                foundationYear: $("#chkFoundationYear").is(":checked"),
+                forEditName: $("#chkForEditName").is(":checked"),
+                documentNumber: $("#chkDocumentNumber").is(":checked"),
+                printCardOnly: $("#chkPrintCardOnly").is(":checked"),
+                showQuitSuspendChangeBranch: $("#chkQuitSuspendChangeBranch").is(":checked"),
+                isAuthenticated: $("#chkAuthenticated").is(":checked")
+            };
+        }
+
+        function loadStudentList() {
+            const request = getReportRequest();
+
+            if (!request.degreeId) {
+                alert("Please select Degree.");
+                return;
+            }
+
+            if (!request.schoolId) {
+                alert("Please select School.");
+                return;
+            }
+
+            if (!request.fieldId) {
+                alert("Please select Field.");
+                return;
+            }
+
+            if (!request.promotionId) {
+                alert("Please select Promotion.");
+                return;
+            }
+
+            if (!request.stageId) {
+                alert("Please select Stage.");
+                return;
+            }
+
+            if (request.groupIds.length === 0) {
+                alert("Please select at least one Group.");
+                return;
+            }
+
+            showLoading();
+
+            $.ajax({
+                url: "/report/student-list",
+                type: "POST",
+                traditional: true,
+                data: request,
+                xhrFields: {
+                    responseType: "blob"
+                },
+                success: function (blob) {
+                    if (studentListPdfUrl) {
+                        URL.revokeObjectURL(studentListPdfUrl);
+                    }
+
+                    studentListPdfUrl = URL.createObjectURL(blob);
+
+                    previewEmpty.hide();
+
+                    reportContainer
+                        .attr("src", studentListPdfUrl)
+                        .show();
+
+                    btnOpenNewTab
+                        .attr("href", studentListPdfUrl)
+                        .show();
+                },
+                error: function (xhr) {
+                    console.error("Student list report error:", xhr);
+                    alert("Unable to generate student list report.");
+                },
+                complete: function () {
+                    hideLoading(1);
+                }
+            });
+        }
+
+        function resetFilters() {
+            cboDegree.val("").trigger("change");
+            cboSchool.val("").trigger("change");
+
+            clearSelect(cboField, "Select Field");
+            clearSelect(cboPromotion, "Select Promotion");
+            clearSelect(cboStage, "Select Stage");
+
+            clearStageInformation();
+            clearGroups();
+
+            $("#chkShowOther").prop("checked", true);
+            $("#chkFoundationYear").prop("checked", false);
+            $("#chkForEditName").prop("checked", false);
+            $("#chkDocumentNumber").prop("checked", false);
+            $("#chkPrintCardOnly").prop("checked", false);
+            $("#chkQuitSuspendChangeBranch").prop("checked", false);
+            $("#chkAuthenticated").prop("checked", false);
+
+            if (studentListPdfUrl) {
+                URL.revokeObjectURL(studentListPdfUrl);
+                studentListPdfUrl = null;
+            }
+
+            reportContainer.attr("src", "").hide();
+            previewEmpty.show();
+            btnOpenNewTab.attr("href", "#").hide();
+        }
+
+        $(window).on("beforeunload", function () {
+            if (studentListPdfUrl) {
+                URL.revokeObjectURL(studentListPdfUrl);
+            }
+        });
+    </script>
+}

@@ -420,7 +420,7 @@ $(document).on("click", "#btnChangeBranch", async function (e) {
     $("#changeBranchStudentId").val(currentStudentInfo.studentId);
     $("#changeBranchTermNo").val(currentStudentInfo.termNo);
     $("#changeBranchFromDate").val(currentStudentInfo.todayDate);
-    await BindSelectOptions("/branch/get-branch","cboChangeBranchId","branchId","branchName",{isAll:true},"Select Branch");
+    await BindSelectOptions("/branch/get-branches","cboChangeBranchId","branchId","branchName",{isAll:true},"Select Branch");
     $("#modalChangeBranch").modal("show");
 });
 $(document).on("click", ".btn-edit-change-branch", async function (e) {

@@ -1,0 +1,388 @@
+@model BBU_SYSTEM.ViewModel.Report.RegisteredViewModel
+
+@{
+    ViewData["Title"] = "Student Letter List";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AdminReport";
+    ViewData["Action"] = "OtherReport";
+
+    ViewContext.RouteData.Values["action"] = "Student Letter List";
+}
+
+<style>
+    .student-letter-page .card-body {
+        padding: 10px;
+    }
+
+    .student-letter-page .report-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .student-letter-page .filter-panel {
+        height: 100%;
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+    }
+
+    .student-letter-page .filter-title {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .student-letter-page .form-group {
+        margin-bottom: 10px;
+    }
+
+    .student-letter-page label {
+        margin-bottom: 3px;
+        color: #343a40;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .student-letter-page .form-control {
+        height: 34px;
+        font-size: 13px;
+    }
+
+    .student-letter-page .action-buttons {
+        display: flex;
+        gap: 6px;
+        margin-top: 12px;
+    }
+
+    .student-letter-page .action-buttons .btn {
+        flex: 1;
+    }
+
+    .student-letter-page .report-panel {
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .student-letter-page .report-header {
+        padding: 8px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .student-letter-page .report-frame {
+        display: block;
+        width: 100%;
+        height: 700px;
+        border: 0;
+        background: #fff;
+    }
+
+    .student-letter-page .report-loading {
+        height: 700px;
+        padding-top: 100px;
+        text-align: center;
+    }
+
+    @@media (max-width: 991.98px) {
+        .student-letter-page .filter-panel {
+            margin-bottom: 10px;
+        }
+
+        .student-letter-page .report-frame,
+        .student-letter-page .report-loading {
+            height: 550px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .student-letter-page .report-navigation .btn {
+            width: 100%;
+        }
+
+        .student-letter-page .action-buttons {
+            flex-direction: column;
+        }
+
+        .student-letter-page .report-frame,
+        .student-letter-page .report-loading {
+            height: 450px;
+        }
+    }
+</style>
+
+<div class="card student-letter-page">
+    <div class="card-header">
+        <div class="report-navigation">
+            <a asp-controller="Report"
+               asp-action="Other"
+               class="btn btn-outline-primary btn-sm">
+                Graduate Student
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentStatistic"
+               class="btn btn-outline-primary btn-sm">
+                Student Statistic
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentLetterList"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                Student Letter List
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentAcceptCertificate"
+               class="btn btn-outline-primary btn-sm">
+                Accept Certificate
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentFeeCollection"
+               class="btn btn-outline-primary btn-sm">
+                Student Fee Collection
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="filter-panel">
+                    <div class="filter-title">
+                        <i class="fas fa-filter mr-1"></i>
+                        Report Filters
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="FromDate">
+                            From Date
+                        </label>
+
+                        <input asp-for="FromDate"
+                               type="datetime-local"
+                               class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ToDate">
+                            To Date
+                        </label>
+
+                        <input asp-for="ToDate"
+                               type="datetime-local"
+                               class="form-control" />
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button"
+                                id="btnPreview"
+                                class="btn btn-primary">
+                            <i class="fas fa-eye mr-1"></i>
+                            Preview
+                        </button>
+
+                        <button type="button"
+                                id="btnTotal"
+                                class="btn btn-success">
+                            <i class="fas fa-calculator mr-1"></i>
+                            Total
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="report-panel">
+                    <div class="report-header">
+                        <i class="fas fa-envelope-open-text mr-1"></i>
+                        Student Letter Report
+                    </div>
+
+                    <div id="reportLoading"
+                         class="report-loading d-none">
+                        <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+
+                        <div class="mt-2">
+                            Loading report...
+                        </div>
+                    </div>
+
+                    <iframe id="printFrame"
+                            title="Student Letter Report"
+                            src="about:blank"
+                            class="report-frame">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        const fromDate = $("#FromDate");
+        const toDate = $("#ToDate");
+
+        const btnPreview = $("#btnPreview");
+        const btnTotal = $("#btnTotal");
+
+        const reportLoading = $("#reportLoading");
+        const printFrame = $("#printFrame");
+
+        let currentPdfUrl = null;
+
+        $(document).ready(function () {
+            btnPreview.on("click", function () {
+                previewStudentLetter();
+            });
+
+            btnTotal.on("click", function () {
+                previewStudentLetterTotal();
+            });
+        });
+
+        function previewStudentLetter() {
+            if (!validateDateRange()) {
+                return;
+            }
+
+            const requestData = {
+                FromDate: fromDate.val() || "",
+                ToDate: toDate.val() || ""
+            };
+
+            loadReport(
+                "YOUR_STUDENT_LETTER_PREVIEW_URL",
+                requestData,
+                btnPreview,
+                "Unable to generate student letter report."
+            );
+        }
+
+        function previewStudentLetterTotal() {
+            if (!validateDateRange()) {
+                return;
+            }
+
+            const requestData = {
+                FromDate: fromDate.val() || "",
+                ToDate: toDate.val() || ""
+            };
+
+            loadReport(
+                "YOUR_STUDENT_LETTER_TOTAL_URL",
+                requestData,
+                btnTotal,
+                "Unable to generate student letter total report."
+            );
+        }
+
+        function validateDateRange() {
+            if (fromDate.val() && toDate.val() && new Date(toDate.val()) < new Date(fromDate.val())) {
+                ShowToastInfo("To Date must be later than From Date."); 
+                return false;
+            } 
+            return true;
+        }
+
+        function loadReport(
+            reportUrl,
+            requestData,
+            activeButton,
+            errorMessage
+        ) {
+            showReportLoading(activeButton);
+
+            $.ajax({
+                url: reportUrl,
+                type: "GET",
+                data: requestData,
+
+                xhrFields: {
+                    responseType: "blob"
+                },
+
+                success: function (response, textStatus, xhr) {
+                    const contentType =
+                        xhr.getResponseHeader("Content-Type")
+                        || "application/pdf";
+
+                    if (currentPdfUrl) {
+                        URL.revokeObjectURL(currentPdfUrl);
+                    }
+
+                    const pdfBlob = new Blob(
+                        [response],
+                        {
+                            type: contentType
+                        }
+                    );
+
+                    currentPdfUrl = URL.createObjectURL(pdfBlob);
+
+                    printFrame
+                        .off("load.studentLetter")
+                        .one("load.studentLetter", function () {
+                            hideReportLoading();
+                        })
+                        .attr("src", currentPdfUrl);
+                },
+
+                error: function (xhr) {
+                    hideReportLoading();
+                    const response = xhr.response;
+                    if (response instanceof Blob) {
+                        response.text().then(function (message) {
+                            ShowToastError(message || errorMessage);
+                        });
+                        return;
+                    }
+                    ShowToastError(xhr.responseText || errorMessage);
+                }
+            });
+        }
+
+        function showReportLoading(activeButton) {
+            printFrame.addClass("d-none");
+            reportLoading.removeClass("d-none");
+            btnPreview.prop("disabled", true);
+            btnTotal.prop("disabled", true);
+            activeButton.html(
+                '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+            );
+        }
+
+        function hideReportLoading() {
+            reportLoading.addClass("d-none");
+            printFrame.removeClass("d-none");
+            btnPreview
+                .prop("disabled", false)
+                .html(
+                    '<i class="fas fa-eye mr-1"></i> Preview'
+                );
+            btnTotal
+                .prop("disabled", false)
+                .html(
+                    '<i class="fas fa-calculator mr-1"></i> Total'
+                );
+        }
+        $(window).on("beforeunload", function () {
+            if (currentPdfUrl) {
+                URL.revokeObjectURL(currentPdfUrl);
+            }
+        });
+    </script>
+}

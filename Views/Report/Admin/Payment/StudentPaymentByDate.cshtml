@@ -1,0 +1,500 @@
+@{
+ViewData["Title"] = "Student Payment By Date";
+ViewData["OpenMenu"] = "Report";
+ViewData["OpenSubMenu"] = "AdminReport";
+ViewData["Action"] = "PaymentReport";
+ViewContext.RouteData.Values["action"] = "Student Payment By Date";
+}
+
+<style>
+    .payment-date-page .card-body {
+        padding: 10px;
+    }
+
+    .payment-date-page .payment-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .payment-date-page .filter-panel {
+        height: 100%;
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+    }
+
+    .payment-date-page .filter-title {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .payment-date-page .form-group {
+        margin-bottom: 10px;
+    }
+
+    .payment-date-page label {
+        margin-bottom: 3px;
+        color: #343a40;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .payment-date-page .form-control {
+        height: 34px;
+        font-size: 13px;
+    }
+
+    .payment-date-page .report-panel {
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .payment-date-page .report-header {
+        padding: 8px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .payment-date-page .report-frame {
+        display: block;
+        width: 100%;
+        height: 700px;
+        border: 0;
+        background: #fff;
+    }
+
+    .payment-date-page .report-loading {
+        height: 700px;
+        padding-top: 100px;
+        text-align: center;
+    }
+
+    @@media (max-width: 991.98px) {
+        .payment-date-page .filter-panel {
+            margin-bottom: 10px;
+        }
+
+        .payment-date-page .report-frame,
+        .payment-date-page .report-loading {
+            height: 550px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .payment-date-page .payment-navigation .btn {
+            width: 100%;
+        }
+
+        .payment-date-page .report-frame,
+        .payment-date-page .report-loading {
+            height: 450px;
+        }
+    }
+</style>
+
+<div class="card payment-date-page">
+    <div class="card-header">
+        <div class="payment-navigation">
+            <a asp-controller="Report"
+               asp-action="Payment"
+               class="btn btn-outline-primary btn-sm">
+                Payment Summary
+            </a>
+            <a asp-controller="Report"
+               asp-action="Income"
+               class="btn btn-outline-primary btn-sm">
+                Income
+            </a>
+            <a asp-controller="Report"
+               asp-action="PaymentByDate"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                Payment By Date
+            </a>
+            <a asp-controller="Report"
+               asp-action="PaymentByGroup"
+               class="btn btn-outline-primary btn-sm">
+                Payment By Group
+            </a>
+            <a asp-controller="Report"
+               asp-action="NotPayment"
+               class="btn btn-outline-primary btn-sm">
+                Not Payment
+            </a>
+            <a asp-controller="Report"
+               asp-action="ReExamPayment"
+               class="btn btn-outline-primary btn-sm">
+                Re-Exam Payment
+            </a>
+            <a asp-controller="Report"
+               asp-action="Owe"
+               class="btn btn-outline-primary btn-sm">
+                Student Owe
+            </a>
+            <a asp-controller="Report"
+               asp-action="Insurance"
+               class="btn btn-outline-primary btn-sm">
+                Insurance
+            </a>
+
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="filter-panel">
+                    <div class="filter-title">
+                        <i class="fas fa-filter mr-1"></i>
+                        Report Filters
+                    </div>
+                    <div class="form-group">
+                        <label for="cboDegree" class="required">Degree</label>
+                        <select id="cboDegree" class="form-control select2">
+                            <option value="">Select degree</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cboSchool" class="required">School</label>
+                        <select id="cboSchool" class="form-control select2">
+                            <option value="">Select school</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="cboPromotion" class="required">Promotion</label>
+                                <select id="cboPromotion" class="form-control select2">
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="cboStage" class="required">Stage</label>
+                                <select id="cboStage" class="form-control select2">
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label for="txtTermNo" class="required">Term</label>
+                                <input type="number"
+                                       id="txtTermNo"
+                                       class="form-control"
+                                       min="1"
+                                       value="1" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="dtFromDate">From Date</label>
+                                <input type="date"
+                                       id="dtFromDate"
+                                       class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="dtToDate">To Date</label>
+                                <input type="date"
+                                       id="dtToDate"
+                                       class="form-control" />
+                            </div>
+                        </div>
+                    </div> 
+                    <button type="button"
+                            id="btnPreview"
+                            class="btn btn-success btn-block">
+                        <i class="fas fa-eye mr-1"></i>
+                        Preview
+                    </button>
+                </div>
+            </div>
+
+            <!-- Report preview -->
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="report-panel">
+                    <div class="report-header">
+                        <i class="fas fa-file-pdf mr-1"></i>
+                        Student Payment By Date Report
+                    </div>
+                    <div id="reportLoading" class="report-loading d-none">
+                        <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                        <div class="mt-2">
+                            Loading report...
+                        </div>
+                    </div>
+
+                    <iframe id="reportContainer"
+                            title="Student Payment By Date Report"
+                            src="about:blank"
+                            class="report-frame">
+                    </iframe>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+<script src="~/function/Degree.js"></script>
+<script src="~/function/School.js"></script>
+<script src="~/function/Promotion.js"></script>
+<script src="~/function/Stage.js"></script>
+<script>
+    const cboDegree = $("#cboDegree");
+    const cboSchool = $("#cboSchool");
+    const cboPromotion = $("#cboPromotion");
+    const cboStage = $("#cboStage");
+    const txtTermNo = $("#txtTermNo");
+    const dtFromDate = $("#dtFromDate");
+    const dtToDate = $("#dtToDate"); 
+
+    const btnPreview = $("#btnPreview");
+    const reportLoading = $("#reportLoading");
+    const reportContainer = $("#reportContainer");
+
+    let currentPdfUrl = null;
+
+    $(document).ready(async function () {
+        initializeSelect2();
+        bindEvents();
+        await getDegree();
+        await getSchool();
+    });
+
+    function initializeSelect2() {
+        cboDegree.select2({
+            width: "100%",
+            placeholder: "Select degree",
+            allowClear: true
+        });
+        cboSchool.select2({
+            width: "100%",
+            placeholder: "Select school",
+            allowClear: true
+        });
+        cboPromotion.select2({
+            width: "100%",
+            placeholder: "Select promotion",
+            allowClear: true
+        });
+        cboStage.select2({
+            width: "100%",
+            placeholder: "Select stage",
+            allowClear: true
+        }); 
+    }
+
+    function bindEvents() {
+        btnPreview.on("click", previewPaymentByDate);
+        cboDegree.on("change", getPromotion);
+        cboSchool.on("change", getPromotion);
+        cboPromotion.on("change", getStage);
+    }
+
+    function clearSelect(select, text) {
+        select.empty().append(`<option value="">${text}</option>`);
+        select.val("").trigger("change.select2");
+    }
+    
+    async function getDegree() {
+        clearSelect(cboDegree, "Select Degree");
+        try {
+            const degrees = await Degree.GetAllDegree();
+            degrees.forEach(function (item) {
+                cboDegree.append(
+                    `<option value="${item.degreeId}">${item.degreeName}</option>`
+                );
+            });
+            cboDegree.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Degree API error:", error);
+        }
+    }
+    
+    async function getSchool() {
+        clearSelect(cboSchool, "Select School");
+        try {
+            const schools = await School.GetSchool();
+            schools.forEach(function (item) {
+                cboSchool.append(
+                    `<option value="${item.schoolId}">${item.schoolName}</option>`
+                );
+            });
+            cboSchool.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("School API error:", error);
+        }
+    }
+
+    async function getPromotion() {
+        const selectedDegreeId = Number(cboDegree.val());
+        const selectedSchoolId = Number(cboSchool.val());
+        clearSelect(cboPromotion, "Select Promotion");
+        clearSelect(cboStage, "Select Stage");
+        if (!selectedDegreeId || !selectedSchoolId) return;
+        try {
+            const promotions = await Promotion.GetPromotions({
+                degreeId: selectedDegreeId,
+                schoolId: selectedSchoolId
+            });
+            promotions.forEach(function (item) {
+                cboPromotion.append(
+                    `<option value="${item.promotionId}">${item.promotionNo}</option>`
+                );
+            });
+            cboPromotion.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Promotion API error:", error);
+        }
+    }
+
+    async function getStage() {
+        const selectedPromotionId = Number(cboPromotion.val());
+        clearSelect(cboStage, "Select Stage");
+        if (!selectedPromotionId) return;
+        try {
+            const stages = await Stage.GetStages({
+                promotionId: selectedPromotionId
+            });
+            stages.forEach(function (item) {
+                cboStage.append(`
+                    <option value="${item.stageId}">${item.stageNo}</option>
+                `);
+            });
+            cboStage.val("").trigger("change.select2");
+        } catch (error) {
+            console.error("Stage API error:", error);
+        }
+    }
+
+    function previewPaymentByDate() {
+        if (!cboDegree.val()) {
+            ShowToastInfo("Please select a degree.");
+            cboDegree.select2("open");
+            return;
+        }
+        if (!cboSchool.val()) {
+            ShowToastInfo("Please select a school.");
+            cboSchool.select2("open");
+            return;
+        } 
+        if (!cboPromotion.val()) {
+            ShowToastInfo("Please select a promotion.");
+            cboPromotion.select2("open");
+            return;
+        }
+        if (!cboStage.val()) {
+            ShowToastInfo("Please select a stage.");
+            cboStage.select2("open");
+            return;
+        }
+        if (!txtTermNo.val() || Number(txtTermNo.val()) < 1) {
+            ShowToastInfo("Please enter a valid term.");
+            txtTermNo.focus();
+            return;
+        } 
+        if (dtFromDate.val() && dtToDate.val() && new Date(dtToDate.val()) < new Date(dtFromDate.val())) {
+            ShowToastInfo("To Date must be later than From Date.");
+            return;
+        }
+        showReportLoading();
+        $.ajax({
+            url: '/report/administration/generate/payment-by-date',
+            type: "POST",
+            data: {
+                DegreeId: cboDegree.find("option:selected").text(),
+                SchoolId: cboSchool.find("option:selected").text(),
+                PromotionId: cboPromotion.val(),
+                StageId: cboStage.val(),
+                TermNo: txtTermNo.val(),
+                FromDate: dtFromDate.val() || "",
+                ToDate: dtToDate.val() || ""
+            },
+            xhrFields: {
+                responseType: "blob"
+            },
+            success: function (response, textStatus, xhr) {
+                const contentType = xhr.getResponseHeader("Content-Type") || "application/pdf";
+                if (currentPdfUrl) {
+                    URL.revokeObjectURL(currentPdfUrl);
+                }
+                const pdfBlob = new Blob(
+                    [response],
+                    {
+                        type: contentType
+                    }
+                );
+                currentPdfUrl = URL.createObjectURL(pdfBlob);
+                reportContainer
+                    .off("load.paymentByDate")
+                    .one(
+                        "load.paymentByDate",
+                        function () {
+                            hideReportLoading();
+                        }
+                    )
+                    .attr("src", currentPdfUrl);
+            },
+            error: function (xhr) {
+                hideReportLoading();
+                const response = xhr.response;
+                if (response instanceof Blob) {
+                    response.text().then(function (message) {
+                        ShowToastError(message || "Unable to generate payment by date report.");
+                    });
+                    return;
+                }
+                ShowToastError(xhr.responseText || "Unable to generate payment by date report.");
+            }
+        });
+    }
+
+    function showReportLoading() {
+        reportContainer.addClass("d-none");
+        reportLoading.removeClass("d-none");
+
+        btnPreview
+            .prop("disabled", true)
+            .html(
+                '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+            );
+    }
+
+    function hideReportLoading() {
+        reportLoading.addClass("d-none");
+        reportContainer.removeClass("d-none");
+
+        btnPreview
+            .prop("disabled", false)
+            .html(
+                '<i class="fas fa-eye mr-1"></i> Preview'
+            );
+    }
+
+    $(window).on("beforeunload", function () {
+        if (currentPdfUrl) {
+            URL.revokeObjectURL(currentPdfUrl);
+        }
+    });
+</script>
+}

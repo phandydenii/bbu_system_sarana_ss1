@@ -1,24 +1,21 @@
-﻿using System.Data;
-using AutoMapper;
-using BBU_SYSTEM.Repository;
-using BBU_SYSTEM.ViewModel;
+﻿using System.Data; 
+using BBU_SYSTEM.Repository; 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using AspNetCore.Reporting;
+using Microsoft.Data.SqlClient; 
+using BBU_SYSTEM.Data;
 using BBU_SYSTEM.Helper;
 using Microsoft.AspNetCore.Authorization;
 using LocalReport = Microsoft.Reporting.NETCore.LocalReport;
 using Microsoft.Reporting.NETCore;
 using BBU_SYSTEM.Models;
-using BBU_SYSTEM.Models.Req;
-using BBU_SYSTEM.ViewModel.Report;
+using BBU_SYSTEM.Models.Req; 
 using BBU_SYSTEM.ViewModel.Report.Academic;
 
 namespace BBU_SYSTEM.Controllers;
 
 [Authorize]
 [Route("report")]
-public class ReportController(
+public class   ReportController(
     IConfiguration configuration,
     ICampusDbContext campusDbContext,
     IHttpContextAccessor context)
@@ -28,36 +25,376 @@ public class ReportController(
 
 
     //======1-Administration Report
+
+    #region ------------------------ registration ------------------------
     [Route("administration/registration")]
     public IActionResult Registration()
     {
-        return View("Admin/Registration");
+        return View("Admin/Registration/RegisteredStudent");
     }
+    [HttpPost("registration-student-generate")] 
+    public async Task<IActionResult> RegistrationStudentGenerate([FromForm] RegistrationStudentGenerateReq req)
+    {
+        try
+        {
+            if (req.DegreeId <= 0) return new ServerResponse().BadRequest("Degree is required."); 
+            if (req.PromotionNo <= 0) return new ServerResponse().BadRequest("Promotion is required."); 
+            if (req.StageNo <= 0)  return new ServerResponse().BadRequest("Stage is required."); 
+            if (req.FromDate.HasValue && req.ToDate.HasValue && req.ToDate.Value < req.FromDate.Value)
+                return new ServerResponse().BadRequest("To Date must be greater than or equal to From Date.");
 
+            var connectionString = configuration.GetConnectionString($"{_campus}_campus"); 
+            const string query = @"
+                SELECT *
+                FROM V_ADMIN_REPORT_REGISTERED_STUDENT
+                WHERE DEGREE_ID = @DegreeId
+                  AND PROMOTION_NO = @PromotionNo
+                  AND STAGE_NO = @StageNo
+                  AND (
+                        @FromDate IS NULL
+                        OR REGISTRATION_DATE >= @FromDate
+                      )
+                  AND (
+                        @ToDate IS NULL
+                        OR REGISTRATION_DATE < DATEADD(
+                            DAY,
+                            1,
+                            CAST(@ToDate AS DATE)
+                        )
+                      )
+                ORDER BY STUDENT_NAME;
+            ";
+
+            var parameters = new[]
+            {
+                new SqlParameter("@DegreeId",req.DegreeId),
+                new SqlParameter("@PromotionNo",req.PromotionNo),
+                new SqlParameter("@StageNo",req.StageNo), 
+                new SqlParameter("@FromDate",req.FromDate.HasValue ? req.FromDate.Value : DBNull.Value),  
+                new SqlParameter("@ToDate",req.ToDate.HasValue ? req.ToDate.Value : DBNull.Value)
+            };
+
+            var dt = await DataManager.DataTableRawSqlAsync(connectionString!,query,parameters);
+            if (dt.Rows.Count == 0) 
+                return new ServerResponse().Success(msg:"No registered student data was found.");
+            
+            var reportPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Reports",
+                "REGISTER",
+                "REGISTER_RPT.rdlc"
+            ); 
+
+            using var localReport = new LocalReport();
+            localReport.ReportPath = reportPath;
+            localReport.DataSources.Add(
+                new ReportDataSource("DataSet1",dt)
+            ); 
+            localReport.SetParameters(new[]
+                {
+                    new ReportParameter("reporter",req.Reporter ?? string.Empty),
+                    new ReportParameter("receiver",req.Receiver ?? string.Empty)
+                }
+            );
+            var pdf = localReport.Render("PDF");
+            return File(
+                pdf,
+                "application/pdf",
+                "registered-student.pdf"
+            );
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
+        }
+    }
+    [Route("administration/registration-static")]
+    public IActionResult RegistrationStatic()
+    {
+        return View("Admin/Registration/RegistrationStatic");
+    }
+    [Route("administration/registration-by-province")]
+    public IActionResult RegistrationByProvince()
+    {
+        return View("Admin/Registration/RegistrationStaticProvince");
+    }
+    [Route("administration/registration-scholarship")]
+    public IActionResult Scholarship()
+    {
+        return View("Admin/Registration/ScholarshipStudent");
+    }
+    #endregion
+    
+    #region ------------------------ Payment ------------------------
     [Route("administration/payment")]
     public IActionResult Payment()
     {
-        return View("admin/Payment");
+        return View("Admin/Payment/StudentPaymentSummary");
     }
+    [Route("administration/income")]
+    public IActionResult Income()
+    {
+        return View("Admin/Payment/Income");
+    } 
+    [Route("administration/payment-by-date")]
+    public IActionResult PaymentByDate()
+    {
+        return View("Admin/Payment/StudentPaymentByDate");
+    }
+    [HttpPost("administration/generate/payment-by-date")]
+    public async Task<IActionResult> PaymentByDateGenerate(PaymentByDateGenerateReq req)
+    {
+        var connectionString = configuration.GetConnectionString($"{_campus}_campus");
+        var parms = new[]
+        {
+            new SqlParameter("@DegreeId", req.DegreeId),
+            new SqlParameter("@SchoolId", req.SchoolId), 
+            new SqlParameter("@PromotionId", req.PromotionId),
+            new SqlParameter("@StageId", req.StageId), 
+            new SqlParameter("@TermNo", req.TermNo),
+            new SqlParameter("@FromDate", req.FromDate.HasValue ? req.FromDate : DBNull.Value),
+            new SqlParameter("@ToDate", req.ToDate.HasValue ? req.ToDate : DBNull.Value)
+        };
+        const string query = @"
+            SELECT *
+            FROM INVOICE_Rep_v
+            WHERE DEGREE_ID = @DegreeId
+              AND SCHOOL_ID = @SchoolId 
+              AND PROMOTION_ID = @PromotionId
+              AND STAGE_ID = @StageId
+              AND TERM_NO = @TermNo
+              AND (@FromDate IS NULL OR STARTDATE >= @FromDate)
+              AND (@ToDate IS NULL OR ENDDATE <= @ToDate)
+            ORDER BY STUDENT_NAME;
+        ";
+        var dt = await DataManager.DataTableRawSqlAsync(connectionString!,query,parms);
+        var localReport = new LocalReport();
+        localReport.ReportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports","STUDENT_PAYMENT_NEW_RPT.rdlc");
+        localReport.DataSources.Add(new ReportDataSource("DataSet1", dt));
+        localReport.SetParameters(new[]
+            {
+                new ReportParameter("fromdate",req.FromDate.ToString() ?? string.Empty),
+                new ReportParameter("todate",req.ToDate.ToString() ?? string.Empty)
+            }
+        );
+        var pdf = localReport.Render("PDF");
+        return File(pdf, "application/pdf", "not_payment.pdf");
+    }
+    [Route("administration/payment-by-group")]
+    public IActionResult PaymentByGroup()
+    {
+        return View("Admin/Payment/StudentPaymentByGroup");
+    }
+    [Route("administration/not-payment")]
+    public IActionResult NotPayment()
+    {
+        return View("Admin/Payment/StudentNotPaymentNew");
+    }
+    [HttpPost("administration/generate/not-payment")]
+    public async Task<IActionResult> NotPaymentGenerate(AdministrationNotPaymentReq req)
+    {
+        var connectionString = configuration.GetConnectionString($"{_campus}_campus");
+        var parms = new[]
+        {
+            new SqlParameter("@DegreeId", req.DegreeId),
+            new SqlParameter("@SchoolId", req.SchoolId),
+            new SqlParameter("@FieldId", req.FieldId),
+            new SqlParameter("@PromotionNo", req.PromotionNo),
+            new SqlParameter("@StageNo", req.StageNo),
+            new SqlParameter("@TermNo", req.TermNo),
+            new SqlParameter("@FromDate", req.FromDate.HasValue ? req.FromDate : DBNull.Value),
+            new SqlParameter("@ToDate", req.ToDate.HasValue ? req.ToDate : DBNull.Value)
+        };
+        const string query = @"
+            SELECT *
+            FROM V_ADMIN_REPORT_LIST_OF_STUDENT_NOT_PAYMENT_NEW
+            WHERE DEGREE_ID = @DegreeId
+              AND SCHOOL_ID = @SchoolId
+              AND FIELD_ID = @FieldId
+              AND PROMOTION_NO = @PromotionNo
+              AND STAGE_NO = @StageNo
+              AND TERM_NO = @TermNo
+              AND (@FromDate IS NULL OR startdate >= @FromDate)
+              AND (@ToDate IS NULL OR enddate <= @ToDate)
+            ORDER BY STUDENT_NAME;
+        ";
+        var dt = await DataManager.DataTableRawSqlAsync(connectionString!,query,parms);
+        var localReport = new LocalReport();
+        localReport.ReportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports","STUDENT_NOT_PAYMENT_RPT.rdlc");
+        localReport.DataSources.Add(new ReportDataSource("DataSet1", dt));
+        var pdf = localReport.Render("PDF");
+        return File(pdf, "application/pdf", "not_payment.pdf");
+    }
+    [Route("administration/re-exam-payment")]
+    public IActionResult ReExamPayment()
+    {
+        return View("Admin/Payment/ReExaminationPayment");
+    }
+    [Route("administration/owe")]
+    public IActionResult Owe()
+    {
+        return View("Admin/Payment/StudentIncomplete");
+    }
+    [Route("administration/insurance")]
+    public IActionResult Insurance()
+    {
+        return View("Admin/Payment/StudentInsurance");
+    }
+    #endregion
 
+    #region ------------------------ Book Clothe ------------------------
     [Route("administration/booking-clothes")]
     public IActionResult BookClothes()
     {
-        return View("Admin/BookClothes");
+        return View("Admin/BookClothe/BookingClothes");
     }
+    [Route("administration/return-clothes")]
+    public IActionResult ReturnClothes()
+    {
+        return View("Admin/BookClothe/ReturnClothes");
+    }
+    #endregion
 
+    #region ------------------------ Others ------------------------
     [Route("administration/others")]
     public IActionResult Other()
     {
-        return View("Admin/Other");
+        return View("Admin/Other/GraduateStudent");
     }
+    [Route("administration/student-statistic")]
+    public IActionResult StudentStatistic()
+    {
+        return View("Admin/Other/StatisticStudent");
+    }
+    [Route("administration/student-letter-list")]
+    public IActionResult StudentLetterList()
+    {
+        return View("Admin/Other/StudentLetterList");
+    }
+    [Route("administration/student-accept-certificate")]
+    public IActionResult StudentAcceptCertificate()
+    {
+        return View("Admin/Other/StudentAcceptCertificate");
+    }
+    [HttpPost("student-list-accept-certificate-generate")] 
+    public async Task<IActionResult> StudentListAcceptCertificateGenerate([FromForm] StudentListAcceptCertificateGenerateReq req)
+    {
+        try
+        {
+            if (req.FromPromotionNo <= 0 || req.ToPromotionNo <=0 || req.DegreeId <=0 || req.SchoolId <=0) 
+                return new ServerResponse().BadRequest("Degree, School and Promotion is required.");  
+            if (req.FromDate.HasValue && req.ToDate.HasValue && req.ToDate.Value < req.FromDate.Value)
+                return new ServerResponse().BadRequest("To Date must be greater than or equal to From Date.");
+            bool isNotAccepted = req.IsAcceptCertificate == "NOT_ACCEPTED";
+            string report = isNotAccepted 
+                ? "STUDENT_LIST_NOT_ACCEPT_CERTIFICATE_RPT.rdlc" : "STUDENT_LIST_ACCEPT_CERTIFICATE_RPT.rdlc";
+            var connectionString = configuration.GetConnectionString($"{_campus}_campus"); 
+            const string query = @"
+                SELECT *
+                FROM V_STUDENT
+                WHERE DEGREE_ID = @DegreeId
+                  AND SCHOOL_ID = @SchoolId
+                  AND PROMOTION_NO BETWEEN @FromPromotionNo AND @ToPromotionNo
+                  AND IS_ACCEPT_CERTIFICATE = @IsAcceptCertificate
+                  AND (
+                        @FromDate IS NULL
+                        OR START_DATE >= @FromDate
+                      )
+                  AND (
+                        @ToDate IS NULL
+                        OR END_DATE < DATEADD(
+                            DAY,
+                            1,
+                            CAST(@ToDate AS DATE)
+                        )
+                      )
+                ORDER BY STUDENT_NAME;
+            ";
+
+            var parameters = new[]
+            {
+                new SqlParameter("@DegreeId",req.DegreeId),
+                new SqlParameter("@SchoolId",req.SchoolId),
+                new SqlParameter("@FromPromotionNo",req.FromPromotionNo),
+                new SqlParameter("@ToPromotionNo",req.ToPromotionNo), 
+                new SqlParameter("@Title",req.Title ?? string.Empty), 
+                new SqlParameter("@IsAcceptCertificate",req.IsAcceptCertificate == "NOT_ACCEPTED" ? 0 : 1), 
+                new SqlParameter("@FromDate", isNotAccepted && req.FromDate.HasValue ? req.FromDate.Value : DBNull.Value),
+                new SqlParameter("@ToDate", isNotAccepted && req.ToDate.HasValue ? req.ToDate.Value : DBNull.Value)
+            };
+
+            var dt = await DataManager.DataTableRawSqlAsync(connectionString!,query,parameters);
+            if (dt.Rows.Count == 0) 
+                return new ServerResponse().Success(msg:"No accept certificate student data was found.");
+            
+            var reportPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Reports",
+                "STUDENT_CERTIFICATE",
+                report
+            ); 
+
+            using var localReport = new LocalReport();
+            localReport.ReportPath = reportPath;
+            localReport.DataSources.Add(new ReportDataSource("DataSet1", dt));
+            var reportParameters = new List<ReportParameter>
+            {
+                new("title", req.Title ?? string.Empty),
+                new("frompro", req.FromPromotionNo.ToString()),
+                new("topro", req.ToPromotionNo.ToString())
+            };
+            if (!isNotAccepted)
+            {
+                reportParameters.Add(new ReportParameter("fromdate",req.FromDate?.ToString("dd/MM/yyyy") ?? string.Empty));
+                reportParameters.Add(new ReportParameter("todate",req.ToDate?.ToString("dd/MM/yyyy") ?? string.Empty));
+            }
+            localReport.SetParameters(reportParameters);
+            var pdf = localReport.Render("PDF");
+            return File(
+                pdf,
+                "application/pdf",
+                "student-list-accept-certificate.pdf"
+            );
+        }
+        catch (Exception ex)
+        {
+            return new ServerResponse().ErrorInternal(ex);
+        }
+    }
+    [Route("administration/student_fee_collection")]
+    public IActionResult StudentFeeCollection()
+    {
+        return View("Admin/Other/StudentFeeCollection");
+    }
+    #endregion
 
     //======2-Academic Report===
+
+    #region ------------------------ Student Report ------------------------ 
     [Route("academic/student")]
     public IActionResult Student()
     {
-        return View("Academic/Student");
+        return View("Academic/Student/StudentList");
     }
+    [HttpGet]
+    [Route("academic/student/skill")]
+    public IActionResult StudentSkillList()
+    {
+        return View("Academic/Student/StudentSkillList");
+    }
+    [HttpGet]
+    [Route("academic/student/score")]
+    public IActionResult StudentScoreList()
+    {
+        return View("Academic/Student/StudentScoreList");
+    }
+    [HttpGet]
+    [Route("academic/student/moeys")]
+    public IActionResult StudentMinistryDoc()
+    {
+        return View("Academic/Student/StudentMinistryDoc");
+    }
+    #endregion
 
     [Route("academic/passing-candidate")]
     public IActionResult PassingCandidate()
@@ -71,11 +408,33 @@ public class ReportController(
         return View("academic/certificate");
     }
 
+    #region ------------------------ Student Result ------------------------ 
     [Route("academic/student-result")]
     public IActionResult StudentResult()
     {
-        return View("Academic/StudentResult");
+        return View("Academic/Result/GraduateStudent");
     }
+    /*[Route("academic/student-statistic")]
+    public IActionResult StudentStatic()
+    {
+        return View("Academic/Result/StudentStatic");
+    }
+    [Route("academic/student_letter_list")]
+    public IActionResult StudentStatic()
+    {
+        return View("Academic/Result/StudentStatic");
+    }
+    [Route("academic/student-accept-certificate")]
+    public IActionResult StudentStatic()
+    {
+        return View("Academic/Result/StudentAcceptCertificate");
+    }
+    [Route("academic/student-fee-collection")]
+    public IActionResult StudentFeeCollection()
+    {
+        return View("Admin/Result/StudentFeeCollection");
+    }*/
+    #endregion
 
     //======3-Continue Education
     [Route("continue-edu/student")]
@@ -421,7 +780,7 @@ public class ReportController(
     }
 
     [HttpPost("student-moeys")]
-    public IActionResult StudentMoeys(int degreeId, int schoolId, int fieldId, int promotionId, string filter)
+    public async Task<IActionResult> StudentMoeys(int degreeId, int schoolId, int fieldId, int promotionId, string filter)
     {
         var degree = $" DEGREE_ID={degreeId}";
         var school = $" AND SCHOOL_ID={schoolId}";
@@ -475,13 +834,21 @@ public class ReportController(
         }
 
         var connectionString = configuration.GetConnectionString($"{_campus}_campus");
-        var con = new SqlConnection(connectionString);
-        var cmd = new SqlCommand(
-            $"SELECT * FROM V_ACADEMIC_OFFICE_REPORT_MOYES_OFFICIAL_LIST WHERE {degree} {school} {field} {promotion} {target} ORDER BY STUDENT_NAME",
-            con);
-        var da = new SqlDataAdapter(cmd);
-        var dt = new DataTable();
-        da.Fill(dt);
+        var parms = new[]
+        {
+            new SqlParameter("@DegreeId", degreeId),
+            new SqlParameter("@SchoolId", schoolId),
+            new SqlParameter("@FieldId", fieldId),
+            new SqlParameter("@PromotionId", promotionId)
+        };
+        var dt = await DataManager.DataTableRawSqlAsync(
+            connectionString!,
+            $"SELECT * " +
+                $"FROM V_ACADEMIC_OFFICE_REPORT_MOYES_OFFICIAL_LIST " +
+                $"WHERE {degree} {school} {field} {promotion} {target} " +
+                $"ORDER BY STUDENT_NAME",
+            parms
+        );
         var localReport = new LocalReport();
         localReport.ReportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports", "MOEYS", $"{report}");
 

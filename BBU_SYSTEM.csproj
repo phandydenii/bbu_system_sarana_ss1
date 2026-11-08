@@ -182,6 +182,10 @@
         <_ContentIncludedByDefault Remove="Views\Administration\BookingClothes\_BookingClothesModal.cshtml" />
         <_ContentIncludedByDefault Remove="Views\Administration\BookingClothes\_ItemModal.cshtml" />
         <_ContentIncludedByDefault Remove="Views\Administration\BookingClothes\_StudentModal.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\ReportPartial\Academic\TabStudent\StudentMinistryDoc.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\ReportPartial\Academic\TabStudent\StudentScoreList.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\ReportPartial\Academic\TabStudent\StudentSkillList.cshtml" />
+        <_ContentIncludedByDefault Remove="Views\ReportPartial\Academic\TabStudent\_StudentReportTabs.cshtml" />
     </ItemGroup>
     <ItemGroup>
         <UpToDateCheckInput Remove="Views\Report\_TabStudentSkillList.cshtml" />
@@ -213,5 +217,7 @@
       <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentAcceptCertificate.cshtml" />
       <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentFeeCollection.cshtml" />
       <AdditionalFiles Include="Views\ReportPartial\Admin\TabOthers\_StudentLetterList.cshtml" />
+      <AdditionalFiles Include="Views\Report\Academic\Student\StudentScoreList.cshtml" />
+      <AdditionalFiles Include="Views\Report\Academic\Student\StudentSkillList.cshtml" />
     </ItemGroup>
 </Project>

@@ -24,20 +24,21 @@ public class ReportPartialController : Controller
     }
     
     
-    [Route("academic/student/{formType}")]
-    public IActionResult Student(string formType = "")
+    
+    /*[HttpGet]
+    [Route("academic/student/{formType?}")]
+    public IActionResult Student(string formType = "student_list")
     {
+        ViewBag.CurrentForm = formType;
         return formType switch
         {
-            "student_list" => PartialView("Academic/TabStudent/_TabStudentList"),
-            "student_skill_list" => PartialView("Academic/TabStudent/_TabStudentSkillList"),
-            "student_all_status" => PartialView("Academic/TabStudent/_TabAllStatus"),
-            "student_score_list" => PartialView("Academic/TabStudent/_TabScoreList"),
-            "student_ministry_doc" => PartialView("Academic/TabStudent/_TabMinistryDoc"),
-            _           => Content("Select form type")
+            "student_skill_list" => View("~/View/Report/Academic/Student/StudentSkillList"),
+            "student_score_list" => View("Academic/TabStudent/StudentScoreList"),
+            "student_ministry_doc" => View("Academic/TabStudent/StudentMinistryDoc"),
+            _ => RedirectToAction(nameof(Student), new { formType = "student_list" })
         };
-    }
-    [Route("academic/student-result/{formType}")]
+    }*/
+    /*[Route("academic/student-result/{formType}")]
     public IActionResult StudentResult(string formType = "")
     {
         return formType switch
@@ -49,7 +50,9 @@ public class ReportPartialController : Controller
             "student_fee_collection" => PartialView("Academic/TabStudentResult/_TabStudentFeeConllection"), 
             _           => Content("Select form type")
         };
-    }
+    }*/
+    
+    
     [Route("academic/student-passing-candidate/{formType}")]
     public IActionResult StudentPassingCandidate(string formType = "")
     {
@@ -66,7 +69,7 @@ public class ReportPartialController : Controller
         };
     }
     
-    [Route("admin/registered/{formType}")]
+    /*[Route("admin/registered/{formType}")]
     public IActionResult Registered(string formType = "")
     {
         return formType switch
@@ -77,10 +80,10 @@ public class ReportPartialController : Controller
             "scholarship" => PartialView("Admin/TabRegistrations/_ScholarshipStudent"),
             _           => Content("Select form type")
         };
-    }
+    }*/
     
      
-    [Route("admin/payment/{formType}")]
+    /*[Route("admin/payment/{formType}")]
     public IActionResult Payment(string formType = "")
     {
         return formType switch
@@ -95,9 +98,9 @@ public class ReportPartialController : Controller
             "insurance" => PartialView("Admin/TabPayments/_StudentInsurance"),
             _           => Content("Select form type")
         };
-    }
+    }*/
     
-    [Route("admin/book-clothes/{formType}")]
+    /*[Route("admin/book-clothes/{formType}")]
     public IActionResult BookClothes(string formType = "")
     {
         return formType switch
@@ -106,9 +109,9 @@ public class ReportPartialController : Controller
             "return_booking" => PartialView("Admin/TabBooking/_ReturnClothes"),
             _           => Content("Select form type")
         };
-    }
+    }*/
     
-    [Route("admin/others/{formType}")]
+    /*[Route("admin/others/{formType}")]
     public IActionResult Other(string formType = "")
     {
         return formType switch
@@ -120,5 +123,5 @@ public class ReportPartialController : Controller
             "student_fee_collection" => PartialView("Admin/TabOthers/_StudentFeeCollection"),
             _           => Content("Select form type")
         };
-    }
+    }*/
 }

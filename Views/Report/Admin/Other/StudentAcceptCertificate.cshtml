@@ -1,0 +1,646 @@
+@model BBU_SYSTEM.ViewModel.Report.RegisteredViewModel
+@{
+    ViewData["Title"] = "Student Accept Certificate";
+    ViewData["OpenMenu"] = "Report";
+    ViewData["OpenSubMenu"] = "AdminReport";
+    ViewData["Action"] = "OtherReport";
+    ViewContext.RouteData.Values["action"] = "Student Accept Certificate";
+}
+
+<style>
+    .accept-certificate-page .card-body {
+        padding: 10px;
+    }
+
+    .accept-certificate-page .report-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .accept-certificate-page .filter-panel {
+        height: 100%;
+        padding: 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #f8f9fa;
+    }
+
+    .accept-certificate-page .filter-title {
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .accept-certificate-page .form-group {
+        margin-bottom: 10px;
+    }
+
+    .accept-certificate-page label {
+        margin-bottom: 3px;
+        color: #343a40;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .accept-certificate-page .form-control {
+        min-height: 34px;
+        font-size: 13px;
+    }
+
+    .accept-certificate-page .option-panel {
+        margin-bottom: 10px;
+        padding: 9px 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        background: #fff;
+    }
+
+    .accept-certificate-page .option-title {
+        margin-bottom: 8px;
+        color: #343a40;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .accept-certificate-page .radio-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .accept-certificate-page .radio-options label {
+        font-weight: 400;
+    }
+
+    .accept-certificate-page .report-panel {
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: #fff;
+    }
+
+    .accept-certificate-page .report-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 42px;
+        padding: 8px 10px;
+        border-bottom: 1px solid #dee2e6;
+        background: #f4f6f9;
+        color: #343a40;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .accept-certificate-page .report-frame {
+        display: none;
+        width: 100%;
+        height: 700px;
+        border: 0;
+        background: #fff;
+    }
+
+    .accept-certificate-page .report-empty,
+    .accept-certificate-page .report-loading {
+        height: 700px;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .accept-certificate-page .report-empty {
+        display: flex;
+        color: #6c757d;
+    }
+
+    .accept-certificate-page .report-empty i {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 42px;
+        opacity: .45;
+    }
+
+    .accept-certificate-page .report-loading {
+        display: none;
+    }
+
+    @@media (max-width: 991.98px) {
+        .accept-certificate-page .filter-panel {
+            margin-bottom: 10px;
+        }
+
+        .accept-certificate-page .report-frame,
+        .accept-certificate-page .report-empty,
+        .accept-certificate-page .report-loading {
+            height: 550px;
+        }
+    }
+
+    @@media (max-width: 767.98px) {
+        .accept-certificate-page .report-navigation .btn {
+            width: 100%;
+        }
+
+        .accept-certificate-page .report-frame,
+        .accept-certificate-page .report-empty,
+        .accept-certificate-page .report-loading {
+            height: 450px;
+        }
+    }
+</style>
+
+<div class="card accept-certificate-page">
+    <div class="card-header">
+        <div class="report-navigation">
+            <a asp-controller="Report"
+               asp-action="Other"
+               class="btn btn-outline-primary btn-sm">
+                Graduate Student
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentStatistic"
+               class="btn btn-outline-primary btn-sm">
+                Student Statistic
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentLetterList"
+               class="btn btn-outline-primary btn-sm">
+                Student Letter List
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentAcceptCertificate"
+               class="btn btn-primary btn-sm">
+                <i class="fas fa-check mr-1"></i>
+                Accept Certificate
+            </a>
+
+            <a asp-controller="Report"
+               asp-action="StudentFeeCollection"
+               class="btn btn-outline-primary btn-sm">
+                Student Fee Collection
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-4 col-lg-3">
+                <div class="filter-panel">
+                    <div class="filter-title">
+                        <i class="fas fa-filter mr-1"></i>
+                        Report Filters
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="DegreeId"
+                               class="required">
+                            Degree
+                        </label>
+
+                        <select asp-for="DegreeId"
+                                id="cboDegree"
+                                class="form-control select2">
+                            <option value="">Select Degree</option>
+                        </select>
+
+                        <span asp-validation-for="DegreeId"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cboSchool" class="required">
+                            School
+                        </label>
+
+                        <select id="cboSchool"
+                                name="SchoolId"
+                                class="form-control select2">
+                            <option value="">Select School</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="Title">Certificate Title</label> 
+                        <input type="text"
+                               id="Title"
+                               name="Title"
+                               class="form-control"
+                               maxlength="200"
+                               placeholder="Enter certificate title"
+                               autocomplete="off" />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="FromPromotionNo">From Promotion</label>
+                                <input type="number"
+                                       id="FromPromotionNo"
+                                       name="FromPromotionNo"
+                                       class="form-control"
+                                       min="1"
+                                       value="1" />
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="ToPromotionNo">To Promotion</label>
+                                <input type="number"
+                                       id="ToPromotionNo"
+                                       name="ToPromotionNo"
+                                       class="form-control"
+                                       min="1"
+                                       value="1" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="FromDate">From Date</label>
+                                <input asp-for="FromDate" type="date" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label asp-for="ToDate">To Date</label>
+                                <input asp-for="ToDate" type="date" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-panel">
+                        <div class="option-title">
+                            Certificate Acceptance
+                        </div>
+                        <div class="radio-options">
+                            <div class="icheck-primary">
+                                <input type="radio"
+                                       id="certificateNotAccepted"
+                                       name="certificateStatus"
+                                       value="NOT_ACCEPTED"
+                                       checked />
+                                <label for="certificateNotAccepted">Not Accepted</label>
+                            </div>
+                            <div class="icheck-primary">
+                                <input type="radio"
+                                       id="certificateAccepted"
+                                       name="certificateStatus"
+                                       value="ACCEPTED" />
+                                <label for="certificateAccepted">Accepted</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="option-panel">
+                        <div class="option-title">Student Status</div>
+                        <div class="radio-options">
+                            <div class="icheck-primary">
+                                <input type="radio"
+                                       id="studentStatusAll"
+                                       name="studentStatus"
+                                       value="ALL"
+                                       checked />
+                                <label for="studentStatusAll">All</label>
+                            </div>
+                            <div class="icheck-primary">
+                                <input type="radio"
+                                       id="studentStatusCompleted"
+                                       name="studentStatus"
+                                       value="COMPLETED" />
+                                <label for="studentStatusCompleted">Completed</label>
+                            </div>
+                            <div class="icheck-primary">
+                                <input type="radio"
+                                       id="studentStatusGraduated"
+                                       name="studentStatus"
+                                       value="GRADUATED" />
+                                <label for="studentStatusGraduated">Graduated</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button"
+                            id="btnPreview"
+                            class="btn btn-primary btn-block">
+                        <i class="fas fa-eye mr-1"></i>
+                        Preview
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-8 col-lg-9">
+                <div class="report-panel">
+                    <div class="report-header">
+                        <span>
+                            <i class="fas fa-certificate mr-1"></i>
+                            Student Accept Certificate Report
+                        </span>
+
+                        <a id="btnOpenReport"
+                           href="#"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-outline-primary btn-sm"
+                           style="display: none;">
+                            <i class="fas fa-external-link-alt mr-1"></i>
+                            Open
+                        </a>
+                    </div>
+
+                    <div id="reportEmpty"
+                         class="report-empty">
+                        <div>
+                            <i class="far fa-file-pdf"></i>
+                            <strong class="d-block">No report generated</strong>
+                            <span>Select the filters and click Preview.</span>
+                        </div>
+                    </div>
+
+                    <div id="reportLoading"
+                         class="report-loading">
+                        <div>
+                            <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                            <div class="mt-2">
+                                Loading report...
+                            </div>
+                        </div>
+                    </div>
+
+                    <iframe id="printFrame"
+                            title="Student Accept Certificate Report"
+                            src="about:blank"
+                            class="report-frame">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/function/Degree.js"></script>
+    <script src="~/function/School.js"></script>
+
+    <script>
+        const cboDegree = $("#cboDegree");
+        const cboSchool = $("#cboSchool");
+
+        const fromPromotionNo = $("#FromPromotionNo");
+        const toPromotionNo = $("#ToPromotionNo");
+
+        const fromDate = $("#FromDate");
+        const toDate = $("#ToDate");
+
+        const btnPreview = $("#btnPreview");
+        const btnOpenReport = $("#btnOpenReport");
+
+        const reportEmpty = $("#reportEmpty");
+        const reportLoading = $("#reportLoading");
+        const printFrame = $("#printFrame");
+
+        let acceptCertificatePdfUrl = null; 
+
+        $(document).ready(async function () {
+            initializeSelect2();
+            bindEvents();
+            await getDegree();
+            await getSchool();
+        });
+
+        function initializeSelect2() {
+            cboDegree.select2({
+                width: "100%",
+                placeholder: "Select Degree",
+                allowClear: true
+            });
+            cboSchool.select2({
+                width: "100%",
+                placeholder: "Select School",
+                allowClear: true
+            });
+        }
+
+        function bindEvents() {
+            btnPreview.on("click", function () {
+                previewAcceptCertificate();
+            });
+        }
+
+        async function getDegree() {
+            clearSelect(cboDegree, "Select Degree");
+            try {
+                const degrees = await Degree.GetAllDegree();
+                if (!degrees || degrees.length === 0) return;
+                degrees.forEach(function (item) {
+                    cboDegree.append(
+                        `<option value="${item.degreeId}">
+                            ${item.degreeName}
+                        </option>`
+                    );
+                });
+                cboDegree.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("Degree API error:",error);
+                ShowToastError("Unable to load degrees.");
+            }
+        }
+
+        async function getSchool() {
+            clearSelect(cboSchool, "Select School");
+            try {
+                const schools = await School.GetSchool();
+                if (!schools || schools.length === 0) return;
+                schools.forEach(function (item) {
+                    cboSchool.append(
+                        `<option value="${item.schoolId}">
+                            ${item.schoolName}
+                        </option>`
+                    );
+                });
+                cboSchool.val("").trigger("change.select2");
+            } catch (error) {
+                console.error("School API error:",error);
+                ShowToastError("Unable to load schools.");
+            }
+        }
+
+        function clearSelect(selectElement, placeholder) {
+            selectElement
+                .empty()
+                .append(
+                    `<option value="">${placeholder}</option>`
+                )
+                .val("")
+                .trigger("change.select2");
+        }
+
+        function getReportRequest() {
+            return {
+                DegreeId: cboDegree.val(),
+                SchoolId: cboSchool.val(),
+                FromPromotionNo: fromPromotionNo.val(),
+                ToPromotionNo: toPromotionNo.val(),
+                IsAcceptCertificate: $("input[name='certificateStatus']:checked").val(),
+                Status: $("input[name='studentStatus']:checked").val(),
+                FromDate:fromDate.val() || "",
+                ToDate:toDate.val() || "",
+                Title : $("#title").val() || ""
+            };
+        }
+
+        function validateFilters(request) {
+            if (!request.DegreeId) {
+                ShowToastInfo("Please select a degree.");
+                cboDegree.select2("open");
+                return false;
+            }
+
+            if (!request.SchoolId) {
+                ShowToastInfo("Please select a school.");
+                cboSchool.select2("open");
+                return false;
+            }
+
+            if (!request.FromPromotionNo || Number(request.FromPromotionNo) < 1){
+                ShowToastInfo("Please enter a valid From Promotion.");
+                fromPromotionNo.focus();
+                return false;
+            }
+
+            if (!request.ToPromotionNo || Number(request.ToPromotionNo) < 1){
+                ShowToastInfo("Please enter a valid To Promotion.");
+                toPromotionNo.focus();
+                return false;
+            }
+
+            if (Number(request.ToPromotionNo) < Number(request.FromPromotionNo)){
+                ShowToastInfo("To Promotion must be greater than or equal to From Promotion.");
+                toPromotionNo.focus();
+                return false;
+            }
+
+            if (request.FromDate && request.ToDate && new Date(request.ToDate) < new Date(request.FromDate)){
+                ShowToastInfo("To Date must be later than or equal to From Date.");
+                toDate.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function previewAcceptCertificate() {
+            const request = getReportRequest();
+            if (!validateFilters(request)) {
+                return;
+            } 
+            showReportLoading();
+            $.ajax({
+                url: '@Url.Action(
+                    "StudentListAcceptCertificateGenerate",
+                "Report"
+                )',
+                type: "POST",
+                data: request,
+                xhrFields: {
+                    responseType: "blob"
+                },
+                success: function (response,textStatus,xhr){
+                    const contentType = xhr.getResponseHeader("Content-Type") || "application/pdf";
+                    if (acceptCertificatePdfUrl) {
+                        URL.revokeObjectURL(acceptCertificatePdfUrl);
+                    }
+                    const pdfBlob = new Blob(
+                        [response],
+                        {
+                            type: contentType
+                        }
+                    );
+                    acceptCertificatePdfUrl = URL.createObjectURL(pdfBlob);
+                    reportEmpty.hide();
+                    reportLoading.hide();
+                    printFrame.attr(
+                            "src",
+                            acceptCertificatePdfUrl
+                        )
+                        .show();
+                    btnOpenReport.attr(
+                            "href",
+                            acceptCertificatePdfUrl
+                        )
+                        .show();
+                },
+                error: function (xhr) {
+                    hideReportLoading();
+                    ShowToastInfo("Unable to generate certificate report.");
+                },
+                complete: function () {
+                    btnPreview.prop("disabled", false)
+                        .html(
+                            '<i class="fas fa-eye mr-1"></i> Preview'
+                        );
+                }
+            });
+        }
+
+        function showReportLoading() {
+            reportEmpty.hide();
+            printFrame.hide();
+            btnOpenReport.hide();
+
+            reportLoading.css(
+                "display",
+                "flex"
+            );
+
+            btnPreview
+                .prop("disabled", true)
+                .html(
+                    '<i class="fas fa-spinner fa-spin mr-1"></i> Loading...'
+                );
+        }
+
+        function hideReportLoading() {
+            reportLoading.hide();
+
+            btnPreview
+                .prop("disabled", false)
+                .html(
+                    '<i class="fas fa-eye mr-1"></i> Preview'
+                );
+
+            if (acceptCertificatePdfUrl) {
+                printFrame.show();
+                btnOpenReport.show();
+                return;
+            }
+
+            reportEmpty.css(
+                "display",
+                "flex"
+            );
+        }
+
+        $(window).on(
+            "beforeunload",
+            function () {
+                if (acceptCertificatePdfUrl) {
+                    URL.revokeObjectURL(
+                        acceptCertificatePdfUrl
+                    );
+                }
+            }
+        );
+    </script>
+}
