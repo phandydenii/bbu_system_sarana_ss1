@@ -145,7 +145,6 @@
         const tblOtherBranchScore = $("#tblOtherBranchScore");
         const tblStudent = $("#tblStudent");
         $(document).ready(function () {
-            fetchStudent();
             $("#student_DateOfBirth").val('');
         });
 
@@ -159,6 +158,9 @@
                 ajax: {
                     url: `/extend/students`,
                     type: "POST",
+                },
+                language: {
+                    zeroRecords: "No student records found matching your search.",
                 },
                 columns: [
                     {data: "studentId"},

@@ -2,6 +2,7 @@
 using BBU_SYSTEM.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BBU_SYSTEM.Controllers;
 
@@ -13,62 +14,17 @@ public class DeanController(ICampusDbContext campusDbContext, IHttpContextAccess
     private readonly string _campus = context.HttpContext?.User.FindFirst("CampusKey")?.Value ?? "pp";
 
     [Route("course")]
-    public IActionResult Course()
+    public async Task<IActionResult> CourseAsync()
     {
-        var db = campusDbContext.DbContext(_campus);
-        var degrees = db.TblDegree.ToList();
-        var schools = db.TblSchool.ToList();
-        var fields = db.TblField.ToList();
-        var promotions = db.TblPromotion.ToList();
-        var stages = db.TblStage.ToList();
-        var terms = db.TblTerm.ToList();
-        var groups = db.TblGroup.ToList();
-        var groupRooms = db.TblGroupRoom.ToList();
-
-        var viewmodel = new ListData
-        {
-            Degrees = degrees,
-            Schools = schools,
-            Fields = fields,
-            Promotions = promotions,
-            Stages = stages,
-            Groups = groups,
-            GroupRooms = groupRooms,
-            Terms = terms
-        };
-        return View(viewmodel);
+        var db = campusDbContext.DbContext(_campus); 
+        ViewBag.TotalSchools = await db.TblSchool.CountAsync(); 
+        return View();
     }
 
     [Route("learner")]
     public ActionResult Learner()
     {
-        var db = campusDbContext.DbContext(_campus);
-        var degrees = db.TblDegree.ToList();
-        var schools = db.TblSchool.ToList();
-        var fields = db.TblField.ToList();
-        var promotions = db.TblPromotion.ToList();
-        var stages = db.TblStage.ToList();
-        var terms = db.TblTerm.ToList();
-        var groups = db.TblGroup.ToList();
-        var groupRooms = db.TblGroupRoom.ToList();
-
-        var listData = new ListData
-        {
-            Degrees = degrees,
-            Schools = schools,
-            Fields = fields,
-            Promotions = promotions,
-            Stages = stages,
-            Groups = groups,
-            GroupRooms = groupRooms,
-            Terms = terms
-        };
-        var learnerViewModel = new LearnerViewModel
-        {
-            ListData = listData,
-            Courses = db.TblCourses.ToList()
-        };
-        return View(learnerViewModel);
+        return View();
     }
 
     [Route("mark")]

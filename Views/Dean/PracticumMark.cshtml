@@ -4,55 +4,81 @@
     ViewData["Action"] = "PracticumMark";
     ViewData["HideHeader"] = true;
 }
+
+<style>
+    .filter-drawer .modal-dialog {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 460px;
+        max-width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+
+    .filter-drawer.fade .modal-dialog {
+        transform: translateX(100%);
+        transition: transform .3s ease;
+    }
+
+    .filter-drawer.show .modal-dialog {
+        transform: translateX(0);
+    }
+
+    .filter-drawer .modal-content {
+        height: 100%;
+        border: 0;
+        border-radius: 0;
+        box-shadow: -8px 0 30px rgba(0, 0, 0, .12);
+    }
+
+    .filter-drawer .modal-header,
+    .filter-drawer .modal-footer {
+        flex-shrink: 0;
+        padding: 16px 24px;
+    }
+
+    .filter-drawer .modal-body {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 24px;
+    }
+
+    .filter-drawer .form-group {
+        margin-bottom: 20px;
+    }
+</style>
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h3 class="m-0 font-weight-bold text-dark">Practicum Mark</h3>
         <small class="text-muted">Record, manage, and evaluate student internship scores, practical field training marks, and hands-on performance assessment results</small>
     </div>
+    <button type="button"
+            class="btn btn-outline-primary"
+            data-toggle="modal"
+            data-target="#PracticumFilterModal">
+        <i class="fas fa-filter mr-1"></i> Filter
+    </button>
 </div>
+
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header"> 
-                <div class="row">
-                    <div class="col-md-2">
-                        <label>Degree</label>
-                        <select id="cboDegree" class="form-control select2"></select>
-                    </div>
-                    <div class="col-md-2">
-                        <label>School</label>
-                        <select id="cboSchool" class="form-control select2"></select>
-                    </div>
-                    <div class="col-md-2">
-                        <label>Field</label>
-                        <select id="cboField" class="form-control select2"></select>
-                    </div>
-                    <div class="col-md-1">
-                        <label>Promotion</label>
-                        <select id="cboPromotion" class="form-control select2"></select>
-                    </div>
-                    <div class="col-md-1">
-                        <label>Stage</label>
-                        <select id="cboStage" class="form-control select2"></select>
-                    </div>
-                    <div class="col-md-1">
-                        <label>Term</label>
-                        <select id="cboTerm" class="form-control select2"></select>
-                    </div>
-                    <div class="col-md-2">
-                        <label>Group</label>
-                        <select id="cboGroup" class="form-control select2"></select>
-                    </div>
-                    <div class="col-md-1">
-                        <label>#</label>
-                        <button onclick="OnFilter()" class="form-control btn btn-success float-right"><i
-                                class="fas fa-filter"></i>
-                            Filter
-                        </button>
+        <div class="card"> 
+            <div class="card-body">
+                <div id="activeFilterSummary"
+                     class="d-none mb-3"
+                     role="status"
+                     aria-live="polite">
+                    <div class="d-flex align-items-center flex-wrap">
+                        <small class="text-primary font-weight-bold mr-2 mb-1">
+                            <i class="fas fa-filter mr-1"></i> Filtered by:
+                        </small>
+
+                        <div id="activeFilterBadges" class="d-flex flex-wrap"></div>
                     </div>
                 </div>
-            </div>
-            <div class="card-body">
                 <div class="row">
                     <div class="col-md-5">
                         <div class="card card-outline card-primary">
@@ -106,7 +132,78 @@
         </div>
     </div>
 </div>
-<script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+
+<div class="modal fade filter-drawer"
+     id="PracticumFilterModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="practicumFilterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold"
+                    id="practicumFilterTitle">
+                    <i class="fas fa-filter mr-2 text-primary"></i>
+                    Filter Criteria
+                </h5>
+
+                <button type="button" class="close"
+                        data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="cboDegree">Degree</label>
+                    <select id="cboDegree" class="form-control select2"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cboSchool">School</label>
+                    <select id="cboSchool" class="form-control select2"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cboField">Field</label>
+                    <select id="cboField" class="form-control select2"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cboPromotion">Promotion</label>
+                    <select id="cboPromotion" class="form-control select2"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cboStage">Stage</label>
+                    <select id="cboStage" class="form-control select2"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cboTerm">Term</label>
+                    <select id="cboTerm" class="form-control select2"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cboGroup">Group</label>
+                    <select id="cboGroup" class="form-control select2"></select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light"
+                        data-dismiss="modal">
+                    Close
+                </button>
+
+                <button type="button" class="btn btn-primary" id="btnFilter">
+                    <i class="fas fa-check mr-1"></i> Apply Filter
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {
@@ -127,42 +224,99 @@
         const cboGroup = $("#cboGroup");
         const tblStudent = $("#tblStudent");
         const tblScore = $("#tblScore");
+
+        let appliedFilters = null;
+
+        const academicFilters = [
+            { label: "Degree", select: cboDegree },
+            { label: "School", select: cboSchool },
+            { label: "Field", select: cboField },
+            { label: "Promotion", select: cboPromotion },
+            { label: "Stage", select: cboStage },
+            { label: "Term", select: cboTerm },
+            { label: "Group", select: cboGroup }
+        ];
+
+        function resetFilter(select, label) {
+            select.empty()
+                .append(new Option("Select " + label, "", true, true))
+                .trigger("change.select2");
+        }
+
+        function resetScoreTable() {
+            if ($.fn.DataTable.isDataTable("#tblScore")) {
+                tblScore.DataTable().destroy();
+            }
+
+            tblScore.find("tbody").empty();
+
+            tblScore.DataTable({
+                responsive: true,
+                columnDefs: [
+                    { targets: [0, 1], visible: false }
+                ],
+                language: {
+                    emptyTable: "Select a student to view practicum scores."
+                }
+            });
+        }
+
         $(document).ready(function () {
-            $("#tblStudent").DataTable({
-                responsive: true,
+            $("#PracticumFilterModal .select2").select2({
+                dropdownParent: $("#PracticumFilterModal"),
+                width: "100%"
             });
-            $("#tblScore").DataTable({
-                responsive: true,
+
+            academicFilters.forEach(function (filter) {
+                resetFilter(filter.select, filter.label);
             });
+
+            tblStudent.DataTable({
+                responsive: true,
+                language: {
+                    emptyTable: "Apply filters to load students."
+                }
+            });
+
+            resetScoreTable();
+
             GetDegree();
             GetSchool();
         });
 
-        cboDegree.change(function () {
+        $("#btnFilter").on("click", OnFilter);
+
+        cboDegree.add(cboSchool).on("change", function () {
+            resetFilter(cboField, "Field");
+            resetFilter(cboPromotion, "Promotion");
+            resetFilter(cboStage, "Stage");
+            resetFilter(cboTerm, "Term");
+            resetFilter(cboGroup, "Group");
+
             GetField();
             GetPromotion();
+        });
+
+        cboPromotion.on("change", function () {
+            resetFilter(cboStage, "Stage");
+            resetFilter(cboTerm, "Term");
+            resetFilter(cboGroup, "Group");
+
             GetStage();
+        });
+
+        cboStage.on("change", function () {
+            resetFilter(cboTerm, "Term");
+            resetFilter(cboGroup, "Group");
+
             GetTerm();
             GetGroup();
         });
 
-        cboSchool.change(function () {
-            GetField();
-            GetPromotion();
-        });
-
-        cboPromotion.change(function () {
-            GetStage();
-            GetTerm();
+        cboField.on("change", function () {
+            resetFilter(cboGroup, "Group");
             GetGroup();
-        });
-        cboStage.change(function () {
-            GetTerm();
-            GetGroup();
-        });
-        cboTerm.change(function () {
-            GetGroup();
-        });
+        }); 
 
         async function GetDegree() {
             cboDegree.empty();
@@ -272,59 +426,94 @@
 
 
         function OnFilter() {
-            const term_no = cboTerm.find("option:selected").text();
-            const group_id = cboGroup.val();
-
-            if (!group_id || !term_no) return;
-
-            tblStudent.DataTable().clear().destroy();
+            if (academicFilters.some(filter => !(Number(filter.select.val()) > 0))) {
+                ShowToastInfo("Please select all filter criteria.");
+                return;
+            }
+            appliedFilters = {
+                groupId: cboGroup.val(),
+                termNo: cboTerm.val()
+            };
+            const container = $("#activeFilterBadges").empty();
+            academicFilters.forEach(function (filter) {
+                $("<span>")
+                    .addClass("badge badge-light border mr-2 mb-1 px-2 py-2")
+                    .text(
+                        filter.label + ": " +
+                        filter.select.find("option:selected").text().trim()
+                    )
+                    .appendTo(container);
+            });
+            $("#activeFilterSummary").removeClass("d-none");
+            $("#PracticumFilterModal").modal("hide");
+            $("#lblStudentName").hide().text("");
+            resetScoreTable();
+            if ($.fn.DataTable.isDataTable("#tblStudent")) {
+                tblStudent.DataTable().destroy();
+            }
+            tblStudent.find("tbody").empty();
             tblStudent.DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
                 info: false,
+                language: {
+                    emptyTable: "No students available for these filters.",
+                    zeroRecords: "No matching students found."
+                },
                 ajax: {
-                    url: `/student/GetStudents`,
+                    url: "/student/GetStudents",
                     type: "POST",
                     data: {
-                        groupid: group_id,
-                        termno: term_no
-                    },
+                        groupid: appliedFilters.groupId,
+                        termno: appliedFilters.termNo
+                    }
                 },
                 drawCallback: function () {
                     const info = this.api().page.info();
+                    const start = info.recordsDisplay > 0 ? info.start + 1 : 0;
+
                     $("#studentCountText").text(
-                        `Showing ${info.start + 1} to ${info.end} of ${info.recordsDisplay}`
+                        `Showing ${start} to ${info.end} of ${info.recordsDisplay}`
                     );
                 },
                 columns: [
-                    {data: "studentId"},
-                    {data: "studentName"},
-                    {data: "sex"},
+                    { data: "studentId" },
+                    { data: "studentName" },
+                    { data: "sex" },
                     {
                         data: "dateOfBirth",
-                        render: function (data, type, row) {
-                            return `${formatDate(data)}`
+                        render: function (data) {
+                            return formatDate(data);
                         }
                     }
                 ],
                 initComplete: function () {
-                    MyApp.utils.dataTableDebounceSearch("#tblStudent",500);
+                    MyApp.utils.dataTableDebounceSearch("#tblStudent", 500);
                 }
-            })
+            });
         }
 
-        tblStudent.on('click', 'tbody tr', function () {
-            tblStudent.find('tbody tr').removeClass('highlight');
-            $(this).addClass('highlight');
-            const $row = $(this).closest('tr');
-            const data = tblStudent.DataTable().row($row).data();
+        tblStudent.on("click", "tbody tr", function () {
+            let row = $(this); 
+            if (row.hasClass("child")) {
+                row = row.prev();
+            } 
+            const data = tblStudent.DataTable().row(row).data(); 
+            if (!data || !data.studentGroupId) return;
+
+            tblStudent.find("tbody tr").removeClass("highlight");
+            row.addClass("highlight"); 
+            $("#lblStudentName").text(`${data.studentId} - ${data.studentName}`).show();
             GetScores(data.studentGroupId);
         });
 
         function GetScores(student_group_id) {
             if (!student_group_id) return;
-            tblScore.DataTable().clear().destroy();
+            if ($.fn.DataTable.isDataTable("#tblScore")) {
+                tblScore.DataTable().destroy();
+            }
+            tblScore.find("tbody").empty();
             tblScore
                 .DataTable({
                     processing: true,

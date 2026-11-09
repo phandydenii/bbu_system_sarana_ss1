@@ -71,29 +71,36 @@
         const tblAssignCourse = $("#tblAssignCourse");
         const tblCourse = $("#tblCourse");
         $(document).ready(function () {
-            fetchSchool();
+            fetchSchool(); 
             tblCourse.DataTable({responsive: true,});
             btnAssignSubject.prop("disabled", true);
-        });
+        }); 
 
-        function fetchSchool() { 
-            tblSchool.DataTable().clear().destroy();
+        function fetchSchool() {
             tblSchool.DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                searching: true,
+                deferLoading: @ViewBag.TotalSchools,
                 ajax: {
                     url: "/school/get-schools",
-                    type: "POST",
+                    type: "POST"
+                },
+                language: {
+                    search: "Search:",
+                    searchPlaceholder: "Search school name...",
+                    emptyTable: "Search to find a school.",
+                    zeroRecords: "No schools found matching your search."
                 },
                 columns: [
-                    {data: "schoolId"}, 
-                    {data: "schoolName"}, 
+                    { data: "schoolId" },
+                    { data: "schoolName" }
                 ],
                 initComplete: function () {
                     MyApp.utils.dataTableDebounceSearch("#tblSchool", 500);
                 }
-            })
+            });
         }
 
         tblSchool.on('click', 'tbody tr', function () {

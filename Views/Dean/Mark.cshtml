@@ -3,57 +3,179 @@
     ViewData["Title"] = "Index";
     ViewData["OpenMenu"] = "Dean";
     ViewData["Action"] = "Mark";
+    ViewData["HideHeader"] = true;
 }
 
 <style>
-    #tblStudent tbody tr {
-        cursor: pointer;
+    .filter-drawer .modal-dialog {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 460px;
+        max-width: 100%;
+        height: 100%;
+        margin: 0;
     }
-    .table-responsive {
-        margin-top: 0.5rem;
+
+    .filter-drawer.fade .modal-dialog {
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .filter-drawer.show .modal-dialog {
+        transform: translateX(0);
+    }
+
+    .filter-drawer .modal-content {
+        height: 100%;
+        border: 0;
+        border-radius: 0;
+        box-shadow: -8px 0 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .filter-drawer .modal-header,
+    .filter-drawer .modal-footer {
+        flex-shrink: 0;
+        padding: 16px 24px;
+    }
+
+    .filter-drawer .modal-body {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 24px;
+    }
+
+    .filter-drawer .form-group {
+        margin-bottom: 20px;
     }
 </style>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <div class="mr-3 mb-2">
+        <h3 class="m-0 font-weight-bold text-dark">Learner Management</h3>
+        <small class="text-muted">
+            Filter learners by academic criteria and manage assigned courses
+        </small>
+    </div>
+
+    <div class="d-flex mb-2">
+        <button type="button"
+                class="btn btn-outline-primary mr-2"
+                data-toggle="modal"
+                data-target="#LearnerFilterModal">
+            <i class="fas fa-filter mr-1"></i> Filter
+        </button>
+    </div>
+</div>
+
+<!-- Filter drawer -->
+<div class="modal fade filter-drawer"
+     id="LearnerFilterModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="learnerFilterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold"
+                    id="learnerFilterTitle">
+                    <i class="fas fa-filter mr-2 text-primary"></i>
+                    Filter Criteria
+                </h5>
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="cboDegree">Degree</label>
+                    <select id="cboDegree"
+                            class="form-control select2"
+                            style="width:100%"></select>
+                </div>
+                <div class="form-group">
+                    <label for="cboSchool">School</label>
+                    <select id="cboSchool"
+                            class="form-control select2"
+                            style="width:100%"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cboField">Field</label>
+                    <select id="cboField"
+                            class="form-control select2"
+                            style="width:100%"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cboPromotion">Promotion</label>
+                    <select id="cboPromotion"
+                            class="form-control select2"
+                            style="width:100%"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cboStage">Stage</label>
+                    <select id="cboStage"
+                            class="form-control select2"
+                            style="width:100%"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cboTerm">Term</label>
+                    <select id="cboTerm"
+                            class="form-control select2"
+                            style="width:100%"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cboGroup">Group</label>
+                    <select id="cboGroup"
+                            class="form-control select2"
+                            style="width:100%"></select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-light"
+                        data-dismiss="modal">
+                    Close
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary"
+                        id="btnFilter">
+                    <i class="fas fa-check mr-1"></i>
+                    Apply Filter
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-12">
         <div class="card shadow-sm border-0">
-            <div class="card-header bg-white pt-3 pb-2">
-                <div class="row align-items-end">
-                    <div class="col-md-3 col-lg-2 mb-2">
-                        <label class="font-weight-600 small text-muted">Degree</label>
-                        <select id="cboDegree" class="form-control select2 w-100"></select>
-                    </div>
-                    <div class="col-md-3 col-lg-2 mb-2">
-                        <label class="font-weight-600 small text-muted">School</label>
-                        <select id="cboSchool" class="form-control select2 w-100"></select>
-                    </div>
-                    <div class="col-md-3 col-lg-2 mb-2">
-                        <label class="font-weight-600 small text-muted">Field</label>
-                        <select id="cboField" class="form-control select2 w-100"></select>
-                    </div>
-                    <div class="col-md-3 col-lg-1 mb-2">
-                        <label class="font-weight-600 small text-muted">Promotion</label>
-                        <select id="cboPromotion" class="form-control select2 w-100"></select>
-                    </div>
-                    <div class="col-md-3 col-lg-1 mb-2">
-                        <label class="font-weight-600 small text-muted">Stage</label>
-                        <select id="cboStage" class="form-control select2 w-100"></select>
-                    </div>
-                    <div class="col-md-3 col-lg-1 mb-2">
-                        <label class="font-weight-600 small text-muted">Term</label>
-                        <select id="cboTerm" class="form-control select2 w-100"></select>
-                    </div>
-                    <div class="col-md-3 col-lg-2 mb-2">
-                        <label class="font-weight-600 small text-muted">Group</label>
-                        <select id="cboGroup" class="form-control select2 w-100"></select>
-                    </div>
-                    <div class="col-md-3 col-lg-1 mb-2">
-                        <button onclick="OnFilter()" class="btn btn-success btn-block"><i class="fas fa-filter mr-1"></i> Filter</button>
+            <div class="card-body bg-light/30">
+                <div id="activeFilterSummary"
+                     class="d-none mb-3"
+                     role="status"
+                     aria-live="polite">
+                    <div class="d-flex align-items-center flex-wrap">
+                        <small class="text-primary font-weight-bold mr-2 mb-1">
+                            <i class="fas fa-filter mr-1"></i>
+                            Filtered by:
+                        </small>
+                        <div id="activeFilterBadges" class="d-flex flex-wrap"></div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="card-body bg-light/30">
                 <div class="row">
                     <div class="col-12 col-xl-5 mb-2">
                         <div class="card card-outline card-primary h-100 shadow-sm border-top-3">
@@ -65,21 +187,27 @@
                                 <div class="table-responsive w-100">
                                     <table id="tblStudent" class="table table-hover table-bordered table-sm w-100 m-0">
                                         <thead class="thead-light">
-                                            <tr>
-                                                <th width="15%">ID</th>
-                                                <th>Name</th>
-                                                <th width="10%">Gender</th>
-                                                <th width="20%">DOB</th>
-                                                <th width="10%">Action</th>
-                                            </tr>
+                                        <tr>
+                                            <th width="15%">ID</th>
+                                            <th>Name</th>
+                                            <th width="10%">Gender</th>
+                                            <th width="20%">DOB</th>
+                                            <th width="10%">Action</th>
+                                        </tr>
                                         </thead>
-                                        <tbody></tbody>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">
+                                                    Apply filters to load students.
+                                                </td>
+                                            </tr>
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-12 col-xl-7 mb-2">
                         <div class="card card-outline card-success h-100 shadow-sm border-top-3">
                             <div class="card-header bg-white d-flex align-items-center justify-content-between">
@@ -90,13 +218,13 @@
                                 <div class="table-responsive w-100">
                                     <table id="tblScore" class="table table-hover table-bordered table-sm w-100 m-0">
                                         <thead class="thead-light">
-                                            <tr>
-                                                <th>Course Name</th>
-                                                <th width="25%">Midterm</th>
-                                                <th width="25%">Final</th>
-                                                <th width="10%">Grade</th>
-                                                <th width="10%">Action</th>
-                                            </tr>
+                                        <tr>
+                                            <th>Course Name</th>
+                                            <th width="25%">Midterm</th>
+                                            <th width="25%">Final</th>
+                                            <th width="10%">Grade</th>
+                                            <th width="10%">Action</th>
+                                        </tr>
                                         </thead>
                                         <tbody></tbody>
                                     </table>
@@ -135,9 +263,46 @@
         let dtStudent = null;
         let dtScore = null;
 
+        let appliedFilters = null;
+        const academicFilters = [
+            { label: "Degree", select: cboDegree },
+            { label: "School", select: cboSchool },
+            { label: "Field", select: cboField },
+            { label: "Promotion", select: cboPromotion },
+            { label: "Stage", select: cboStage },
+            { label: "Term", select: cboTerm },
+            { label: "Group", select: cboGroup }
+        ];
+
+        function updateFilterSummary() {
+            const container = $("#activeFilterBadges").empty();
+            academicFilters.forEach(function (filter) {
+                $("<span>")
+                    .addClass("badge badge-light border mr-2 mb-1 px-2 py-2")
+                    .text(
+                        filter.label + ": " +
+                        filter.select.find("option:selected").text().trim()
+                    )
+                    .appendTo(container);
+            });
+            $("#activeFilterSummary").removeClass("d-none");
+        }
+
         $(document).ready(function () {
+            $("#LearnerFilterModal .select2").select2({
+                dropdownParent: $("#LearnerFilterModal"),
+                width: "100%"
+            });
             GetDegree();
             GetSchool();
+        });
+
+        $("#btnFilter").on("click", function () {
+            OnFilter();
+        });
+
+        cboField.change(function () {
+            GetGroup();
         });
 
         cboDegree.change(function () { GetField(); GetPromotion(); });
@@ -229,12 +394,24 @@
         }
 
         function OnFilter() {
-            if (!cboGroup.val() || !cboTerm.val()) {
-                ShowToastError("Please select Term and Group.");
+            if (academicFilters.some(filter => !(Number(filter.select.val()) > 0))) {
+                ShowToastInfo("Please select all filter criteria.");
                 return;
             }
-            $("#lblStudentName").hide().text("");  
-            if (dtStudent) { 
+            appliedFilters = {
+                termNo: cboTerm.val(),
+                groupId: cboGroup.val()
+            };
+
+            updateFilterSummary();
+            $("#LearnerFilterModal").modal("hide");
+            $("#lblStudentName").hide().text("");
+            tblStudent.find("tbody tr").removeClass("highlight");
+            if ($.fn.DataTable.isDataTable("#tblScore")) {
+                tblScore.DataTable().destroy();
+            }
+            tblScore.find("tbody").empty();
+            if (dtStudent) {
                 dtStudent.ajax.reload();
                 return;
             }
@@ -243,13 +420,17 @@
                 serverSide: true,
                 responsive: true,
                 autoWidth: false,
+                language: {
+                    emptyTable: "No students available.",
+                    zeroRecords: "No matching students found."
+                },
                 info:false,
                 ajax: {
                     url: `/student/GetStudents`,
                     type: "POST",
-                    data: function (d){
-                        d.TermNo = cboTerm.val();
-                        d.GroupId = cboGroup.val();
+                    data: function (d) {
+                        d.TermNo = appliedFilters.termNo;
+                        d.GroupId = appliedFilters.groupId;
                     }
                 },
                 drawCallback: function () {
