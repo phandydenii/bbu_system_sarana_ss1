@@ -6,33 +6,26 @@ ViewData["HideHeader"] = true;
 }
 
 <style>
-    #paymentProductPage .dataTables_wrapper,
+    #paymentProductPage :is(.dataTables_wrapper, .dt-container),
     #paymentProductPage .product-table-container {
         width: 100%;
     }
 
-    #tblProduct {
-        width: 100% !important;
-        min-width: 1600px;
+    #paymentProductPage :is(#tblProduct_wrapper, #tblProductPayOnline_wrapper):not(.product-has-results) :is(.dataTables_length, .dt-length),
+    #paymentProductPage :is(#tblProduct_wrapper, #tblProductPayOnline_wrapper):not(.product-has-pages) :is(.dataTables_paginate, .dt-paging) {
+        display: none;
     }
 
-    #tblProductPayOnline {
-        width: 100% !important;
-        min-width: 1300px;
+    #paymentProductPage .product-table-scroll {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
     }
 
     #paymentProductPage table.dataTable th,
     #paymentProductPage table.dataTable td {
         white-space: nowrap !important;
         vertical-align: middle !important;
-    }
-
-    #paymentProductPage table.dataTable thead th {
-        padding-right: 24px !important;
-    }
-
-    #paymentProductPage .dataTables_scrollBody {
-        overflow-x: auto !important;
     }
 
     #paymentProductPage .dt-action {
@@ -102,10 +95,16 @@ ViewData["HideHeader"] = true;
 </style>
 
 <div id="paymentProductPage" class="container-fluid px-0 pt-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div class="mr-3">
             <h3 class="m-0 font-weight-bold text-dark">Payment Items</h3>
             <small class="text-muted">Manage tuition payment products and WeBill payment settings</small>
+        </div>
+        <div id="productCreateAction" class="ml-auto mt-2 mt-sm-0">
+            <button type="button" class="btn btn-primary shadow-sm text-nowrap" id="btnAddNewProduct">
+                <i class="fas fa-plus-circle mr-1" aria-hidden="true"></i>
+                Add New Product
+            </button>
         </div>
     </div>
 
@@ -143,83 +142,6 @@ ViewData["HideHeader"] = true;
         </div>
     </div>
 
-    <!-- Shared date range; each table keeps its built-in text search. -->
-    <div class="card card-outline card-primary shadow-sm mb-4">
-        <div class="card-header bg-white py-2">
-            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
-                <i class="fas fa-filter text-primary mr-1"></i>
-                Filter Payment Items
-            </h3>
-            <div class="card-tools">
-                <button type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                        aria-label="Collapse product filters">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
-        </div>
-        <div class="card-body bg-light py-3">
-            <form id="frmProductDateFilters">
-                <div class="row align-items-end">
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="productFromDate" class="text-secondary small font-weight-bold">
-                            From Date
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
-                            </div>
-                            <input type="date"
-                                   id="productFromDate"
-                                   name="fromDate"
-                                   class="form-control border-left-0" />
-                        </div>
-                    </div>
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="productToDate" class="text-secondary small font-weight-bold">
-                            To Date
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
-                            </div>
-                            <input type="date"
-                                   id="productToDate"
-                                   name="toDate"
-                                   class="form-control border-left-0" />
-                        </div>
-                    </div>
-                    <div class="col-md-2 col-sm-12 mb-2 mb-md-0 d-flex">
-                        <div class="btn-group shadow-sm" role="group" aria-label="Product date filters">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-search mr-1"></i>
-                                Filter
-                            </button>
-                            <button type="button"
-                                    id="btnResetProductDateFilters"
-                                    class="btn btn-success border-left"
-                                    title="Reset filters"
-                                    aria-label="Reset product date filters">
-                                <i class="fas fa-redo-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div id="productCreateAction" class="col-md-6 col-sm-12 mt-2 mt-md-0 text-md-right">
-                        <button type="button" class="btn btn-primary shadow-sm" id="btnAddNewProduct">
-                            <i class="fas fa-plus-circle mr-1"></i>
-                            Add New Product
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <div class="tab-content" id="custom-tabs-four-tabContent">
         <div class="tab-pane fade show active"
              id="custom-tabs-four-1"
@@ -229,7 +151,7 @@ ViewData["HideHeader"] = true;
                 <div class="card-body">
                     <div class="product-table-container">
                         <table id="tblProduct"
-                               class="table table-sm table-hover table-bordered table-striped w-100"
+                               class="table table-sm table-hover table-bordered table-striped"
                                style="width: 100%;">
                             <thead class="thead-light">
                             <tr>
@@ -263,7 +185,7 @@ ViewData["HideHeader"] = true;
                 <div class="card-body">
                     <div class="product-table-container">
                         <table id="tblProductPayOnline"
-                               class="table table-sm table-hover table-bordered table-striped w-100 nowrap"
+                               class="table table-sm table-hover table-bordered table-striped"
                                style="width: 100%;">
                             <thead class="thead-light">
                             <tr>
@@ -413,20 +335,6 @@ ViewData["HideHeader"] = true;
         fetchProduct();
         fetchProductPayOnline();
 
-        $("#frmProductDateFilters")
-            .off("submit.productDateFilters")
-            .on("submit.productDateFilters", function (event) {
-                event.preventDefault();
-                applyProductDateFilter();
-            });
-
-        $("#btnResetProductDateFilters")
-            .off("click.productDateFilters")
-            .on("click.productDateFilters", function () {
-                $("#productFromDate, #productToDate").val("");
-                reloadProductDateFilteredTables();
-            });
-
         Components.BindSelectOptions(
             "/product/get-product-category-list",
             "product_CategoryId",
@@ -434,38 +342,6 @@ ViewData["HideHeader"] = true;
             "categoryName"
         );
     });
-    function addProductDateParameters(request) {
-        // Both list-controller actions must apply these optional parameters
-        // to the intended date field before counting and paging their queries.
-        request.fromDate = $("#productFromDate").val() || "";
-        request.toDate = $("#productToDate").val() || "";
-    }
-
-    function applyProductDateFilter() {
-        const fromDate = $("#productFromDate").val();
-        const toDate = $("#productToDate").val();
-
-        if (fromDate && toDate && fromDate > toDate) {
-            const message = "From Date must not be later than To Date.";
-
-            if (typeof ShowToastError === "function") {
-                ShowToastError(message);
-            } else {
-                alert(message);
-            }
-            return;
-        }
-
-        reloadProductDateFilteredTables();
-    }
-
-    function reloadProductDateFilteredTables() {
-        ["#tblProduct", "#tblProductPayOnline"].forEach(function (selector) {
-            if ($.fn.DataTable.isDataTable(selector)) {
-                $(selector).DataTable().ajax.reload(null, true);
-            }
-        });
-    }
 
     function fetchProduct() {
         if ($.fn.DataTable.isDataTable("#tblProduct")) {
@@ -482,24 +358,23 @@ ViewData["HideHeader"] = true;
 
             responsive: false,
             autoWidth: false,
-            scrollX: true,
-            scrollCollapse: true,
+            scrollX: false,
+            scrollY: "",
 
             processing: true,
             serverSide: true,
 
             order: [[0, "desc"]],
 
-            ajax: {
+            ...createProductListOptions({
+                selector: "#tblProduct",
                 url: "/product/get-product-list",
-                type: "POST",
-                dataType: "json",
-                data: addProductDateParameters,
-                error: function (xhr) {
-                    console.log(xhr.responseText);
-                    ShowToastError("Cannot load product list.");
-                }
-            },
+                label: "Payment Items table",
+                placeholder: "Search payment items",
+                prompt: "Search for an item to see results.",
+                noMatches: "No payment items match your search.",
+                errorMessage: "Cannot load product list."
+            }),
 
             columns: [
                 {
@@ -623,30 +498,8 @@ ViewData["HideHeader"] = true;
                     `;
                     }
                 }
-            ],
-
-            initComplete: function () {
-                const api = this.api();
-
-                MyApp.utils.dataTableDebounceSearch("#tblProduct", 500);
-
-                setTimeout(function () {
-                    api.columns.adjust();
-                }, 300);
-            },
-
-            drawCallback: function () {
-                const api = this.api();
-
-                setTimeout(function () {
-                    api.columns.adjust();
-                }, 100);
-            }
+            ]
         });
-
-        setTimeout(function () {
-            tblProduct.DataTable().columns.adjust();
-        }, 1000);
     }
 
     function fetchProductPayOnline() {
@@ -666,27 +519,20 @@ ViewData["HideHeader"] = true;
 
             responsive: false,
             autoWidth: false,
-            scrollX: true,
-            scrollCollapse: true,
+            scrollX: false,
+            scrollY: "",
 
             order: [[0, "desc"]],
 
-            ajax: {
+            ...createProductListOptions({
+                selector: "#tblProductPayOnline",
                 url: "/product/get-product-detail-list",
-                type: "POST",
-                dataType: "json",
-                data: addProductDateParameters,
-
-                dataSrc: function (json) {
-                    console.log("Product WeBill response:", json);
-                    return json.data || [];
-                },
-
-                error: function (xhr) {
-                    console.log(xhr.responseText);
-                    ShowToastError("Cannot load WeBill product list.");
-                }
-            },
+                label: "WeBill payment items table",
+                placeholder: "Search WeBill items",
+                prompt: "Search for a WeBill item to see results.",
+                noMatches: "No WeBill items match your search.",
+                errorMessage: "Cannot load WeBill product list."
+            }),
 
             columns: [
                 { data: "productDetailId" },
@@ -724,26 +570,122 @@ ViewData["HideHeader"] = true;
                     `;
                     }
                 }
-            ],
+            ]
+        });
+    }
+
+    function createProductListOptions({ selector, url, label, placeholder, prompt, noMatches, errorMessage }) {
+        let inFlight = null;
+        let countUnavailable = false;
+        let emptyMessage = prompt;
+
+        return {
+            language: {
+                processing: "Loading...",
+                searchPlaceholder: placeholder,
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of _MAX_ entries",
+                infoFiltered: "",
+                thousands: ",",
+                emptyTable: prompt,
+                zeroRecords: noMatches
+            },
+
+            infoCallback: function (_settings, _start, _end, _max, _total, text) {
+                return countUnavailable ? "Total entries unavailable" : text;
+            },
+
+            ajax: function (request, complete) {
+                if (inFlight) {
+                    const previous = inFlight;
+                    inFlight = null;
+                    previous.abort();
+                }
+
+                const search = String(request.search?.value ?? "").trim();
+                const summaryOnly = !search;
+                const emptyResponse = { draw: request.draw, recordsTotal: 0, recordsFiltered: 0, data: [] };
+                emptyMessage = summaryOnly ? prompt : noMatches;
+
+                const pending = $.ajax({
+                    url,
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        ...request,
+                        // The existing endpoint can return the total with a one-row page.
+                        ...(summaryOnly ? { start: 0, length: 1 } : {}),
+                        search: { ...request.search, value: search }
+                    }
+                });
+                inFlight = pending;
+
+                function showLoadError(reason) {
+                    if (inFlight !== pending) return;
+
+                    countUnavailable = true;
+                    if (!summaryOnly) emptyMessage = errorMessage;
+                    console.error(errorMessage, reason);
+                    complete(emptyResponse);
+                    if (!summaryOnly && typeof ShowToastError === "function") {
+                        ShowToastError(errorMessage);
+                    }
+                }
+
+                return pending.done(function (response) {
+                    if (inFlight !== pending) return;
+
+                    const recordsTotal = Number(response?.recordsTotal ?? NaN);
+                    const recordsFiltered = Number(response?.recordsFiltered ?? NaN);
+                    const rows = response?.data ?? (recordsFiltered === 0 ? [] : null);
+                    if (!Number.isSafeInteger(recordsTotal) || recordsTotal < 0 ||
+                        (!summaryOnly && (!Array.isArray(rows) ||
+                            !Number.isSafeInteger(recordsFiltered) || recordsFiltered < 0))) {
+                        showLoadError("Unexpected list response.");
+                        return;
+                    }
+
+                    countUnavailable = false;
+                    complete(summaryOnly
+                        ? { ...emptyResponse, recordsTotal }
+                        : { draw: request.draw, recordsTotal, recordsFiltered, data: rows });
+                }).fail(function (xhr, status) {
+                    if (status !== "abort") showLoadError(xhr.status || status);
+                }).always(function () {
+                    if (inFlight === pending) inFlight = null;
+                });
+            },
 
             initComplete: function () {
-                const api = this.api();
-
-                MyApp.utils.dataTableDebounceSearch("#tblProductPayOnline", 500);
-
-                setTimeout(function () {
-                    api.columns.adjust();
-                }, 300);
+                const table = $(this.api().table().node());
+                if (!table.parent().hasClass("product-table-scroll")) {
+                    table.wrap($("<div>", {
+                        class: "product-table-scroll",
+                        role: "region",
+                        "aria-label": label,
+                        tabindex: 0
+                    }));
+                }
+                if (typeof MyApp !== "undefined" &&
+                    typeof MyApp.utils?.dataTableDebounceSearch === "function") {
+                    MyApp.utils.dataTableDebounceSearch(selector, 500);
+                }
             },
 
             drawCallback: function () {
                 const api = this.api();
+                const page = api.page.info();
+                const hasResults = page.recordsDisplay > 0;
 
-                setTimeout(function () {
-                    api.columns.adjust();
-                }, 100);
+                $(api.table().container())
+                    .toggleClass("product-has-results", hasResults)
+                    .toggleClass("product-has-pages", hasResults && page.pages > 1);
+
+                if (!hasResults) {
+                    $(api.table().body()).find("td.dataTables_empty, td.dt-empty").text(emptyMessage);
+                }
             }
-        });
+        };
     }
 
     btnAddNewProduct.off("click").on("click", function () {

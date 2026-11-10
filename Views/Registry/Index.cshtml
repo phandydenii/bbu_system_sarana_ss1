@@ -10,8 +10,17 @@ ViewData["HideHeader"] = true;
         width: 100%;
     }
 
-    #tblRegistry {
-        width: 100% !important;
+    #tblRegistry_wrapper:not(.registry-has-results) .dataTables_length,
+    #tblRegistry_wrapper:not(.registry-has-results) .dt-length,
+    #tblRegistry_wrapper:not(.registry-has-pages) .dataTables_paginate,
+    #tblRegistry_wrapper:not(.registry-has-pages) .dt-paging {
+        display: none;
+    }
+
+    #registryPage .registry-table-scroll {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
     }
 
     #tblRegistry th,
@@ -27,14 +36,6 @@ ViewData["HideHeader"] = true;
     #tblRegistry .badge {
         min-width: 75px;
         padding: 6px 8px;
-    }
-
-    #registryPage .dataTables_scrollHead {
-        overflow: hidden !important;
-    }
-
-    #registryPage .dataTables_scrollBody {
-        overflow-x: auto !important;
     }
 
     #RegistryDetailsModal {
@@ -86,89 +87,118 @@ ViewData["HideHeader"] = true;
 </style>
 
 <div id="registryPage" class="container-fluid px-0 pt-3" data-ui-design="booking-clothes-sample">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div class="mr-3">
             <h3 class="m-0 font-weight-bold text-dark">Student Registry</h3>
             <small class="text-muted">Manage student registrations and academic records</small>
         </div>
+        <button type="button"
+                id="btnOpenCreateRegistryModal"
+                class="btn btn-primary shadow-sm text-nowrap ml-auto mt-2 mt-sm-0">
+            <i class="fas fa-plus-circle mr-1" aria-hidden="true"></i>
+            New Register
+        </button>
     </div>
 
-    <!-- Filter card: same layout as the Booking Clothes sample. -->
     <div class="card card-outline card-primary shadow-sm mb-4">
         <div class="card-header bg-white py-2">
             <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
-                <i class="fas fa-filter text-primary mr-1"></i>
+                <i class="fas fa-filter text-primary mr-1" aria-hidden="true"></i>
                 Filter Registrations
             </h3>
             <div class="card-tools">
                 <button type="button"
                         class="btn btn-tool"
                         data-card-widget="collapse"
-                        aria-label="Collapse registration filters">
-                    <i class="fas fa-minus"></i>
+                        aria-label="Toggle registration filters">
+                    <i class="fas fa-minus" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
         <div class="card-body bg-light py-3">
-            <form id="frmRegistryFilters">
+            <form id="frmRegistryFilters" novalidate>
                 <div class="row align-items-end">
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="dtpFrom" class="text-secondary small font-weight-bold">
-                            From Date
+                    <div class="col-sm-6 col-lg-3 col-xl-2 mb-2 mb-xl-0">
+                        <label for="registryDateRange" class="text-secondary small font-weight-bold">
+                            Registration Date
                         </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
-                            </div>
-                            <input type="date"
-                                   id="dtpFrom"
-                                   name="from"
-                                   class="form-control border-left-0" />
-                        </div>
+                        <select id="registryDateRange"
+                                class="custom-select"
+                                aria-controls="registryCustomDates">
+                            <option value="all" selected>All Dates</option>
+                            <option value="today">Today</option>
+                            <option value="last7">Last 7 Days</option>
+                            <option value="month">This Month</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
                     </div>
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="dtpTo" class="text-secondary small font-weight-bold">
-                            To Date
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
+                    <div id="registryCustomDates" class="col-12 col-lg-6 col-xl-4 mb-2 mb-xl-0">
+                        <div class="row">
+                            <div class="col-sm-6 mb-2 mb-sm-0">
+                                <label for="dtpFrom" class="text-secondary small font-weight-bold">
+                                    From Date
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0">
+                                            <i class="far fa-calendar-alt text-muted" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                    <input type="date"
+                                           id="dtpFrom"
+                                           name="from"
+                                           min="0001-01-01"
+                                           max="9999-12-31"
+                                           class="form-control border-left-0"
+                                           aria-describedby="registryCustomDateHelp registryDateFilterError" />
+                                </div>
                             </div>
-                            <input type="date"
-                                   id="dtpTo"
-                                   name="to"
-                                   class="form-control border-left-0" />
+                            <div class="col-sm-6">
+                                <label for="dtpTo" class="text-secondary small font-weight-bold">
+                                    To Date
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-white border-right-0">
+                                            <i class="far fa-calendar-alt text-muted" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                    <input type="date"
+                                           id="dtpTo"
+                                           name="to"
+                                           min="0001-01-01"
+                                           max="9999-12-30"
+                                           class="form-control border-left-0"
+                                           aria-describedby="registryCustomDateHelp registryDateFilterError" />
+                                </div>
+                            </div>
                         </div>
+                        <small id="registryCustomDateHelp" class="sr-only">
+                            Enter one or both dates. Both selected dates are included.
+                        </small>
                     </div>
-                    <div class="col-md-2 col-sm-12 mb-2 mb-md-0 d-flex">
+                    <div class="col-auto d-flex mb-2 mb-xl-0">
                         <div class="btn-group shadow-sm" role="group" aria-label="Registration date filters">
                             <button type="submit"
                                     id="btnFilterRegistry"
                                     class="btn btn-success">
-                                <i class="fas fa-search mr-1"></i>
+                                <i class="fas fa-search mr-1" aria-hidden="true"></i>
                                 Filter
                             </button>
                             <button type="button"
                                     id="btnResetRegistryFilter"
                                     class="btn btn-success border-left"
                                     title="Reset filters"
-                                    aria-label="Reset registration filters">
-                                <i class="fas fa-redo-alt"></i>
+                                    aria-label="Reset registration date filters">
+                                <i class="fas fa-redo-alt" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="col-md-6 col-sm-12 d-flex justify-content-md-end mt-2 mt-md-0">
-                        <button type="button"
-                                id="btnOpenCreateRegistryModal"
-                                class="btn btn-primary shadow-sm">
-                            <i class="fas fa-plus-circle mr-1"></i>
-                            New Register
-                        </button>
-                    </div>
+                </div>
+
+                <div id="registryDateFilterError" class="text-danger small mt-2" role="alert" hidden></div>
+                <div id="registryDateFilterSummary" class="small text-secondary mt-3" role="status">
+                    Applied registration dates: All Dates
                 </div>
             </form>
         </div>
@@ -178,7 +208,7 @@ ViewData["HideHeader"] = true;
     <div class="card shadow-sm border-0">
         <div class="card-body">
             <table id="tblRegistry"
-                   class="table table-sm table-hover table-bordered table-striped w-100"
+                   class="table table-sm table-hover table-bordered table-striped"
                    style="width: 100%;">
                 <thead class="thead-light">
                 <tr>
@@ -251,12 +281,19 @@ ViewData["HideHeader"] = true;
 <script src="~/js/Components.js"></script>
 <script>
     let registryTable = null;
-    let registryResizeTimer = null;
+    let appliedRegistryDates = { preset: "all", from: "", to: "" };
+    let registryListRequest = null;
+    let registryEntryCountUnavailable = false;
+    const registrySearchPrompt = "Search by Student ID or name, or apply a date range.";
+    const registryNoMatchesMessage = "No registrations match your search or date range.";
+    let registryListEmptyMessage = registrySearchPrompt;
 
     $(function () {
+        registerRegistryDateFilters();
         initializeRegistryTable();
-        registerRegistryResizeEvents();
+    });
 
+    function registerRegistryDateFilters() {
         $("#frmRegistryFilters")
             .off("submit.registryFilters")
             .on("submit.registryFilters", function (event) {
@@ -264,36 +301,163 @@ ViewData["HideHeader"] = true;
                 applyRegistryDateFilters();
             });
 
+        $("#registryDateRange")
+            .off("change.registryFilters")
+            .on("change.registryFilters", syncRegistryDateInputs);
+
+        $("#dtpFrom, #dtpTo")
+            .off("input.registryFilters change.registryFilters")
+            .on("input.registryFilters change.registryFilters", function () {
+                $("#registryDateRange").val("custom");
+                setRegistryDateFilterError("");
+            });
+
         $("#btnResetRegistryFilter")
             .off("click.registryFilters")
-            .on("click.registryFilters", function () {
-                $("#dtpFrom, #dtpTo").val("");
+            .on("click.registryFilters", clearRegistryDateFilters);
 
-                if (registryTable) {
-                    registryTable.ajax.reload(null, true);
-                }
-            });
-    });
+        syncRegistryDateInputs();
+    }
+
+    function syncRegistryDateInputs() {
+        const preset = $("#registryDateRange").val();
+
+        if (preset !== "custom") {
+            setRegistryDateInputs(getRegistryPresetDates(preset));
+        }
+
+        setRegistryDateFilterError("");
+    }
+
+    function setRegistryDateInputs({ from, to }) {
+        $("#dtpFrom").val(from);
+        $("#dtpTo").val(to);
+    }
+
+    function setRegistryDateFilterError(message, fieldSelector) {
+        $("#registryDateFilterError").text(message).prop("hidden", !message);
+        $("#dtpFrom, #dtpTo").removeAttr("aria-invalid");
+
+        if (fieldSelector) {
+            $(fieldSelector).attr("aria-invalid", "true").trigger("focus");
+        }
+    }
+
+    function getRegistryPresetDates(preset, now = new Date()) {
+        if (!["today", "last7", "month"].includes(preset)) {
+            return { preset: "all", from: "", to: "" };
+        }
+
+        // Resolve the calendar day in Cambodia even if the device is in another timezone.
+        const parts = Object.fromEntries(
+            new Intl.DateTimeFormat("en-GB", {
+                timeZone: "Asia/Phnom_Penh",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+            }).formatToParts(now).map(part => [part.type, part.value])
+        );
+        const year = Number(parts.year);
+        const month = Number(parts.month) - 1;
+        const today = Date.UTC(year, month, Number(parts.day));
+        const isoDay = timestamp => new Date(timestamp).toISOString().slice(0, 10);
+
+        if (preset === "month") {
+            return {
+                preset,
+                from: isoDay(Date.UTC(year, month, 1)),
+                to: isoDay(Date.UTC(year, month + 1, 0))
+            };
+        }
+
+        const dayInMilliseconds = 24 * 60 * 60 * 1000;
+        const firstDay = preset === "last7" ? today - 6 * dayInMilliseconds : today;
+        return { preset, from: isoDay(firstDay), to: isoDay(today) };
+    }
 
     function applyRegistryDateFilters() {
-        const from = $("#dtpFrom").val();
-        const to = $("#dtpTo").val();
+        const preset = $("#registryDateRange").val();
+        let dates;
 
-        if (from && to && from > to) {
-            const message = "From Date must not be later than To Date.";
+        setRegistryDateFilterError("");
 
-            if (typeof ShowToastError === "function") {
-                ShowToastError(message);
-            } else {
-                alert(message);
+        if (preset === "custom") {
+            const fromInput = document.getElementById("dtpFrom");
+            const toInput = document.getElementById("dtpTo");
+
+            if (!fromInput.validity.valid) {
+                setRegistryDateFilterError("Enter a valid From Date.", "#dtpFrom");
+                return;
             }
 
-            return;
+            if (!toInput.validity.valid) {
+                setRegistryDateFilterError("Enter a valid To Date.", "#dtpTo");
+                return;
+            }
+
+            const from = fromInput.value;
+            const to = toInput.value;
+
+            if (!from && !to) {
+                setRegistryDateFilterError("Enter at least one date, or choose All Dates.", "#dtpFrom");
+                return;
+            }
+
+            if (from && to && from > to) {
+                setRegistryDateFilterError("To Date must be on or after From Date.", "#dtpTo");
+                return;
+            }
+
+            dates = { preset, from, to };
+        } else {
+            dates = getRegistryPresetDates(preset);
+            setRegistryDateInputs(dates);
         }
+
+        appliedRegistryDates = dates;
+        updateRegistryDateFilterSummary();
 
         if (registryTable) {
             registryTable.ajax.reload(null, true);
         }
+    }
+
+    function clearRegistryDateFilters() {
+        const hadDateFilter = Boolean(appliedRegistryDates.from || appliedRegistryDates.to);
+
+        $("#registryDateRange").val("all");
+        appliedRegistryDates = { preset: "all", from: "", to: "" };
+        syncRegistryDateInputs();
+        updateRegistryDateFilterSummary();
+
+        // Reset dates only; keep the user's DataTables search.
+        if (registryTable && hadDateFilter) {
+            registryTable.ajax.reload(null, true);
+        }
+    }
+
+    function updateRegistryDateFilterSummary() {
+        const { preset, from, to } = appliedRegistryDates;
+        const labels = {
+            all: "All Dates",
+            today: "Today",
+            last7: "Last 7 Days",
+            month: "This Month",
+            custom: "Custom Range"
+        };
+        const displayDate = iso => iso.split("-").reverse().join("/");
+        let summary = "Applied registration dates: " + labels[preset];
+
+        if (from && to) {
+            summary += " (" + displayDate(from) +
+                (from === to ? "" : " – " + displayDate(to)) + ")";
+        } else if (from) {
+            summary += " (from " + displayDate(from) + ")";
+        } else if (to) {
+            summary += " (through " + displayDate(to) + ")";
+        }
+
+        $("#registryDateFilterSummary").text(summary);
     }
 
     function initializeRegistryTable() {
@@ -312,37 +476,16 @@ ViewData["HideHeader"] = true;
             searching: true,
             ordering: true,
             info: true,
+            stateSave: false,
 
             responsive: false,
             autoWidth: false,
-            scrollX: true,
-            scrollCollapse: true,
+            scrollX: false,
+            scrollY: "",
 
             order: [[0, "desc"]],
 
-            ajax: {
-                url: "@Url.Action("GetStudentRegistryList", "Registry")",
-                type: "POST",
-                data: function (request) {
-                    request.from = $("#dtpFrom").val() || "";
-                    request.to = $("#dtpTo").val() || "";
-                },
-                dataSrc: function (response) {
-                    return response?.data ?? [];
-                },
-                error: function (xhr, error, thrown) {
-                    console.error(
-                        "Cannot load student registry list:",
-                        xhr.responseText || error || thrown
-                    );
-
-                    if (typeof ShowToastError === "function") {
-                        ShowToastError(
-                            "Cannot load student registry list."
-                        );
-                    }
-                }
-            },
+            ajax: loadRegistryRows,
 
             columns: [
                 {
@@ -476,60 +619,127 @@ ViewData["HideHeader"] = true;
 
             language: {
                 processing: "Loading...",
-                emptyTable: "No student registry found.",
-                zeroRecords: "No matching student found."
+                searchPlaceholder: "Student ID or name",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of _MAX_ entries",
+                infoFiltered: "",
+                thousands: ",",
+                emptyTable: registrySearchPrompt,
+                zeroRecords: registryNoMatchesMessage
+            },
+
+            infoCallback: function (_settings, _start, _end, _max, _total, text) {
+                return registryEntryCountUnavailable ? "Total entries unavailable" : text;
             },
 
             initComplete: function () {
-                const api = this.api();
-                MyApp.utils.dataTableDebounceSearch(tableSelector,500);
-                adjustRegistryColumns(api);
+                // Scroll the single table instead of having DataTables clone its header.
+                const $table = $(this.api().table().node());
+                if (!$table.parent().hasClass("registry-table-scroll")) {
+                    $table.wrap('<div class="registry-table-scroll" role="region" aria-label="Student Registry table" tabindex="0"></div>');
+                }
+                if (typeof MyApp !== "undefined" &&
+                    typeof MyApp.utils?.dataTableDebounceSearch === "function") {
+                    MyApp.utils.dataTableDebounceSearch(tableSelector, 500);
+                }
             },
 
             drawCallback: function () {
-                adjustRegistryColumns(this.api());
+                updateRegistryResultControls(this.api());
             }
         });
     }
 
-    function adjustRegistryColumns(api) {
-        window.requestAnimationFrame(function () {
-            api.columns.adjust();
+    function loadRegistryRows(request, complete) {
+        if (registryListRequest) {
+            const previousRequest = registryListRequest;
+            registryListRequest = null;
+            previousRequest.abort();
+        }
+
+        const searchValue = String(request.search?.value ?? "").trim();
+        const { from, to } = appliedRegistryDates;
+        const summaryOnly = !searchValue && !from && !to;
+        const emptyResponse = {
+            draw: request.draw,
+            recordsTotal: 0,
+            recordsFiltered: 0,
+            data: []
+        };
+
+        registryListEmptyMessage = summaryOnly ? registrySearchPrompt : registryNoMatchesMessage;
+        const pending = $.ajax({
+            url: "@Url.Action("GetStudentRegistryList", "Registry")",
+            type: "POST",
+            dataType: "json",
+            data: {
+                ...request,
+                // Older controllers ignore countOnly; limit that fallback to one undisplayed row.
+                ...(summaryOnly ? { start: 0, length: 1, countOnly: true } : {}),
+                search: { ...request.search, value: searchValue },
+                from,
+                to
+            }
         });
+        registryListRequest = pending;
 
-        window.setTimeout(function () {
-            api.columns.adjust();
-        }, 150);
+        function showLoadError(reason) {
+            if (registryListRequest !== pending) return;
 
-        window.setTimeout(function () {
-            api.columns.adjust();
-        }, 350);
+            registryEntryCountUnavailable = true;
+            if (!summaryOnly) {
+                registryListEmptyMessage = "Unable to load registrations. Try searching again.";
+            }
+            console.error("Cannot load student registry list:", reason);
+            complete(emptyResponse);
+            if (!summaryOnly && typeof ShowToastError === "function") {
+                ShowToastError("Cannot load student registry list.");
+            }
+        }
+
+        return pending.done(function (response) {
+            if (registryListRequest !== pending) return;
+
+            const recordsTotal = Number(response?.recordsTotal ?? NaN);
+            const recordsFiltered = Number(response?.recordsFiltered ?? NaN);
+            if (!Array.isArray(response?.data) ||
+                !Number.isSafeInteger(recordsTotal) || recordsTotal < 0 ||
+                !Number.isSafeInteger(recordsFiltered) || recordsFiltered < 0) {
+                showLoadError("Unexpected list response.");
+                return;
+            }
+
+            registryEntryCountUnavailable = false;
+            if (summaryOnly) {
+                // Give DataTables the true total for its footer, but no rows or pages.
+                complete({ ...emptyResponse, recordsTotal });
+            } else {
+                complete({ ...response, draw: request.draw, recordsTotal, recordsFiltered });
+            }
+        }).fail(function (xhr, status) {
+            if (status !== "abort") {
+                showLoadError(xhr.status || status);
+            }
+        }).always(function () {
+            if (registryListRequest === pending) {
+                registryListRequest = null;
+            }
+        });
     }
 
-    function registerRegistryResizeEvents() {
-        $(window)
-            .off("resize.registryTable")
-            .on("resize.registryTable", function () {
-                clearTimeout(registryResizeTimer);
-                registryResizeTimer = setTimeout(function () {
-                    if ($.fn.DataTable.isDataTable(
-                        "#tblRegistry"
-                    )) {
-                        registryTable.columns.adjust();
-                    }
-                }, 100);
-            });
+    function updateRegistryResultControls(api) {
+        const page = api.page.info();
+        const hasResults = page.recordsDisplay > 0;
 
-        $(document).off("collapsed.lte.pushmenu.registry " + "shown.lte.pushmenu.registry")
-            .on("collapsed.lte.pushmenu.registry " + "shown.lte.pushmenu.registry",
-                function () {
-                    setTimeout(function () {
-                        if ($.fn.DataTable.isDataTable("#tblRegistry")) {
-                            registryTable.columns.adjust();
-                        }
-                    }, 350);
-                }
-            );
+        $(api.table().container())
+            .toggleClass("registry-has-results", hasResults)
+            .toggleClass("registry-has-pages", hasResults && page.pages > 1);
+
+        if (!hasResults) {
+            $(api.table().body())
+                .find("td.dataTables_empty, td.dt-empty")
+                .text(registryListEmptyMessage);
+        }
     }
 
     function escapeRegistryHtml(value) {
@@ -558,25 +768,25 @@ ViewData["HideHeader"] = true;
                 cache: false,
                 timeout: 20000
             }).done(function (html) {
-                    createRegistryModalHost.html(html);
-                    const modal = $("#CreateRegistryModal");
-                    if (!modal.length) {
-                        const message = "Create Registry modal was not returned.";
-                        if (typeof ShowToastError === "function") {
-                            ShowToastError(message);
-                        } else {
-                            alert(message);
-                        }
-                        createRegistryModalHost.empty();
-                        return;
+                createRegistryModalHost.html(html);
+                const modal = $("#CreateRegistryModal");
+                if (!modal.length) {
+                    const message = "Create Registry modal was not returned.";
+                    if (typeof ShowToastError === "function") {
+                        ShowToastError(message);
+                    } else {
+                        alert(message);
                     }
+                    createRegistryModalHost.empty();
+                    return;
+                }
 
-                    modal.modal({
-                        backdrop: "static",
-                        keyboard: false,
-                        show: true
-                    });
-                })
+                modal.modal({
+                    backdrop: "static",
+                    keyboard: false,
+                    show: true
+                });
+            })
                 .fail(function (xhr, status) {
                     if (status === "abort") {
                         return;

@@ -36,77 +36,6 @@ ViewData["HideHeader"] = true;
         </div>
     </div>
 
-    <!-- Date filter card; keep the DataTable's existing text search. -->
-    <div class="card card-outline card-primary shadow-sm mb-4">
-        <div class="card-header bg-white py-2">
-            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
-                <i class="fas fa-filter text-primary mr-1"></i>
-                Filter Graduate Letters
-            </h3>
-            <div class="card-tools">
-                <button type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                        aria-label="Collapse graduate letter filters">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
-        </div>
-        <div class="card-body bg-light py-3">
-            <form id="frmGraduateLetterFilters">
-                <div class="row align-items-end">
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="graduateLetterFromDate" class="text-secondary small font-weight-bold">
-                            From Date
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
-                            </div>
-                            <input type="date"
-                                   id="graduateLetterFromDate"
-                                   name="fromDate"
-                                   class="form-control border-left-0" />
-                        </div>
-                    </div>
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="graduateLetterToDate" class="text-secondary small font-weight-bold">
-                            To Date
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
-                            </div>
-                            <input type="date"
-                                   id="graduateLetterToDate"
-                                   name="toDate"
-                                   class="form-control border-left-0" />
-                        </div>
-                    </div>
-                    <div class="col-md-2 col-sm-12 d-flex">
-                        <div class="btn-group shadow-sm" role="group" aria-label="Graduate letter date filters">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-search mr-1"></i>
-                                Filter
-                            </button>
-                            <button type="button"
-                                    id="btnResetGraduateLetterFilters"
-                                    class="btn btn-success border-left"
-                                    title="Reset filters"
-                                    aria-label="Reset graduate letter date filters">
-                                <i class="fas fa-redo-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Data Table Card -->
     <div class="card shadow-sm border-0">
         <div class="card-body graduate-letter-table-scroll">
@@ -144,26 +73,14 @@ ViewData["HideHeader"] = true;
     const btnSave = $("#btnSave");
     const formCertificateInfo = $("#formCertificateInfo");
     const formBookingInfo = $("#formBookingInfo");
+    const graduateLetterSearchPrompt = "Search by Student ID or name to display students.";
+    const graduateLetterNoMatches = "No students match your search.";
+    const graduateLetterLoadError = "Unable to load students. Try searching again.";
+    let graduateLetterEmptyMessage = graduateLetterSearchPrompt;
+    let graduateLetterStudentRequest = null;
 
     $(document).ready(function () {
         fetchStudent();
-
-        $("#frmGraduateLetterFilters")
-            .off("submit.graduateLetterFilters")
-            .on("submit.graduateLetterFilters", function (event) {
-                event.preventDefault();
-                applyGraduateLetterDateFilter();
-            });
-
-        $("#btnResetGraduateLetterFilters")
-            .off("click.graduateLetterFilters")
-            .on("click.graduateLetterFilters", function () {
-                $("#graduateLetterFromDate, #graduateLetterToDate").val("");
-
-                if ($.fn.DataTable.isDataTable("#tblStudent")) {
-                    tblStudent.DataTable().ajax.reload(null, true);
-                }
-            });
 
         $('#formCertificateInfo :input').each(function () {
             certificateData[this.name] = $(this).val();
@@ -173,26 +90,6 @@ ViewData["HideHeader"] = true;
             bookingData[this.name] = $(this).val();
         });
     });
-
-    function applyGraduateLetterDateFilter() {
-        const fromDate = $("#graduateLetterFromDate").val();
-        const toDate = $("#graduateLetterToDate").val();
-
-        if (fromDate && toDate && fromDate > toDate) {
-            const message = "From Date must not be later than To Date.";
-
-            if (typeof ShowToastError === "function") {
-                ShowToastError(message);
-            } else {
-                alert(message);
-            }
-            return;
-        }
-
-        if ($.fn.DataTable.isDataTable("#tblStudent")) {
-            tblStudent.DataTable().ajax.reload(null, true);
-        }
-    }
 
     function isFormCertificateChanged() {
         let changed = false;
@@ -228,23 +125,8 @@ ViewData["HideHeader"] = true;
             autoWidth: false,
             pageLength: 10,
             searching: true,
-            ajax: {
-                url: "/student/academic/student-list/all",
-                type: "POST",
-                // The list controller must apply these optional dates to
-                // the intended database date column before count/paging.
-                data: function (request) {
-                    request.fromDate = $("#graduateLetterFromDate").val() || "";
-                    request.toDate = $("#graduateLetterToDate").val() || "";
-                },
-                error: function (xhr) {
-                    if (typeof ShowToastError === 'function') {
-                        ShowToastError(xhr.responseText || "Failed to load student list");
-                    } else {
-                        alert(xhr.responseText || "Failed to load student list");
-                    }
-                }
-            },
+            stateSave: false,
+            ajax: loadGraduateLetterStudents,
             columns: [
                 { data: "studentId" },
                 { data: "studentName" },
@@ -284,11 +166,80 @@ ViewData["HideHeader"] = true;
                     }
                 }
             ],
+            language: {
+                searchPlaceholder: "Student ID or name",
+                emptyTable: graduateLetterSearchPrompt,
+                zeroRecords: graduateLetterNoMatches
+            },
+            infoCallback: function (_settings, _start, _end, _max, _total, text) {
+                const idleOrFailed = graduateLetterEmptyMessage === graduateLetterSearchPrompt ||
+                    graduateLetterEmptyMessage === graduateLetterLoadError;
+                return idleOrFailed ? "" : text;
+            },
+            drawCallback: function () {
+                $(this.api().table().body()).find("td.dataTables_empty, td.dt-empty")
+                    .text(graduateLetterEmptyMessage);
+            },
             initComplete: function () {
                 if (typeof MyApp !== "undefined" &&
                     typeof MyApp.utils?.dataTableDebounceSearch === "function") {
                     MyApp.utils.dataTableDebounceSearch("#tblStudent", 500);
                 }
+            }
+        });
+    }
+
+    function loadGraduateLetterStudents(request, complete) {
+        if (graduateLetterStudentRequest) {
+            const previousRequest = graduateLetterStudentRequest;
+            graduateLetterStudentRequest = null;
+            previousRequest.abort();
+        }
+
+        const search = String(request.search?.value ?? "").trim();
+        const emptyResponse = { draw: request.draw, recordsTotal: 0, recordsFiltered: 0, data: [] };
+
+        if (!search) {
+            graduateLetterEmptyMessage = graduateLetterSearchPrompt;
+            complete(emptyResponse);
+            return;
+        }
+
+        const pending = $.ajax({
+            url: "/student/academic/student-list/all",
+            type: "POST",
+            dataType: "json",
+            data: { ...request, search: { ...request.search, value: search } }
+        });
+        graduateLetterStudentRequest = pending;
+
+        function showLoadError() {
+            graduateLetterEmptyMessage = graduateLetterLoadError;
+            complete(emptyResponse);
+        }
+
+        return pending.done(function (response) {
+            if (graduateLetterStudentRequest !== pending) return;
+
+            const recordsTotal = Number(response?.recordsTotal ?? NaN);
+            const recordsFiltered = Number(response?.recordsFiltered ?? NaN);
+            const rows = response?.data ?? (recordsFiltered === 0 ? [] : null);
+            if (!Number.isSafeInteger(recordsTotal) || recordsTotal < 0 ||
+                !Number.isSafeInteger(recordsFiltered) || recordsFiltered < 0 ||
+                !Array.isArray(rows)) {
+                showLoadError();
+                return;
+            }
+
+            graduateLetterEmptyMessage = graduateLetterNoMatches;
+            complete({ draw: request.draw, recordsTotal, recordsFiltered, data: rows });
+        }).fail(function (_xhr, status) {
+            if (graduateLetterStudentRequest === pending && status !== "abort") {
+                showLoadError();
+            }
+        }).always(function () {
+            if (graduateLetterStudentRequest === pending) {
+                graduateLetterStudentRequest = null;
             }
         });
     }

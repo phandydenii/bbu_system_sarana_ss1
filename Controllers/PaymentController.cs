@@ -41,7 +41,118 @@ public class PaymentController(ICampusDbContext campusDbContext, IHttpContextAcc
             StudentSearches = students
         });
     }
+    [HttpPost("get-students-by-invoice-date")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GetStudentsByInvoiceDate(
+        [FromForm] DateTime? fromDate,
+        [FromForm] DateTime? toDate,
+        System.Threading.CancellationToken cancellationToken)
+    {
+        var fromDay = fromDate?.Date;
+        var toDay = toDate?.Date;
 
+        if (!ModelState.IsValid || (fromDay == null && toDay == null))
+        {
+            return BadRequest(new { message = "Enter a valid From Date or To Date." });
+        }
+
+        if (fromDay.HasValue && toDay.HasValue && fromDay.Value > toDay.Value)
+        {
+            return BadRequest(new { message = "From Date must not be later than To Date." });
+        }
+
+        if (toDay == DateTime.MaxValue.Date)
+        {
+            return BadRequest(new { message = "Choose an earlier To Date." });
+        }
+
+        var form = await Request.ReadFormAsync(cancellationToken);
+        var draw = int.TryParse(form["draw"].ToString(), out var drawValue)
+            ? Math.Max(0, drawValue)
+            : 0;
+        var start = int.TryParse(form["start"].ToString(), out var startValue)
+            ? Math.Max(0, startValue)
+            : 0;
+        var pageSize = int.TryParse(form["length"].ToString(), out var lengthValue) && lengthValue > 0
+            ? Math.Min(100, lengthValue)
+            : 10;
+
+        var db = campusDbContext.DbContext(_campus);
+        var matchingInvoices = db.TblInvoice.AsNoTracking();
+
+        if (fromDay is DateTime firstDay)
+        {
+            matchingInvoices = matchingInvoices.Where(invoice => invoice.InvoiceDate >= firstDay);
+        }
+
+        if (toDay is DateTime lastDay)
+        {
+            // INVOICE_DATE can include a time. Include all of the selected last day.
+            var endExclusive = lastDay.AddDays(1);
+            matchingInvoices = matchingInvoices.Where(invoice => invoice.InvoiceDate < endExclusive);
+        }
+
+        // A student appears once, even when several of their invoices match.
+        var students = db.TblStudent.AsNoTracking()
+            .Where(student => student.StudentId != null &&
+                matchingInvoices.Any(invoice => invoice.StudentId == student.StudentId));
+
+        var recordsTotal = await students.CountAsync(cancellationToken);
+        var recordsFiltered = recordsTotal;
+        var search = form["search[value]"].ToString().Trim();
+
+        if (search.Length > 0)
+        {
+            students = students.Where(student =>
+                (student.StudentId ?? "").Contains(search) ||
+                (student.StudentName ?? "").Contains(search) ||
+                (student.StudentNameInKhmer ?? "").Contains(search) ||
+                (student.Phone ?? "").Contains(search));
+            recordsFiltered = await students.CountAsync(cancellationToken);
+        }
+
+        var column = form["order[0][column]"].ToString();
+        var descending = string.Equals(
+            form["order[0][dir]"].ToString(), "desc", StringComparison.OrdinalIgnoreCase);
+
+        IOrderedQueryable<T> Sort<T, TKey>(
+            IQueryable<T> rows, System.Linq.Expressions.Expression<Func<T, TKey>> key)
+            => descending ? rows.OrderByDescending(key) : rows.OrderBy(key);
+
+        var orderedStudents = column switch
+        {
+            "0" => Sort(students, student => student.StudentId),
+            "1" => Sort(students, student => student.StudentName),
+            "2" => Sort(students, student => student.StudentNameInKhmer),
+            "3" => Sort(students, student => student.Sex),
+            "4" => Sort(students, student => student.DateOfBirth),
+            "5" => Sort(students, student => student.Phone),
+            "6" => Sort(students, student => student.Status),
+            _ => students.OrderByDescending(student => student.StudentId)
+        };
+
+        if (column is "1" or "2" or "3" or "4" or "5" or "6")
+        {
+            orderedStudents = orderedStudents.ThenBy(student => student.StudentId);
+        }
+
+        var data = await orderedStudents
+            .Skip(start)
+            .Take(pageSize)
+            .Select(student => new
+            {
+                studentId = student.StudentId,
+                studentName = student.StudentName,
+                studentNameInKhmer = student.StudentNameInKhmer,
+                sex = student.Sex,
+                dateOfBirth = student.DateOfBirth,
+                phone = student.Phone,
+                status = student.Status
+            })
+            .ToListAsync(cancellationToken);
+
+        return Json(new { draw, recordsTotal, recordsFiltered, data });
+    }
     [HttpGet("create-student-payment")]
     public IActionResult Create([FromQuery] string? studentId)
     {
