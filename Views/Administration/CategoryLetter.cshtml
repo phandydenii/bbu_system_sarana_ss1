@@ -1,8 +1,8 @@
 ﻿@{
-    ViewData["Title"] = "Letter Types";
-    ViewData["OpenMenu"] = "Administration";
-    ViewData["Action"] = "LetterType";
-    ViewData["HideHeader"] = true;
+ViewData["Title"] = "Letter Types";
+ViewData["OpenMenu"] = "Administration";
+ViewData["Action"] = "LetterType";
+ViewData["HideHeader"] = true;
 }
 
 <style>
@@ -32,87 +32,15 @@
 </style>
 
 <div id="letterTypePage" class="container-fluid px-0 pt-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div class="mr-3 my-1">
             <h3 class="m-0 font-weight-bold text-dark">Letter Types</h3>
             <small class="text-muted">Manage letter categories, pricing, and numbering settings</small>
         </div>
-    </div>
-
-    <div class="card card-outline card-primary shadow-sm mb-4">
-        <div class="card-header bg-white py-2">
-            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
-                <i class="fas fa-filter text-primary mr-1"></i>
-                Filter Letter Types
-            </h3>
-            <div class="card-tools">
-                <button type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                        aria-label="Collapse letter type filters">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
-        </div>
-        <div class="card-body bg-light py-3">
-            <form id="frmLetterTypeFilters">
-                <div class="row align-items-end">
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="letterTypeFromDate" class="text-secondary small font-weight-bold">
-                            From Date
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
-                            </div>
-                            <input type="date"
-                                   id="letterTypeFromDate"
-                                   name="fromDate"
-                                   class="form-control border-left-0" />
-                        </div>
-                    </div>
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="letterTypeToDate" class="text-secondary small font-weight-bold">
-                            To Date
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
-                            </div>
-                            <input type="date"
-                                   id="letterTypeToDate"
-                                   name="toDate"
-                                   class="form-control border-left-0" />
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-12 mb-2 mb-md-0">
-                        <div class="btn-group shadow-sm" role="group" aria-label="Letter type date filters">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-search mr-1"></i>
-                                Filter
-                            </button>
-                            <button type="button"
-                                    id="btnResetLetterTypeFilters"
-                                    class="btn btn-success border-left"
-                                    title="Reset filters"
-                                    aria-label="Reset letter type date filters">
-                                <i class="fas fa-redo-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-md-5 col-sm-12 text-md-right">
-                        <button type="button" class="btn btn-primary shadow-sm" id="btnAddNew">
-                            <i class="fas fa-plus-circle mr-1"></i>
-                            Add New
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
+        <button type="button" class="btn btn-primary shadow-sm ml-auto my-1" id="btnAddNew">
+            <i class="fas fa-plus-circle mr-1" aria-hidden="true"></i>
+            Add New
+        </button>
     </div>
 
     <div class="card shadow-sm border-0">
@@ -141,223 +69,195 @@
 
 @section Scripts
 {
-    <script>
-        const tblLetterCategory = $("#tblLetterCategory");
-        const modalLetterCategory = $("#modalLetterCategory");
-        const frmLetterCategory = $("#frmLetterCategory");
-        let letterCategoryTable = null;
+<script>
+    const tblLetterCategory = $("#tblLetterCategory");
+    const modalLetterCategory = $("#modalLetterCategory");
+    const frmLetterCategory = $("#frmLetterCategory");
+    const letterTypeSearchPrompt = "Search by letter type name to display results.";
+    const letterTypeNoMatches = "No letter types match your search.";
+    const letterTypeLoadError = "Unable to load letter types. Try searching again.";
+    let letterCategoryTable = null;
+    let letterTypeRequest = null;
+    let letterTypeEmptyMessage = letterTypeSearchPrompt;
 
-        $(document).ready(function () {
-            fetchLetterCategory();
+    $(document).ready(function () {
+        fetchLetterCategory();
 
-            $("#frmLetterTypeFilters").on("submit.letterTypeFilters", function (event) {
-                event.preventDefault();
+        $("#btnAddNew").on("click.letterCategory", function () {
+            resetLetterCategoryForm();
+            modalLetterCategory.find(".modal-title").text("Add New Letter Category");
+            modalLetterCategory.modal("show");
+        });
 
-                const fromDate = $("#letterTypeFromDate").val();
-                const toDate = $("#letterTypeToDate").val();
+        tblLetterCategory.on("click", ".js-letter-category-edit", function (event) {
+            event.preventDefault();
+            const row = getLetterCategoryRow(this);
+            if (!row) return;
 
-                if (fromDate && toDate && fromDate > toDate) {
-                    ShowToastError("From Date must not be later than To Date.");
-                    return;
-                }
+            resetLetterCategoryForm();
+            $("#letterCategory_CategoryId").val(row.categoryId);
+            $("#letterCategory_CategoryName").val(row.categoryName);
+            $("#letterCategory_UnitPrice").val(row.unitPrice);
+            $("#isAdmin").prop("checked", row.isAdmin === true);
+            $("#isFoundation").prop("checked", row.isFoundation === true);
+            $("#isShort").prop("checked", row.isShortCourse === true);
+            $("#isStartNewNumber").prop("checked", row.isStartNewNumber === true);
 
-                letterCategoryTable.ajax.reload(null, true);
-            });
+            modalLetterCategory.find(".modal-title").text("Edit Letter Category");
+            modalLetterCategory.modal("show");
+        });
 
-            $("#btnResetLetterTypeFilters").on("click.letterTypeFilters", function () {
-                $("#letterTypeFromDate, #letterTypeToDate").val("");
-                letterCategoryTable.ajax.reload(null, true);
-            });
+        tblLetterCategory.on("click", ".js-letter-category-delete", function (event) {
+            event.preventDefault();
+            const row = getLetterCategoryRow(this);
+            if (!row) return;
 
-            $("#btnAddNew").on("click.letterCategory", function () {
-                resetLetterCategoryForm();
-                modalLetterCategory.find(".modal-title").text("Add New Letter Category");
-                modalLetterCategory.modal("show");
-            });
+            if (!confirm("Are you sure you want to delete this category?")) return;
 
-            tblLetterCategory.on("click", ".js-letter-category-edit", function (event) {
-                event.preventDefault();
-                const row = getLetterCategoryRow(this);
-                if (!row) return;
-
-                resetLetterCategoryForm();
-                $("#letterCategory_CategoryId").val(row.categoryId);
-                $("#letterCategory_CategoryName").val(row.categoryName);
-                $("#letterCategory_UnitPrice").val(row.unitPrice);
-                $("#isAdmin").prop("checked", row.isAdmin === true);
-                $("#isFoundation").prop("checked", row.isFoundation === true);
-                $("#isShort").prop("checked", row.isShortCourse === true);
-                $("#isStartNewNumber").prop("checked", row.isStartNewNumber === true);
-
-                modalLetterCategory.find(".modal-title").text("Edit Letter Category");
-                modalLetterCategory.modal("show");
-            });
-
-            tblLetterCategory.on("click", ".js-letter-category-delete", function (event) {
-                event.preventDefault();
-                const row = getLetterCategoryRow(this);
-                if (!row) return;
-
-                if (!confirm("Are you sure you want to delete this category?")) return;
-
-                $.ajax({
-                    url: `/letter-category/delete/${encodeURIComponent(row.categoryId)}`,
-                    type: "POST",
-                    data: letterCategoryAntiForgeryData(),
-                    success: function (response) {
-                        if (String(response?.status?.code) === "200") {
-                            ShowToastSuccess(response.status.message || "Letter category deleted successfully.");
-                            resetLetterCategoryForm();
-                            modalLetterCategory.modal("hide");
-                            letterCategoryTable.ajax.reload(null, false);
-                        } else {
-                            ShowToastError(response?.status?.message || "Failed to delete letter category.");
-                        }
-                    },
-                    error: function (xhr) {
-                        showLetterCategoryError(xhr, "Failed to delete letter category.");
+            $.ajax({
+                url: `/letter-category/delete/${encodeURIComponent(row.categoryId)}`,
+                type: "POST",
+                data: letterCategoryAntiForgeryData(),
+                success: function (response) {
+                    if (String(response?.status?.code) === "200") {
+                        ShowToastSuccess(response.status.message || "Letter category deleted successfully.");
+                        resetLetterCategoryForm();
+                        modalLetterCategory.modal("hide");
+                        letterCategoryTable.ajax.reload(null, false);
+                    } else {
+                        ShowToastError(response?.status?.message || "Failed to delete letter category.");
                     }
-                });
-            });
-
-            frmLetterCategory.on("submit.letterCategory", function (event) {
-                event.preventDefault();
-
-                if (typeof frmLetterCategory.valid === "function" && !frmLetterCategory.valid()) {
-                    return;
+                },
+                error: function (xhr) {
+                    showLetterCategoryError(xhr, "Failed to delete letter category.");
                 }
-
-                const submitButtons = frmLetterCategory.find(":submit");
-                submitButtons.prop("disabled", true);
-
-                $.ajax({
-                    url: "/letter-category/post-letter-category",
-                    method: "POST",
-                    data: frmLetterCategory.serialize(),
-                    success: function (response) {
-                        if (String(response?.status?.code) === "200") {
-                            ShowToastSuccess(response.status.message || "Letter category saved successfully.");
-                            resetLetterCategoryForm();
-                            modalLetterCategory.modal("hide");
-                            letterCategoryTable.ajax.reload(null, false);
-                        } else {
-                            ShowToastError(response?.status?.message || "Failed to save letter category.");
-                        }
-                    },
-                    error: function (xhr) {
-                        showLetterCategoryError(xhr, "Failed to save letter category.");
-                    },
-                    complete: function () {
-                        submitButtons.prop("disabled", false);
-                    }
-                });
             });
         });
 
-        function resetLetterCategoryForm() {
-            frmLetterCategory[0].reset();
-            // An Add operation must never reuse the ID from the previous edit.
-            $("#letterCategory_CategoryId").val("0");
+        frmLetterCategory.on("submit.letterCategory", function (event) {
+            event.preventDefault();
 
-            const validator = frmLetterCategory.data("validator");
-            if (validator && typeof validator.resetForm === "function") {
-                validator.resetForm();
-            }
-        }
-
-        function getLetterCategoryRow(button) {
-            let tableRow = $(button).closest("tr");
-
-            // DataTables Responsive can put action buttons in a child row.
-            if (tableRow.hasClass("child")) {
-                tableRow = tableRow.prev();
+            if (typeof frmLetterCategory.valid === "function" && !frmLetterCategory.valid()) {
+                return;
             }
 
-            return letterCategoryTable.row(tableRow).data();
-        }
+            const submitButtons = frmLetterCategory.find(":submit");
+            submitButtons.prop("disabled", true);
 
-        function letterCategoryAntiForgeryData() {
-            const token = frmLetterCategory.find('input[name="__RequestVerificationToken"]').val();
-            return token ? { __RequestVerificationToken: token } : {};
-        }
-
-        function showLetterCategoryError(xhr, fallbackMessage) {
-            console.error("Letter category request failed:", xhr.status, xhr.responseText);
-            const response = xhr.responseJSON;
-            ShowToastError(response?.status?.message || response?.detail || fallbackMessage);
-        }
-
-        function fetchLetterCategory() {
-            if ($.fn.DataTable.isDataTable("#tblLetterCategory")) {
-                tblLetterCategory.DataTable().clear().destroy();
-            }
-
-            const renderText = $.fn.dataTable.render.text();
-
-            letterCategoryTable = tblLetterCategory.DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                autoWidth: false,
-                pageLength: 10,
-                searching: true,
-                ajax: {
-                    url: "/letter-category/get-letter-category",
-                    type: "POST",
-                    data: function (request) {
-                        request.isAll = false;
-                        // The controller must apply these optional values to
-                        // the correct database date field before paging.
-                        request.fromDate = $("#letterTypeFromDate").val() || "";
-                        request.toDate = $("#letterTypeToDate").val() || "";
-
-                        Object.assign(request, letterCategoryAntiForgeryData());
-                    },
-                    error: function (xhr) {
-                        showLetterCategoryError(xhr, "Failed to get letter categories.");
+            $.ajax({
+                url: "/letter-category/post-letter-category",
+                method: "POST",
+                data: frmLetterCategory.serialize(),
+                success: function (response) {
+                    if (String(response?.status?.code) === "200") {
+                        ShowToastSuccess(response.status.message || "Letter category saved successfully.");
+                        resetLetterCategoryForm();
+                        modalLetterCategory.modal("hide");
+                        letterCategoryTable.ajax.reload(null, false);
+                    } else {
+                        ShowToastError(response?.status?.message || "Failed to save letter category.");
                     }
                 },
-                columns: [
-                    { data: "categoryId", defaultContent: "", render: renderText },
-                    { data: "categoryName", defaultContent: "", render: renderText },
-                    { data: "unitPrice", defaultContent: "", render: renderText },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            const names = [];
-                            if (row.isAdmin) names.push("Admin");
-                            if (row.isFoundation) names.push("Foundation");
-                            if (row.isShortCourse) names.push("Short Course");
+                error: function (xhr) {
+                    showLetterCategoryError(xhr, "Failed to save letter category.");
+                },
+                complete: function () {
+                    submitButtons.prop("disabled", false);
+                }
+            });
+        });
+    });
 
-                            if (type !== "display") return names.join(", ");
+    function resetLetterCategoryForm() {
+        frmLetterCategory[0].reset();
+        // An Add operation must never reuse the ID from the previous edit.
+        $("#letterCategory_CategoryId").val("0");
 
-                            const badges = [];
-                            if (row.isAdmin) badges.push('<span class="badge badge-success">Admin</span>');
-                            if (row.isFoundation) badges.push('<span class="badge badge-info">Foundation</span>');
-                            if (row.isShortCourse) badges.push('<span class="badge badge-primary">Short Course</span>');
-                            return badges.join(" ") || '<span class="text-muted">—</span>';
-                        }
-                    },
-                    {
-                        data: "isStartNewNumber",
-                        render: function (data, type) {
-                            const label = data ? "New Number" : "Continue Number";
-                            if (type !== "display") return label;
+        const validator = frmLetterCategory.data("validator");
+        if (validator && typeof validator.resetForm === "function") {
+            validator.resetForm();
+        }
+    }
 
-                            return data
-                                ? '<span class="badge bg-indigo">New Number</span>'
-                                : '<span class="badge badge-secondary">Continue Number</span>';
-                        }
-                    },
-                    {
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        className: "text-center letter-type-actions",
-                        render: function (data, type) {
-                            if (type !== "display") return "";
+    function getLetterCategoryRow(button) {
+        let tableRow = $(button).closest("tr");
 
-                            return `<button type="button" class="btn btn-warning btn-sm js-letter-category-edit"
+        // DataTables Responsive can put action buttons in a child row.
+        if (tableRow.hasClass("child")) {
+            tableRow = tableRow.prev();
+        }
+
+        return letterCategoryTable.row(tableRow).data();
+    }
+
+    function letterCategoryAntiForgeryData() {
+        const token = frmLetterCategory.find('input[name="__RequestVerificationToken"]').val();
+        return token ? { __RequestVerificationToken: token } : {};
+    }
+
+    function showLetterCategoryError(xhr, fallbackMessage) {
+        console.error("Letter category request failed:", xhr.status, xhr.responseText);
+        const response = xhr.responseJSON;
+        ShowToastError(response?.status?.message || response?.detail || fallbackMessage);
+    }
+
+    function fetchLetterCategory() {
+        if ($.fn.DataTable.isDataTable("#tblLetterCategory")) {
+            tblLetterCategory.DataTable().clear().destroy();
+        }
+
+        const renderText = $.fn.dataTable.render.text();
+
+        letterCategoryTable = tblLetterCategory.DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            autoWidth: false,
+            pageLength: 10,
+            searching: true,
+            stateSave: false,
+            ajax: loadLetterTypes,
+            columns: [
+                { data: "categoryId", defaultContent: "", render: renderText },
+                { data: "categoryName", defaultContent: "", render: renderText },
+                { data: "unitPrice", defaultContent: "", render: renderText },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const names = [];
+                        if (row.isAdmin) names.push("Admin");
+                        if (row.isFoundation) names.push("Foundation");
+                        if (row.isShortCourse) names.push("Short Course");
+
+                        if (type !== "display") return names.join(", ");
+
+                        const badges = [];
+                        if (row.isAdmin) badges.push('<span class="badge badge-success">Admin</span>');
+                        if (row.isFoundation) badges.push('<span class="badge badge-info">Foundation</span>');
+                        if (row.isShortCourse) badges.push('<span class="badge badge-primary">Short Course</span>');
+                        return badges.join(" ") || '<span class="text-muted">—</span>';
+                    }
+                },
+                {
+                    data: "isStartNewNumber",
+                    render: function (data, type) {
+                        const label = data ? "New Number" : "Continue Number";
+                        if (type !== "display") return label;
+
+                        return data
+                            ? '<span class="badge bg-indigo">New Number</span>'
+                            : '<span class="badge badge-secondary">Continue Number</span>';
+                    }
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: "text-center letter-type-actions",
+                    render: function (data, type) {
+                        if (type !== "display") return "";
+
+                        return `<button type="button" class="btn btn-warning btn-sm js-letter-category-edit"
                                             title="Edit category" aria-label="Edit category">
                                         <i class="fas fa-edit" aria-hidden="true"></i>
                                     </button>
@@ -365,16 +265,89 @@
                                             title="Delete category" aria-label="Delete category">
                                         <i class="fas fa-trash" aria-hidden="true"></i>
                                     </button>`;
-                        }
-                    }
-                ],
-                initComplete: function () {
-                    if (typeof MyApp !== "undefined" &&
-                        typeof MyApp.utils?.dataTableDebounceSearch === "function") {
-                        MyApp.utils.dataTableDebounceSearch("#tblLetterCategory", 500);
                     }
                 }
-            });
+            ],
+            language: {
+                searchPlaceholder: "Letter type name",
+                emptyTable: letterTypeSearchPrompt,
+                zeroRecords: letterTypeNoMatches
+            },
+            infoCallback: function (_settings, _start, _end, _max, _total, text) {
+                const idleOrFailed = letterTypeEmptyMessage === letterTypeSearchPrompt ||
+                    letterTypeEmptyMessage === letterTypeLoadError;
+                return idleOrFailed ? "" : text;
+            },
+            drawCallback: function () {
+                $(this.api().table().body()).find("td.dataTables_empty, td.dt-empty")
+                    .text(letterTypeEmptyMessage);
+            },
+            initComplete: function () {
+                if (typeof MyApp !== "undefined" &&
+                    typeof MyApp.utils?.dataTableDebounceSearch === "function") {
+                    MyApp.utils.dataTableDebounceSearch("#tblLetterCategory", 500);
+                }
+            }
+        });
+    }
+
+    function loadLetterTypes(request, complete) {
+        if (letterTypeRequest) {
+            const previousRequest = letterTypeRequest;
+            letterTypeRequest = null;
+            previousRequest.abort();
         }
-    </script>
+
+        const search = String(request.search?.value ?? "").trim();
+        const emptyResponse = { draw: request.draw, recordsTotal: 0, recordsFiltered: 0, data: [] };
+        if (!search) {
+            letterTypeEmptyMessage = letterTypeSearchPrompt;
+            complete(emptyResponse);
+            return;
+        }
+
+        const pending = $.ajax({
+            url: "/letter-category/get-letter-category",
+            type: "POST",
+            dataType: "json",
+            data: {
+                ...request,
+                isAll: false,
+                search: { ...request.search, value: search },
+                ...letterCategoryAntiForgeryData()
+            }
+        });
+        letterTypeRequest = pending;
+
+        function showLoadError() {
+            letterTypeEmptyMessage = letterTypeLoadError;
+            complete(emptyResponse);
+        }
+
+        return pending.done(function (response) {
+            if (letterTypeRequest !== pending) return;
+
+            const recordsTotal = Number(response?.recordsTotal ?? NaN);
+            const recordsFiltered = Number(response?.recordsFiltered ?? NaN);
+            const rows = response?.data ?? (recordsFiltered === 0 ? [] : null);
+            if (!Number.isSafeInteger(recordsTotal) || recordsTotal < 0 ||
+                !Number.isSafeInteger(recordsFiltered) || recordsFiltered < 0 ||
+                !Array.isArray(rows)) {
+                showLoadError();
+                return;
+            }
+
+            letterTypeEmptyMessage = letterTypeNoMatches;
+            complete({ draw: request.draw, recordsTotal, recordsFiltered, data: rows });
+        }).fail(function (_xhr, status) {
+            if (letterTypeRequest === pending && status !== "abort") {
+                showLoadError();
+            }
+        }).always(function () {
+            if (letterTypeRequest === pending) {
+                letterTypeRequest = null;
+            }
+        });
+    }
+</script>
 }

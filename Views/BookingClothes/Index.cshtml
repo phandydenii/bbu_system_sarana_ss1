@@ -1,15 +1,47 @@
 @{
+    ViewData["Title"] = "Booking Clothes";
     ViewData["OpenMenu"] = "Administration";
     ViewData["Action"] = "BookingClothes";
     ViewData["HideHeader"] = true;
 }
 
-<div class="container-fluid px-0 pt-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
+<style>
+    #bookingClothesPage #tblBooking_wrapper {
+        width: 100%;
+    }
+
+    #tblBooking_wrapper:not(.booking-has-results) .dataTables_length,
+    #tblBooking_wrapper:not(.booking-has-results) .dt-length,
+    #tblBooking_wrapper:not(.booking-has-pages) .dataTables_paginate,
+    #tblBooking_wrapper:not(.booking-has-pages) .dt-paging {
+        display: none;
+    }
+
+    #bookingClothesPage .booking-table-scroll {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    #tblBooking th,
+    #tblBooking td {
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+</style>
+
+<div id="bookingClothesPage" class="container-fluid px-0 pt-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div class="mr-3">
             <h3 class="m-0 font-weight-bold text-dark">Booking Clothes</h3>
             <small class="text-muted">Manage student clothing bookings and returns</small>
-        </div> 
+        </div>
+        <button type="button"
+                id="btnNewBooking"
+                class="btn btn-primary shadow-sm text-nowrap ml-auto mt-2 mt-sm-0">
+            <i class="fas fa-plus-circle mr-1" aria-hidden="true"></i>
+            New Booking
+        </button>
     </div>
 
     <!-- Filter Card Bar -->
@@ -19,61 +51,82 @@
                 <i class="fas fa-filter text-primary mr-1"></i> Filter Bookings
             </h3>
             <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-minus"></i>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse"
+                        aria-label="Toggle booking filters">
+                    <i class="fas fa-minus" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
-        <div class="card-body bg-light py-3">
+        <form id="frmBookingDateFilter" class="card-body bg-light py-3" novalidate>
             <div class="row align-items-end">
-                <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                    <label for="fromDate" class="form-label text-secondary small font-weight-bold">From Date</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text bg-white border-right-0"><i class="far fa-calendar-alt text-muted"></i></span>
-                        </div>
-                        <input type="date" id="fromDate" class="form-control border-left-0">
-                    </div>
-                </div> 
-                <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                    <label for="toDate" class="form-label text-secondary small font-weight-bold">To Date</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text bg-white border-right-0"><i class="far fa-calendar-alt text-muted"></i></span>
-                        </div>
-                        <input type="date" id="toDate" class="form-control border-left-0">
-                    </div>
-                </div> 
-                <div class="col-md-2 col-sm-12 d-flex">
-                    <div class="btn-group shadow-sm" role="group">
-                        <button type="button" onclick="OnSearch()" class="btn btn-success">
-                            <i class="fas fa-search mr-1"></i>
-                            Filter
-                        </button> 
-                        <button type="button" onclick="OnResetFilter()" class="btn btn-success border-left" title="Reset Filters">
-                            <i class="fas fa-redo-alt"></i>
-                        </button>
-
-                    </div> 
+                <div class="col-sm-6 col-lg-3 col-xl-2 mb-2 mb-xl-0">
+                    <label for="bookingDateRange" class="text-secondary small font-weight-bold">Booking Date</label>
+                    <select id="bookingDateRange" class="custom-select" aria-controls="bookingCustomDates">
+                        <option value="all" selected>All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="last7">Last 7 Days</option>
+                        <option value="month">This Month</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
                 </div>
-                <div class="col-6 d-flex justify-content-end mt-2">
-                    <button id="btnNewBooking" class="btn btn-primary shadow-sm">
-                        <i class="fas fa-plus-circle mr-1"></i>
-                        New Booking
-                    </button>
+                <div id="bookingCustomDates" class="col-12 col-lg-6 col-xl-4 mb-2 mb-xl-0">
+                    <div class="row">
+                        <div class="col-sm-6 mb-2 mb-sm-0">
+                            <label for="fromDate" class="text-secondary small font-weight-bold">From Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white border-right-0">
+                                        <i class="far fa-calendar-alt text-muted" aria-hidden="true"></i>
+                                    </span>
+                                </div>
+                                <input type="date" id="fromDate" min="0001-01-01" max="9999-12-31"
+                                       class="form-control border-left-0" aria-describedby="bookingDateFilterError">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="toDate" class="text-secondary small font-weight-bold">To Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white border-right-0">
+                                        <i class="far fa-calendar-alt text-muted" aria-hidden="true"></i>
+                                    </span>
+                                </div>
+                                <input type="date" id="toDate" min="0001-01-01" max="9999-12-31"
+                                       class="form-control border-left-0" aria-describedby="bookingDateFilterError">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-auto d-flex mb-2 mb-xl-0">
+                    <div class="btn-group shadow-sm" role="group" aria-label="Booking date filters">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-search mr-1" aria-hidden="true"></i>
+                            Filter
+                        </button>
+                        <button type="button" id="btnResetBookingDates" class="btn btn-success border-left"
+                                title="Reset Booking Dates" aria-label="Reset booking dates">
+                            <i class="fas fa-redo-alt" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+            <p id="bookingDateFilterError" class="text-danger small mt-2 mb-0" role="alert" hidden></p>
+            <p id="bookingDateFilterSummary" class="small text-secondary mt-3 mb-0" role="status">
+                Applied booking dates: All Dates
+            </p>
+        </form>
     </div>
 
     <!-- Data Table Card -->
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <table id="tblBooking" class="table table-sm table-hover table-bordered table-striped w-100">
+            <table id="tblBooking"
+                   class="table table-sm table-hover table-bordered table-striped"
+                   style="width: 100%;">
                 <thead class="thead-light">
                     <tr>
                         <th>ID</th>
-                        <th>Date</th>
+                        <th>Booking Date</th>
                         <th>Booking No.</th>
                         <th>Student ID</th>
                         <th>Pay (USD)</th>
@@ -112,10 +165,41 @@
         const tblSearchStudent = $("#tblSearchStudent");
         let selectedItems = [];
         let bookingItems = [];
+        const bookingDateRange = $("#bookingDateRange");
         const fromDate = $("#fromDate");
         const toDate = $("#toDate");
+        const bookingDateInputs = fromDate.add(toDate);
+        const bookingDateFilterError = $("#bookingDateFilterError");
+        const bookingDateFilterSummary = $("#bookingDateFilterSummary");
+        const bookingDatePresetLabels = {
+            all: "All Dates",
+            today: "Today",
+            last7: "Last 7 Days",
+            month: "This Month",
+            custom: "Custom Range"
+        };
+        const bookingCalendarDate = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Asia/Phnom_Penh",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        });
+        let appliedBookingDates = { preset: "all", from: "", to: "" };
+        let bookingListRequest = null;
+        let bookingCountUnavailable = false;
+        const bookingSearchPrompt = "Search bookings or apply a booking date range.";
+        const bookingNoMatches = "No bookings match your search or booking date range.";
+        let bookingEmptyMessage = bookingSearchPrompt;
 
         $(document).ready(function () {
+            $("#frmBookingDateFilter").on("submit", applyBookingDateFilter);
+            $("#btnResetBookingDates").on("click", resetBookingDateFilter);
+            bookingDateRange.on("change", syncBookingDateInputs);
+            bookingDateInputs.on("input change", function () {
+                bookingDateRange.val("custom");
+                showBookingDateFilterError("");
+            });
+            syncBookingDateInputs();
             fetchBooking();
         }); 
 
@@ -126,15 +210,17 @@
             tblBooking.DataTable({
                 processing: true,
                 serverSide: true,
-                responsive: true,
-                ajax: {
-                    url: "/booking-clothes/get-booking-clothes",
-                    type: "POST",
-                    data: function (d) {
-                        d.fromDate = fromDate.val();
-                        d.toDate = toDate.val();
-                    }
-                },
+                paging: true,
+                pageLength: 10,
+                lengthChange: true,
+                searching: true,
+                info: true,
+                stateSave: false,
+                responsive: false,
+                autoWidth: false,
+                scrollX: false,
+                scrollY: "",
+                ajax: loadBookingRows,
                 columns: [
                     { data: "bookingId" },
                     {
@@ -175,22 +261,213 @@
                         }
                     }
                 ],
-                initComplete:function (){
-                    MyApp.utils.dataTableDebounceSearch("#tblBooking",500);
+                language: {
+                    processing: "Loading...",
+                    searchPlaceholder: "Search bookings",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of _MAX_ entries",
+                    infoFiltered: "",
+                    thousands: ",",
+                    emptyTable: bookingSearchPrompt,
+                    zeroRecords: bookingNoMatches
+                },
+                infoCallback: function (_settings, _start, _end, _max, _total, text) {
+                    return bookingCountUnavailable ? "Total entries unavailable" : text;
+                },
+                initComplete: function () {
+                    const table = $(this.api().table().node());
+                    if (!table.parent().hasClass("booking-table-scroll")) {
+                        table.wrap('<div class="booking-table-scroll" role="region" aria-label="Booking Clothes table" tabindex="0"></div>');
+                    }
+                    if (typeof MyApp !== "undefined" &&
+                        typeof MyApp.utils?.dataTableDebounceSearch === "function") {
+                        MyApp.utils.dataTableDebounceSearch("#tblBooking", 500);
+                    }
+                },
+                drawCallback: function () {
+                    const api = this.api();
+                    const page = api.page.info();
+                    const hasResults = page.recordsDisplay > 0;
+
+                    $(api.table().container())
+                        .toggleClass("booking-has-results", hasResults)
+                        .toggleClass("booking-has-pages", hasResults && page.pages > 1);
+
+                    if (!hasResults) {
+                        $(api.table().body()).find("td.dataTables_empty, td.dt-empty").text(bookingEmptyMessage);
+                    }
                 }
             });
         }
 
-        function OnSearch() {
-            if (!fromDate.val() || !toDate.val()) return;
-            tblBooking.DataTable().ajax.reload();
+        function loadBookingRows(request, complete) {
+            if (bookingListRequest) {
+                const previousRequest = bookingListRequest;
+                bookingListRequest = null;
+                previousRequest.abort();
+            }
+
+            const search = String(request.search?.value ?? "").trim();
+            const { from, to } = appliedBookingDates;
+            const summaryOnly = !search && !from && !to;
+            const emptyResponse = { draw: request.draw, recordsTotal: 0, recordsFiltered: 0, data: [] };
+            bookingEmptyMessage = summaryOnly ? bookingSearchPrompt : bookingNoMatches;
+
+            const pending = $.ajax({
+                url: "/booking-clothes/get-booking-clothes",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    ...request,
+                    // Read the total from the existing endpoint without displaying its row.
+                    ...(summaryOnly ? { start: 0, length: 1 } : {}),
+                    search: { ...request.search, value: search },
+                    fromDate: from,
+                    toDate: to
+                }
+            });
+            bookingListRequest = pending;
+
+            function showLoadError(reason, message) {
+                if (bookingListRequest !== pending) return;
+
+                bookingCountUnavailable = true;
+                if (!summaryOnly) {
+                    bookingEmptyMessage = "Unable to load bookings. Try searching again.";
+                }
+                console.error("Cannot load bookings:", reason);
+                complete(emptyResponse);
+                if (!summaryOnly && typeof ShowToastError === "function") {
+                    ShowToastError(message || "Cannot load bookings.");
+                }
+            }
+
+            return pending.done(function (response) {
+                if (bookingListRequest !== pending) return;
+
+                const recordsTotal = Number(response?.recordsTotal ?? NaN);
+                const recordsFiltered = Number(response?.recordsFiltered ?? NaN);
+                const rows = response?.data ?? (recordsFiltered === 0 ? [] : null);
+                if (!Number.isSafeInteger(recordsTotal) || recordsTotal < 0 ||
+                    (!summaryOnly && (!Array.isArray(rows) ||
+                        !Number.isSafeInteger(recordsFiltered) || recordsFiltered < 0))) {
+                    showLoadError("Unexpected list response.");
+                    return;
+                }
+
+                bookingCountUnavailable = false;
+                complete(summaryOnly
+                    ? { ...emptyResponse, recordsTotal }
+                    : { draw: request.draw, recordsTotal, recordsFiltered, data: rows });
+            }).fail(function (xhr, status) {
+                if (status !== "abort") {
+                    showLoadError(xhr.status || status, xhr.responseJSON?.status?.message || xhr.responseJSON?.message);
+                }
+            }).always(function () {
+                if (bookingListRequest === pending) {
+                    bookingListRequest = null;
+                }
+            });
         }
 
-        function OnResetFilter() {
-            if (!fromDate.val() || !toDate.val()) return;
-            $("#dtpFrom").val("");
-            $("#dtpTo").val("");
-            tblBooking.DataTable().ajax.reload();
+        function getBookingPresetDates(preset, now = new Date()) {
+            if (!["today", "last7", "month"].includes(preset)) {
+                return { preset: "all", from: "", to: "" };
+            }
+
+            // Use the campus calendar day, even when the browser is in another timezone.
+            const parts = Object.fromEntries(
+                bookingCalendarDate.formatToParts(now).map(part => [part.type, part.value])
+            );
+            const year = Number(parts.year);
+            const month = Number(parts.month) - 1;
+            const day = Number(parts.day);
+            const isoDay = timestamp => new Date(timestamp).toISOString().slice(0, 10);
+            const startDay = preset === "month" ? 1 : day - (preset === "last7" ? 6 : 0);
+
+            return {
+                preset,
+                from: isoDay(Date.UTC(year, month, startDay)),
+                to: isoDay(preset === "month" ? Date.UTC(year, month + 1, 0) : Date.UTC(year, month, day))
+            };
+        }
+
+        function setBookingDateInputs(dates) {
+            fromDate.val(dates.from);
+            toDate.val(dates.to);
+        }
+
+        function syncBookingDateInputs() {
+            const preset = bookingDateRange.val();
+            if (preset !== "custom") {
+                setBookingDateInputs(getBookingPresetDates(preset));
+            }
+            showBookingDateFilterError("");
+        }
+
+        function showBookingDateFilterError(message, field) {
+            bookingDateFilterError.text(message).prop("hidden", !message);
+            bookingDateInputs.removeAttr("aria-invalid");
+            if (field) {
+                field.attr("aria-invalid", "true").trigger("focus");
+            }
+        }
+
+        function applyBookingDateFilter(event) {
+            event.preventDefault();
+
+            const preset = bookingDateRange.val();
+            let dates;
+            if (preset === "custom") {
+                const fromInput = fromDate[0];
+                const toInput = toDate[0];
+                if (!fromInput.validity.valid) {
+                    showBookingDateFilterError("Enter a valid From Date.", fromDate);
+                    return;
+                }
+                if (!toInput.validity.valid) {
+                    showBookingDateFilterError("Enter a valid To Date.", toDate);
+                    return;
+                }
+
+                const from = fromInput.value;
+                const to = toInput.value;
+                if (!from || !to) {
+                    showBookingDateFilterError("Enter both dates, or choose All Dates.", from ? toDate : fromDate);
+                    return;
+                }
+                if (from > to) {
+                    showBookingDateFilterError("To Date must be on or after From Date.", toDate);
+                    return;
+                }
+                dates = { preset, from, to };
+            } else {
+                dates = getBookingPresetDates(preset);
+                setBookingDateInputs(dates);
+            }
+
+            appliedBookingDates = dates;
+            showBookingDateFilterError("");
+            updateBookingDateFilterSummary();
+            tblBooking.DataTable().ajax.reload(null, true);
+        }
+
+        function resetBookingDateFilter() {
+            bookingDateRange.val("all");
+            appliedBookingDates = { preset: "all", from: "", to: "" };
+            syncBookingDateInputs();
+            updateBookingDateFilterSummary();
+            tblBooking.DataTable().ajax.reload(null, true);
+        }
+
+        function updateBookingDateFilterSummary() {
+            const { preset, from, to } = appliedBookingDates;
+            const displayDate = value => value.split("-").reverse().join("/");
+            let summary = "Applied booking dates: " + bookingDatePresetLabels[preset];
+            if (from && to) {
+                summary += " (" + displayDate(from) + (from === to ? "" : " – " + displayDate(to)) + ")";
+            }
+            bookingDateFilterSummary.text(summary);
         }
         
         function fetchBookingDetail(bookingId) {

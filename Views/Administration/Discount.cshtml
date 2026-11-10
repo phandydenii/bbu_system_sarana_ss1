@@ -8,19 +8,33 @@
 }
 
 <style>
+    #studentDiscountPage #tblStudentDiscount_wrapper {
+        width: 100%;
+    }
+
+    #tblStudentDiscount_wrapper:not(.discount-has-results) .dataTables_length,
+    #tblStudentDiscount_wrapper:not(.discount-has-results) .dt-length,
+    #tblStudentDiscount_wrapper:not(.discount-has-pages) .dataTables_paginate,
+    #tblStudentDiscount_wrapper:not(.discount-has-pages) .dt-paging {
+        display: none;
+    }
+
     #studentDiscountPage .student-discount-table-scroll {
         width: 100%;
+        max-width: 100%;
         overflow-x: auto;
     }
 
-    #tblStudentDiscount,
-    #tblStudentDiscount_wrapper,
+    #tblStudentDiscount th,
+    #tblStudentDiscount td {
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
     #tblStudentDiscountDetail {
         width: 100% !important;
     }
 
-    #tblStudentDiscount th,
-    #tblStudentDiscount td,
     #tblStudentDiscountDetail th,
     #tblStudentDiscountDetail td {
         vertical-align: middle;
@@ -29,108 +43,20 @@
     #tblStudentDiscountDetail tbody tr.highlight > td {
         background-color: #e8f0fe;
     }
-
-    /* True Floating Popover Styling */
-    .filter-wrapper {
-        position: relative;
-        display: inline-block;
-    }
-
-    .filter-popover-card {
-        position: absolute;
-        top: calc(100% + 5px);
-        right: 0;
-        z-index: 1050;
-        display: none;
-        width: 360px;
-        background: #fff;
-        border: 1px solid rgba(0,0,0,.15);
-        border-radius: 0.375rem;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        padding: 1rem;
-    }
-    .filter-popover-card.show {
-        display: block;
-    }
 </style>
 
 <div id="studentDiscountPage" class="container-fluid px-0 pt-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div class="mr-3">
             <h3 class="m-0 font-weight-bold text-dark">Student Discount</h3>
             <small class="text-muted">Manage student discounts and term-based discount records</small>
-        </div>
-
-        <!-- Floating Popover Filter Wrapper -->
-        <div class="filter-wrapper">
-            <div class="d-flex align-items-center">
-                <button type="button" id="btnToggleFilterPopover" class="btn btn-outline-secondary shadow-sm">
-                    <i class="fas fa-filter text-primary mr-1"></i>
-                    <span id="filterButtonLabel">Filter by Date</span>
-                </button>
-                <button type="button" id="btnClearActiveFilter" class="btn btn-outline-danger btn-sm ml-1" style="display: none;" title="Clear filter">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <!-- Floating Popover Panel -->
-            <div id="studentDiscountFilterPopover" class="filter-popover-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="font-weight-bold text-secondary text-sm">Filter by Date Range</span>
-                    <button type="button" class="close text-dark" id="btnCloseFilterPopover" aria-label="Close" style="outline: none;">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-                <!-- Quick Preset Buttons -->
-                <div class="mb-3">
-                    <div class="small text-muted mb-1">Quick Presets:</div>
-                    <div class="btn-group btn-group-sm w-100" role="group">
-                        <button type="button" class="btn btn-outline-secondary js-preset-filter" data-preset="today">Today</button>
-                        <button type="button" class="btn btn-outline-secondary js-preset-filter" data-preset="last7">Last 7 Days</button>
-                        <button type="button" class="btn btn-outline-secondary js-preset-filter" data-preset="thisMonth">This Month</button>
-                    </div>
-                </div>
-
-                <form id="frmStudentDiscountFilters">
-                    <div class="form-row">
-                        <div class="col-6 mb-2">
-                            <label for="discountFromDate" class="small text-muted font-weight-bold mb-1">From Date</label>
-                            <input type="date"
-                                   id="discountFromDate"
-                                   name="fromDate"
-                                   class="form-control form-control-sm" />
-                        </div>
-                        <div class="col-6 mb-2">
-                            <label for="discountToDate" class="small text-muted font-weight-bold mb-1">To Date</label>
-                            <input type="date"
-                                   id="discountToDate"
-                                   name="toDate"
-                                   class="form-control form-control-sm" />
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-                        <button type="button"
-                                id="btnResetStudentDiscountFilters"
-                                class="btn btn-link btn-sm text-danger p-0 text-decoration-none"
-                                title="Reset filters">
-                            <i class="fas fa-redo-alt mr-1"></i> Reset
-                        </button>
-                        <div>
-                            <button type="button" id="btnCancelFilter" class="btn btn-secondary btn-sm mr-1">Cancel</button>
-                            <button type="submit" class="btn btn-success btn-sm">Apply Filter</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 
     <div class="card shadow-sm border-0">
-        <div class="card-body student-discount-table-scroll">
+        <div class="card-body">
             <table id="tblStudentDiscount"
-                   class="table table-sm table-hover table-bordered table-striped w-100"
+                   class="table table-sm table-hover table-bordered table-striped"
                    style="width: 100%;">
                 <thead class="thead-light">
                 <tr>
@@ -158,6 +84,11 @@
         const tblStudentDiscount = $("#tblStudentDiscount");
         const tblStudentDiscountDetail = $("#tblStudentDiscountDetail");
         let studentDiscountDetailTable = null;
+        let studentDiscountListRequest = null;
+        let discountEntryCountUnavailable = false;
+        const discountStudentSearchPrompt = "Search by Student ID or name to find a student.";
+        const discountStudentNoMatches = "No students match your search.";
+        let discountStudentEmptyMessage = discountStudentSearchPrompt;
         const btnSaveChange = $("#btnSaveChange");
         const btnNew = $("#btnNew");
         const frmDiscount = $("#frmDiscount");
@@ -169,105 +100,7 @@
                 "table-sm table-hover table-bordered table-striped w-100"
             );
             tblStudentDiscountDetail.find("thead").addClass("thead-light");
-
-            // Toggle Popover open/close
-            $("#btnToggleFilterPopover").on("click", function (e) {
-                e.stopPropagation();
-                $("#studentDiscountFilterPopover").toggleClass("show");
-            });
-
-            $("#btnCloseFilterPopover, #btnCancelFilter").on("click", function () {
-                $("#studentDiscountFilterPopover").removeClass("show");
-            });
-
-            // Close popover when clicking outside
-            $(document).on("click", function (e) {
-                if (!$(e.target).closest(".filter-wrapper").length) {
-                    $("#studentDiscountFilterPopover").removeClass("show");
-                }
-            });
-
-            // Quick Preset Selection Logic
-            $(".js-preset-filter").on("click", function () {
-                const preset = $(this).data("preset");
-                const today = new Date();
-                let from = "", to = "";
-
-                const formatDateString = (d) => d.toISOString().split('T')[0];
-
-                if (preset === "today") {
-                    from = to = formatDateString(today);
-                } else if (preset === "last7") {
-                    let past = new Date();
-                    past.setDate(today.getDate() - 7);
-                    from = formatDateString(past);
-                    to = formatDateString(today);
-                } else if (preset === "thisMonth") {
-                    let firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-                    let lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-                    from = formatDateString(firstDay);
-                    to = formatDateString(lastDay);
-                }
-
-                $("#discountFromDate").val(from);
-                $("#discountToDate").val(to);
-            });
-
-            $("#frmStudentDiscountFilters")
-                .off("submit.studentDiscountFilters")
-                .on("submit.studentDiscountFilters", function (event) {
-                    event.preventDefault();
-                    applyStudentDiscountDateFilter();
-                });
-
-            $("#btnResetStudentDiscountFilters")
-                .off("click.studentDiscountFilters")
-                .on("click.studentDiscountFilters", function () {
-                    $("#discountFromDate, #discountToDate").val("");
-                    $("#filterButtonLabel").text("Filter by Date");
-                    $("#btnToggleFilterPopover").removeClass("btn-primary text-white").addClass("btn-outline-secondary");
-                    $("#btnClearActiveFilter").hide();
-                    $("#studentDiscountFilterPopover").removeClass("show");
-
-                    if ($.fn.DataTable.isDataTable("#tblStudentDiscount")) {
-                        tblStudentDiscount.DataTable().ajax.reload(null, true);
-                    }
-                });
-
-            $("#btnClearActiveFilter").on("click", function () {
-                $("#discountFromDate, #discountToDate").val("");
-                $("#filterButtonLabel").text("Filter by Date");
-                $("#btnToggleFilterPopover").removeClass("btn-primary text-white").addClass("btn-outline-secondary");
-                $("#btnClearActiveFilter").hide();
-                $("#studentDiscountFilterPopover").removeClass("show");
-
-                if ($.fn.DataTable.isDataTable("#tblStudentDiscount")) {
-                    tblStudentDiscount.DataTable().ajax.reload(null, true);
-                }
-            });
         });
-
-        function applyStudentDiscountDateFilter() {
-            const fromDate = $("#discountFromDate").val();
-            const toDate = $("#discountToDate").val();
-
-            if (fromDate && toDate && fromDate > toDate) {
-                showStudentDiscountError("From Date must not be later than To Date.");
-                return;
-            }
-
-            if (fromDate || toDate) {
-                $("#filterButtonLabel").text(`Filter: ${fromDate || '...'} to ${toDate || '...'}`);
-                $("#btnToggleFilterPopover").removeClass("btn-outline-secondary").addClass("btn-primary text-white");
-                $("#btnClearActiveFilter").show();
-            }
-
-            $("#studentDiscountFilterPopover").removeClass("show");
-
-            if ($.fn.DataTable.isDataTable("#tblStudentDiscount")) {
-                tblStudentDiscount.DataTable().ajax.reload(null, true);
-            }
-        }
 
         function fetchStudentDiscount() {
             if ($.fn.DataTable.isDataTable("#tblStudentDiscount")) {
@@ -277,24 +110,17 @@
             tblStudentDiscount.DataTable({
                 processing: true,
                 serverSide: true,
-                responsive: true,
-                autoWidth: false,
+                paging: true,
                 pageLength: 10,
+                lengthChange: true,
                 searching: true,
-                ajax: {
-                    url: "/student-discount/gets",
-                    type: "POST",
-                    data: function (request) {
-                        request.fromDate = $("#discountFromDate").val() || "";
-                        request.toDate = $("#discountToDate").val() || "";
-                    },
-                    error: function (xhr) {
-                        showStudentDiscountError(
-                            xhr.responseJSON?.status?.message ||
-                            "Cannot load student discount data."
-                        );
-                    }
-                },
+                info: true,
+                stateSave: false,
+                responsive: false,
+                autoWidth: false,
+                scrollX: false,
+                scrollY: "",
+                ajax: loadStudentDiscountRows,
                 columns: [
                     { data: "studentId", defaultContent: "" },
                     { data: "studentName", defaultContent: "" },
@@ -327,8 +153,105 @@
                         }
                     }
                 ],
+                language: {
+                    processing: "Loading...",
+                    searchPlaceholder: "Student ID or name",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of _MAX_ entries",
+                    infoFiltered: "",
+                    thousands: ",",
+                    emptyTable: discountStudentSearchPrompt,
+                    zeroRecords: discountStudentNoMatches
+                },
+                infoCallback: function (_settings, _start, _end, _max, _total, text) {
+                    return discountEntryCountUnavailable ? "Total entries unavailable" : text;
+                },
                 initComplete: function () {
+                    const table = $(this.api().table().node());
+                    if (!table.parent().hasClass("student-discount-table-scroll")) {
+                        table.wrap('<div class="student-discount-table-scroll" role="region" aria-label="Student Discount table" tabindex="0"></div>');
+                    }
                     debounceStudentDiscountSearch("#tblStudentDiscount");
+                },
+                drawCallback: function () {
+                    const api = this.api();
+                    const page = api.page.info();
+                    const hasResults = page.recordsDisplay > 0;
+
+                    $(api.table().container())
+                        .toggleClass("discount-has-results", hasResults)
+                        .toggleClass("discount-has-pages", hasResults && page.pages > 1);
+
+                    if (!hasResults) {
+                        $(api.table().body()).find("td.dataTables_empty, td.dt-empty").text(discountStudentEmptyMessage);
+                    }
+                }
+            });
+        }
+
+        function loadStudentDiscountRows(request, complete) {
+            if (studentDiscountListRequest) {
+                const previousRequest = studentDiscountListRequest;
+                studentDiscountListRequest = null;
+                previousRequest.abort();
+            }
+
+            const search = String(request.search?.value ?? "").trim();
+            const summaryOnly = !search;
+            const emptyResponse = { draw: request.draw, recordsTotal: 0, recordsFiltered: 0, data: [] };
+            discountStudentEmptyMessage = summaryOnly ? discountStudentSearchPrompt : discountStudentNoMatches;
+
+            const pending = $.ajax({
+                url: "/student-discount/gets",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    ...request,
+                    // Use the existing paged endpoint for the total without displaying its row.
+                    ...(summaryOnly ? { start: 0, length: 1 } : {}),
+                    search: { ...request.search, value: search }
+                }
+            });
+            studentDiscountListRequest = pending;
+
+            function showLoadError(reason, message) {
+                if (studentDiscountListRequest !== pending) return;
+
+                discountEntryCountUnavailable = true;
+                if (!summaryOnly) {
+                    discountStudentEmptyMessage = "Unable to load students. Try searching again.";
+                }
+                console.error("Cannot load student discount data:", reason);
+                complete(emptyResponse);
+                if (!summaryOnly) {
+                    showStudentDiscountError(message || "Cannot load student discount data.");
+                }
+            }
+
+            return pending.done(function (response) {
+                if (studentDiscountListRequest !== pending) return;
+
+                const recordsTotal = Number(response?.recordsTotal ?? NaN);
+                const recordsFiltered = Number(response?.recordsFiltered ?? NaN);
+                const rows = response?.data ?? (recordsFiltered === 0 ? [] : null);
+                if (!Number.isSafeInteger(recordsTotal) || recordsTotal < 0 ||
+                    (!summaryOnly && (!Array.isArray(rows) ||
+                        !Number.isSafeInteger(recordsFiltered) || recordsFiltered < 0))) {
+                    showLoadError("Unexpected list response.");
+                    return;
+                }
+
+                discountEntryCountUnavailable = false;
+                complete(summaryOnly
+                    ? { ...emptyResponse, recordsTotal }
+                    : { draw: request.draw, recordsTotal, recordsFiltered, data: rows });
+            }).fail(function (xhr, status) {
+                if (status !== "abort") {
+                    showLoadError(xhr.status || status, xhr.responseJSON?.status?.message);
+                }
+            }).always(function () {
+                if (studentDiscountListRequest === pending) {
+                    studentDiscountListRequest = null;
                 }
             });
         }
@@ -481,7 +404,9 @@
 
         tblStudentDiscountDetail.on("click", ".js-discount-delete", function (event) {
             event.preventDefault();
-            const row = getStatisticalDiscountTableRow ? getStatisticalDiscountTableRow(tblStudentDiscountDetail, this) : getStudentDiscountTableRow(tblStudentDiscountDetail, this);
+            const row = typeof getStatisticalDiscountTableRow === "function"
+                ? getStatisticalDiscountTableRow(tblStudentDiscountDetail, this)
+                : getStudentDiscountTableRow(tblStudentDiscountDetail, this);
             const json = row.data;
             if (!json) return;
 

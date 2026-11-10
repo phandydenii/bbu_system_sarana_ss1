@@ -1,8 +1,8 @@
 ﻿@{
-    ViewData["Title"] = "Administration Letters";
-    ViewData["OpenMenu"] = "Administration";
-    ViewData["Action"] = "AdminLetter";
-    ViewData["HideHeader"] = true;
+ViewData["Title"] = "Administration Letters";
+ViewData["OpenMenu"] = "Administration";
+ViewData["Action"] = "AdminLetter";
+ViewData["HideHeader"] = true;
 }
 
 <style>
@@ -38,76 +38,6 @@
         </div>
     </div>
 
-    <div class="card card-outline card-primary shadow-sm mb-4">
-        <div class="card-header bg-white py-2">
-            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
-                <i class="fas fa-filter text-primary mr-1"></i>
-                Filter Administration Letters
-            </h3>
-            <div class="card-tools">
-                <button type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                        aria-label="Collapse administration letter filters">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
-        </div>
-        <div class="card-body bg-light py-3">
-            <form id="frmAdminLetterFilters">
-                <div class="row align-items-end">
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="adminLetterFromDate" class="text-secondary small font-weight-bold">
-                            From Date
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
-                            </div>
-                            <input type="date"
-                                   id="adminLetterFromDate"
-                                   name="fromDate"
-                                   class="form-control border-left-0" />
-                        </div>
-                    </div>
-                    <div class="col-md-2 col-sm-6 mb-2 mb-md-0">
-                        <label for="adminLetterToDate" class="text-secondary small font-weight-bold">
-                            To Date
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-white border-right-0">
-                                    <i class="far fa-calendar-alt text-muted"></i>
-                                </span>
-                            </div>
-                            <input type="date"
-                                   id="adminLetterToDate"
-                                   name="toDate"
-                                   class="form-control border-left-0" />
-                        </div>
-                    </div>
-                    <div class="col-md-2 col-sm-12 d-flex">
-                        <div class="btn-group shadow-sm" role="group" aria-label="Administration letter date filters">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-search mr-1"></i>
-                                Filter
-                            </button>
-                            <button type="button"
-                                    id="btnResetAdminLetterFilters"
-                                    class="btn btn-success border-left"
-                                    title="Reset filters"
-                                    aria-label="Reset administration letter date filters">
-                                <i class="fas fa-redo-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <div class="card shadow-sm border-0">
         <div class="card-body admin-letter-table-scroll">
             <table id="tblStudent"
@@ -116,12 +46,12 @@
                 <thead class="thead-light">
                 <tr>
                     <th>Student ID</th>
-                    <th>Name English</th>
-                    <th>Name Khmer</th>
+                    <th>Name (English)</th>
+                    <th>Name (Khmer)</th>
                     <th>Gender</th>
                     <th>DOB</th>
                     <th>Phone</th>
-                    <th class="text-center">Status</th>
+                    <th>Status</th>
                     <th class="text-center" style="width: 155px;">Action</th>
                 </tr>
                 </thead>
@@ -136,327 +66,357 @@
 
 @section Scripts
 {
-    <script src="~/js/Components.js"></script>
-    <script>
-        const tblStudent = $("#tblStudent");
-        const modalAdminLetter = $("#modalAdminLetter");
-        const tblLetterCertificate = $("#tblLetterCertificate");
-        const cardLetterCertification = $("#cardLetterCertification");
-        const formLetterCertification = $("#formLetterCertification");
-        const btnEmptyStateNew = $("#btnEmptyStateNew");
-        const letterFormEmptyState = $("#letterFormEmptyState");
-        const btnNew = $("#btnNew");
-        const btnSave = $("#btnSaveChange");
-        $(document).ready(function () {
-            fetchStudent();
+<script src="~/js/Components.js"></script>
+<script>
+    const tblStudent = $("#tblStudent");
+    const modalAdminLetter = $("#modalAdminLetter");
+    const tblLetterCertificate = $("#tblLetterCertificate");
+    const cardLetterCertification = $("#cardLetterCertification");
+    const formLetterCertification = $("#formLetterCertification");
+    const btnEmptyStateNew = $("#btnEmptyStateNew");
+    const letterFormEmptyState = $("#letterFormEmptyState");
+    const btnNew = $("#btnNew");
+    const btnSave = $("#btnSaveChange");
+    const adminLetterSearchPrompt = "Search by Student ID or name to display students.";
+    const adminLetterNoMatches = "No students match your search.";
+    const adminLetterLoadError = "Unable to load students. Try searching again.";
+    let adminLetterEmptyMessage = adminLetterSearchPrompt;
+    let adminLetterStudentRequest = null;
 
-            tblLetterCertificate.addClass(
-                "table-sm table-hover table-bordered table-striped w-100"
-            );
-            tblLetterCertificate.find("thead").addClass("thead-light");
+    $(document).ready(function () {
+        fetchStudent();
 
-            $("#frmAdminLetterFilters")
-                .off("submit.adminLetterFilters")
-                .on("submit.adminLetterFilters", function (event) {
-                    event.preventDefault();
-                    applyAdminLetterDateFilter();
-                });
+        tblLetterCertificate.addClass(
+            "table-sm table-hover table-bordered table-striped w-100"
+        );
+        tblLetterCertificate.find("thead").addClass("thead-light");
 
-            $("#btnResetAdminLetterFilters")
-                .off("click.adminLetterFilters")
-                .on("click.adminLetterFilters", function () {
-                    $("#adminLetterFromDate, #adminLetterToDate").val("");
+        cardLetterCertification.prop("hidden", "hidden");
+    });
+    btnNew.on("click", function (event) {
+        event.preventDefault();
+        cardLetterCertification.prop("hidden", "");
+    })
 
-                    if ($.fn.DataTable.isDataTable("#tblStudent")) {
-                        tblStudent.DataTable().ajax.reload(null, true);
+    function debounceAdminLetterSearch(selector) {
+        if (typeof MyApp !== "undefined" &&
+            typeof MyApp.utils?.dataTableDebounceSearch === "function") {
+            MyApp.utils.dataTableDebounceSearch(selector, 500);
+        }
+    }
+
+    function fetchStudent() {
+        if ($.fn.DataTable.isDataTable("#tblStudent")) {
+            tblStudent.DataTable().clear().destroy();
+        }
+        tblStudent.DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            autoWidth: false,
+            pageLength: 10,
+            searching: true,
+            stateSave: false,
+            ajax: loadAdminLetterStudents,
+            columns: [
+                {data: "studentId"},
+                {data: "studentName"},
+                {data: "studentNameInKhmer"},
+                {data: "sex"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        const dob = row.dateOfBirth ?? row.date_of_birth;
+                        if (!dob) return "";
+                        if (type !== "display" && type !== "filter") return dob;
+                        return formatDate(dob);
                     }
-                });
+                },
+                {data: "phone"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        if (row.status === "REGISTER") {
+                            return ` <span class="badge badge-warning px-2 py-1">${row.status}</span>`;
+                        } else if (row.status === "ACTIVE") {
+                            return ` <span class="badge badge-primary px-2 py-1">${row.status}</span>`;
+                        } else if (row.status === "QUIT") {
+                            return ` <span class="badge badge-danger px-2 py-1">${row.status}</span>`;
+                        } else {
+                            return ` <span class="badge badge-secondary px-2 py-1">${row.status}</span>`;
+                        }
+                    }
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    className: "text-center text-nowrap",
+                    render: function (data, type, row) {
+                        return `
+                                <button type="button" class="btn btn-primary btn-sm btnManageLetter"><i class='fas fa-cog mr-1'></i> Manage Letter</button>
+                            `;
+                    }
 
-            cardLetterCertification.prop("hidden", "hidden");
-        });
-        btnNew.on("click", function (event) {
-            event.preventDefault();
-            cardLetterCertification.prop("hidden", "");
-        })
-
-        function applyAdminLetterDateFilter() {
-            const fromDate = $("#adminLetterFromDate").val();
-            const toDate = $("#adminLetterToDate").val();
-
-            if (fromDate && toDate && fromDate > toDate) {
-                const message = "From Date must not be later than To Date.";
-
-                if (typeof ShowToastError === "function") {
-                    ShowToastError(message);
-                } else {
-                    alert(message);
                 }
+            ],
+            language: {
+                searchPlaceholder: "Student ID or name",
+                emptyTable: adminLetterSearchPrompt,
+                zeroRecords: adminLetterNoMatches
+            },
+            infoCallback: function (_settings, _start, _end, _max, _total, text) {
+                const idleOrFailed = adminLetterEmptyMessage === adminLetterSearchPrompt ||
+                    adminLetterEmptyMessage === adminLetterLoadError;
+                return idleOrFailed ? "" : text;
+            },
+            drawCallback: function () {
+                $(this.api().table().body()).find("td.dataTables_empty, td.dt-empty")
+                    .text(adminLetterEmptyMessage);
+            },
+            initComplete: function () {
+                debounceAdminLetterSearch("#tblStudent");
+            }
+        });
+    }
+
+    function loadAdminLetterStudents(request, complete) {
+        if (adminLetterStudentRequest) {
+            const previousRequest = adminLetterStudentRequest;
+            adminLetterStudentRequest = null;
+            previousRequest.abort();
+        }
+
+        const search = String(request.search?.value ?? "").trim();
+        const emptyResponse = { draw: request.draw, recordsTotal: 0, recordsFiltered: 0, data: [] };
+
+        if (!search) {
+            adminLetterEmptyMessage = adminLetterSearchPrompt;
+            complete(emptyResponse);
+            return;
+        }
+
+        const pending = $.ajax({
+            url: "/student/academic/student-list/all",
+            type: "POST",
+            dataType: "json",
+            data: { ...request, search: { ...request.search, value: search } }
+        });
+        adminLetterStudentRequest = pending;
+
+        function showLoadError() {
+            adminLetterEmptyMessage = adminLetterLoadError;
+            complete(emptyResponse);
+        }
+
+        return pending.done(function (response) {
+            if (adminLetterStudentRequest !== pending) return;
+
+            const recordsTotal = Number(response?.recordsTotal ?? NaN);
+            const recordsFiltered = Number(response?.recordsFiltered ?? NaN);
+            const rows = response?.data ?? (recordsFiltered === 0 ? [] : null);
+            if (!Number.isSafeInteger(recordsTotal) || recordsTotal < 0 ||
+                !Number.isSafeInteger(recordsFiltered) || recordsFiltered < 0 ||
+                !Array.isArray(rows)) {
+                showLoadError();
                 return;
             }
 
-            if ($.fn.DataTable.isDataTable("#tblStudent")) {
-                tblStudent.DataTable().ajax.reload(null, true);
+            adminLetterEmptyMessage = adminLetterNoMatches;
+            complete({ draw: request.draw, recordsTotal, recordsFiltered, data: rows });
+        }).fail(function (_xhr, status) {
+            if (adminLetterStudentRequest === pending && status !== "abort") {
+                showLoadError();
             }
-        }
-
-        function debounceAdminLetterSearch(selector) {
-            if (typeof MyApp !== "undefined" &&
-                typeof MyApp.utils?.dataTableDebounceSearch === "function") {
-                MyApp.utils.dataTableDebounceSearch(selector, 500);
+        }).always(function () {
+            if (adminLetterStudentRequest === pending) {
+                adminLetterStudentRequest = null;
             }
-        }
-
-        function fetchStudent() {
-            if ($.fn.DataTable.isDataTable("#tblStudent")) {
-                tblStudent.DataTable().clear().destroy();
-            }
-            tblStudent.DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                autoWidth: false,
-                pageLength: 10,
-                searching: true,
-                ajax: {
-                    url: "/student/academic/student-list/all",
-                    type: "POST",
-                    // The controller must apply these optional dates to its
-                    // chosen database date field before counting and paging.
-                    data: function (request) {
-                        request.fromDate = $("#adminLetterFromDate").val() || "";
-                        request.toDate = $("#adminLetterToDate").val() || "";
-                    }
-                },
-                columns: [
-                    {data: "studentId"},
-                    {data: "studentName"},
-                    {data: "studentNameInKhmer"},
-                    {data: "sex"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            const dob = row.dateOfBirth ?? row.date_of_birth;
-                            if (!dob) return "";
-                            if (type !== "display" && type !== "filter") return dob;
-                            return formatDate(dob);
-                        }
-                    },
-                    {data: "phone"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            if (row.status === "REGISTER") {
-                                return ` <span class="badge badge-warning px-2 py-1">${row.status}</span>`;
-                            } else if (row.status === "ACTIVE") {
-                                return ` <span class="badge badge-primary px-2 py-1">${row.status}</span>`;
-                            } else if (row.status === "QUIT") {
-                                return ` <span class="badge badge-danger px-2 py-1">${row.status}</span>`;
-                            } else {
-                                return ` <span class="badge badge-secondary px-2 py-1">${row.status}</span>`;
-                            }
-                        }
-                    },
-                    {
-                        data: null,
-                        orderable: false,
-                        searchable: false,
-                        className: "text-center text-nowrap",
-                        render: function (data, type, row) {
-                            return `
-                                <button type="button" class="btn btn-primary btn-sm btnManageLetter"><i class='fas fa-cog mr-1'></i> Manage Letter</button>
-                            `;
-                        }
-
-                    }
-                ],
-                initComplete: function () {
-                    debounceAdminLetterSearch("#tblStudent");
-                }
-            });
-        }
-
-        tblStudent.on("click", ".btnManageLetter", function (event) {
-            event.preventDefault();
-            let $row = $(this).closest("tr");
-            if ($row.hasClass("child")) $row = $row.prev();
-
-            const data = tblStudent.DataTable().row($row).data();
-            if (!data || !data.studentId) return;
-
-            showLoading();
-            getStudent(data.studentId);
-            GetLetterCertificate(data.studentId);
-            BindSelectOptions("/letter-category/get-letter-category", "letterCertification_CategoryId", "categoryId", "categoryName");
-            showLetterEmptyState();
-            modalAdminLetter.modal('show');
-            hideLoading(1);
         });
-        
-        function getStudent(studentId) {
-            $.ajax({
-                url: "/student/academic/student-id/" + studentId,
-                type: "GET",
-                success: function (response) {
-                    const data = response && response.data ? response.data : response;
-                    if (data && data.student) {
-                        const student = data.student;
-                        const degree = data["degree"];
-                        const school = data["school"];
-                        const field = data["field"];
-                        const promotion = data["promotion"];
-                        const stage = data["stage"];
-                        const term = data["term"];
-                        const group = data["group"];
-                        
-                        // Personal Information Fields
-                        $("#student_StudentId").val(studentId);
-                        $("#letterCertification_StuId").val(studentId);
-                        $("#student_StudentName").val(student.studentName || "");
-                        $("#student_StudentNameInKhmer").val(student.studentNameInKhmer || "");
-                        $("#student_Sex").val(student.sex || "");
-                        $("#student_DateOfBirth").val(formatDate(student.dateOfBirth));
-                        $("#student_ApprovedDate").val(formatDate(student.approvedDate));
-                        $("#student_GraduateLetterNo").val(student.graduateLetterNo || "");
+    }
 
-                        // Academic Information Fields
-                        $("#txtDegree").val(degree.degreeNameInKhmer || degree.degreeName || "");
-                        $("#txtSchool").val(school.schoolNameInKhmer || school.schoolName || "");
-                        $("#txtField").val(field.fieldNameInKhmer || field.fieldName || "");
-                        $("#txtPromotion").val(promotion.promotionNo || "");
-                        $("#txtStage").val(stage.stageNo || "");
-                        $("#txtTerm").val(term.termNo || "");
-                        $("#txtGroup").val(group.groupName || "");
-                    } else {
-                        ShowToastInfo("Student not found.");
-                    }
-                },
-                error: function () {
-                    ShowToastError("Error fetching student data.");
+    tblStudent.on("click", ".btnManageLetter", function (event) {
+        event.preventDefault();
+        let $row = $(this).closest("tr");
+        if ($row.hasClass("child")) $row = $row.prev();
+
+        const data = tblStudent.DataTable().row($row).data();
+        if (!data || !data.studentId) return;
+
+        showLoading();
+        getStudent(data.studentId);
+        GetLetterCertificate(data.studentId);
+        BindSelectOptions("/letter-category/get-letter-category", "letterCertification_CategoryId", "categoryId", "categoryName");
+        showLetterEmptyState();
+        modalAdminLetter.modal('show');
+        hideLoading(1);
+    });
+
+    function getStudent(studentId) {
+        $.ajax({
+            url: "/student/academic/student-id/" + studentId,
+            type: "GET",
+            success: function (response) {
+                const data = response && response.data ? response.data : response;
+                if (data && data.student) {
+                    const student = data.student;
+                    const degree = data["degree"];
+                    const school = data["school"];
+                    const field = data["field"];
+                    const promotion = data["promotion"];
+                    const stage = data["stage"];
+                    const term = data["term"];
+                    const group = data["group"];
+
+                    // Personal Information Fields
+                    $("#student_StudentId").val(studentId);
+                    $("#letterCertification_StuId").val(studentId);
+                    $("#student_StudentName").val(student.studentName || "");
+                    $("#student_StudentNameInKhmer").val(student.studentNameInKhmer || "");
+                    $("#student_Sex").val(student.sex || "");
+                    $("#student_DateOfBirth").val(formatDate(student.dateOfBirth));
+                    $("#student_ApprovedDate").val(formatDate(student.approvedDate));
+                    $("#student_GraduateLetterNo").val(student.graduateLetterNo || "");
+
+                    // Academic Information Fields
+                    $("#txtDegree").val(degree.degreeNameInKhmer || degree.degreeName || "");
+                    $("#txtSchool").val(school.schoolNameInKhmer || school.schoolName || "");
+                    $("#txtField").val(field.fieldNameInKhmer || field.fieldName || "");
+                    $("#txtPromotion").val(promotion.promotionNo || "");
+                    $("#txtStage").val(stage.stageNo || "");
+                    $("#txtTerm").val(term.termNo || "");
+                    $("#txtGroup").val(group.groupName || "");
+                } else {
+                    ShowToastInfo("Student not found.");
                 }
-            });
-        }
-
-        function GetLetterCertificate(studentId) {
-            if ($.fn.DataTable.isDataTable("#tblLetterCertificate")) {
-                tblLetterCertificate.DataTable().clear().destroy();
+            },
+            error: function () {
+                ShowToastError("Error fetching student data.");
             }
-            tblLetterCertificate.DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                ajax: {
-                    url: "/letter-certificates/gets/" + studentId,
-                    type: "POST",
-                    error: function (error) {
-                        console.log(error.responseText);
-                        ShowToastError("Failed to get letter certificates.");
-                    }
-                },
-                columns: [
-                    {data: "id"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `${data["letterNo"] ?? 0}/${data["yearNumber"] ?? 0}`;
-                        }
-                    },
-                    {
-                        data: "issuedDate",
-                        render: function (data, type, row) {
-                            return data ? formatDate(data) : 'N/A'
-                        }
-                    },
-                    {data: "issuedNo"},
-                    // {data: "issuedStatus"},
-                    {
-                        data: "receivedDate", render: function (data, type, row) {
-                            return data ? formatDate(data) : 'N/A'
-                        }
-                    },
-                    {data: "amount"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `${data["foundationNo"] ?? 0}/${data["foundationYear"] ?? 0}`;
-                        }
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `${data["shortCourseNo"] ?? 0}/${data["shortCourseYear"] ?? 0}`;
-                        }
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return row.issuedStatus ? `<badge class="badge badge-info">Done</badge>` :
-                                `<a class="btn btn-warning btn-xs" id="btnEdit"><i class="fas fa-edit"></i></a>
-                                    <a class="btn btn-danger btn-xs" id="btnDelete"><i class="fas fa-trash"></i></a>`;
-                        }
-                    }
-                ],
-                initComplete: function () {
-                    debounceAdminLetterSearch("#tblLetterCertificate");
-                }
-            });
+        });
+    }
+
+    function GetLetterCertificate(studentId) {
+        if ($.fn.DataTable.isDataTable("#tblLetterCertificate")) {
+            tblLetterCertificate.DataTable().clear().destroy();
         }
-        
-        tblLetterCertificate.on("click","#btnEdit", function (event) {
-            event.preventDefault();
-            btnSave.prop("disabled", false);
-            formLetterCertification.removeAttr("hidden");
-        });
-        
-        btnNew.on("click", function (event) {
-            event.preventDefault();
-            formLetterCertification.removeAttr("hidden");
-            showLetterForm();
-        })
-
-        btnEmptyStateNew.on("click", function (event) {
-            event.preventDefault();
-            btnNew.trigger("click");
-        });
-
-        formLetterCertification.on("submit", function (event) {
-            event.preventDefault();
-            showLoading();
-            const form = $(this);
-            const formData = form.serialize();
-            $.ajax({
-                url: '/letter-certificates/save-letter-certificate',
-                method: 'POST',
-                data: formData,
-                success: function (response) {
-                    tblLetterCertificate.DataTable().ajax.reload();
-                    modalAdminLetter.modal("hide");
-                    formLetterCertification[0].reset();
-                    ShowToastSuccess(response.status.message);
-                },
+        tblLetterCertificate.DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            ajax: {
+                url: "/letter-certificates/gets/" + studentId,
+                type: "POST",
                 error: function (error) {
-                    ShowToastError(error.responseText);
+                    console.log(error.responseText);
+                    ShowToastError("Failed to get letter certificates.");
                 }
-            });
-            hideLoading();
+            },
+            columns: [
+                {data: "id"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return `${data["letterNo"] ?? 0}/${data["yearNumber"] ?? 0}`;
+                    }
+                },
+                {
+                    data: "issuedDate",
+                    render: function (data, type, row) {
+                        return data ? formatDate(data) : 'N/A'
+                    }
+                },
+                {data: "issuedNo"},
+                // {data: "issuedStatus"},
+                {
+                    data: "receivedDate", render: function (data, type, row) {
+                        return data ? formatDate(data) : 'N/A'
+                    }
+                },
+                {data: "amount"},
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return `${data["foundationNo"] ?? 0}/${data["foundationYear"] ?? 0}`;
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return `${data["shortCourseNo"] ?? 0}/${data["shortCourseYear"] ?? 0}`;
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data, type, row) {
+                        return row.issuedStatus ? `<badge class="badge badge-info">Done</badge>` :
+                            `<a class="btn btn-warning btn-xs" id="btnEdit"><i class="fas fa-edit"></i></a>
+                                    <a class="btn btn-danger btn-xs" id="btnDelete"><i class="fas fa-trash"></i></a>`;
+                    }
+                }
+            ],
+            initComplete: function () {
+                debounceAdminLetterSearch("#tblLetterCertificate");
+            }
         });
-        
-        $("#btnClose").on("click", function (event) {
-            event.preventDefault();
-            formLetterCertification[0].reset();
-            modalAdminLetter.modal("hide");
-        })
+    }
 
-        function showLetterEmptyState() {
-            formLetterCertification.prop("hidden", true);
-            letterFormEmptyState.removeAttr("hidden").addClass("d-flex");
-            btnSave.prop("disabled", true);
-        }
+    tblLetterCertificate.on("click","#btnEdit", function (event) {
+        event.preventDefault();
+        btnSave.prop("disabled", false);
+        formLetterCertification.removeAttr("hidden");
+    });
+
+    btnNew.on("click", function (event) {
+        event.preventDefault();
+        formLetterCertification.removeAttr("hidden");
+        showLetterForm();
+    })
+
+    btnEmptyStateNew.on("click", function (event) {
+        event.preventDefault();
+        btnNew.trigger("click");
+    });
+
+    formLetterCertification.on("submit", function (event) {
+        event.preventDefault();
+        showLoading();
+        const form = $(this);
+        const formData = form.serialize();
+        $.ajax({
+            url: '/letter-certificates/save-letter-certificate',
+            method: 'POST',
+            data: formData,
+            success: function (response) {
+                tblLetterCertificate.DataTable().ajax.reload();
+                modalAdminLetter.modal("hide");
+                formLetterCertification[0].reset();
+                ShowToastSuccess(response.status.message);
+            },
+            error: function (error) {
+                ShowToastError(error.responseText);
+            }
+        });
+        hideLoading();
+    });
+
+    $("#btnClose").on("click", function (event) {
+        event.preventDefault();
+        formLetterCertification[0].reset();
+        modalAdminLetter.modal("hide");
+    })
+
+    function showLetterEmptyState() {
+        formLetterCertification.prop("hidden", true);
+        letterFormEmptyState.removeAttr("hidden").addClass("d-flex");
+        btnSave.prop("disabled", true);
+    }
 
 
-        function showLetterForm() {
-            letterFormEmptyState.prop("hidden", true).removeClass("d-flex");
-            formLetterCertification.removeAttr("hidden");
-            btnSave.prop("disabled", false);
-        }
-    </script>
+    function showLetterForm() {
+        letterFormEmptyState.prop("hidden", true).removeClass("d-flex");
+        formLetterCertification.removeAttr("hidden");
+        btnSave.prop("disabled", false);
+    }
+</script>
 }
