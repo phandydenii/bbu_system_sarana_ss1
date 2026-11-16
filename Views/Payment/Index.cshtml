@@ -1,15 +1,153 @@
 ﻿@model BBU_SYSTEM.ViewModel.ListData
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
-ViewData["Title"] = "Student Payment";
-ViewData["TitleContent"] = "Student Payment";
-ViewData["Controller"] = "Payment";
-ViewData["OpenMenu"] = "Administration";
-ViewData["Action"] = "Payment";
-ViewData["HideHeader"] = true;
+    ViewData["Title"] = "Student Payment";
+    ViewData["TitleContent"] = "Student Payment";
+    ViewData["Controller"] = "Payment";
+    ViewData["OpenMenu"] = "Administration";
+    ViewData["Action"] = "Payment";
+    ViewData["HideHeader"] = true;
 }
 
+<link rel="stylesheet" href="~/AdminLTE/plugins/select2/css/select2.min.css" />
+
 <style>
+    #studentPaymentPage h1 {
+        margin: 0;
+        color: #222d43;
+        font-size: clamp(1.4rem, 2.5vw, 1.75rem);
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    #studentPaymentPage .payment-page-subtitle,
+    #PaymentInvoiceDateFilterModal .payment-filter-intro {
+        color: #56637a;
+        font-size: .875rem;
+    }
+
+    #studentPaymentPage .payment-page-subtitle {
+        margin: .2rem 0 0;
+    }
+
+    #studentPaymentPage .payment-page-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+    #studentPaymentPage .payment-page-actions .btn {
+        min-height: 2.5rem;
+        border-radius: .4rem;
+        padding-inline: .95rem;
+        font-weight: 600;
+    }
+
+    #studentPaymentPage .payment-date-summary {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: .4rem .6rem;
+        padding: .8rem 1rem;
+        border-bottom-color: #dce2ed;
+    }
+
+    #studentPaymentPage .payment-date-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .24rem .55rem;
+        border-radius: 1rem;
+        background: #eef0fa;
+        color: #25296b;
+        font-size: .78rem;
+        font-weight: 600;
+    }
+
+    #PaymentInvoiceDateFilterModal .modal-dialog {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 460px;
+        max-width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+
+    #PaymentInvoiceDateFilterModal.fade .modal-dialog {
+        transform: translateX(100%);
+        transition: transform .3s ease;
+    }
+
+    #PaymentInvoiceDateFilterModal.show .modal-dialog {
+        transform: translateX(0);
+    }
+
+    #PaymentInvoiceDateFilterModal .modal-content {
+        height: 100%;
+        border: 0;
+        border-radius: 0;
+        box-shadow: -8px 0 30px rgba(0, 0, 0, .12);
+    }
+
+    #PaymentInvoiceDateFilterModal .modal-header {
+        flex-shrink: 0;
+        padding: 20px 24px;
+        border-bottom-color: #dce2ed;
+        color: #222d43;
+    }
+
+    #PaymentInvoiceDateFilterModal .modal-body {
+        min-height: 0;
+        overflow-y: auto;
+        padding: 24px;
+        background: #f7f8fc;
+    }
+
+    #PaymentInvoiceDateFilterModal label {
+        color: #222d43;
+        font-size: .875rem;
+    }
+
+    #PaymentInvoiceDateFilterModal .form-control,
+    #PaymentInvoiceDateFilterModal .custom-select {
+        border-color: #c7d0df;
+        border-radius: .4rem;
+    }
+
+    #PaymentInvoiceDateFilterModal .modal-footer {
+        flex-shrink: 0;
+        padding: 16px 24px;
+        border-top-color: #dce2ed;
+        background: #fff;
+    }
+
+    @@media (max-width: 575px) {
+        #studentPaymentPage .payment-page-actions {
+            width: 100%;
+        }
+
+        #studentPaymentPage .payment-page-actions .btn {
+            flex: 1 1 auto;
+        }
+
+        #studentPaymentPage .payment-date-summary,
+        #PaymentInvoiceDateFilterModal .modal-header,
+        #PaymentInvoiceDateFilterModal .modal-body,
+        #PaymentInvoiceDateFilterModal .modal-footer {
+            padding-inline: .85rem;
+        }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        #PaymentInvoiceDateFilterModal.fade .modal-dialog {
+            transition: none;
+        }
+    }
+
     #tblStudent_wrapper {
         width: 100%;
     }
@@ -32,20 +170,9 @@ ViewData["HideHeader"] = true;
         text-align: center !important;
     }
 
-    #tblPaymentStudentPicker {
-        width: 100% !important;
-        min-width: 760px;
-    }
-
-    #tblPaymentStudentPicker th,
-    #tblPaymentStudentPicker td {
-        vertical-align: middle !important;
-        white-space: nowrap;
-    }
-
-    #tblPaymentStudentPicker .dt-picker-status-col,
-    #tblPaymentStudentPicker .dt-picker-action-col {
-        text-align: center !important;
+    #tblStudent td.dataTables_empty,
+    #tblStudent td.dt-empty {
+        white-space: normal;
     }
 
     #studentPaymentPage .payment-table-scroll {
@@ -63,218 +190,152 @@ ViewData["HideHeader"] = true;
 
 </style>
 
-<div id="studentPaymentPage" class="container-fluid px-0 pt-3" data-ui-design="booking-clothes-sample">
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+<div id="studentPaymentPage" class="container-fluid px-0 pt-3">
+    <header class="d-flex flex-wrap justify-content-between align-items-center mb-3">
         <div class="mr-3">
-            <h3 class="m-0 font-weight-bold text-dark">Student Payment</h3>
-            <small class="text-muted">Find students, view their payments, and create new payments</small>
+            <h1>Student Payment</h1>
+            <p class="payment-page-subtitle">Find students, view their payments, and create new payments</p>
         </div>
-        <button type="button"
-                id="btnOpenPaymentStudentPicker"
-                class="btn btn-primary shadow-sm text-nowrap ml-auto mt-2 mt-sm-0">
-            <i class="fas fa-plus-circle mr-1" aria-hidden="true"></i>
-            New Payment
-        </button>
-    </div>
-
-    <!-- Date filter card; the DataTable keeps its built-in text search. -->
-    <div class="card card-outline card-primary shadow-sm mb-4">
-        <div class="card-header bg-white py-2">
-            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
-                <i class="fas fa-filter text-primary mr-1"></i>
-                Filter by Invoice Date
-            </h3>
-            <div class="card-tools">
-                <button type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                        aria-label="Collapse invoice date filters">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
+        <div class="payment-page-actions ml-auto mt-2 mt-sm-0">
+            <button type="button"
+                    id="btnOpenPaymentInvoiceDateFilter"
+                    class="btn btn-outline-primary text-nowrap"
+                    data-toggle="modal"
+                    data-target="#PaymentInvoiceDateFilterModal"
+                    aria-haspopup="dialog"
+                    aria-controls="PaymentInvoiceDateFilterModal">
+                <i class="fas fa-filter mr-1" aria-hidden="true"></i>
+                Filter
+            </button>
+            <button type="button"
+                    id="btnNewPayment"
+                    class="btn btn-primary shadow-sm text-nowrap"
+                    aria-haspopup="dialog"
+                    aria-controls="PaymentModal">
+                <i class="fas fa-plus-circle mr-1" aria-hidden="true"></i>
+                New Payment
+            </button>
         </div>
-        <div class="card-body bg-light py-3">
-            <form id="frmPaymentStudentFilters" method="post" novalidate>
-                @Html.AntiForgeryToken()
-                <div class="row align-items-end">
-                    <div class="col-sm-6 col-lg-3 col-xl-2 mb-2 mb-xl-0">
-                        <label for="paymentInvoiceDateRange" class="text-secondary small font-weight-bold">
-                            Invoice Date
-                        </label>
-                        <select id="paymentInvoiceDateRange"
-                                class="custom-select"
-                                aria-controls="paymentInvoiceDateFields">
-                            <option value="all" selected>All Dates</option>
-                            <option value="today">Today</option>
-                            <option value="last7">Last 7 Days</option>
-                            <option value="month">This Month</option>
-                            <option value="custom">Custom Range</option>
-                        </select>
-                    </div>
-                    <div id="paymentInvoiceDateFields" class="col-12 col-lg-6 col-xl-4 mb-2 mb-xl-0">
-                        <div class="row">
-                            <div class="col-sm-6 mb-2 mb-sm-0">
-                                <label for="paymentFromDate" class="text-secondary small font-weight-bold">
-                                    From Date
-                                </label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white border-right-0">
-                                            <i class="far fa-calendar-alt text-muted" aria-hidden="true"></i>
-                                        </span>
-                                    </div>
-                                    <input type="date"
-                                           id="paymentFromDate"
-                                           name="fromDate"
-                                           min="0001-01-01"
-                                           max="9999-12-31"
-                                           class="form-control border-left-0"
-                                           aria-describedby="paymentInvoiceDateHelp paymentInvoiceDateFilterError" />
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <label for="paymentToDate" class="text-secondary small font-weight-bold">
-                                    To Date
-                                </label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text bg-white border-right-0">
-                                            <i class="far fa-calendar-alt text-muted" aria-hidden="true"></i>
-                                        </span>
-                                    </div>
-                                    <input type="date"
-                                           id="paymentToDate"
-                                           name="toDate"
-                                           min="0001-01-01"
-                                           max="9999-12-30"
-                                           class="form-control border-left-0"
-                                           aria-describedby="paymentInvoiceDateHelp paymentInvoiceDateFilterError" />
-                                </div>
-                            </div>
-                        </div>
-                        <small id="paymentInvoiceDateHelp" class="sr-only">
-                            Enter one or both dates. Both selected dates are included.
-                        </small>
-                    </div>
-                    <div class="col-auto d-flex mb-2 mb-xl-0">
-                        <div class="btn-group shadow-sm" role="group" aria-label="Invoice date filters">
-                            <button type="submit"
-                                    id="btnFilterPaymentStudents"
-                                    class="btn btn-success">
-                                <i class="fas fa-search mr-1" aria-hidden="true"></i>
-                                Filter
-                            </button>
-                            <button type="button"
-                                    id="btnResetPaymentStudentFilter"
-                                    class="btn btn-success border-left"
-                                    title="Reset filters"
-                                    aria-label="Reset invoice date filters">
-                                <i class="fas fa-redo-alt" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+    </header>
 
-                <div id="paymentInvoiceDateFilterError" class="text-danger small mt-2" role="alert" hidden></div>
-                <div id="paymentInvoiceDateFilterSummary" class="small text-secondary mt-3" role="status">
-                    Applied invoice dates: All Dates
-                </div>
-            </form>
+    <section class="card shadow-sm border-0" aria-label="Student payments">
+        <div id="paymentInvoiceDateFilterSummary" class="card-header bg-white payment-date-summary d-none">
+            <span class="payment-date-chip">
+                <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                <span id="paymentActiveInvoiceDateLabel"></span>
+            </span>
+            <button type="button" id="btnClearPaymentInvoiceDates" class="btn btn-link btn-sm px-1"
+                    aria-label="Clear invoice date filter">
+                Clear
+            </button>
         </div>
-    </div>
-
-    <!-- Student payment table: retain the existing columns and Payment action. -->
-    <div class="card shadow-sm border-0">
+        <span id="paymentInvoiceDateFilterStatus" class="sr-only" role="status"></span>
         <div class="card-body">
             <table id="tblStudent"
                    class="table table-sm table-hover table-bordered table-striped"
                    style="width: 100%;">
+                <caption class="sr-only">Students and payment actions</caption>
                 <thead class="thead-light">
-                <tr>
-                    <th>Student ID</th>
-                    <th>Name English</th>
-                    <th>Name Khmer</th>
-                    <th>Gender</th>
-                    <th>DOB</th>
-                    <th>Phone</th>
-                    <th class="text-center">Status</th>
-                    <th class="text-center" style="width: 110px;">Action</th>
-                </tr>
+                    <tr>
+                        <th scope="col">Student ID</th>
+                        <th scope="col">Name English</th>
+                        <th scope="col">Name Khmer</th>
+                        <th scope="col">Gender</th>
+                        <th scope="col">DOB</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col" class="text-center">Status</th>
+                        <th scope="col" class="text-center" style="width: 145px;">Action</th>
+                    </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
-    </div>
+    </section>
 </div>
 
 <div class="modal fade"
-     id="PaymentStudentPickerModal"
+     id="PaymentInvoiceDateFilterModal"
      tabindex="-1"
      role="dialog"
-     aria-labelledby="PaymentStudentPickerTitle"
+     aria-labelledby="paymentInvoiceDateFilterTitle"
+     aria-describedby="paymentInvoiceDateHelp"
      aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
+    <div class="modal-dialog" role="document">
+        <form id="frmPaymentStudentFilters" class="modal-content" method="post" novalidate>
+            @Html.AntiForgeryToken()
             <div class="modal-header">
-                <h4 class="modal-title" id="PaymentStudentPickerTitle">
-                    <i class="fas fa-user-check mr-2"></i>
-                    Select Student
-                </h4>
-                <button type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close">
+                <h5 class="modal-title font-weight-bold" id="paymentInvoiceDateFilterTitle">
+                    <i class="fas fa-filter mr-2 text-primary" aria-hidden="true"></i>Filter by Invoice Date
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
 
             <div class="modal-body">
-                <div class="table-responsive">
-                    <table id="tblPaymentStudentPicker"
-                           class="table table-sm table-hover table-bordered table-striped w-100"
-                           style="width: 100%;">
-                        <thead class="thead-light">
-                        <tr>
-                            <th>Student Id</th>
-                            <th>Name English</th>
-                            <th>Name Khmer</th>
-                            <th>Gender</th>
-                            <th>Phone</th>
-                            <th>Status</th>
-                            <th>Select</th>
-                        </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                <p id="paymentInvoiceDateHelp" class="payment-filter-intro mb-3">
+                    Choose a preset or enter one or both dates for a custom range.
+                </p>
+                <div class="form-group">
+                    <label for="paymentInvoiceDateRange">Invoice Date</label>
+                    <select id="paymentInvoiceDateRange" class="custom-select">
+                        <option value="all" selected>All Dates</option>
+                        <option value="today">Today</option>
+                        <option value="last7">Last 7 Days</option>
+                        <option value="month">This Month</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
                 </div>
+
+                <div class="form-group">
+                    <label for="paymentFromDate">From Date</label>
+                    <input type="date" id="paymentFromDate" name="fromDate" min="0001-01-01" max="9999-12-31"
+                           class="form-control" aria-describedby="paymentInvoiceDateFilterError" />
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentToDate">To Date</label>
+                    <input type="date" id="paymentToDate" name="toDate" min="0001-01-01" max="9999-12-30"
+                           class="form-control" aria-describedby="paymentInvoiceDateFilterError" />
+                </div>
+
+                <p id="paymentInvoiceDateFilterError" class="text-danger small mb-0" role="alert" hidden></p>
             </div>
 
             <div class="modal-footer">
-                <button type="button"
-                        class="btn btn-danger"
-                        data-dismiss="modal">
-                    <i class="fas fa-times mr-1"></i>
-                    Close
+                <button type="button" id="btnResetPaymentStudentFilter" class="btn btn-outline-secondary mr-auto"
+                        aria-label="Reset invoice date filter">
+                    <i class="fas fa-redo-alt mr-1" aria-hidden="true"></i> Reset
+                </button>
+                <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                <button type="submit" id="btnFilterPaymentStudents" class="btn btn-primary">
+                    <i class="fas fa-check mr-1" aria-hidden="true"></i> Apply Filter
                 </button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
 <div id="createPaymentModalHost"></div>
 
+<template id="newPaymentModalTemplate">
+    @await Html.PartialAsync("_CreatePaymentModal", new BBU_SYSTEM.ViewModel.PaymentViewModel())
+</template>
+
 @section Scripts
 {
-<partial name="_ValidationScriptsPartial" />
-<script src="~/js/Alert.js"></script>
-<script src="~/function/Product.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/Alert.js"></script>
+    <script src="~/function/Product.js"></script>
+    <script src="~/AdminLTE/plugins/select2/js/select2.full.min.js"
+            asp-fallback-src="~/AdminLTE/plugins/select2/js/select2.min.js"
+            asp-fallback-test="window.jQuery && window.jQuery.fn.select2"></script>
 
-<script>
+    <script>
     // Keep the jQuery instance that already owns Bootstrap and DataTables.
     // Some older modal partials load jquery.min.js again and replace it.
     window.paymentPageJQuery = window.paymentPageJQuery || window.jQuery;
 
-    let paymentModalRequest = null;
     let paymentStudentListRequest = null;
     let paymentStudentCountUnavailable = false;
     const paymentStudentSearchPrompt = "Search by Student ID or name, or apply an invoice date range.";
@@ -282,6 +343,8 @@ ViewData["HideHeader"] = true;
     let paymentStudentEmptyMessage = paymentStudentSearchPrompt;
     const paymentStudentListUrl = '@Url.Content("~/student/academic/student-list/all")';
     const paymentInvoiceDateListUrl = '@Url.Action("GetStudentsByInvoiceDate", "Payment")';
+    const paymentInvoiceDateFilterModal = $("#PaymentInvoiceDateFilterModal");
+    const paymentInvoiceDateRange = $("#paymentInvoiceDateRange");
     let appliedPaymentInvoiceDates = { preset: "all", fromDate: "", toDate: "" };
 
     $(document).ready(function () {
@@ -297,14 +360,14 @@ ViewData["HideHeader"] = true;
                 applyPaymentDateFilter();
             });
 
-        $("#paymentInvoiceDateRange")
+        paymentInvoiceDateRange
             .off("change.paymentInvoiceFilters")
             .on("change.paymentInvoiceFilters", syncPaymentInvoiceDateInputs);
 
         $("#paymentFromDate, #paymentToDate")
             .off("input.paymentInvoiceFilters change.paymentInvoiceFilters")
             .on("input.paymentInvoiceFilters change.paymentInvoiceFilters", function () {
-                $("#paymentInvoiceDateRange").val("custom");
+                paymentInvoiceDateRange.val("custom");
                 setPaymentInvoiceDateFilterError("");
             });
 
@@ -312,11 +375,32 @@ ViewData["HideHeader"] = true;
             .off("click.paymentInvoiceFilters")
             .on("click.paymentInvoiceFilters", clearPaymentInvoiceDateFilters);
 
-        syncPaymentInvoiceDateInputs();
+        $("#btnClearPaymentInvoiceDates")
+            .off("click.paymentInvoiceFilters")
+            .on("click.paymentInvoiceFilters", function () {
+                clearPaymentInvoiceDateFilters();
+                $("#btnOpenPaymentInvoiceDateFilter").trigger("focus");
+            });
+
+        paymentInvoiceDateFilterModal
+            .off(".paymentInvoiceFilters")
+            .on("show.bs.modal.paymentInvoiceFilters", restoreAppliedPaymentInvoiceDates)
+            .on("shown.bs.modal.paymentInvoiceFilters", function () {
+                paymentInvoiceDateRange.trigger("focus");
+            });
+
+        restoreAppliedPaymentInvoiceDates();
+        updatePaymentInvoiceDateFilterSummary();
+    }
+
+    function restoreAppliedPaymentInvoiceDates() {
+        paymentInvoiceDateRange.val(appliedPaymentInvoiceDates.preset);
+        setPaymentInvoiceDateInputs(appliedPaymentInvoiceDates);
+        setPaymentInvoiceDateFilterError("");
     }
 
     function syncPaymentInvoiceDateInputs() {
-        const preset = $("#paymentInvoiceDateRange").val();
+        const preset = paymentInvoiceDateRange.val();
 
         if (preset !== "custom") {
             setPaymentInvoiceDateInputs(getPaymentInvoicePresetDates(preset));
@@ -372,7 +456,7 @@ ViewData["HideHeader"] = true;
     }
 
     function applyPaymentDateFilter() {
-        const preset = $("#paymentInvoiceDateRange").val();
+        const preset = paymentInvoiceDateRange.val();
         let dates;
 
         setPaymentInvoiceDateFilterError("");
@@ -418,17 +502,16 @@ ViewData["HideHeader"] = true;
         appliedPaymentInvoiceDates = dates;
         updatePaymentInvoiceDateFilterSummary();
         reloadPaymentStudentList();
+        paymentInvoiceDateFilterModal.modal("hide");
     }
 
     function clearPaymentInvoiceDateFilters() {
         const hadDateFilter = Boolean(appliedPaymentInvoiceDates.fromDate || appliedPaymentInvoiceDates.toDate);
 
-        $("#paymentInvoiceDateRange").val("all");
         appliedPaymentInvoiceDates = { preset: "all", fromDate: "", toDate: "" };
-        syncPaymentInvoiceDateInputs();
+        restoreAppliedPaymentInvoiceDates();
         updatePaymentInvoiceDateFilterSummary();
 
-        // Reset dates only; keep the user's DataTables search.
         if (hadDateFilter) {
             reloadPaymentStudentList();
         }
@@ -444,18 +527,21 @@ ViewData["HideHeader"] = true;
             custom: "Custom Range"
         };
         const displayDate = iso => iso.split("-").reverse().join("/");
-        let summary = "Applied invoice dates: " + labels[preset];
+        const active = Boolean(fromDate || toDate);
+        let summary = labels[preset];
 
         if (fromDate && toDate) {
-            summary += " (" + displayDate(fromDate) +
-                (fromDate === toDate ? "" : " – " + displayDate(toDate)) + ")";
+            summary += ": " + displayDate(fromDate) +
+                (fromDate === toDate ? "" : " – " + displayDate(toDate));
         } else if (fromDate) {
-            summary += " (from " + displayDate(fromDate) + ")";
+            summary += ": From " + displayDate(fromDate);
         } else if (toDate) {
-            summary += " (through " + displayDate(toDate) + ")";
+            summary += ": Through " + displayDate(toDate);
         }
 
-        $("#paymentInvoiceDateFilterSummary").text(summary);
+        $("#paymentInvoiceDateFilterSummary").toggleClass("d-none", !active);
+        $("#paymentActiveInvoiceDateLabel").text(active ? summary : "");
+        $("#paymentInvoiceDateFilterStatus").text("Applied invoice dates: " + summary);
     }
 
     function reloadPaymentStudentList() {
@@ -465,249 +551,45 @@ ViewData["HideHeader"] = true;
         }
     }
 
+    $("#btnNewPayment").on("click", function () {
+        openNewPaymentModal(this);
+    });
+
+    function openNewPaymentModal(trigger, studentId = "") {
+        const host = window.paymentPageJQuery("#createPaymentModalHost");
+        if (host.children().length) return;
+
+        const template = document.getElementById("newPaymentModalTemplate");
+        if (!template) {
+            showPaymentError("The New Payment form is unavailable.");
+            return;
+        }
+
+        host.attr("data-payment-entry-mode", "new")
+            .attr("data-payment-student-id", studentId)
+            .data("payment-trigger", trigger);
+        try {
+            host.html(template.innerHTML);
+        } catch (error) {
+            host.removeAttr("data-payment-entry-mode data-payment-student-id")
+                .removeData("payment-trigger")
+                .empty();
+            showPaymentError(error?.message || "Unable to open the New Payment form.");
+        }
+    }
+
     $(document)
-        .off("click.openPaymentStudentPicker", "#btnOpenPaymentStudentPicker")
-        .on("click.openPaymentStudentPicker", "#btnOpenPaymentStudentPicker", function () {
-            openPaymentStudentPicker();
-        })
-        .off("click.selectPaymentStudent", ".js-select-payment-student")
-        .on("click.selectPaymentStudent", ".js-select-payment-student", function () {
-            const button = $(this);
-            const studentId = String(button.attr("data-student-id") || "").trim();
+        .off("click.openPaymentModal", ".js-open-payment-modal")
+        .on("click.openPaymentModal", ".js-open-payment-modal", function () {
+            const studentId = String($(this).attr("data-student-id") ?? "").trim();
 
             if (!studentId) {
                 showPaymentError("The selected student ID is missing.");
                 return;
             }
 
-            $("#PaymentStudentPickerModal")
-                .one("hidden.bs.modal.openPayment", function () {
-                    openCreatePaymentModal(studentId, button);
-                })
-                .modal("hide");
+            openNewPaymentModal(this, studentId);
         });
-
-    $(document)
-        .off("click.openPaymentModal", ".js-open-payment-modal")
-        .on("click.openPaymentModal", ".js-open-payment-modal", function () {
-            const button = $(this);
-            const studentId = String(button.attr("data-student-id") || "").trim();
-
-            openCreatePaymentModal(studentId, button);
-        });
-
-    function openCreatePaymentModal(studentId, button) {
-        const triggerButton = button && button.length ? button : $();
-
-        if (!studentId) {
-            showPaymentError("Please select a student first.");
-            return;
-        }
-
-        // Only one modal request may run at a time. This prevents several
-        // rows from remaining in the Loading state after repeated clicks.
-        if (paymentModalRequest && paymentModalRequest.readyState !== 4) {
-            return;
-        }
-
-        if (triggerButton.length) {
-            setPaymentButtonLoading(triggerButton, true);
-        }
-
-        paymentModalRequest = $.ajax({
-            url: "/payment/create-student-payment-modal",
-            type: "GET",
-            cache: false,
-            timeout: 20000,
-            data: {
-                studentId: studentId
-            }
-        })
-            .done(function (html) {
-                try {
-                    if (!html || !String(html).trim()) {
-                        throw new Error("The server returned an empty payment form.");
-                    }
-
-                    const host = $("#createPaymentModalHost");
-                    host.empty();
-
-                    // The returned partial contains its own initialization
-                    // script, so insertion may throw a JavaScript error.
-                    host.html(html);
-
-                    // Restore the page instance if an older nested partial
-                    // loaded another copy of jQuery during insertion.
-                    if (window.paymentPageJQuery) {
-                        window.jQuery = window.paymentPageJQuery;
-                        window.$ = window.paymentPageJQuery;
-                    }
-
-                    const modal = host.find("#CreateStudentPaymentModal");
-
-                    if (!modal.length) {
-                        throw new Error("The payment modal was not returned by the server.");
-                    }
-
-                    modal.modal({
-                        backdrop: "static",
-                        keyboard: false,
-                        show: true
-                    });
-                } catch (error) {
-                    console.error("Payment modal initialization error:", error);
-                    $("#createPaymentModalHost").empty();
-                    showPaymentError(
-                        error?.message || "Unable to initialize the payment form."
-                    );
-                }
-            })
-            .fail(function (xhr, textStatus, errorThrown) {
-                console.error(
-                    "Cannot load payment modal:",
-                    xhr.status,
-                    textStatus,
-                    errorThrown,
-                    xhr.responseText
-                );
-
-                const timedOut = textStatus === "timeout";
-
-                showPaymentError(
-                    xhr.responseJSON?.status?.message ||
-                    xhr.responseJSON?.message ||
-                    (timedOut
-                        ? "The payment form took too long to load. Please try again."
-                        : "") ||
-                    "Unable to load the payment form."
-                );
-            })
-            .always(function () {
-                if (triggerButton.length) {
-                    setPaymentButtonLoading(triggerButton, false);
-                }
-
-                paymentModalRequest = null;
-            });
-    }
-
-    function openPaymentStudentPicker() {
-        const picker = $("#PaymentStudentPickerModal");
-        const tableSelector = "#tblPaymentStudentPicker";
-
-        if (!$.fn.DataTable.isDataTable(tableSelector)) {
-            $(tableSelector).DataTable({
-                processing: true,
-                serverSide: true,
-                paging: true,
-                pageLength: 10,
-                lengthChange: true,
-                searching: true,
-                ordering: true,
-                info: true,
-                responsive: false,
-                autoWidth: false,
-                searchDelay: 500,
-                ajax: {
-                    url: "/student/academic/student-list/all",
-                    type: "POST",
-                    dataSrc: function (json) {
-                        return json.data || [];
-                    },
-                    error: function (xhr) {
-                        console.error(
-                            "Cannot load students for payment:",
-                            xhr.status,
-                            xhr.responseText
-                        );
-                        showPaymentError("Cannot load the student list.");
-                    }
-                },
-                columns: [
-                    { data: "studentId", defaultContent: "" },
-                    { data: "studentName", defaultContent: "" },
-                    { data: "studentNameInKhmer", defaultContent: "" },
-                    { data: "sex", defaultContent: "" },
-                    { data: "phone", defaultContent: "" },
-                    {
-                        data: "status",
-                        defaultContent: "",
-                        className: "dt-picker-status-col",
-                        render: function (data, type) {
-                            return renderPaymentStatus(data, type);
-                        }
-                    },
-                    {
-                        data: "studentId",
-                        orderable: false,
-                        searchable: false,
-                        className: "dt-picker-action-col",
-                        render: function (studentId) {
-                            const normalizedId = String(studentId || "").trim();
-
-                            if (!normalizedId) {
-                                return "";
-                            }
-
-                            return `
-                                <button type="button"
-                                        class="btn btn-primary btn-sm js-select-payment-student"
-                                        data-student-id="${escapePaymentHtml(normalizedId)}">
-                                    <i class="fas fa-check mr-1"></i>
-                                    Select
-                                </button>
-                            `;
-                        }
-                    }
-                ],
-                columnDefs: [
-                    { targets: 0, width: "110px" },
-                    { targets: 3, width: "90px" },
-                    { targets: 5, width: "100px" },
-                    { targets: 6, width: "100px" }
-                ],
-                initComplete: function () {
-                    this.api().columns.adjust();
-
-                    if (window.MyApp?.utils?.dataTableDebounceSearch) {
-                        MyApp.utils.dataTableDebounceSearch(tableSelector, 500);
-                    }
-                }
-            });
-        } else {
-            $(tableSelector).DataTable().ajax.reload(null, false);
-        }
-
-        picker
-            .off("shown.bs.modal.paymentStudentPicker")
-            .on("shown.bs.modal.paymentStudentPicker", function () {
-                $(tableSelector).DataTable().columns.adjust();
-            })
-            .modal("show");
-    }
-
-    function setPaymentButtonLoading(button, isLoading) {
-        if (isLoading) {
-            button.data("payment-original-html", button.html());
-            button
-                .prop("disabled", true)
-                .attr("aria-busy", "true")
-                .html('<i class="fas fa-spinner fa-spin mr-1"></i>Loading...');
-            return;
-        }
-
-        const originalHtml = button.data("payment-original-html");
-
-        button
-            .prop("disabled", false)
-            .removeAttr("aria-busy")
-            .html(
-                originalHtml ||
-                '<i class="fas fa-dollar-sign mr-1"></i>Payment'
-            );
-
-        button.removeData("payment-original-html");
-    }
 
     function fetchStudent() {
         const tblStudent = $("#tblStudent");
@@ -789,11 +671,13 @@ ViewData["HideHeader"] = true;
                             return "";
                         }
 
+                        const studentIdAttribute = escapePaymentHtml(studentId).replace(/"/g, "&quot;");
                         return `
                             <button type="button"
                                     class="btn btn-success btn-sm js-open-payment-modal"
-                                    data-student-id="${escapePaymentHtml(studentId)}">
-                                <i class="fas fa-dollar-sign mr-1"></i>
+                                    aria-haspopup="dialog"
+                                    data-student-id="${studentIdAttribute}">
+                                <i class="fas fa-dollar-sign mr-1" aria-hidden="true"></i>
                                 Payment
                             </button>
                         `;
@@ -806,7 +690,7 @@ ViewData["HideHeader"] = true;
                 { targets: 3, width: "90px" },
                 { targets: 4, width: "110px" },
                 { targets: 6, width: "100px" },
-                { targets: 7, width: "110px" }
+                { targets: 7, width: "145px" }
             ],
 
             language: {
@@ -1002,10 +886,5 @@ ViewData["HideHeader"] = true;
         }
     }
 
-    $(window).on("resize.paymentStudents", function () {
-        if ($.fn.DataTable.isDataTable("#tblPaymentStudentPicker")) {
-            $("#tblPaymentStudentPicker").DataTable().columns.adjust();
-        }
-    });
-</script>
+    </script>
 }
