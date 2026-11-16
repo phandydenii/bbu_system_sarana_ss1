@@ -1,67 +1,420 @@
 @{
-    ViewData["Title"] = "Booking Clothes";
-    ViewData["OpenMenu"] = "Administration";
-    ViewData["Action"] = "BookingClothes";
-    ViewData["HideHeader"] = true;
+ViewData["Title"] = "Booking Clothes";
+ViewData["OpenMenu"] = "Administration";
+ViewData["Action"] = "BookingClothes";
+ViewData["HideHeader"] = true;
 }
 
 <style>
+    /* DataTables, Select2, and booking modal markup supply the generated selectors. */
+    #bookingClothesPage h1 {
+        margin: 0;
+        color: #222d43;
+        font-size: clamp(1.4rem, 2.5vw, 1.75rem);
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    #bookingClothesPage .booking-page-subtitle,
+    #BookingDateFilterModal .booking-filter-intro {
+        color: #56637a;
+        font-size: .875rem;
+    }
+
+    #bookingClothesPage .booking-page-subtitle {
+        margin: .2rem 0 0;
+    }
+
+    #bookingClothesPage .booking-page-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
+    #bookingClothesPage .booking-page-actions .btn {
+        min-height: 2.5rem;
+        border-radius: .4rem;
+        padding-inline: .95rem;
+        font-weight: 600;
+    }
+
+    #bookingClothesPage .booking-date-summary {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: .4rem .6rem;
+        padding: .8rem 1rem;
+        border-bottom-color: #dce2ed;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #bookingClothesPage .booking-date-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .24rem .55rem;
+        border-radius: 1rem;
+        background: #eef0fa;
+        color: #25296b;
+        font-size: .78rem;
+        font-weight: 600;
+    }
+
+    /*noinspection CssUnusedSymbol*/
     #bookingClothesPage #tblBooking_wrapper {
         width: 100%;
     }
 
-    #tblBooking_wrapper:not(.booking-has-results) .dataTables_length,
-    #tblBooking_wrapper:not(.booking-has-results) .dt-length,
-    #tblBooking_wrapper:not(.booking-has-pages) .dataTables_paginate,
-    #tblBooking_wrapper:not(.booking-has-pages) .dt-paging {
+    /*noinspection CssUnusedSymbol*/
+    #bookingClothesPage #tblBooking_wrapper:not(.booking-has-results) .dataTables_length,
+    #bookingClothesPage #tblBooking_wrapper:not(.booking-has-results) .dt-length,
+    #bookingClothesPage #tblBooking_wrapper:not(.booking-has-pages) .dataTables_paginate,
+    #bookingClothesPage #tblBooking_wrapper:not(.booking-has-pages) .dt-paging {
         display: none;
     }
 
+    /*noinspection CssUnusedSymbol*/
     #bookingClothesPage .booking-table-scroll {
         width: 100%;
         max-width: 100%;
         overflow-x: auto;
     }
 
-    #tblBooking th,
-    #tblBooking td {
-        vertical-align: middle;
+    #bookingClothesPage #tblBooking th,
+    #bookingClothesPage #tblBooking td {
+        vertical-align: middle !important;
         white-space: nowrap;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #bookingClothesPage #tblBooking .badge {
+        min-width: 75px;
+        padding: 6px 8px;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #bookingClothesPage #tblBooking td.dataTables_empty,
+    #bookingClothesPage #tblBooking td.dt-empty {
+        white-space: normal;
+    }
+
+    #bookingClothesPage #tblBooking .booking-money {
+        text-align: left;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #bookingClothesPage .booking-number,
+    #bookingClothesPage .booking-money {
+        font-variant-numeric: tabular-nums;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #bookingClothesPage .btnEditBooking[aria-busy="true"] {
+        cursor: progress;
+    }
+
+    #BookingDateFilterModal .modal-dialog {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 460px;
+        max-width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+
+    #BookingDateFilterModal.fade .modal-dialog {
+        transform: translateX(100%);
+        transition: transform .3s ease;
+    }
+
+    #BookingDateFilterModal.show .modal-dialog {
+        transform: translateX(0);
+    }
+
+    #BookingDateFilterModal .modal-content {
+        height: 100%;
+        border: 0;
+        border-radius: 0;
+        box-shadow: -8px 0 30px rgba(0, 0, 0, .12);
+    }
+
+    #BookingDateFilterModal .modal-header {
+        flex-shrink: 0;
+        padding: 20px 24px;
+        border-bottom-color: #dce2ed;
+        color: #222d43;
+    }
+
+    #BookingDateFilterModal .modal-body {
+        min-height: 0;
+        overflow-y: auto;
+        padding: 24px;
+        background: #f7f8fc;
+    }
+
+    #BookingDateFilterModal label {
+        color: #222d43;
+        font-size: .875rem;
+    }
+
+    #BookingDateFilterModal .form-control,
+    #BookingDateFilterModal .custom-select {
+        border-color: #c7d0df;
+        border-radius: .4rem;
+    }
+
+    #BookingDateFilterModal .modal-footer {
+        flex-shrink: 0;
+        padding: 16px 24px;
+        border-top-color: #dce2ed;
+        background: #fff;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal.booking-inline-editor:not(.fullscreen-modal) .modal-dialog {
+        width: calc(100% - 2rem);
+        max-width: 1320px;
+        margin: 1rem auto;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal.booking-inline-editor:not(.fullscreen-modal) .modal-content {
+        max-height: calc(100vh - 2rem);
+        border: 1px solid #dce2ed;
+        border-radius: .7rem;
+        box-shadow: 0 12px 38px rgba(20, 28, 49, .2);
+    }
+
+    #BookingClothesModal.booking-inline-editor .modal-content > form {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    #BookingClothesModal.booking-inline-editor .modal-body {
+        min-height: 0;
+        overflow: auto;
+        padding: 1rem 1.25rem;
+    }
+
+    #BookingClothesModal.booking-inline-editor .modal-header,
+    #BookingClothesModal.booking-inline-editor .modal-footer {
+        flex-shrink: 0;
+        padding: .75rem 1.25rem;
+        border-color: #dce2ed;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal.booking-inline-editor .modal-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal .booking-save-feedback {
+        flex: 0 0 100%;
+        min-width: 0;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal .booking-inline-student {
+        position: relative;
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal .booking-inline-student > .select2-container {
+        display: block;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal .booking-student-icon {
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        left: .75rem;
+        color: #56637a;
+        font-size: .85rem;
+        transform: translateY(-50%);
+        pointer-events: none;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal .booking-inline-student .select2-selection--single {
+        height: calc(2.25rem + 2px);
+        padding: 0;
+        border: 1px solid #c7d0df;
+        border-radius: .4rem;
+        background: #fff;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal .booking-inline-student .select2-selection__rendered {
+        padding: 0 2rem 0 .75rem;
+        color: #222d43;
+        line-height: 2.25rem;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal .booking-inline-student .select2-selection__rendered {
+        padding-left: 2.15rem;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal .booking-inline-student .select2-selection__arrow {
+        right: .45rem;
+        height: 2.25rem;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #BookingClothesModal .booking-inline-student .select2-selection--single:focus-visible {
+        outline: 2px solid #5365b0;
+        outline-offset: 1px;
+    }
+
+    @@media (max-width: 575px) {
+        #bookingClothesPage .booking-page-actions {
+            width: 100%;
+        }
+
+        #bookingClothesPage .booking-page-actions .btn {
+            flex: 1 1 auto;
+        }
+
+        /*noinspection CssUnusedSymbol*/
+        #BookingClothesModal.booking-inline-editor:not(.fullscreen-modal) .modal-dialog {
+            width: calc(100% - 1rem);
+            margin: .5rem auto;
+        }
+
+        /*noinspection CssUnusedSymbol*/
+        #BookingClothesModal.booking-inline-editor:not(.fullscreen-modal) .modal-content {
+            max-height: calc(100vh - 1rem);
+        }
+
+        #bookingClothesPage .booking-date-summary,
+        #BookingClothesModal.booking-inline-editor .modal-header,
+        #BookingClothesModal.booking-inline-editor .modal-body,
+        #BookingClothesModal.booking-inline-editor .modal-footer,
+        #BookingDateFilterModal .modal-header,
+        #BookingDateFilterModal .modal-body,
+        #BookingDateFilterModal .modal-footer {
+            padding-inline: .85rem;
+        }
+    }
+
+    /* Keep the viewport-height fallback outside this feature query. */
+    @@supports (height: 100dvh) {
+        /*noinspection CssUnusedSymbol*/
+        #BookingClothesModal.booking-inline-editor:not(.fullscreen-modal) .modal-content {
+            max-height: calc(100dvh - 2rem);
+        }
+
+        @@media (max-width: 575px) {
+            /*noinspection CssUnusedSymbol*/
+            #BookingClothesModal.booking-inline-editor:not(.fullscreen-modal) .modal-content {
+                max-height: calc(100dvh - 1rem);
+            }
+        }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        #BookingDateFilterModal.fade .modal-dialog {
+            transition: none;
+        }
     }
 </style>
 
 <div id="bookingClothesPage" class="container-fluid px-0 pt-3">
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <header class="d-flex flex-wrap justify-content-between align-items-center mb-3">
         <div class="mr-3">
-            <h3 class="m-0 font-weight-bold text-dark">Booking Clothes</h3>
-            <small class="text-muted">Manage student clothing bookings and returns</small>
+            <h1>Booking Clothes</h1>
+            <p class="booking-page-subtitle">Manage student clothing bookings and returns</p>
         </div>
-        <button type="button"
-                id="btnNewBooking"
-                class="btn btn-primary shadow-sm text-nowrap ml-auto mt-2 mt-sm-0">
-            <i class="fas fa-plus-circle mr-1" aria-hidden="true"></i>
-            New Booking
-        </button>
-    </div>
+        <div class="booking-page-actions ml-auto mt-2 mt-sm-0">
+            <button type="button"
+                    id="btnOpenBookingDateFilter"
+                    class="btn btn-outline-primary text-nowrap"
+                    data-toggle="modal"
+                    data-target="#BookingDateFilterModal"
+                    aria-haspopup="dialog"
+                    aria-controls="BookingDateFilterModal">
+                <i class="fas fa-filter mr-1" aria-hidden="true"></i>
+                Filter
+            </button>
+            <button type="button"
+                    id="btnNewBooking"
+                    class="btn btn-primary shadow-sm text-nowrap"
+                    aria-haspopup="dialog"
+                    aria-controls="BookingClothesModal">
+                <i class="fas fa-plus-circle mr-1" aria-hidden="true"></i>
+                New Booking
+            </button>
+        </div>
+    </header>
 
-    <!-- Filter Card Bar -->
-    <div class="card card-outline card-primary shadow-sm mb-4">
-        <div class="card-header bg-white py-2">
-            <h3 class="card-title font-weight-bold text-secondary" style="font-size: 0.95rem;">
-                <i class="fas fa-filter text-primary mr-1"></i> Filter Bookings
-            </h3>
-            <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse"
-                        aria-label="Toggle booking filters">
-                    <i class="fas fa-minus" aria-hidden="true"></i>
+    <section class="card shadow-sm border-0" aria-label="Booking records">
+        <div id="bookingDateFilterSummary" class="card-header bg-white booking-date-summary d-none">
+            <span class="booking-date-chip">
+                <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                <span id="bookingActiveDateLabel" role="status"></span>
+            </span>
+            <button type="button" id="btnClearBookingDates" class="btn btn-link btn-sm px-1"
+                    aria-label="Clear booking date filter">
+                Clear
+            </button>
+        </div>
+        <div class="card-body">
+            <table id="tblBooking"
+                   class="table table-sm table-hover table-bordered table-striped"
+                   style="width: 100%;">
+                <caption class="sr-only">Clothing bookings</caption>
+                <thead class="thead-light">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Booking Date</th>
+                    <th scope="col">Booking No.</th>
+                    <th scope="col">Student ID</th>
+                    <th scope="col" class="booking-money">Pay (USD)</th>
+                    <th scope="col" class="booking-money">Pay (KHR)</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="text-center" style="width: 100px;">Action</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<div class="modal fade"
+     id="BookingDateFilterModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="bookingDateFilterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="frmBookingDateFilter" class="modal-content" novalidate>
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold" id="bookingDateFilterTitle">
+                    <i class="fas fa-filter mr-2 text-primary" aria-hidden="true"></i>Filter Bookings
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-        </div>
-        <form id="frmBookingDateFilter" class="card-body bg-light py-3" novalidate>
-            <div class="row align-items-end">
-                <div class="col-sm-6 col-lg-3 col-xl-2 mb-2 mb-xl-0">
-                    <label for="bookingDateRange" class="text-secondary small font-weight-bold">Booking Date</label>
-                    <select id="bookingDateRange" class="custom-select" aria-controls="bookingCustomDates">
+
+            <div class="modal-body">
+                <p class="booking-filter-intro mb-3">
+                    Choose a preset or enter both dates for a custom range.
+                </p>
+                <div class="form-group">
+                    <label for="bookingDateRange">Booking Date</label>
+                    <select id="bookingDateRange" class="custom-select">
                         <option value="all" selected>All Dates</option>
                         <option value="today">Today</option>
                         <option value="last7">Last 7 Days</option>
@@ -69,852 +422,1661 @@
                         <option value="custom">Custom Range</option>
                     </select>
                 </div>
-                <div id="bookingCustomDates" class="col-12 col-lg-6 col-xl-4 mb-2 mb-xl-0">
-                    <div class="row">
-                        <div class="col-sm-6 mb-2 mb-sm-0">
-                            <label for="fromDate" class="text-secondary small font-weight-bold">From Date</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white border-right-0">
-                                        <i class="far fa-calendar-alt text-muted" aria-hidden="true"></i>
-                                    </span>
-                                </div>
-                                <input type="date" id="fromDate" min="0001-01-01" max="9999-12-31"
-                                       class="form-control border-left-0" aria-describedby="bookingDateFilterError">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <label for="toDate" class="text-secondary small font-weight-bold">To Date</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white border-right-0">
-                                        <i class="far fa-calendar-alt text-muted" aria-hidden="true"></i>
-                                    </span>
-                                </div>
-                                <input type="date" id="toDate" min="0001-01-01" max="9999-12-31"
-                                       class="form-control border-left-0" aria-describedby="bookingDateFilterError">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-auto d-flex mb-2 mb-xl-0">
-                    <div class="btn-group shadow-sm" role="group" aria-label="Booking date filters">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-search mr-1" aria-hidden="true"></i>
-                            Filter
-                        </button>
-                        <button type="button" id="btnResetBookingDates" class="btn btn-success border-left"
-                                title="Reset Booking Dates" aria-label="Reset booking dates">
-                            <i class="fas fa-redo-alt" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <p id="bookingDateFilterError" class="text-danger small mt-2 mb-0" role="alert" hidden></p>
-            <p id="bookingDateFilterSummary" class="small text-secondary mt-3 mb-0" role="status">
-                Applied booking dates: All Dates
-            </p>
-        </form>
-    </div>
 
-    <!-- Data Table Card -->
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <table id="tblBooking"
-                   class="table table-sm table-hover table-bordered table-striped"
-                   style="width: 100%;">
-                <thead class="thead-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Booking Date</th>
-                        <th>Booking No.</th>
-                        <th>Student ID</th>
-                        <th>Pay (USD)</th>
-                        <th>Pay (KHR)</th>
-                        <th>Status</th>
-                        <th class="text-center" style="width: 100px;">Action</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+                <div class="form-group">
+                    <label for="fromDate">From Date</label>
+                    <input type="date" id="fromDate" min="0001-01-01" max="9999-12-31"
+                           class="form-control" aria-describedby="bookingDateFilterError">
+                </div>
+
+                <div class="form-group">
+                    <label for="toDate">To Date</label>
+                    <input type="date" id="toDate" min="0001-01-01" max="9999-12-31"
+                           class="form-control" aria-describedby="bookingDateFilterError">
+                </div>
+
+                <p id="bookingDateFilterError" class="text-danger small mb-0" role="alert" hidden></p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="btnResetBookingDates" class="btn btn-outline-secondary mr-auto"
+                        aria-label="Reset booking dates">
+                    <i class="fas fa-redo-alt mr-1" aria-hidden="true"></i> Reset
+                </button>
+                <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check mr-1" aria-hidden="true"></i> Apply Filter
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script src="~/AdminLTE/plugins/jquery/jquery.min.js"></script>
+<div id="bookingSaveToken" hidden>@Html.AntiForgeryToken()</div>
 <partial name="_BookingClothesModal"/>
 <partial name="_ItemModal"/>
 <partial name="_StudentModal"/>
 
-@section scripts{ 
-    <script>
-        const tblBooking = $("#tblBooking");
-        const tblBookingDetail = $("#tblBookingDetail");
-        const btnNewBooking = $("#btnNewBooking");
-        const BookingClothesModal = $("#BookingClothesModal");
-        const tblItem = $("#tblItem");
-        const selectItem = $("#btnSelectItem");
-        const ItemModal = $("#ItemModal");
-        const modalStudent = $("#StudentModal");
-        const btnChooseItem = $("#btnChooseItem");
-        const btnCloseBooking = $("#btnCloseBooking");
-        const btnCloseItem = $("#btnCloseItem");
-        const stateSelect = $("#stateSelect");
-        const btnAssignItem = $("#btnAssignItem");
-        const btnSearchStudent = $("#btnSearchStudent");
-        const tblSearchStudent = $("#tblSearchStudent");
-        let selectedItems = [];
-        let bookingItems = [];
-        const bookingDateRange = $("#bookingDateRange");
-        const fromDate = $("#fromDate");
-        const toDate = $("#toDate");
-        const bookingDateInputs = fromDate.add(toDate);
-        const bookingDateFilterError = $("#bookingDateFilterError");
-        const bookingDateFilterSummary = $("#bookingDateFilterSummary");
-        const bookingDatePresetLabels = {
-            all: "All Dates",
-            today: "Today",
-            last7: "Last 7 Days",
-            month: "This Month",
-            custom: "Custom Range"
-        };
-        const bookingCalendarDate = new Intl.DateTimeFormat("en-GB", {
-            timeZone: "Asia/Phnom_Penh",
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit"
+@section scripts {
+<script>
+    // Shapes used by the existing JSON endpoints and the local editor.
+    /** @@typedef {string|number} BookingKey */
+    /** @@typedef {number|string|null} BookingAmount */
+
+    /**
+     * @@typedef {{
+     *   recordsTotal?: BookingAmount,
+     *   recordsFiltered?: BookingAmount,
+     *   data?: (BookingRecord | BookingStudent | BookingCatalogItem)[]
+     * }} BookingGridResponse
+     */
+
+    /**
+     * @@typedef {{
+     *   status?: {code?: BookingKey, message?: string},
+     *   message?: string,
+     *   title?: string
+     * }} BookingServerStatus
+     */
+
+    /** @@typedef {{status: number, responseJSON?: BookingServerStatus}} BookingAjaxError */
+
+    /**
+     * @@typedef {{
+     *   studentId?: BookingKey,
+     *   studentName?: string,
+     *   studentNameInKhmer?: string,
+     *   status?: string
+     * }} BookingStudent
+     */
+
+    // The server uses the legacy KHR payment field in this record.
+    //noinspection SpellCheckingInspection
+    /**
+     * @@typedef {{
+     *   bookingId: BookingKey,
+     *   bookingDate: string,
+     *   yearNumber?: BookingKey,
+     *   bookingNo?: BookingKey,
+     *   note?: string,
+     *   payDollar?: BookingAmount,
+     *   'payRieal'?: BookingAmount,
+     *   total?: BookingAmount,
+     *   vat?: BookingAmount,
+     *   discount?: BookingAmount,
+     *   active?: boolean|null,
+     *   schoolId?: BookingAmount,
+     *   fieldId?: BookingAmount,
+     *   termNo?: BookingAmount,
+     *   groupId?: BookingAmount,
+     *   returnAlready?: boolean
+     * } & BookingStudent} BookingRecord
+     */
+
+    /**
+     * @@typedef {{
+     *   id: BookingKey,
+     *   name?: string,
+     *   nameKhmer?: string,
+     *   namekhmer?: string,
+     *   price?: BookingAmount,
+     *   priceKhr?: BookingAmount
+     * }} BookingCatalogItem
+     */
+
+    /**
+     * @@typedef {{
+     *   bookingDetailId: BookingKey,
+     *   bookingId: BookingKey,
+     *   clothId: BookingKey|null,
+     *   itemName?: string,
+     *   nameKhmer?: string,
+     *   qty: number,
+     *   price: number
+     * }} BookingLine
+     */
+
+    /**
+     * @@typedef {{
+     *   bookingDetailId: BookingKey,
+     *   bookingId: BookingKey,
+     *   clothId: BookingKey|null,
+     *   itemName?: string,
+     *   nameKhmer?: string,
+     *   itemNameKhmer?: string,
+     *   qty: BookingAmount,
+     *   price: BookingAmount
+     * }} SavedBookingLine
+     */
+
+    /**
+     * @@typedef {{
+     *   data?: {
+     *     booking: BookingRecord,
+     *     item?: SavedBookingLine[],
+     *     student?: BookingStudent,
+     *     editorItemSaveSupported?: boolean
+     *   }
+     * }} BookingDetailResponse
+     */
+
+    /**
+     * @@typedef {{
+     *   status?: {code?: BookingKey, message?: string},
+     *   data?: {bookingId?: BookingKey, itemCount?: BookingAmount}
+     * }} BookingSaveResponse
+     */
+
+        // The controller expects this JSON key for the KHR amount.
+        //noinspection SpellCheckingInspection
+    const bookingKhrPaymentKey = "payRieal";
+
+    const bookingTableSelector = "#tblBooking";
+    const bookingDetailTableSelector = "#tblBookingDetail";
+    const bookingSaveButtonSelector = "#btnSaveBooking";
+    const bookingFormSelector = "#PaymentForm";
+    const tblBooking = $(bookingTableSelector);
+    const tblBookingDetail = $(bookingDetailTableSelector);
+    const btnNewBooking = $("#btnNewBooking");
+    const BookingClothesModal = $("#BookingClothesModal");
+    const tblItem = $("#tblItem");
+    const ItemModal = $("#ItemModal");
+    const modalStudent = $("#StudentModal");
+    const btnCloseBooking = $("#btnCloseBooking");
+    const btnCloseItem = $("#btnCloseItem");
+    const stateSelect = $("#stateSelect");
+    const btnAssignItem = $("#btnAssignItem");
+    const btnSearchStudent = $("#btnSearchStudent");
+    const tblSearchStudent = $("#tblSearchStudent");
+    const bookingStudentField = BookingClothesModal.find("#booking_StudentId");
+    /** @@type {BookingCatalogItem[]} */
+    let selectedItems = [];
+    /** @@type {(BookingLine|null)[]} */
+    let bookingRows = [];
+    let bookingBrowseRow = null;
+    const defaultBookingRowCount = 4;
+    const bookingItemRequests = new Map();
+    /** @@type {{bookingDetailId: number, clothId: number|null, qty: number|null, price: number|null}[]} */
+    let originalBookingItems = [];
+    /** @@type {BookingRecord|null} */
+    let editingBooking = null;
+    let editingBookingSupportsItemSave = false;
+    let bookingSaveInProgress = false;
+    let bookingSaveReady = false;
+    let bookingDetailRequest = null;
+    let bookingExchangeRateRequest = null;
+    let bookingInlineStudent = null;
+    const bookingLookupPageSize = 20;
+    const bookingDateRange = $("#bookingDateRange");
+    const fromDate = $("#fromDate");
+    const toDate = $("#toDate");
+    const bookingDateInputs = fromDate.add(toDate);
+    const bookingDateFilterError = $("#bookingDateFilterError");
+    const bookingDateFilterModal = $("#BookingDateFilterModal");
+    const bookingDateFilterSummary = $("#bookingDateFilterSummary");
+    const bookingActiveDateLabel = $("#bookingActiveDateLabel");
+    const bookingDatePresetLabels = {
+        all: "All Dates",
+        today: "Today",
+        last7: "Last 7 Days",
+        month: "This Month",
+        custom: "Custom Range"
+    };
+    // Use the campus's IANA time zone.
+    //noinspection SpellCheckingInspection
+    const bookingCalendarDate = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Phnom_Penh",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    });
+    let appliedBookingDates = { preset: "all", from: "", to: "" };
+    let bookingListRequest = null;
+    let bookingCountUnavailable = false;
+    const bookingSearchPrompt = "Search above or filter by booking date to see bookings.";
+    const bookingNoMatches = "No matching bookings. Try a different search or date range.";
+    let bookingEmptyMessage = bookingSearchPrompt;
+
+    $(document).ready(function () {
+        initializeBookingSave();
+        $("#frmBookingDateFilter").on("submit", applyBookingDateFilter);
+        $("#btnResetBookingDates").on("click", resetBookingDateFilter);
+        $("#btnClearBookingDates").on("click", function () {
+            resetBookingDateFilter();
+            $("#btnOpenBookingDateFilter").trigger("focus");
         });
-        let appliedBookingDates = { preset: "all", from: "", to: "" };
-        let bookingListRequest = null;
-        let bookingCountUnavailable = false;
-        const bookingSearchPrompt = "Search bookings or apply a booking date range.";
-        const bookingNoMatches = "No bookings match your search or booking date range.";
-        let bookingEmptyMessage = bookingSearchPrompt;
-
-        $(document).ready(function () {
-            $("#frmBookingDateFilter").on("submit", applyBookingDateFilter);
-            $("#btnResetBookingDates").on("click", resetBookingDateFilter);
-            bookingDateRange.on("change", syncBookingDateInputs);
-            bookingDateInputs.on("input change", function () {
-                bookingDateRange.val("custom");
-                showBookingDateFilterError("");
+        bookingDateFilterModal
+            .on("show.bs.modal", restoreAppliedBookingDates)
+            .on("shown.bs.modal", function () {
+                bookingDateRange.trigger("focus");
             });
-            syncBookingDateInputs();
-            fetchBooking();
-        }); 
-
-        function fetchBooking() {
-            if ($.fn.DataTable.isDataTable('#tblBooking')) {
-                tblBooking.DataTable().destroy();
-            }
-            tblBooking.DataTable({
-                processing: true,
-                serverSide: true,
-                paging: true,
-                pageLength: 10,
-                lengthChange: true,
-                searching: true,
-                info: true,
-                stateSave: false,
-                responsive: false,
-                autoWidth: false,
-                scrollX: false,
-                scrollY: "",
-                ajax: loadBookingRows,
-                columns: [
-                    { data: "bookingId" },
-                    {
-                        data: "bookingDate",
-                        render: function (data) {
-                            return `${formatDate(data)}`;
-                        }
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `<span class="font-weight-bold text-dark">${row.yearNumber}-${row.bookingNo}</span>`;
-                        }
-                    },
-                    { data: "studentId" },
-                    { data: "payDollar" },
-                    { data: "payRieal" },
-                    {
-                        data: null,
-                        className: "text-center",
-                        render: function (data, type, row) {
-                            if (row.returnAlready === false) 
-                                return `<span class="badge badge-danger px-2 py-1"><i class="fas fa-unlock mr-1"></i> Not Returned</span>`; 
-                            return `<span class="badge badge-success px-2 py-1"><i class="fas fa-check mr-1"></i> Returned</span>`;
-                        }
-                    },
-                    {
-                        data: null,
-                        className: "text-center",
-                        render: function (data, type, row) {
-                            return `
-                                <button type="button"
-                                        class="btn btn-warning btn-sm btnEditBooking"
-                                        data-id="${row.bookingId}">
-                                    <i class="fas fa-pencil"></i> Edit
-                                </button>
-                            `;
-                        }
-                    }
-                ],
-                language: {
-                    processing: "Loading...",
-                    searchPlaceholder: "Search bookings",
-                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                    infoEmpty: "Showing 0 to 0 of _MAX_ entries",
-                    infoFiltered: "",
-                    thousands: ",",
-                    emptyTable: bookingSearchPrompt,
-                    zeroRecords: bookingNoMatches
-                },
-                infoCallback: function (_settings, _start, _end, _max, _total, text) {
-                    return bookingCountUnavailable ? "Total entries unavailable" : text;
-                },
-                initComplete: function () {
-                    const table = $(this.api().table().node());
-                    if (!table.parent().hasClass("booking-table-scroll")) {
-                        table.wrap('<div class="booking-table-scroll" role="region" aria-label="Booking Clothes table" tabindex="0"></div>');
-                    }
-                    if (typeof MyApp !== "undefined" &&
-                        typeof MyApp.utils?.dataTableDebounceSearch === "function") {
-                        MyApp.utils.dataTableDebounceSearch("#tblBooking", 500);
-                    }
-                },
-                drawCallback: function () {
-                    const api = this.api();
-                    const page = api.page.info();
-                    const hasResults = page.recordsDisplay > 0;
-
-                    $(api.table().container())
-                        .toggleClass("booking-has-results", hasResults)
-                        .toggleClass("booking-has-pages", hasResults && page.pages > 1);
-
-                    if (!hasResults) {
-                        $(api.table().body()).find("td.dataTables_empty, td.dt-empty").text(bookingEmptyMessage);
-                    }
-                }
-            });
-        }
-
-        function loadBookingRows(request, complete) {
-            if (bookingListRequest) {
-                const previousRequest = bookingListRequest;
-                bookingListRequest = null;
-                previousRequest.abort();
-            }
-
-            const search = String(request.search?.value ?? "").trim();
-            const { from, to } = appliedBookingDates;
-            const summaryOnly = !search && !from && !to;
-            const emptyResponse = { draw: request.draw, recordsTotal: 0, recordsFiltered: 0, data: [] };
-            bookingEmptyMessage = summaryOnly ? bookingSearchPrompt : bookingNoMatches;
-
-            const pending = $.ajax({
-                url: "/booking-clothes/get-booking-clothes",
-                type: "POST",
-                dataType: "json",
-                data: {
-                    ...request,
-                    // Read the total from the existing endpoint without displaying its row.
-                    ...(summaryOnly ? { start: 0, length: 1 } : {}),
-                    search: { ...request.search, value: search },
-                    fromDate: from,
-                    toDate: to
-                }
-            });
-            bookingListRequest = pending;
-
-            function showLoadError(reason, message) {
-                if (bookingListRequest !== pending) return;
-
-                bookingCountUnavailable = true;
-                if (!summaryOnly) {
-                    bookingEmptyMessage = "Unable to load bookings. Try searching again.";
-                }
-                console.error("Cannot load bookings:", reason);
-                complete(emptyResponse);
-                if (!summaryOnly && typeof ShowToastError === "function") {
-                    ShowToastError(message || "Cannot load bookings.");
-                }
-            }
-
-            return pending.done(function (response) {
-                if (bookingListRequest !== pending) return;
-
-                const recordsTotal = Number(response?.recordsTotal ?? NaN);
-                const recordsFiltered = Number(response?.recordsFiltered ?? NaN);
-                const rows = response?.data ?? (recordsFiltered === 0 ? [] : null);
-                if (!Number.isSafeInteger(recordsTotal) || recordsTotal < 0 ||
-                    (!summaryOnly && (!Array.isArray(rows) ||
-                        !Number.isSafeInteger(recordsFiltered) || recordsFiltered < 0))) {
-                    showLoadError("Unexpected list response.");
-                    return;
-                }
-
-                bookingCountUnavailable = false;
-                complete(summaryOnly
-                    ? { ...emptyResponse, recordsTotal }
-                    : { draw: request.draw, recordsTotal, recordsFiltered, data: rows });
-            }).fail(function (xhr, status) {
-                if (status !== "abort") {
-                    showLoadError(xhr.status || status, xhr.responseJSON?.status?.message || xhr.responseJSON?.message);
-                }
-            }).always(function () {
-                if (bookingListRequest === pending) {
-                    bookingListRequest = null;
-                }
-            });
-        }
-
-        function getBookingPresetDates(preset, now = new Date()) {
-            if (!["today", "last7", "month"].includes(preset)) {
-                return { preset: "all", from: "", to: "" };
-            }
-
-            // Use the campus calendar day, even when the browser is in another timezone.
-            const parts = Object.fromEntries(
-                bookingCalendarDate.formatToParts(now).map(part => [part.type, part.value])
-            );
-            const year = Number(parts.year);
-            const month = Number(parts.month) - 1;
-            const day = Number(parts.day);
-            const isoDay = timestamp => new Date(timestamp).toISOString().slice(0, 10);
-            const startDay = preset === "month" ? 1 : day - (preset === "last7" ? 6 : 0);
-
-            return {
-                preset,
-                from: isoDay(Date.UTC(year, month, startDay)),
-                to: isoDay(preset === "month" ? Date.UTC(year, month + 1, 0) : Date.UTC(year, month, day))
-            };
-        }
-
-        function setBookingDateInputs(dates) {
-            fromDate.val(dates.from);
-            toDate.val(dates.to);
-        }
-
-        function syncBookingDateInputs() {
-            const preset = bookingDateRange.val();
-            if (preset !== "custom") {
-                setBookingDateInputs(getBookingPresetDates(preset));
-            }
+        bookingDateRange.on("change", syncBookingDateInputs);
+        bookingDateInputs.on("input change", function () {
+            bookingDateRange.val("custom");
             showBookingDateFilterError("");
+        });
+        restoreAppliedBookingDates();
+        updateBookingDateFilterSummary();
+        fetchBooking();
+    });
+
+    function fetchBooking() {
+        if ($.fn.DataTable.isDataTable(bookingTableSelector)) {
+            tblBooking.DataTable().destroy();
         }
-
-        function showBookingDateFilterError(message, field) {
-            bookingDateFilterError.text(message).prop("hidden", !message);
-            bookingDateInputs.removeAttr("aria-invalid");
-            if (field) {
-                field.attr("aria-invalid", "true").trigger("focus");
-            }
-        }
-
-        function applyBookingDateFilter(event) {
-            event.preventDefault();
-
-            const preset = bookingDateRange.val();
-            let dates;
-            if (preset === "custom") {
-                const fromInput = fromDate[0];
-                const toInput = toDate[0];
-                if (!fromInput.validity.valid) {
-                    showBookingDateFilterError("Enter a valid From Date.", fromDate);
-                    return;
-                }
-                if (!toInput.validity.valid) {
-                    showBookingDateFilterError("Enter a valid To Date.", toDate);
-                    return;
-                }
-
-                const from = fromInput.value;
-                const to = toInput.value;
-                if (!from || !to) {
-                    showBookingDateFilterError("Enter both dates, or choose All Dates.", from ? toDate : fromDate);
-                    return;
-                }
-                if (from > to) {
-                    showBookingDateFilterError("To Date must be on or after From Date.", toDate);
-                    return;
-                }
-                dates = { preset, from, to };
-            } else {
-                dates = getBookingPresetDates(preset);
-                setBookingDateInputs(dates);
-            }
-
-            appliedBookingDates = dates;
-            showBookingDateFilterError("");
-            updateBookingDateFilterSummary();
-            tblBooking.DataTable().ajax.reload(null, true);
-        }
-
-        function resetBookingDateFilter() {
-            bookingDateRange.val("all");
-            appliedBookingDates = { preset: "all", from: "", to: "" };
-            syncBookingDateInputs();
-            updateBookingDateFilterSummary();
-            tblBooking.DataTable().ajax.reload(null, true);
-        }
-
-        function updateBookingDateFilterSummary() {
-            const { preset, from, to } = appliedBookingDates;
-            const displayDate = value => value.split("-").reverse().join("/");
-            let summary = "Applied booking dates: " + bookingDatePresetLabels[preset];
-            if (from && to) {
-                summary += " (" + displayDate(from) + (from === to ? "" : " – " + displayDate(to)) + ")";
-            }
-            bookingDateFilterSummary.text(summary);
-        }
-        
-        function fetchBookingDetail(bookingId) {
-            $.ajax({
-                url: `/booking-clothes/details-booking-clothes/${bookingId}`,
-                type: "GET",  
-                success: function (response) { 
-                    console.log(response); 
-                    const data = response.data; 
-                    if (!data) {
-                        ShowToastInfo("Booking data not found.");
-                        return;
-                    }  
-                    const booking = data.booking;
-                    const items = data.item || []; 
-                    $("#booking_bookingId").val(booking.bookingId);
-                    $("#booking_StudentId").val(booking.studentId);
-                    $("#booking_BookingNo").val(booking.bookingNo);
-                    $("#booking_BookingDate").val(formatDateForInput(booking.bookingDate)); 
-                    $("#booking_Note").val(booking.note || "");
-                    $("#booking_PayDollar").val(booking.payDollar || 0);
-                    $("#booking_PayRieal").val(booking.payRieal || 0); 
-
-                    bookingItems = items.map(function (x) {
-                        return {
-                            bookingDetailId: x.bookingDetailId,
-                            bookingId: x.bookingId,
-                            clothId: x.clothId,
-                            itemName: x.itemName || "",
-                            nameKhmer: x.itemNameKhmer || "",
-                            qty: Number(x.qty || 0),
-                            price: Number(x.price || 0),
-                            priceKhr: Number(x.priceKhr || 0),
-                            discountPercent: Number(x.discountPercent || 0)
-                        };
-
-                    });
-                    renderBookingItems(); 
-                    
-                    selectedItems = [];
-                    stateSelect.empty().trigger("change"); 
-                    $("#BookingClothesModal .modal-title").text("Edit Booking"); 
-                    BookingClothesModal.modal("show");
+        tblBooking.DataTable({
+            processing: true,
+            serverSide: true,
+            paging: true,
+            pageLength: 10,
+            lengthChange: true,
+            searching: true,
+            info: true,
+            stateSave: false,
+            responsive: false,
+            autoWidth: false,
+            scrollX: false,
+            scrollY: "",
+            ajax: loadBookingRows,
+            columns: [
+                { data: "bookingId" },
+                {
+                    data: "bookingDate",
+                    render: function (data) {
+                        return `${formatDate(data)}`;
+                    }
                 },
-                error: function () { 
-                    ShowToastInfo("Unable to load booking details.");
+                {
+                    data: null,
+                    /** @@param {BookingRecord} row */
+                    render: function (row) {
+                        const number = [row.yearNumber, row.bookingNo]
+                            .filter(value => value != null && value !== "").join("-");
+                        return `<span class="booking-number">${escapeBookingHtml(number || "—")}</span>`;
+                    }
+                },
+                { data: "studentId" },
+                { data: "payDollar", className: "booking-money" },
+                { data: bookingKhrPaymentKey, className: "booking-money" },
+                {
+                    data: null,
+                    className: "text-center",
+                    /** @@param {BookingRecord} row */
+                    render: function (row) {
+                        if (row.returnAlready === false)
+                            return '<span class="badge badge-warning px-2 py-1"><i class="far fa-clock mr-1" aria-hidden="true"></i>Not Returned</span>';
+                        return '<span class="badge badge-success px-2 py-1"><i class="fas fa-check mr-1" aria-hidden="true"></i>Returned</span>';
+                    }
+                },
+                {
+                    data: null,
+                    className: "text-center",
+                    /** @@param {BookingRecord} row */
+                    render: function (row) {
+                        return `
+                            <button type="button"
+                                    class="btn btn-warning btn-sm btnEditBooking"
+                                    aria-haspopup="dialog"
+                                    aria-controls="BookingClothesModal"
+                                    data-id="${escapeBookingHtml(row.bookingId)}">
+                                <i class="fas fa-pen mr-1" aria-hidden="true"></i>Edit
+                            </button>
+                        `;
+                    }
                 }
-            });
-        } 
+            ],
+            language: {
+                processing: "Loading...",
+                searchPlaceholder: "Search bookings",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of _MAX_ entries",
+                infoFiltered: "",
+                thousands: ",",
+                emptyTable: bookingSearchPrompt,
+                zeroRecords: bookingNoMatches
+            },
+            infoCallback: function (_settings, _start, _end, _max, _total, text) {
+                return bookingCountUnavailable ? "Total entries unavailable" : text;
+            },
+            initComplete: function () {
+                const table = $(this.api().table().node());
+                if (!table.parent().hasClass("booking-table-scroll")) {
+                    table.wrap('<div class="booking-table-scroll" role="region" aria-label="Booking Clothes table" tabindex="0"></div>');
+                }
+                if (typeof MyApp !== "undefined" &&
+                    typeof MyApp.utils?.dataTableDebounceSearch === "function") {
+                    MyApp.utils.dataTableDebounceSearch(bookingTableSelector, 500);
+                }
+            },
+            drawCallback: function () {
+                const api = this.api();
+                const page = api.page.info();
+                const hasResults = page.recordsDisplay > 0;
 
-        //---------------------------------------------------- Event Trigger ----------------------------------------------------
-        btnNewBooking.on("click", function () {
-            BookingClothesModal.modal("show");
-            tblItem.DataTable();
-            $("#BookingClothesModal .modal-title").text("New Booking");
-            setPaymentFullscreen(true);
-        });
-        
-        btnCloseBooking.on("click", function () {
-            BookingClothesModal.modal("hide");
-        });
+                $(api.table().container())
+                    .toggleClass("booking-has-results", hasResults)
+                    .toggleClass("booking-has-pages", hasResults && page.pages > 1);
 
-        btnCloseItem.on("click", function () {
-            ItemModal.modal("hide");
+                if (!hasResults) {
+                    $(api.table().body()).find("td.dataTables_empty, td.dt-empty").text(bookingEmptyMessage);
+                }
+            }
         });
+    }
 
-        btnAssignItem.on("click", function () {
-            if (selectedItems.length === 0) {
-                ShowToastInfo("Please select at least one item.");
+    function loadBookingRows(request, complete) {
+        if (bookingListRequest) {
+            const previousRequest = bookingListRequest;
+            bookingListRequest = null;
+            previousRequest.abort();
+        }
+
+        const search = String(request.search?.value ?? "").trim();
+        const { from, to } = appliedBookingDates;
+        const summaryOnly = !search && !from && !to;
+        const emptyResponse = { draw: request.draw, recordsTotal: 0, recordsFiltered: 0, data: [] };
+        bookingEmptyMessage = summaryOnly ? bookingSearchPrompt : bookingNoMatches;
+
+        const pending = $.ajax({
+            url: "/booking-clothes/get-booking-clothes",
+            type: "POST",
+            dataType: "json",
+            data: {
+                ...request,
+                // Read the total from the existing endpoint without displaying its row.
+                ...(summaryOnly ? { start: 0, length: 1 } : {}),
+                search: { ...request.search, value: search },
+                fromDate: from,
+                toDate: to
+            }
+        });
+        bookingListRequest = pending;
+
+        function showLoadError(reason, message) {
+            if (bookingListRequest !== pending) return;
+
+            bookingCountUnavailable = true;
+            if (!summaryOnly) {
+                bookingEmptyMessage = "Unable to load bookings. Try searching again.";
+            }
+            console.error("Cannot load bookings:", reason);
+            complete(emptyResponse);
+            if (!summaryOnly && typeof ShowToastError === "function") {
+                ShowToastError(message || "Cannot load bookings.");
+            }
+        }
+
+        return pending.done(/** @@param {BookingGridResponse|null} response */ function (response) {
+            if (bookingListRequest !== pending) return;
+
+            const recordsTotal = Number(response?.recordsTotal ?? NaN);
+            const recordsFiltered = Number(response?.recordsFiltered ?? NaN);
+            const rows = response?.data ?? (recordsFiltered === 0 ? [] : null);
+            if (!Number.isSafeInteger(recordsTotal) || recordsTotal < 0 ||
+                (!summaryOnly && (!Array.isArray(rows) ||
+                    !Number.isSafeInteger(recordsFiltered) || recordsFiltered < 0))) {
+                showLoadError("Unexpected list response.");
                 return;
             }
-            selectedItems.forEach(function (item) {
-                addBookingItem(item);
-            });
-            selectedItems = [];
-            stateSelect.empty().trigger("change");
-            ItemModal.modal("hide");
+
+            bookingCountUnavailable = false;
+            complete(summaryOnly
+                ? { ...emptyResponse, recordsTotal }
+                : { draw: request.draw, recordsTotal, recordsFiltered, data: rows });
+        }).fail(/** @@param {BookingAjaxError} xhr */ function (xhr, status) {
+            if (status !== "abort") {
+                const error = xhr.responseJSON;
+                showLoadError(xhr.status || status, error?.status?.message || error?.message);
+            }
+        }).always(function () {
+            if (bookingListRequest === pending) {
+                bookingListRequest = null;
+            }
         });
-        
-        selectItem.on("click", function () {
-            tblItem.DataTable().clear().destroy();
-            tblItem.DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                ajax: {
-                    url: "/booking-clothes/get-items",
-                    type: "POST"
-                },
-                columns: [
-                    { data: "id" },
-                    { data: "name" },
-                    { data: "nameKhmer" },
-                    { data: "price" },
-                    {
-                        data: null,
-                        render: function () {
-                            return `
-                                <button type="button"
-                                        class="btn btn-default btn-xs btn-block btnChooseItem">
-                                    <i class="fas fa-check mr-1"></i>
-                                    Select
-                                </button>
-                            `;
-                        }
-                    }
-                ]
-            });
-            ItemModal.modal("show");
-        });
+    }
 
-        tblItem.on("click", ".btnChooseItem", function () {
-            const $button = $(this);
-            const $row = $button.closest("tr");
-            const selectedRow = tblItem.DataTable().row($row).data();
+    function getBookingPresetDates(preset, now = new Date()) {
+        if (!["today", "last7", "month"].includes(preset)) {
+            return { preset: "all", from: "", to: "" };
+        }
 
-            if (!selectedRow) return;
+        // Use the campus calendar day, even when the browser is in another timezone.
+        const parts = Object.fromEntries(
+            bookingCalendarDate.formatToParts(now).map(part => [part.type, part.value])
+        );
+        const year = Number(parts.year);
+        const month = Number(parts.month) - 1;
+        const day = Number(parts.day);
+        const isoDay = timestamp => new Date(timestamp).toISOString().slice(0, 10);
+        const startDay = preset === "month" ? 1 : day - (preset === "last7" ? 6 : 0);
 
-            const exists = selectedItems.some(function (x) {
-                return String(x.id) === String(selectedRow.id);
-            });
-            if (exists) return;
-            selectedItems.push(selectedRow);
-            const text =
-                `${selectedRow.name} (${formatUsd(selectedRow.price)} $)`;
+        return {
+            preset,
+            from: isoDay(Date.UTC(year, month, startDay)),
+            to: isoDay(preset === "month" ? Date.UTC(year, month + 1, 0) : Date.UTC(year, month, day))
+        };
+    }
 
-            const newOption = new Option(
-                text,
-                selectedRow.id,
-                true,
-                true
-            );
+    function setBookingDateInputs(dates) {
+        fromDate.val(dates.from);
+        toDate.val(dates.to);
+    }
 
-            stateSelect
-                .append(newOption)
-                .trigger("change");
+    function restoreAppliedBookingDates() {
+        bookingDateRange.val(appliedBookingDates.preset);
+        setBookingDateInputs(appliedBookingDates);
+        showBookingDateFilterError("");
+    }
 
-            $button
-                .removeClass("btn-default")
-                .addClass("btn-success")
-                .html('<i class="fas fa-check mr-1"></i> Selected')
-                .prop("disabled", true);
-        });
+    function syncBookingDateInputs() {
+        const preset = bookingDateRange.val();
+        if (preset !== "custom") {
+            setBookingDateInputs(getBookingPresetDates(preset));
+        }
+        showBookingDateFilterError("");
+    }
 
-        tblBooking.on("click", ".btnEditBooking", function () {
+    function showBookingDateFilterError(message, field) {
+        bookingDateFilterError.text(message).prop("hidden", !message);
+        bookingDateInputs.removeAttr("aria-invalid");
+        if (field) {
+            field.attr("aria-invalid", "true").trigger("focus");
+        }
+    }
 
-            const bookingId = $(this).data("id");
+    function applyBookingDateFilter(event) {
+        event.preventDefault();
 
-            if (!bookingId) return;
+        const preset = bookingDateRange.val();
+        let dates;
+        if (preset === "custom") {
+            const fromInput = fromDate[0];
+            const toInput = toDate[0];
+            if (!fromInput.validity.valid) {
+                showBookingDateFilterError("Enter a valid From Date.", fromDate);
+                return;
+            }
+            if (!toInput.validity.valid) {
+                showBookingDateFilterError("Enter a valid To Date.", toDate);
+                return;
+            }
 
-            fetchBookingDetail(bookingId);
-        });
-        
-        btnSearchStudent.on("click", function (e) {
-            e.preventDefault();
-            tblSearchStudent.DataTable().clear().destroy();
-            tblSearchStudent.DataTable({
-                processing: true,
-                serverSide: true,
-                paging: true,
-                lengthChange: true,
-                searching: true,
-                ordering: true,
-                info: true,
-                responsive: true,
-                autoWidth: true,
-                scrollCollapse: true,
-                ajax: {
-                    url: "/student/academic/student-list/all",
-                    type: "POST",
-                    error: function (error) {
-                        console.log(error.responseText);
-                    }
-                },
-                columns: [
-                    {data: "studentId"},
-                    {data: "studentName"},
-                    {data: "studentNameInKhmer"},
-                    {data: "sex"},
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            if (row.status === "REGISTER") {
-                                return ` <span class="badge badge-warning">${row.status}</span>`;
-                            } else if (row.status === "ACTIVE") {
-                                return ` <span class="badge badge-primary">${row.status}</span>`;
-                            } else if (row.status === "QUIT") {
-                                return ` <span class="badge badge-danger">${row.status}</span>`;
-                            } else {
-                                return `<span class="badge badge-secondary">${row.status}</span>`;
-                            }
-                        },
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            return `<a id="btnSelectStudent" class="btn btn-success btn-xs btn-block">Select</a>`;
-                        },
-                    },
-                ],
-                initComplete: function () {
-                    MyApp.utils.dataTableDebounceSearch("#tblSearchStudent", 500);
+            const from = fromInput.value;
+            const to = toInput.value;
+            if (!from || !to) {
+                showBookingDateFilterError("Enter both dates, or choose All Dates.", from ? toDate : fromDate);
+                return;
+            }
+            if (from > to) {
+                showBookingDateFilterError("To Date must be on or after From Date.", toDate);
+                return;
+            }
+            dates = { preset, from, to };
+        } else {
+            dates = getBookingPresetDates(preset);
+            setBookingDateInputs(dates);
+        }
+
+        appliedBookingDates = dates;
+        showBookingDateFilterError("");
+        updateBookingDateFilterSummary();
+        tblBooking.DataTable().ajax.reload();
+        bookingDateFilterModal.modal("hide");
+    }
+
+    function resetBookingDateFilter() {
+        appliedBookingDates = { preset: "all", from: "", to: "" };
+        restoreAppliedBookingDates();
+        updateBookingDateFilterSummary();
+        tblBooking.DataTable().ajax.reload();
+    }
+
+    function updateBookingDateFilterSummary() {
+        const { preset, from, to } = appliedBookingDates;
+        const active = Boolean(from && to);
+        bookingDateFilterSummary.toggleClass("d-none", !active);
+        if (!active) {
+            bookingActiveDateLabel.text("");
+            return;
+        }
+
+        const displayDate = value => value.split("-").reverse().join("/");
+        const range = displayDate(from) + (from === to ? "" : " – " + displayDate(to));
+        bookingActiveDateLabel.text(bookingDatePresetLabels[preset] + ": " + range);
+    }
+
+    function bookingLookupAjax({ url, columns, idFor, labelFor, browseButton, excludedIds, picker }) {
+        return {
+            url,
+            type: "POST",
+            dataType: "json",
+            delay: 250,
+            data: function (params) {
+                const page = Number(params.page) || 1;
+                // Request room for rows that the item picker will filter out.
+                const length = params.bookingPageLength ?? (bookingLookupPageSize + (excludedIds?.().size ?? 0));
+                params.bookingPageLength = length;
+                return {
+                    draw: page,
+                    start: (page - 1) * length,
+                    length,
+                    search: { value: String(params.term || "").trim(), regex: false },
+                    order: [{ column: 0, dir: "asc" }],
+                    columns: columns.map(data => ({
+                        data: data ?? "",
+                        name: "",
+                        searchable: data != null,
+                        orderable: data != null,
+                        search: { value: "", regex: false }
+                    }))
+                };
+            },
+            /** @@param {BookingGridResponse|null} response */
+            processResults: function (response, params) {
+                if (!Array.isArray(response?.data)) {
+                    browseButton.removeClass("d-none");
+                    return { results: [], pagination: { more: false } };
                 }
-            });
-            modalStudent.modal("show");
-        })
-        
-        tblSearchStudent.on("click", "#btnSelectStudent", function () {
-            const $row = $(this).closest('tr');
-            const selectedRow = tblSearchStudent.DataTable().row($row).data();
-            if (selectedRow) {
-                $("#booking_StudentId").val(selectedRow.studentId);
-                modalStudent.modal("hide");
-            }
-        });
-        //---------------------------------------------------- Event Trigger ----------------------------------------------------
-        
-        // ---------------------------------------------------- Booking Item Section ---------------------------------------------------- 
-        function getExchangeRate() { 
-            let rate = $('#txtRateOut').text(); 
-            rate = parseFloat(
-                String(rate).replace(/,/g, '')
-            );
 
-            return rate || 4100;
-        }
-        
-        // ADD SELECTED ITEM
-        function addBookingItem(item) {
-            let clothId = item.id; 
-            let exists = bookingItems.some(x =>
-                String(x.clothId) === String(clothId)
-            );
-            if (exists) return;
-            let priceUsd = parseFloat(item.price || 0);
-            let priceKhr = parseFloat(
-                item.priceKhr || 0
-            );
-            if (priceKhr === 0) {
-                priceKhr = priceUsd * getExchangeRate();
-            }
-            bookingItems.push({
-                bookingDetailId: 0,
-                bookingId: 0,
-                clothId: clothId,
-                itemName: item.name || item.namekhmer || '',
-                nameKhmer: item.nameKhmer || '',
-                qty: 1,
-                price: priceUsd,
-                priceKhr: priceKhr,
-                discountPercent: 0
-            });
-            renderBookingItems();
-        }
-        
-        // RENDER TABLE 
-        function renderBookingItems() {
-            let tbody = $('#tblBookingDetail tbody'); 
-            tbody.empty(); 
-            $.each(bookingItems, function(index, item) { 
-                let totalUsd = calculateLineUsd(item);
-                let totalKhr = calculateLineKhr(item); 
-                let row = `<tr data-index="${index}"> 
-                    <td style="display:none;">${item.bookingDetailId}</td>
-                    <td style="display:none;">${item.bookingId}</td>
-                    <td style="display:none;">${item.clothId}</td>
-                    <td>
-                        <strong>${item.itemName}</strong>
-                        ${item.nameKhmer ? `<div class="small text-muted"> ${item.nameKhmer} </div>` : ''}
-                    </td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm text-right item-qty"
-                               min="1"
-                               step="1"
-                               value="${item.qty}"
-                               data-index="${index}">
-                    </td> 
-                    <td>
-                        <input type="number" class="form-control form-control-sm text-right item-price-usd"
-                               min="0"
-                               step="0.01"
-                               value="${item.price.toFixed(2)}"
-                               data-index="${index}">
-                    </td> 
-                    <td>
-                        <input type="number" class="form-control form-control-sm text-right item-price-khr"
-                               min="0"
-                               step="100"
-                               value="${item.priceKhr.toFixed(0)}"
-                               data-index="${index}">
-                    </td> 
-                    <td>
-                        <div class="input-group input-group-sm">
-                            <input type="number" class="form-control text-right item-discount"
-                                   min="0"
-                                   max="100"
-                                   step="1"
-                                   value="${item.discountPercent}"
-                                   data-index="${index}">
-                            <div class="input-group-append">
-                                <span class="input-group-text">
-                                    %
-                                </span>
-                            </div>
-                        </div>
-                    </td> 
-                    <td class="text-right font-weight-bold line-total-usd">
-                        ${formatUsd(totalUsd)}
-                    </td> 
-                    <td class="text-right font-weight-bold line-total-khr">
-                        ${formatKhr(totalKhr)}
-                    </td> 
-                    <td class="text-center"> 
-                        <button type="button" class="btn btn-danger btn-sm"
-                                onclick="removeBookingItem(${index})"
-                                title="Remove"> 
-                            <i class="fas fa-trash"></i> 
-                        </button> 
-                    </td> 
-                </tr>
-            `; 
-                tbody.append(row);
-            }); 
-            calculateGrandTotal();
-        }
-
- 
-        // CALCULATE USD 
-        function calculateLineUsd(item) {
-            let qty = parseFloat(item.qty || 0);
-            let price = parseFloat(item.price || 0);
-            let discount = parseFloat(item.discountPercent || 0);
-            let subTotal = qty * price;
-            let discountAmount = subTotal * discount / 100;
-            return subTotal - discountAmount;
-        }
-        
-        // CALCULATE KHR 
-        function calculateLineKhr(item) { 
-            let qty = parseFloat(item.qty || 0);
-            let price = parseFloat(item.priceKhr || 0);
-            let discount = parseFloat(item.discountPercent || 0); 
-            let subTotal = qty * price;
-            let discountAmount = subTotal * discount / 100;
-            return subTotal - discountAmount;
-        }
-        
-        // CHANGE QTY 
-        $(document).on('input','.item-qty',function () { 
-                let index = $(this).data('index');
-                bookingItems[index].qty = parseFloat($(this).val()) || 0;
-                updateRowTotal(index);
-            }
-        );
-        
-        // CHANGE USD PRICE 
-        $(document).on('input','.item-price-usd',function () {
-                let index = $(this).data('index');
-                let usd = parseFloat($(this).val()) || 0;
-                bookingItems[index].price = usd;
-                // automatically update KHR
-                bookingItems[index].priceKhr = usd * getExchangeRate();
-                let row = $('#tblBookingDetail tbody tr').eq(index);
-                row.find('.item-price-khr').val(bookingItems[index].priceKhr.toFixed(0));
-                updateRowTotal(index);
-            }
-        );
-
-        // CHANGE KHR PRICE 
-        $(document).on('input','.item-price-khr',function () {
-                let index = $(this).data('index');
-                bookingItems[index].priceKhr = parseFloat($(this).val()) || 0;
-                updateRowTotal(index);
-            }
-        );
-        
-        // CHANGE DISCOUNT
-        $(document).on('input','.item-discount',function () {
-                let index = $(this).data('index');
-                let discount = parseFloat($(this).val()) || 0;
-                if (discount > 100) {
-                    discount = 100;
-                    $(this).val(100);
+                const page = Number(params.page) || 1;
+                const length = params.bookingPageLength ?? bookingLookupPageSize;
+                const total = Number(response.recordsFiltered ?? response.recordsTotal ?? NaN);
+                const excluded = excludedIds?.();
+                const results = [];
+                for (const row of response.data) {
+                    const id = idFor(row);
+                    if (id && !excluded?.has(id)) results.push({ id, text: labelFor(row), record: row });
                 }
-                bookingItems[index].discountPercent = discount;
-                updateRowTotal(index);
+
+                return {
+                    results,
+                    pagination: {
+                        more: response.data.length > 0 &&
+                            (Number.isFinite(total)
+                                ? page * length < total
+                                : response.data.length === length)
+                    }
+                };
+            },
+            transport: function (params, success, failure) {
+                if (picker && (!picker.isConnected || bookingSaveInProgress || !BookingClothesModal.hasClass("show") ||
+                    !picker.nextElementSibling?.classList.contains("select2-container--open"))) return;
+
+                const request = $.ajax(params);
+                if (picker) bookingItemRequests.set(picker, request);
+                const isCurrent = () => !picker || (picker.isConnected && bookingItemRequests.get(picker) === request);
+                request.done(function (response) {
+                    if (isCurrent()) success(response);
+                }).fail(function (xhr, status) {
+                    if (status === "abort" || !isCurrent()) return;
+                    browseButton.removeClass("d-none");
+                    failure(xhr);
+                }).always(function () {
+                    if (picker && bookingItemRequests.get(picker) === request) bookingItemRequests.delete(picker);
+                });
+                return request;
             }
-        );
-        
-        // UPDATE ONLY CURRENT ROW
-        function updateRowTotal(index) {
-            let item = bookingItems[index];
-            let usd = calculateLineUsd(item);
-            let khr = calculateLineKhr(item);
-            let row = $('#tblBookingDetail tbody tr').eq(index);
-            row.find('.line-total-usd').text('$' + formatUsd(usd));
-            row.find('.line-total-khr').text(formatKhr(khr) + ' ៛');
-            calculateGrandTotal();
+        };
+    }
+
+    /** @@param {BookingStudent} row */
+    function bookingStudentLabel(row) {
+        return [row.studentId, row.studentName, row.studentNameInKhmer]
+            .map(value => String(value ?? "").trim())
+            .filter(Boolean)
+            .join(" · ");
+    }
+
+    function bookingProductNames(english, khmer, fallback) {
+        const englishName = String(english ?? "").trim();
+        const khmerName = String(khmer ?? "").trim();
+        return {
+            primary: englishName || khmerName || fallback,
+            secondary: englishName && khmerName !== englishName ? khmerName : ""
+        };
+    }
+
+    /** @@param {BookingCatalogItem} row */
+    function bookingItemPriceLabel(row) {
+        const prices = [];
+        if (row.price != null) prices.push(formatUsd(bookingNumber(row.price)) + " USD");
+        if (bookingNumber(row.priceKhr) > 0) prices.push(formatKhr(bookingNumber(row.priceKhr)) + " KHR");
+        return prices.join(" / ");
+    }
+
+    /** @@param {BookingCatalogItem} row */
+    function bookingItemLabel(row) {
+        const names = bookingProductNames(row.name, row.nameKhmer || row.namekhmer, "Item " + row.id);
+        return [names.primary, names.secondary].filter(Boolean).join(" · ");
+    }
+
+    /** @@param {{text?: string, record?: BookingCatalogItem}} option */
+    function renderBookingItemOption(option) {
+        if (!option.record) return option.text || "";
+
+        const row = option.record;
+        const names = bookingProductNames(row.name, row.nameKhmer || row.namekhmer, "Item " + row.id);
+        const namesLabel = [names.primary, names.secondary].filter(Boolean).join(" · ");
+        const title = $('<span class="booking-catalog-names">')
+            .attr("title", namesLabel)
+            .append($("<strong>").text(names.primary));
+        if (names.secondary) {
+            title.append($('<span class="booking-product-name-khmer" lang="km">').text(names.secondary));
         }
-        
-        // CALCULATE TOTAL 
-        function calculateGrandTotal() {
-            let grandUsd = 0;
-            let grandKhr = 0;
-            $.each(bookingItems, function(_, item) {
-                grandUsd += calculateLineUsd(item);
-                grandKhr += calculateLineKhr(item);
-            });
-            $('#lblGrandTotalUsd').text(formatUsd(grandUsd));
-            $('#lblGrandTotalKhr').text(formatKhr(grandKhr));
-            $('#invoice_GrandTotalUsd').val(grandUsd.toFixed(2));
-            $('#invoice_GrandTotalKhr').val(grandKhr.toFixed(0));
+
+        const result = $('<span class="booking-catalog-option">').append(title);
+        const prices = bookingItemPriceLabel(row);
+        if (prices) {
+            result.append($('<span class="booking-catalog-price">').text(prices));
         }
-        
-        // REMOVE 
-        function removeBookingItem(index) {
-            bookingItems.splice(index, 1);
-            renderBookingItems();
-        } 
-        // ---------------------------------------------------- Booking Item Section ----------------------------------------------------
-        
-        
-        // toggle modal fullscreen or minimize screen
-        $(document).on('click','.btnEditBooking',function () {
-            setPaymentFullscreen(true);
-        })
-        $("#btnTogglePaymentFullscreen").on("click", function () {
-            const modal = $("#BookingClothesModal");
-            setPaymentFullscreen(!modal.hasClass("fullscreen-modal"));
+        return result;
+    }
+
+    function initializeBookingStudentPicker() {
+        if (!$.fn.select2) return;
+
+        if (!bookingInlineStudent && bookingStudentField.length) {
+            const wrapper = $('<div class="booking-inline-student">')
+                .insertBefore(bookingStudentField);
+            wrapper.append('<i class="fas fa-search booking-student-icon" aria-hidden="true"></i>');
+            const picker = $('<select id="bookingInlineStudent" aria-label="Search for a student"></select>')
+                .append(new Option("", ""))
+                .appendTo(wrapper);
+
+            try {
+                picker.select2({
+                    width: "100%",
+                    dropdownParent: BookingClothesModal,
+                    placeholder: "Search student ID or name",
+                    minimumInputLength: 1,
+                    allowClear: true,
+                    ajax: bookingLookupAjax({
+                        url: "/student/academic/student-list/all",
+                        columns: ["studentId", "studentName", "studentNameInKhmer", "sex", null, null],
+                        idFor: row => String(row?.studentId ?? "").trim(),
+                        labelFor: bookingStudentLabel,
+                        browseButton: btnSearchStudent
+                    })
+                }).on("change.bookingInline", function () {
+                    bookingStudentField.val(picker.val() || "");
+                });
+
+                bookingInlineStudent = picker;
+                // Keep the original input in the form for the existing save handler.
+                if (bookingStudentField.prop("readOnly")) {
+                    bookingStudentField.addClass("d-none");
+                }
+                btnSearchStudent.addClass("d-none");
+            } catch (error) {
+                wrapper.remove();
+                console.warn("Inline student lookup is unavailable.", error);
+            }
+        }
+    }
+
+    /**
+     * @@param {BookingKey|null|undefined} studentId
+     * @@param {BookingStudent} [student]
+     */
+    function syncBookingStudentLookup(studentId, student = {}) {
+        const id = String(studentId ?? "").trim();
+        bookingStudentField.val(id);
+        if (!bookingInlineStudent) return;
+
+        bookingInlineStudent.empty().append(new Option("", ""));
+        if (id) {
+            bookingInlineStudent.append(new Option(bookingStudentLabel({ ...student, studentId: id }), id));
+        }
+        bookingInlineStudent.val(id).trigger("change.select2");
+    }
+
+    /**
+     * @@param {string} title
+     * @@param {BookingStudent} [student]
+     */
+    function showBookingEditor(title, student = {}) {
+        BookingClothesModal.addClass("booking-inline-editor");
+        initializeBookingStudentPicker();
+        syncBookingStudentLookup(bookingStudentField.val(), student);
+        renderBookingItems();
+        if (bookingSaveReady) showBookingSaveFeedback("");
+
+        BookingClothesModal.find(".modal-title").first().text(title);
+        setPaymentFullscreen(false);
+        BookingClothesModal.modal("show");
+        loadBookingExchangeRate();
+    }
+
+    function resetBookingItemSelection() {
+        selectedItems = [];
+        bookingBrowseRow = null;
+        stateSelect.empty().trigger("change");
+    }
+
+    function cancelBookingDetailRequest() {
+        if (bookingDetailRequest) {
+            const previous = bookingDetailRequest;
+            bookingDetailRequest = null;
+            previous.abort();
+        }
+    }
+
+    function getBookingEditorFields() {
+        const bookingId = BookingClothesModal.find("#booking_BookingId");
+        // The partial uses the controller's legacy KHR payment field name.
+        //noinspection SpellCheckingInspection
+        const paidKhr = BookingClothesModal.find("#booking_PayRieal");
+        return {
+            id: bookingId.length ? bookingId : BookingClothesModal.find("#booking_bookingId"),
+            number: BookingClothesModal.find("#booking_BookingNo"),
+            date: BookingClothesModal.find("#booking_BookingDate"),
+            note: BookingClothesModal.find("#booking_Note"),
+            paidUsd: BookingClothesModal.find("#booking_PayDollar"),
+            paidKhr,
+            vat: BookingClothesModal.find("#booking_Vat"),
+            discount: BookingClothesModal.find("#booking_Discount"),
+            total: BookingClothesModal.find("#booking_Total"),
+            active: BookingClothesModal.find("#Active"),
+            schoolId: BookingClothesModal.find("#booking_SchoolId"),
+            fieldId: BookingClothesModal.find("#booking_FieldId"),
+            termNo: BookingClothesModal.find("#booking_TermNo"),
+            groupId: BookingClothesModal.find("#booking_GroupId")
+        };
+    }
+
+    function resetNewBooking() {
+        const form = BookingClothesModal.find(bookingFormSelector)[0];
+        if (typeof form?.reset === "function") {
+            form.reset();
+            $(form).find("select.select2-hidden-accessible").trigger("change.select2");
+        }
+
+        editingBooking = null;
+        editingBookingSupportsItemSave = false;
+        bookingRows = Array(defaultBookingRowCount).fill(null);
+        originalBookingItems = [];
+        resetBookingItemSelection();
+        const fields = getBookingEditorFields();
+        fields.id.val(0);
+        bookingStudentField.val("");
+        fields.number.val(fields.number[0]?.defaultValue || "");
+        fields.date.val(getBookingPresetDates("today").from);
+        fields.note.val("");
+        fields.paidUsd.val(0);
+        fields.paidKhr.val(0);
+        fields.vat.val(0);
+        fields.discount.val(0);
+        fields.total.val(0);
+        fields.active.prop("checked", fields.active[0]?.defaultChecked === true);
+    }
+
+    function fetchBookingDetail(bookingId, button) {
+        if (bookingSaveInProgress) return;
+        cancelBookingDetailRequest();
+        button.prop("disabled", true).attr("aria-busy", "true");
+
+        const pending = $.ajax({
+            url: "/booking-clothes/details-booking-clothes/" + encodeURIComponent(bookingId),
+            type: "GET",
+            dataType: "json",
+            timeout: 20000
         });
-        function setPaymentFullscreen(isFullscreen) {
-            const modal = $("#BookingClothesModal");
-            const icon = $("#paymentFullscreenIcon");
-            if (isFullscreen) {
-                modal.addClass("fullscreen-modal");
-                icon.removeClass("fa-expand").addClass("fa-compress");
-                $("#btnTogglePaymentFullscreen").attr("title", "Restore");
+        bookingDetailRequest = pending;
+
+        return pending.done(/** @@param {BookingDetailResponse|null} response */ function (response) {
+            if (bookingDetailRequest !== pending) return;
+
+            const data = response?.data;
+            const booking = data?.booking;
+            const items = data?.item ?? [];
+            if (!booking || String(booking.bookingId) !== String(bookingId) || !Array.isArray(items)) {
+                ShowToastInfo("Unable to load the selected booking.");
+                return;
+            }
+
+            editingBooking = booking;
+            editingBookingSupportsItemSave = data?.editorItemSaveSupported === true;
+            const fields = getBookingEditorFields();
+            fields.id.val(booking.bookingId);
+            bookingStudentField.val(booking.studentId ?? "");
+            fields.number.val(booking.bookingNo ?? "");
+            fields.date.val(formatDateForInput(booking.bookingDate));
+            fields.note.val(booking.note || "");
+            fields.paidUsd.val(booking.payDollar ?? 0);
+            fields.paidKhr.val(booking[bookingKhrPaymentKey] ?? 0);
+            fields.vat.val(booking.vat ?? 0);
+            fields.discount.val(booking.discount ?? 0);
+            fields.total.val(booking.total ?? 0);
+            fields.active.prop("checked", booking.active === true);
+            fields.schoolId.val(booking.schoolId ?? "");
+            fields.fieldId.val(booking.fieldId ?? "");
+            fields.termNo.val(booking.termNo ?? "");
+            fields.groupId.val(booking.groupId ?? "");
+
+            // Keep raw saved values for the controller's stale-edit check.
+            originalBookingItems = items.map(x => ({
+                bookingDetailId: Number(x.bookingDetailId),
+                clothId: x.clothId == null ? null : Number(x.clothId),
+                qty: x.qty == null ? null : Number(x.qty),
+                price: x.price == null ? null : Number(x.price)
+            }));
+            bookingRows = items.map(x => ({
+                bookingDetailId: x.bookingDetailId,
+                bookingId: x.bookingId,
+                clothId: x.clothId,
+                itemName: x.itemName || "",
+                nameKhmer: x.nameKhmer || x.itemNameKhmer || "",
+                qty: bookingNumber(x.qty),
+                price: bookingNumber(x.price)
+            }));
+            while (bookingRows.length < defaultBookingRowCount) bookingRows.push(null);
+
+            resetBookingItemSelection();
+            showBookingEditor("Edit Booking", data?.student ?? booking);
+        }).fail(function (_xhr, status) {
+            if (bookingDetailRequest === pending && status !== "abort") {
+                ShowToastInfo("Unable to load booking details. Please try again.");
+            }
+        }).always(function () {
+            button.prop("disabled", false).removeAttr("aria-busy");
+            if (bookingDetailRequest === pending) bookingDetailRequest = null;
+        });
+    }
+
+    function initializeBookingSave() {
+        const form = BookingClothesModal.find(bookingFormSelector);
+        const saveButton = BookingClothesModal.find(bookingSaveButtonSelector);
+        if (saveButton.length !== 1) {
+            console.error("Booking Save: expected one #btnSaveBooking in the booking modal.");
+            return;
+        }
+
+        saveButton.before(`
+            <div class="booking-save-feedback" id="bookingSaveFeedback" hidden>
+                <p id="bookingSaveMessage" class="alert alert-info py-2 px-3 small mb-1"
+                   role="status" aria-live="polite" aria-atomic="true"></p>
+            </div>
+        `);
+        saveButton.prop("disabled", true);
+
+        if (form.length !== 1 || !form.is("form")) {
+            showBookingSaveFeedback("Save can't find the booking form. Check that the modal contains one form with ID PaymentForm.", "danger");
+            return;
+        }
+
+        // The footer button is outside the form in the existing modal partial.
+        form.attr("method", "post").prop("noValidate", true);
+        form.on("submit.bookingSave", function (event) {
+            event.preventDefault();
+            return saveBooking();
+        });
+        saveButton.attr("type", "submit")
+            .attr("form", "PaymentForm")
+            .attr("aria-describedby", "bookingSaveMessage");
+
+        if (saveButton[0].form !== form[0]) {
+            showBookingSaveFeedback("Save is not connected to the booking form. Check for duplicate PaymentForm IDs on the page.", "danger");
+            return;
+        }
+
+        bookingSaveReady = true;
+        saveButton.prop("disabled", false);
+    }
+
+    function showBookingSaveFeedback(message, tone = "info") {
+        const feedback = BookingClothesModal.find("#bookingSaveFeedback");
+        feedback.prop("hidden", !message);
+        feedback.find("#bookingSaveMessage")
+            .removeClass("alert-info alert-warning alert-danger")
+            .addClass("alert-" + tone)
+            .text(message);
+    }
+
+    function showBookingSaveError(message) {
+        showBookingSaveFeedback(message, "danger");
+    }
+
+    function saveBooking() {
+        if (!bookingSaveReady || bookingSaveInProgress) return;
+        if (bookingDetailRequest) {
+            showBookingSaveFeedback("Wait for the booking details to finish loading, then try Save again.", "warning");
+            return;
+        }
+
+        const fields = getBookingEditorFields();
+        const bookingId = editingBooking ? Number(editingBooking.bookingId) : 0;
+        if (!Number.isSafeInteger(bookingId) || (editingBooking && bookingId <= 0)) {
+            showBookingSaveError("The booking ID is missing or invalid. Reopen the booking and try again.");
+            return;
+        }
+        if (editingBooking && !editingBookingSupportsItemSave) {
+            showBookingSaveError("Update BookingClothesController.cs to the version that saves clothing items. The booking was not changed.");
+            return;
+        }
+
+        const studentId = String(bookingStudentField.val() ?? "").trim();
+        if (!studentId) {
+            showBookingSaveError("Select a student before saving the booking.");
+            return;
+        }
+
+        const bookingDate = String(fields.date.val() ?? "").trim();
+        const date = new Date(bookingDate + "T00:00:00Z");
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(bookingDate) ||
+            !Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== bookingDate) {
+            showBookingSaveError("Enter a valid booking date in YYYY-MM-DD format.");
+            fields.date.trigger("focus");
+            return;
+        }
+
+        const payDollar = Number(fields.paidUsd.val() ?? 0);
+        const paidKhr = Number(fields.paidKhr.val() ?? 0);
+        if (!Number.isFinite(payDollar) || payDollar < 0 ||
+            !Number.isFinite(paidKhr) || paidKhr < 0) {
+            showBookingSaveError("Enter non-negative USD and KHR payment amounts.");
+            return;
+        }
+
+        const bookingItems = getBookingItems();
+        if (!bookingItems.length && (!editingBooking || originalBookingItems.length > 0)) {
+            showBookingSaveError("Keep at least one clothing item on the booking before saving.");
+            return;
+        }
+
+        const items = bookingItems.map(item => ({
+            bookingDetailId: Number(item.bookingDetailId),
+            clothId: Number(item.clothId),
+            qty: item.qty,
+            price: item.price
+        }));
+        if (items.some(item => !Number.isSafeInteger(item.bookingDetailId) || item.bookingDetailId < 0 ||
+            !Number.isSafeInteger(item.clothId) || item.clothId <= 0 ||
+            item.qty <= 0 || !fitsBookingDetailNumber(item.qty) ||
+            item.price < 0 || !fitsBookingDetailNumber(item.price))) {
+            showBookingSaveError("Each clothing item needs a positive quantity and a non-negative USD price, with at most three decimal places.");
+            return;
+        }
+
+        const token = $("#bookingSaveToken").find('input[name="__RequestVerificationToken"]').val();
+        if (!token) {
+            showBookingSaveError("Save verification is missing. Reload the booking page before trying again.");
+            return;
+        }
+
+        /** @@type {BookingRecord} */
+        const booking = {
+            bookingId,
+            studentId,
+            bookingDate,
+            note: String(fields.note.val() ?? ""),
+            payDollar,
+            [bookingKhrPaymentKey]: paidKhr,
+            active: fields.active.prop("checked") === true
+        };
+
+        if (!editingBooking) {
+            const number = Number(fields.number.val());
+            if (Number.isSafeInteger(number) && number > 0) booking.bookingNo = number;
+            for (const key of ["schoolId", "fieldId", "termNo", "groupId"]) {
+                const value = Number(fields[key].val());
+                if (Number.isSafeInteger(value) && value > 0) booking[key] = value;
+            }
+        }
+
+        const saveButton = BookingClothesModal.find(bookingSaveButtonSelector);
+        const label = saveButton.find("span").first();
+        const originalLabel = label.text();
+        const itemControls = tblBookingDetail.find("button, select, input");
+        bookingSaveInProgress = true;
+        closeBookingItemLookups();
+        itemControls.prop("disabled", true);
+        saveButton.prop("disabled", true).attr("aria-busy", "true");
+        btnCloseBooking.prop("disabled", true);
+        label.text("Saving…");
+        showBookingSaveFeedback("Saving the booking and its clothing items…");
+
+        return $.ajax({
+            url: "/booking-clothes/save-booking-with-items",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            headers: { RequestVerificationToken: token },
+            data: JSON.stringify({ booking, items, originalItems: originalBookingItems }),
+            timeout: 20000
+        }).done(/** @@param {BookingSaveResponse|null} response */ function (response) {
+            if (String(response?.status?.code) !== "200") {
+                showBookingSaveError(response?.status?.message || "Unable to save the booking.");
+                return;
+            }
+
+            const savedBookingId = Number(response?.data?.bookingId);
+            if (!Number.isSafeInteger(savedBookingId) || savedBookingId <= 0 ||
+                Number(response?.data?.itemCount) !== items.length) {
+                showBookingSaveError("The server did not confirm all clothing items. Search for the booking before retrying.");
+                return;
+            }
+
+            const message = response?.status?.message || "Booking and clothing items saved successfully.";
+            bookingSaveInProgress = false;
+            BookingClothesModal.modal("hide");
+            tblBooking.DataTable().ajax.reload();
+            if (typeof ShowToastSuccess === "function") {
+                ShowToastSuccess(message);
             } else {
-                modal.removeClass("fullscreen-modal");
-                icon.removeClass("fa-compress").addClass("fa-expand");
-                $("#btnTogglePaymentFullscreen").attr("title", "Fullscreen");
+                ShowToastInfo(message);
             }
-            setTimeout(function () {
-                if ($.fn.DataTable && $.fn.DataTable.isDataTable("#tblBookingDetail")) {
-                    $("#tblBookingDetail").DataTable().columns.adjust().draw(false);
-                }
-            }, 200);
+        }).fail(/** @@param {BookingAjaxError} xhr */ function (xhr, status) {
+            const error = xhr.responseJSON;
+            const message = error?.status?.message || error?.message || error?.title;
+            if (status === "timeout" || xhr.status === 0) {
+                showBookingSaveError("The save result could not be confirmed. Search for the booking before retrying.");
+            } else if (xhr.status === 401 || xhr.status === 403 || status === "parsererror") {
+                showBookingSaveError("The server did not return a save confirmation. Check that you are signed in.");
+            } else if (xhr.status === 404 && !message) {
+                showBookingSaveError("The clothing save action was not found. Install the matching BookingClothesController.cs.");
+            } else if (xhr.status === 400 && !message) {
+                showBookingSaveError("The server rejected the request. Reload the page to refresh Save verification, then try again.");
+            } else {
+                showBookingSaveError(message || "Unable to save the booking. Please try again.");
+            }
+        }).always(function () {
+            bookingSaveInProgress = false;
+            itemControls.prop("disabled", false);
+            saveButton.prop("disabled", false).removeAttr("aria-busy");
+            btnCloseBooking.prop("disabled", false);
+            label.text(originalLabel);
+        });
+    }
+
+    //---------------------------------------------------- Event Trigger ----------------------------------------------------
+    btnNewBooking.on("click", function () {
+        if (bookingSaveInProgress) return;
+        cancelBookingDetailRequest();
+        resetNewBooking();
+        showBookingEditor("New Booking");
+    });
+
+    BookingClothesModal.on("hide.bs.modal.bookingInline", function (event) {
+        if (bookingSaveInProgress) {
+            event.preventDefault();
+            return;
         }
-    </script>
+        bookingInlineStudent?.select2("close");
+        closeBookingItemLookups();
+    });
+
+    btnCloseBooking.on("click", function () {
+        BookingClothesModal.modal("hide");
+    });
+
+    btnCloseItem.on("click", function () {
+        ItemModal.modal("hide");
+    });
+
+    ItemModal.on("hidden.bs.modal.bookingBrowse", resetBookingItemSelection);
+
+    btnAssignItem.on("click", function () {
+        if (bookingSaveInProgress || !bookingBrowseRow?.isConnected) return;
+        if (selectedItems.length === 0) {
+            ShowToastInfo("Please select at least one item.");
+            return;
+        }
+        let index = Number(bookingBrowseRow.dataset.bookingRowIndex);
+        for (const item of selectedItems) {
+            if (setBookingRowItem(index, item)) {
+                const blankIndex = bookingRows.indexOf(null);
+                index = blankIndex < 0 ? bookingRows.length : blankIndex;
+            }
+        }
+        renderBookingItems();
+        ItemModal.modal("hide");
+    });
+
+    tblBookingDetail.on("click", ".booking-item-browse", function () {
+        if (bookingSaveInProgress) return;
+        if (!ItemModal.length || !tblItem.length) {
+            ShowToastInfo("Clothing item search is unavailable. Reload the page and try again.");
+            return;
+        }
+        closeBookingItemLookups();
+        resetBookingItemSelection();
+        bookingBrowseRow = this.closest("tr");
+        tblItem.DataTable().clear().destroy();
+        tblItem.DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            ajax: {
+                url: "/booking-clothes/get-items",
+                type: "POST"
+            },
+            columns: [
+                { data: "id" },
+                { data: "name" },
+                { data: "nameKhmer" },
+                { data: "price" },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (_data, _type, item) {
+                        const used = selectedBookingClothIds().has(bookingClothKey(item?.id));
+                        return `
+                            <button type="button"
+                                    class="btn ${used ? "btn-success" : "btn-default"} btn-xs btn-block btnChooseItem"
+                                    ${used ? "disabled" : ""}>
+                                <i class="fas fa-check mr-1"></i>
+                                ${used ? "Selected" : "Select"}
+                            </button>
+                        `;
+                    }
+                }
+            ]
+        });
+        ItemModal.modal("show");
+    });
+
+    tblItem.on("click", ".btnChooseItem", function () {
+        const $button = $(this);
+        const $row = $button.closest("tr");
+        /** @@type {BookingCatalogItem|undefined} */
+        const selectedRow = tblItem.DataTable().row($row).data();
+
+        const id = bookingClothKey(selectedRow?.id);
+        if (!id || selectedBookingClothIds().has(id)) return;
+
+        const exists = selectedItems.some(function (x) {
+            return bookingClothKey(x.id) === id;
+        });
+        if (exists) return;
+        selectedItems.push(selectedRow);
+        const text =
+            `${selectedRow.name} (${formatUsd(selectedRow.price)} $)`;
+
+        const newOption = new Option(
+            text,
+            id,
+            true,
+            true
+        );
+
+        stateSelect
+            .append(newOption)
+            .trigger("change");
+
+        $button
+            .removeClass("btn-default")
+            .addClass("btn-success")
+            .html('<i class="fas fa-check mr-1"></i> Selected')
+            .prop("disabled", true);
+    });
+
+    tblBooking.on("click", ".btnEditBooking", function () {
+        const button = $(this);
+        const bookingId = button.data("id");
+        if (!bookingId) return;
+
+        fetchBookingDetail(bookingId, button);
+    });
+
+    btnSearchStudent.on("click", function (e) {
+        e.preventDefault();
+        tblSearchStudent.DataTable().clear().destroy();
+        tblSearchStudent.DataTable({
+            processing: true,
+            serverSide: true,
+            paging: true,
+            lengthChange: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            responsive: true,
+            autoWidth: true,
+            scrollCollapse: true,
+            ajax: {
+                url: "/student/academic/student-list/all",
+                type: "POST",
+                error: function (error) {
+                    console.log(error.responseText);
+                }
+            },
+            columns: [
+                {data: "studentId"},
+                {data: "studentName"},
+                {data: "studentNameInKhmer"},
+                {data: "sex"},
+                {
+                    data: null,
+                    /** @@param {BookingStudent} row */
+                    render: function (row) {
+                        if (row.status === "REGISTER") {
+                            return ` <span class="badge badge-warning">${row.status}</span>`;
+                        } else if (row.status === "ACTIVE") {
+                            return ` <span class="badge badge-primary">${row.status}</span>`;
+                        } else if (row.status === "QUIT") {
+                            return ` <span class="badge badge-danger">${row.status}</span>`;
+                        } else {
+                            return `<span class="badge badge-secondary">${row.status}</span>`;
+                        }
+                    },
+                },
+                {
+                    data: null,
+                    render: function () {
+                        return `<a id="btnSelectStudent" class="btn btn-success btn-xs btn-block">Select</a>`;
+                    },
+                },
+            ],
+            initComplete: function () {
+                MyApp.utils.dataTableDebounceSearch("#tblSearchStudent", 500);
+            }
+        });
+        modalStudent.modal("show");
+    })
+
+    tblSearchStudent.on("click", "#btnSelectStudent", function () {
+        const $row = $(this).closest('tr');
+        /** @@type {BookingStudent|undefined} */
+        const selectedRow = tblSearchStudent.DataTable().row($row).data();
+        if (selectedRow) {
+            syncBookingStudentLookup(selectedRow.studentId, selectedRow);
+            modalStudent.modal("hide");
+        }
+    });
+    //---------------------------------------------------- Event Trigger ----------------------------------------------------
+
+    // ---------------------------------------------------- Booking Item Section ----------------------------------------------------
+    function loadBookingExchangeRate() {
+        if (bookingExchangeRateRequest) return;
+
+        bookingExchangeRateRequest = $.ajax({
+            url: "/exchange-rates/get-exchange-rates",
+            method: "POST",
+            dataType: "json",
+            data: { isAll: true },
+            timeout: 20000
+        });
+        bookingExchangeRateRequest.done(function (response) {
+            if (String(response?.status?.code) !== "200" || !response.data) return;
+
+            const rateIn = bookingNumber(String(response.data.rateIn ?? "").replace(/,/g, ""));
+            const rateOut = bookingNumber(String(response.data.rateOut ?? "").replace(/,/g, ""));
+            if (rateIn > 0) BookingClothesModal.find("#txtRateIn").text(rateIn);
+            if (rateOut <= 0) return;
+
+            BookingClothesModal.find("#txtRateOut").text(rateOut);
+            tblBookingDetail.find("tbody tr").each(function () {
+                const item = bookingRows[Number(this.dataset.bookingRowIndex)];
+                if (item) updateBookingRowAmounts(this, item);
+            });
+            calculateGrandTotal();
+        }).always(function () {
+            bookingExchangeRateRequest = null;
+        });
+    }
+
+    function getExchangeRate() {
+        const rate = Number(BookingClothesModal.find("#txtRateOut").text().replace(/,/g, "").trim());
+        return Number.isFinite(rate) && rate > 0 ? rate : 4100;
+    }
+
+    function bookingNumber(value) {
+        const number = Number(value);
+        return Number.isFinite(number) ? number : 0;
+    }
+
+    function fitsBookingDetailNumber(value) {
+        return Number.isFinite(value) && Number(value.toFixed(3)) === value;
+    }
+
+    function readBookingDetailNumber(input) {
+        const value = String($(input).val() ?? "").trim();
+        return value === "" ? NaN : Number(value);
+    }
+
+    function escapeBookingHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[character]);
+    }
+
+    function bookingClothKey(value) {
+        const id = Number(value);
+        return Number.isSafeInteger(id) && id > 0 ? String(id) : "";
+    }
+
+    /** @@returns {BookingLine[]} */
+    function getBookingItems() {
+        return bookingRows.filter(item => item !== null);
+    }
+
+    function selectedBookingClothIds() {
+        return new Set(getBookingItems().map(item => bookingClothKey(item.clothId)).filter(Boolean));
+    }
+
+    function bookingLineValue(item) {
+        if (!item) return "";
+        return bookingClothKey(item.clothId) || "legacy";
+    }
+
+    /** @@param {number} index @@param {BookingCatalogItem} item */
+    function setBookingRowItem(index, item) {
+        const clothId = bookingClothKey(item.id);
+        if (!clothId || selectedBookingClothIds().has(clothId)) return false;
+
+        const previous = bookingRows[index];
+        // A change of catalog item replaces the old detail through the existing save action.
+        bookingRows[index] = {
+            bookingDetailId: 0,
+            bookingId: 0,
+            clothId,
+            itemName: item.name || item.nameKhmer || item.namekhmer || "",
+            nameKhmer: item.name ? (item.nameKhmer || item.namekhmer || "") : "",
+            qty: previous?.qty > 0 ? previous.qty : 1,
+            price: bookingNumber(item.price)
+        };
+        return true;
+    }
+
+    function initializeBookingItemPicker(row, item) {
+        const picker = row.find(".booking-item-select");
+        const browse = row.find(".booking-item-browse");
+        if (item) {
+            const names = bookingProductNames(item.itemName, item.nameKhmer, "Item " + (item.clothId ?? ""));
+            const label = [names.primary, names.secondary].filter(Boolean).join(" · ");
+            picker.append(new Option(label, bookingLineValue(item), true, true));
+            browse.text(label);
+        }
+        if (!$.fn.select2) return;
+
+        try {
+            picker.removeClass("d-none").select2({
+                width: "100%",
+                dropdownParent: BookingClothesModal,
+                placeholder: "Search clothing items",
+                minimumResultsForSearch: 0,
+                templateResult: renderBookingItemOption,
+                language: { noResults: () => "No available clothing items found." },
+                ajax: bookingLookupAjax({
+                    url: "/booking-clothes/get-items",
+                    columns: ["id", "name", "nameKhmer", "price", null],
+                    idFor: record => bookingClothKey(record?.id),
+                    labelFor: bookingItemLabel,
+                    browseButton: browse,
+                    excludedIds: selectedBookingClothIds,
+                    picker: picker[0]
+                })
+            });
+            browse.addClass("d-none");
+        } catch (error) {
+            picker.addClass("d-none");
+            console.warn("Clothing item dropdown unavailable.", error);
+        }
+    }
+
+    function closeBookingItemLookups() {
+        if (!$.fn.select2) return;
+        tblBookingDetail.find(".booking-item-select.select2-hidden-accessible").select2("close");
+        const requests = Array.from(bookingItemRequests.values());
+        bookingItemRequests.clear();
+        requests.forEach(request => request.abort());
+    }
+
+    function destroyBookingItemPickers(container) {
+        container.find(".booking-item-select.select2-hidden-accessible").each(function () {
+            const request = bookingItemRequests.get(this);
+            bookingItemRequests.delete(this);
+            $(this).select2("close").select2("destroy");
+            request?.abort();
+        });
+    }
+
+    function renderBookingItems() {
+        const tbody = tblBookingDetail.find("tbody");
+        destroyBookingItemPickers(tbody);
+        tbody.empty();
+        bookingRows.forEach((_item, index) => renderBookingItemRow(index));
+        calculateGrandTotal();
+    }
+
+    function renderBookingItemRow(index, target) {
+        const item = bookingRows[index];
+        const quantity = Number.isFinite(item?.qty) ? item.qty : (item ? "" : 0);
+        let price = item ? "" : 0;
+        if (Number.isFinite(item?.price)) {
+            price = item.price.toFixed(Number(item.price.toFixed(2)) === item.price ? 2 : 3);
+        }
+        const priceKhr = (bookingNumber(item?.price) * getExchangeRate()).toFixed(0);
+        const locked = item ? "" : "readonly";
+        const usdUnit = item ? "$" : "—";
+        const khrUnit = item ? "៛" : "—";
+        const row = target ? $(target) : $("<tr>").appendTo(tblBookingDetail.find("tbody"));
+
+        destroyBookingItemPickers(row);
+        row.attr("data-booking-row-index", index).html(`
+                <td hidden>${escapeBookingHtml(item?.bookingDetailId ?? 0)}</td>
+                <td hidden>${escapeBookingHtml(item?.bookingId ?? 0)}</td>
+                <td hidden>${escapeBookingHtml(item?.clothId ?? "")}</td>
+                <td class="text-center booking-row-number">${index + 1}</td>
+                <td class="booking-item-name">
+                    <select class="form-control form-control-sm booking-item-select d-none"
+                            aria-label="Clothing item for row ${index + 1}">
+                        <option value=""></option>
+                    </select>
+                    <button type="button" class="btn btn-outline-secondary btn-sm booking-item-browse"
+                            aria-controls="ItemModal" aria-haspopup="dialog">
+                        Search clothing items
+                    </button>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm text-right item-qty"
+                           aria-label="Quantity"
+                           min="0.001"
+                           step="0.001"
+                           value="${quantity}" ${locked}>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm booking-item-amount">
+                        <input type="number" class="form-control text-right item-price-usd"
+                               aria-label="Unit price in USD" min="0" step="0.001" value="${price}" ${locked}>
+                        <div class="input-group-append">
+                            <span class="input-group-text" aria-hidden="true">${usdUnit}</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm booking-item-amount">
+                        <input type="number" class="form-control text-right item-price-khr"
+                               aria-label="Unit price in KHR (converted from USD)" value="${priceKhr}" readonly>
+                        <div class="input-group-append">
+                            <span class="input-group-text" aria-hidden="true">${khrUnit}</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm booking-item-amount">
+                        <input type="number" class="form-control text-right item-discount"
+                               aria-label="Per-item discount is not stored"
+                               title="The booking detail table has no per-item discount column."
+                               value="0"
+                               readonly>
+                        <div class="input-group-append">
+                            <span class="input-group-text" aria-hidden="true">%</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm booking-item-amount">
+                        <output class="form-control text-right font-weight-bold line-total-usd"
+                                aria-label="Line total in USD">${formatUsd(item ? calculateLineUsd(item) : 0)}</output>
+                        <div class="input-group-append">
+                            <span class="input-group-text" aria-hidden="true">$</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group input-group-sm booking-item-amount">
+                        <output class="form-control text-right font-weight-bold line-total-khr"
+                                aria-label="Line total in KHR">${formatKhr(item ? calculateLineKhr(item) : 0)}</output>
+                        <div class="input-group-append">
+                            <span class="input-group-text" aria-hidden="true">៛</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-outline-danger btn-sm js-remove-booking-item"
+                            title="Remove row" aria-label="Remove row ${index + 1}">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                </td>
+        `);
+        initializeBookingItemPicker(row, item);
+        return row;
+    }
+
+    tblBookingDetail.on("click", "#btnAddBookingItem", function () {
+        if (bookingSaveInProgress) return;
+        closeBookingItemLookups();
+        const index = bookingRows.push(null) - 1;
+        const row = renderBookingItemRow(index);
+        row[0].scrollIntoView({ block: "nearest", inline: "nearest" });
+        const picker = row.find(".booking-item-select");
+        if (picker.hasClass("select2-hidden-accessible")) {
+            picker.select2("open");
+        } else {
+            row.find(".booking-item-browse").trigger("click");
+        }
+    });
+
+    tblBookingDetail.on("select2:open.bookingItems", ".booking-item-select", function () {
+        const search = BookingClothesModal.find(".select2-container--open .select2-search__field").last();
+        search.attr("aria-label", "Search clothing items")
+            .attr("placeholder", "Search clothing items")
+            .trigger("focus");
+    });
+
+    tblBookingDetail.on("select2:select.bookingItems", ".booking-item-select", function (event) {
+        const row = this.closest("tr");
+        const index = Number(row.dataset.bookingRowIndex);
+        const item = (/** @@type {{params?: {data?: {record?: BookingCatalogItem}}}} */ (event))
+            .params?.data?.record;
+        $(this).val(bookingLineValue(bookingRows[index])).trigger("change.select2");
+        if (!item || bookingSaveInProgress) return;
+
+        // Let Select2 finish the selection before replacing its row controls.
+        window.setTimeout(() => {
+            if (!this.isConnected || bookingSaveInProgress || !BookingClothesModal.hasClass("show")) return;
+            if (!setBookingRowItem(index, item)) {
+                ShowToastInfo("This item is already in the booking. Change the quantity in its row.");
+                return;
+            }
+            renderBookingItemRow(index, row).find(".item-qty").trigger("focus");
+            calculateGrandTotal();
+        }, 0);
+    });
+
+    // CALCULATE USD
+    /** @@param {BookingLine} item */
+    function calculateLineUsd(item) {
+        return bookingNumber(item.qty) * bookingNumber(item.price);
+    }
+
+    // CALCULATE KHR
+    /** @@param {BookingLine} item */
+    function calculateLineKhr(item) {
+        return calculateLineUsd(item) * getExchangeRate();
+    }
+
+    // CHANGE QTY
+    tblBookingDetail.on("input", ".item-qty", function () {
+        const row = this.closest("tr");
+        const item = bookingRows[Number(row.dataset.bookingRowIndex)];
+        if (!item || bookingSaveInProgress) return;
+        item.qty = readBookingDetailNumber(this);
+        updateBookingRowAmounts(row, item);
+        calculateGrandTotal();
+    });
+
+    // CHANGE USD PRICE
+    tblBookingDetail.on("input", ".item-price-usd", function () {
+        const row = this.closest("tr");
+        const item = bookingRows[Number(row.dataset.bookingRowIndex)];
+        if (!item || bookingSaveInProgress) return;
+        item.price = readBookingDetailNumber(this);
+        updateBookingRowAmounts(row, item);
+        calculateGrandTotal();
+    });
+
+    function updateBookingRowAmounts(row, item) {
+        const itemRow = $(row);
+        itemRow.find(".item-price-khr").val((bookingNumber(item.price) * getExchangeRate()).toFixed(0));
+        itemRow.find(".line-total-usd").text(formatUsd(calculateLineUsd(item)));
+        itemRow.find(".line-total-khr").text(formatKhr(calculateLineKhr(item)));
+    }
+
+    function hasBookingItemChanges(bookingItems) {
+        if (bookingItems.length !== originalBookingItems.length) return true;
+        const originalById = new Map(originalBookingItems.map(item => [item.bookingDetailId, item]));
+        return bookingItems.some(item => {
+            const original = originalById.get(Number(item.bookingDetailId));
+            return !original || original.clothId !== Number(item.clothId) ||
+                original.qty !== item.qty || bookingNumber(original.price) !== item.price;
+        });
+    }
+
+    // CALCULATE TOTAL
+    function calculateGrandTotal() {
+        const bookingItems = getBookingItems();
+        let grandUsd = 0;
+        let grandKhr = 0;
+        bookingItems.forEach(function (item) {
+            grandUsd += calculateLineUsd(item);
+            grandKhr += calculateLineKhr(item);
+        });
+        $('#lblGrandTotalUsd').text(formatUsd(grandUsd));
+        $('#lblGrandTotalKhr').text(formatKhr(grandKhr));
+        $('#invoice_GrandTotalUsd').val(grandUsd.toFixed(2));
+        $('#invoice_GrandTotalKhr').val(grandKhr.toFixed(0));
+        const preserveSavedTotal = editingBooking && (!hasBookingItemChanges(bookingItems) ||
+            bookingNumber(editingBooking.vat) !== 0 || bookingNumber(editingBooking.discount) !== 0);
+        getBookingEditorFields().total.val(preserveSavedTotal ? (editingBooking.total ?? 0) : grandUsd.toFixed(2));
+    }
+
+    // REMOVE
+    tblBookingDetail.on("click", ".js-remove-booking-item", function () {
+        if (bookingSaveInProgress) return;
+        const index = Number(this.closest("tr").dataset.bookingRowIndex);
+        bookingRows.splice(index, 1);
+        if (!bookingRows.length) bookingRows.push(null);
+        renderBookingItems();
+        tblBookingDetail.find("tbody tr").eq(Math.min(index, bookingRows.length - 1))
+            .find(".js-remove-booking-item").trigger("focus");
+    });
+    // ---------------------------------------------------- Booking Item Section ----------------------------------------------------
+
+
+    // toggle modal fullscreen or minimize screen
+    const bookingFullscreenToggle = $("#btnTogglePaymentFullscreen");
+    bookingFullscreenToggle.on("click", function () {
+        setPaymentFullscreen(!BookingClothesModal.hasClass("fullscreen-modal"));
+    });
+    function setPaymentFullscreen(isFullscreen) {
+        const icon = $("#paymentFullscreenIcon");
+        if (isFullscreen) {
+            BookingClothesModal.addClass("fullscreen-modal");
+            icon.removeClass("fa-expand").addClass("fa-compress");
+        } else {
+            BookingClothesModal.removeClass("fullscreen-modal");
+            icon.removeClass("fa-compress").addClass("fa-expand");
+        }
+        bookingFullscreenToggle.attr("title", isFullscreen ? "Restore" : "Fullscreen");
+        setTimeout(function () {
+            const DataTable = $.fn.dataTable;
+            if (DataTable?.isDataTable(bookingDetailTableSelector)) {
+                new DataTable.Api(bookingDetailTableSelector).columns.adjust();
+            }
+        }, 200);
+    }
+</script>
 }

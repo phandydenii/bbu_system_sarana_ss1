@@ -1,33 +1,146 @@
-<div class="modal fade" id="StudentModal" data-backdrop="static">
-    <div class="modal-dialog modal-xl">
+<style>
+    #StudentModal .modal-dialog {
+        width: calc(100% - 2rem);
+        max-width: 1140px;
+        margin: 1rem auto;
+    }
+
+    #StudentModal .modal-content {
+        max-height: calc(100vh - 2rem);
+        max-height: calc(100dvh - 2rem);
+        border: 1px solid #dee2e6;
+        border-radius: .3rem;
+    }
+
+    #StudentModal .modal-header,
+    #StudentModal .modal-footer {
+        flex-shrink: 0;
+        min-height: 3.75rem;
+        padding: .75rem 1rem;
+        border-color: #dee2e6;
+        background: #fff;
+    }
+
+    #StudentModal .modal-header {
+        align-items: center;
+    }
+
+    #StudentModal .modal-title {
+        margin: 0;
+        color: #343a40;
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+
+    #StudentModal .modal-header .btn {
+        min-width: 1.875rem;
+        padding-inline: .25rem;
+    }
+
+    #StudentModal .modal-body {
+        min-height: 0;
+        padding: 1rem;
+        overflow: auto;
+        color: #495057;
+        font-size: .875rem;
+    }
+
+    #StudentModal #tblSearchStudent {
+        margin-bottom: 0;
+        font-size: .875rem;
+    }
+
+    #StudentModal #tblSearchStudent th,
+    #StudentModal #tblSearchStudent td {
+        vertical-align: middle;
+        border-color: #dee2e6;
+    }
+
+    #StudentModal #tblSearchStudent thead th {
+        background: #f4f6f9;
+        color: #343a40;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    #StudentModal #tblSearchStudent td:nth-child(1) {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+    }
+
+    #StudentModal #tblSearchStudent td:nth-child(3) {
+        font-family: "Noto Sans Khmer", "Khmer OS System", "Leelawadee UI", sans-serif;
+        line-height: 1.5;
+    }
+
+    #StudentModal #tblSearchStudent td:nth-child(5),
+    #StudentModal #tblSearchStudent td:nth-child(6) {
+        text-align: center;
+    }
+
+    /* DataTables creates the row actions and search controls. */
+    /*noinspection CssUnusedSymbol*/
+    #StudentModal #tblSearchStudent .btn {
+        display: inline-block;
+        width: auto;
+        min-width: 4rem;
+        padding: .15rem .5rem;
+        border-radius: .25rem;
+        font-size: .8125rem;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #StudentModal .dataTables_filter input,
+    #StudentModal .dt-search input,
+    #StudentModal .dataTables_length select,
+    #StudentModal .dt-length select {
+        min-height: calc(1.8125rem + 2px);
+        border-color: #ced4da;
+        border-radius: .25rem;
+        font-size: .875rem;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #StudentModal .dataTables_filter input,
+    #StudentModal .dt-search input {
+        width: min(14rem, 58vw);
+    }
+</style>
+
+<div class="modal fade" id="StudentModal" tabindex="-1" aria-labelledby="studentSearchModalTitle"
+     aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Student Search</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <h4 class="modal-title" id="studentSearchModalTitle">Student Search</h4>
+                <button type="button" class="btn btn-light btn-sm" data-dismiss="modal"
+                        title="Close" aria-label="Close student search">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
+
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-12">
-                        <table id="tblSearchStudent" class="table table-sm table-bordered table-striped" style="width: 100%;">
-                            <thead>
-                            <tr>
-                                <th>Student Id</th>
-                                <th>Name English</th>
-                                <th>Name Khmer</th>
-                                <th>Gender</th>
-                                @* <th>DOB</th>
-                                <th>Phone</th> *@
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <table id="tblSearchStudent" class="table table-sm table-hover table-bordered table-striped"
+                       style="width: 100%;">
+                    <caption class="sr-only">Student search results</caption>
+                    <thead>
+                    <tr>
+                        <th scope="col" class="all">Student ID</th>
+                        <th scope="col">Name English</th>
+                        <th scope="col">Name Khmer</th>
+                        <th scope="col">Gender</th>
+                        <th scope="col" class="text-center">Status</th>
+                        <th scope="col" class="all text-center">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">
+                    <i class="fas fa-times mr-1" aria-hidden="true"></i> Close
+                </button>
             </div>
         </div>
     </div>

@@ -1,0 +1,865 @@
+﻿<style>
+    #PaymentModal:not(.fullscreen-modal) .modal-dialog {
+        width: calc(100% - 2rem);
+        max-width: 1140px;
+        margin: 1rem auto;
+    }
+
+    #PaymentModal:not(.fullscreen-modal) .modal-content {
+        max-height: calc(100vh - 2rem);
+        max-height: calc(100dvh - 2rem);
+        border: 1px solid #dee2e6;
+        border-radius: .3rem;
+    }
+
+    #PaymentModal.fullscreen-modal .modal-dialog,
+    #PaymentModal.fullscreen-modal .modal-content {
+        height: 100vh;
+        height: 100dvh;
+    }
+
+    #PaymentModal.fullscreen-modal .modal-dialog {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+    }
+
+    #PaymentModal.fullscreen-modal .modal-content {
+        border: 0;
+        border-radius: 0;
+    }
+
+    #PaymentModal .modal-header,
+    #PaymentModal .modal-footer {
+        flex-shrink: 0;
+        min-height: 3.75rem;
+        padding: .75rem 1rem;
+        border-color: #dee2e6;
+        background: #fff;
+    }
+
+    #PaymentModal .modal-header {
+        align-items: center;
+        gap: .75rem;
+    }
+
+    #PaymentModal .modal-title {
+        color: #343a40;
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+
+    #PaymentModal .payment-header-actions {
+        display: flex;
+        gap: .125rem;
+    }
+
+    #PaymentModal .payment-header-actions .btn {
+        min-width: 1.875rem;
+        padding: .2rem;
+        color: #343a40;
+    }
+
+    #PaymentModal .modal-body {
+        min-height: 0;
+        padding: 1rem;
+        overflow: auto;
+        background: #fff;
+        color: #495057;
+        font-size: .875rem;
+    }
+
+    #PaymentModal [hidden] {
+        display: none !important;
+    }
+
+    #PaymentModal .payment-detail-context {
+        display: grid;
+        grid-template-columns: minmax(0, 28rem) minmax(0, 21rem);
+        justify-content: space-between;
+        align-items: start;
+        gap: .5rem 2rem;
+        margin-bottom: .25rem;
+    }
+
+    #PaymentModal .payment-context-fields {
+        display: grid;
+        gap: .4rem;
+        min-width: 0;
+    }
+
+    #PaymentModal .payment-context-row {
+        display: grid;
+        grid-template-columns: minmax(6.5rem, auto) minmax(0, 1fr);
+        align-items: center;
+        column-gap: .75rem;
+    }
+
+    #PaymentModal .payment-context-row > label,
+    #PaymentModal .payment-context-label {
+        margin: 0;
+        font-weight: 400;
+    }
+
+    #PaymentModal .payment-invoice-fields .payment-context-row > label,
+    #PaymentModal .payment-invoice-fields .payment-context-label {
+        text-align: right;
+    }
+
+    #PaymentModal .payment-context-control {
+        grid-column: 2;
+        min-width: 0;
+    }
+
+    #PaymentModal .payment-context-control.btn {
+        width: 100%;
+    }
+
+    #PaymentModal .payment-context-control.rate-values {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .15rem .75rem;
+        min-height: 1.8125rem;
+        align-items: center;
+        font-variant-numeric: tabular-nums;
+    }
+
+    #PaymentModal .rate-values strong:empty::after {
+        content: "—";
+    }
+
+    #PaymentModal #paymentStudentFeedback {
+        grid-column: 2;
+    }
+
+    #PaymentModal .payment-detail-context .form-control,
+    #PaymentModal .payment-summary-area .form-control {
+        border-color: #ced4da;
+        border-radius: .2rem;
+    }
+
+    #PaymentModal .payment-detail-context .form-control[readonly],
+    #PaymentModal .payment-summary-area .form-control[readonly] {
+        background: #e9ecef;
+    }
+
+    #PaymentModal .payment-inline-picker {
+        min-width: 0;
+    }
+
+    /* Select2 creates these elements for the student and item pickers. */
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-inline-picker > .select2-container,
+    #PaymentModal #tblInvoiceDetail .select2-container {
+        display: block;
+        max-width: 100%;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-inline-picker .select2-selection--single,
+    #PaymentModal #tblInvoiceDetail .select2-selection--single {
+        position: relative;
+        display: flex;
+        align-items: center;
+        height: calc(1.8125rem + 2px);
+        border: 1px solid #bdc8d4;
+        border-radius: .3rem;
+        background: #fff;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-inline-picker .select2-container--open .select2-selection--single,
+    #PaymentModal #tblInvoiceDetail .select2-container--open .select2-selection--single {
+        border-color: #3384d6;
+        box-shadow: 0 0 0 2px #3384d626;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-inline-picker .select2-selection__rendered,
+    #PaymentModal #tblInvoiceDetail .select2-selection__rendered {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        padding: 0 1.75rem 0 .55rem;
+        color: #243348;
+        font-size: .9375rem;
+        line-height: 1.45;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal #paymentInlineStudentControl .select2-selection__rendered {
+        padding-right: 3.1rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .select2-selection__placeholder {
+        color: #53647a;
+        font-weight: 400;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-inline-picker .select2-selection__arrow,
+    #PaymentModal #tblInvoiceDetail .select2-selection__arrow {
+        top: 0;
+        right: .3rem;
+        width: 1.2rem;
+        height: 100%;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-inline-picker .select2-selection__clear {
+        position: absolute;
+        top: 50%;
+        right: 1.55rem;
+        display: grid;
+        width: 1.35rem;
+        height: 1.35rem;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: .25rem;
+        background: transparent;
+        color: #546478;
+        font-size: .9375rem;
+        line-height: 1;
+        place-items: center;
+        transform: translateY(-50%);
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-inline-picker .select2-selection__clear:hover {
+        background: #eef3f8;
+        color: #233953;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .select2-container--disabled .select2-selection--single {
+        background: #e9ecef;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .select2-selection--single:focus-visible {
+        outline: 2px solid #3384d6;
+        outline-offset: 1px;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .select2-dropdown {
+        overflow: hidden;
+        border: 1px solid #c5cfdb;
+        border-radius: .4rem;
+        background: #fff;
+        box-shadow: 0 .4rem 1.1rem #21355420;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .select2-search--dropdown {
+        padding: .4rem;
+        border-bottom: 1px solid #e4eaf1;
+        background: #f7f9fc;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .select2-search--dropdown .select2-search__field {
+        min-height: 2rem;
+        padding: .3rem .55rem;
+        border: 1px solid #bdc8d4;
+        border-radius: .3rem;
+        background: #fff;
+        color: #243348;
+        font-size: .9375rem;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .select2-search--dropdown .select2-search__field:focus {
+        border-color: #3384d6;
+        outline: 2px solid #3384d626;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .select2-results > .select2-results__options {
+        max-height: min(15rem, 42vh);
+        padding: .2rem 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .select2-results__option {
+        margin: 0 .2rem;
+        padding: .45rem .65rem;
+        border-radius: .25rem;
+        color: #243348;
+        font-size: .9375rem;
+        line-height: 1.45;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .select2-results__option--highlighted {
+        background: #e7f1fd;
+        color: #164779;
+    }
+
+    /* The payment lookup script renders these labels in Select2. */
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-lookup-result {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .65rem;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-lookup-names {
+        flex: 1 1 auto;
+        display: grid;
+        gap: .1rem;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-lookup-primary {
+        font-weight: 600;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-lookup-details {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        column-gap: .65rem;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-item-selection {
+        display: flex;
+        align-items: baseline;
+        gap: .5rem;
+        font-weight: 500;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-item-selection > span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-item-selection-khmer {
+        max-width: 50%;
+        font-weight: 400;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-lookup-names [lang="km"],
+    #PaymentModal .payment-item-selection [lang="km"] {
+        font-family: "Noto Sans Khmer", "Khmer OS System", "Leelawadee UI", sans-serif;
+        line-height: 1.5;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-lookup-details,
+    #PaymentModal .payment-item-selection-khmer,
+    #PaymentModal .payment-lookup-price {
+        color: #45576c;
+        font-size: .875rem;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .payment-lookup-price {
+        flex-shrink: 0;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    /*noinspection CssUnusedSymbol*/
+    #PaymentModal .select2-results__option--highlighted .payment-lookup-details,
+    #PaymentModal .select2-results__option--highlighted .payment-lookup-price {
+        color: inherit;
+    }
+
+    #PaymentModal .invoice-detail-scroll {
+        max-height: 46vh;
+        overflow: auto;
+    }
+
+    #PaymentModal #tblInvoiceDetail {
+        width: 100%;
+        margin-bottom: 0;
+        color: #495057;
+        font-size: .8125rem;
+    }
+
+    #PaymentModal #tblInvoiceDetail th,
+    #PaymentModal #tblInvoiceDetail td {
+        padding: .2rem .25rem;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    #PaymentModal #tblInvoiceDetail thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: #fff;
+        color: #343a40;
+        font-weight: 600;
+    }
+
+    #PaymentModal #tblInvoiceDetail .hide-col {
+        display: none;
+    }
+
+    #PaymentModal #tblInvoiceDetail .payment-item-name {
+        min-width: 13rem;
+        width: 100%;
+    }
+
+    #PaymentModal #tblInvoiceDetail [data-payment-row-number] {
+        min-width: 2rem;
+    }
+
+    #PaymentModal #tblInvoiceDetail .payment-item-qty {
+        width: 3.5rem;
+    }
+
+    #PaymentModal #tblInvoiceDetail .payment-item-amount {
+        width: 5.75rem;
+        flex-wrap: nowrap;
+    }
+
+    #PaymentModal #tblInvoiceDetail .payment-item-total {
+        width: 7rem;
+    }
+
+    #PaymentModal #tblInvoiceDetail .payment-item-amount > .form-control {
+        min-width: 0;
+    }
+
+    #PaymentModal #tblInvoiceDetail input[type="number"],
+    #PaymentModal #tblInvoiceDetail [data-payment-line-total],
+    #PaymentModal .input-group-text {
+        border-color: #ced4da;
+        font-variant-numeric: tabular-nums;
+    }
+
+    #PaymentModal #tblInvoiceDetail [data-payment-line-total],
+    #PaymentModal .input-group-text {
+        background: #e9ecef;
+        color: #495057;
+    }
+
+    #PaymentModal #tblInvoiceDetail .input-group-text {
+        min-width: 1.45rem;
+        justify-content: center;
+        padding-inline: .25rem;
+    }
+
+    #PaymentModal #tblInvoiceDetail tfoot {
+        background: #f8f9fa;
+        font-variant-numeric: tabular-nums;
+    }
+
+    #PaymentModal #tblInvoiceDetail .btn-sm {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 1.5rem;
+        min-height: 1.5rem;
+        padding: .05rem .25rem;
+    }
+
+    #PaymentModal .payment-invoice-bottom {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
+        align-items: start;
+        gap: .75rem clamp(1rem, 5vw, 4rem);
+        margin-top: .85rem;
+    }
+
+    #PaymentModal .payment-invoice-notes {
+        min-width: 0;
+        width: 100%;
+        max-width: 34rem;
+    }
+
+    #PaymentModal .payment-invoice-tabs {
+        flex-wrap: nowrap;
+    }
+
+    #PaymentModal .payment-invoice-tabs .nav-link {
+        padding: .35rem .75rem;
+        background: transparent;
+        color: #495057;
+    }
+
+    #PaymentModal .payment-invoice-tabs .nav-link.active {
+        border-top-color: #3384d6;
+        background: #fff;
+        color: #2069b9;
+    }
+
+    #PaymentModal .payment-remark-panel {
+        padding: .45rem;
+        border: 1px solid #dee2e6;
+        border-top: 0;
+    }
+
+    #PaymentModal .payment-remark-panel textarea {
+        min-height: 7.5rem;
+        border-color: #ced4da;
+        resize: vertical;
+    }
+
+    #PaymentModal .payment-detail-summary summary {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+        gap: .4rem;
+        padding-bottom: .25rem;
+        color: #343a40;
+        font-weight: 600;
+        cursor: pointer;
+        list-style: none;
+    }
+
+    #PaymentModal .payment-detail-summary summary::-webkit-details-marker {
+        display: none;
+    }
+
+    #PaymentModal .payment-detail-summary[open] .payment-summary-chevron {
+        transform: rotate(180deg);
+    }
+
+    #PaymentModal .payment-summary-area {
+        display: grid;
+        grid-template-columns: minmax(5rem, 1fr) repeat(2, minmax(0, 6.75rem));
+        gap: .25rem .4rem;
+        align-items: center;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    #PaymentModal .payment-summary-area .form-control {
+        height: 1.75rem;
+        padding: .125rem .4rem;
+        font-size: .8125rem;
+        text-align: right;
+    }
+
+    #PaymentModal .payment-summary-area #invoice_TotalDollar,
+    #PaymentModal .payment-summary-area #invoice_TotalRiel {
+        font-weight: 600;
+    }
+
+    #PaymentModal .payment-invoice-bottom #paymentInvoiceHistory {
+        grid-column: 1 / -1;
+        min-width: 0;
+        border: 1px solid #dee2e6;
+    }
+
+    #PaymentModal .payment-invoice-bottom #paymentInvoiceHistory .invoice-history-header {
+        padding: .45rem .6rem;
+        background: #f8f9fa;
+    }
+
+    @@media (max-width: 767.98px) {
+        #PaymentModal .payment-detail-context,
+        #PaymentModal .payment-invoice-bottom {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        #PaymentModal .payment-invoice-fields .payment-context-row > label,
+        #PaymentModal .payment-invoice-fields .payment-context-label {
+            text-align: left;
+        }
+    }
+
+    @@media (max-width: 575.98px) {
+        #PaymentModal:not(.fullscreen-modal) .modal-dialog {
+            width: calc(100% - 1rem);
+            margin: .5rem auto;
+        }
+
+        #PaymentModal:not(.fullscreen-modal) .modal-content {
+            max-height: calc(100vh - 1rem);
+            max-height: calc(100dvh - 1rem);
+        }
+
+        #PaymentModal .modal-header,
+        #PaymentModal .modal-body,
+        #PaymentModal .modal-footer {
+            padding-inline: .65rem;
+        }
+    }
+</style>
+
+<div class="modal fade"
+     id="PaymentModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="paymentModalTitle"
+     aria-hidden="true"
+     data-backdrop="static">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="paymentModalTitle" tabindex="-1">Invoice</h4>
+                <div class="payment-header-actions">
+                    <button type="button" id="btnTogglePaymentFullscreen" class="btn btn-sm"
+                            title="Fullscreen" aria-label="Toggle full screen" aria-pressed="false">
+                        <i id="paymentFullscreenIcon" class="fas fa-expand" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" id="btnDismissPayment" class="btn btn-sm" data-dismiss="modal"
+                            title="Close" aria-label="Close invoice">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="PaymentForm" method="post">
+                    <input type="hidden" id="invoice_InvoiceId" name="invoice.InvoiceId" value="0" />
+                    <input type="hidden" id="invoice_StudentId" name="invoice.StudentId" />
+                    <input type="hidden" id="invoice_DegreeId" name="invoice.DegreeId" />
+                    <input type="hidden" id="invoice_SchoolId" name="invoice.SchoolId" />
+                    <input type="hidden" id="invoice_FieldId" name="invoice.FieldId" />
+                    <input type="hidden" id="invoice_PromotionId" name="invoice.PromotionId" />
+                    <input type="hidden" id="invoice_StageId" name="invoice.StageId" />
+                    <input type="hidden" id="invoice_TermNo" name="invoice.TermNo" />
+                    <input type="hidden" id="invoice_GroupId" name="invoice.GroupId" />
+                    <input type="hidden" id="invoice_StartDate" name="invoice.StartDate" />
+                    <input type="hidden" id="invoice_EndDate" name="invoice.EndDate" />
+                    <input type="hidden" id="invoice_ExchangeRateId" name="invoice.ExchangeRateId" />
+                    <input type="hidden" id="invoice_Vat" name="invoice.Vat" value="0" />
+
+                    <section class="payment-detail-context" aria-label="Invoice information">
+                        <div class="payment-context-fields">
+                            <div class="payment-context-row">
+                                <label for="paymentDetailStudentId">Student ID<span class="text-danger" aria-hidden="true">*</span></label>
+                                <input type="text" id="paymentDetailStudentId" class="form-control form-control-sm payment-context-control" readonly />
+                                <div id="paymentInlineStudentControl" class="payment-context-control payment-inline-picker d-none">
+                                    <select id="paymentInlineStudent" class="form-control form-control-sm"
+                                            aria-label="Search student ID or name" aria-describedby="paymentStudentFeedback">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <p id="paymentStudentFeedback" class="small text-secondary mb-0 mt-1" role="status" hidden></p>
+                            </div>
+                            <div class="payment-context-row">
+                                <label for="paymentDetailStudentName">Student Name</label>
+                                <input type="text" id="paymentDetailStudentName" class="form-control form-control-sm" readonly />
+                            </div>
+                            <div class="payment-context-row">
+                                <label for="paymentDetailPhone">Phone</label>
+                                <input type="text" id="paymentDetailPhone" class="form-control form-control-sm" value="N/A" readonly />
+                            </div>
+                            <div class="payment-context-row">
+                                <button type="button" id="btnPaymentHistoryPanel" class="btn btn-sm btn-outline-info payment-context-control"
+                                        aria-controls="paymentInvoiceHistory">
+                                    <i class="fas fa-history mr-1" aria-hidden="true"></i> Invoice History
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="payment-context-fields payment-invoice-fields">
+                            <div class="payment-context-row">
+                                <label for="paymentDetailInvoiceNo">Invoice No.</label>
+                                <input type="text" id="paymentDetailInvoiceNo" class="form-control form-control-sm" readonly />
+                            </div>
+                            <div class="payment-context-row">
+                                <label for="paymentDetailInvoiceDate">Invoice Date</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" id="paymentDetailInvoiceDate" class="form-control" readonly />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text"><i class="far fa-calendar-alt" aria-hidden="true"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="payment-context-row">
+                                <label for="paymentDetailTerm">Term</label>
+                                <input type="text" id="paymentDetailTerm" class="form-control form-control-sm" readonly />
+                            </div>
+                            <div class="payment-context-row">
+                                <span class="payment-context-label">Exchange Rate</span>
+                                <div class="payment-context-control rate-values">
+                                    <span>In: <strong id="txtRateIn"></strong></span>
+                                    <span>Out: <strong id="txtRateOut"></strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="payment-table-area" aria-label="Payment Items">
+                        <span id="paymentDetailItemCount" class="sr-only" role="status">0 items</span>
+                        <div class="invoice-detail-scroll" role="region" aria-label="Payment items table" tabindex="0">
+                            <table id="tblInvoiceDetail" class="table table-sm table-bordered table-hover">
+                                <caption class="sr-only">Invoice items</caption>
+                                <thead>
+                                <tr>
+                                    <th scope="col" class="text-center">No.</th>
+                                    <th class="hide-col">invoice_detail_id</th>
+                                    <th class="hide-col">invoice_id</th>
+                                    <th class="hide-col">product_id</th>
+                                    <th scope="col">Item Description</th>
+                                    <th scope="col" class="text-center">Qty</th>
+                                    <th scope="col" class="text-right">Unit Price</th>
+                                    <th class="hide-col">total_khr</th>
+                                    <th class="hide-col">total_usd</th>
+                                    <th class="hide-col">type</th>
+                                    <th class="hide-col">vat</th>
+                                    <th scope="col" class="text-left">Discount %</th>
+                                    <th class="hide-col">discount_khr</th>
+                                    <th class="hide-col">discount_usd</th>
+                                    <th scope="col" class="text-left">Owe</th>
+                                    <th scope="col" class="text-left">Other</th>
+                                    <th scope="col" class="text-left">Total USD</th>
+                                    <th scope="col" class="text-left">Total KHR</th>
+                                    <th class="hide-col">grand_total_khr</th>
+                                    <th class="hide-col">grand_total_usd</th>
+                                    <th class="hide-col">pay_as_khr</th>
+                                    <th class="hide-col">pay_as_usd</th>
+                                    <th class="hide-col">pay_bath</th>
+                                    <th class="hide-col">tuition_fees</th>
+                                    <th class="hide-col">card_certificate</th>
+                                    <th class="hide-col">category_id</th>
+                                    <th class="hide-col">payment_type</th>
+                                    <th scope="col" class="text-center">
+                                        <span class="sr-only">Action</span>
+                                        <button type="button" id="btnAddPaymentItem" class="btn btn-success btn-sm"
+                                                title="Add item" aria-label="Add item">
+                                            <i class="fas fa-plus" aria-hidden="true"></i>
+                                        </button>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                                <tfoot>
+                                <tr class="font-weight-bold">
+                                    <th scope="row" colspan="7" class="text-right">Grand Total</th>
+                                    <td id="paymentDetailGrandUsd" class="text-right">0.00</td>
+                                    <td id="paymentDetailGrandKhr" class="text-right">0</td>
+                                    <td></td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="payment-invoice-bottom">
+                            <div class="payment-invoice-notes">
+                                <div class="nav nav-tabs payment-invoice-tabs" role="tablist" aria-label="Invoice notes and history">
+                                    <button type="button" id="btnPaymentRemarkTab" class="nav-link active" role="tab"
+                                            aria-controls="paymentInvoiceRemark" aria-selected="true">Remark</button>
+                                    <button type="button" id="btnPaymentHistoryTab" class="nav-link" role="tab"
+                                            aria-controls="paymentInvoiceHistory" aria-selected="false" tabindex="-1">Invoice History</button>
+                                </div>
+                                <section id="paymentInvoiceRemark" class="payment-remark-panel" role="tabpanel" aria-labelledby="btnPaymentRemarkTab">
+                                    <label for="invoice_Description" class="sr-only">Remark</label>
+                                    <textarea id="invoice_Description" name="invoice.Description" class="form-control form-control-sm"
+                                              rows="4" maxlength="100"></textarea>
+                                </section>
+                            </div>
+
+                            <details class="payment-detail-summary" open>
+                                <summary>
+                                    <span>Summary</span>
+                                    <i class="fas fa-chevron-down payment-summary-chevron" aria-hidden="true"></i>
+                                </summary>
+                                <div class="payment-summary-area">
+                                    <span></span>
+                                    <strong>USD</strong>
+                                    <strong>KHR</strong>
+                                    <span>Grand Total</span>
+                                    <input type="number" id="invoice_GrandTotalUsd" name="invoice.GrandTotalUsd"
+                                           aria-label="Grand Total (USD)" class="form-control form-control-sm" value="0.00" readonly />
+                                    <input type="number" id="invoice_GrandTotalKhr" name="invoice.GrandTotalKhr"
+                                           aria-label="Grand Total (KHR)" class="form-control form-control-sm" value="0" readonly />
+                                    <span>Discount</span>
+                                    <input type="number" id="invoice_TotalDiscountUsd" name="invoice.TotalDiscountUsd"
+                                           aria-label="Discount (USD)" class="form-control form-control-sm" value="0.00" readonly />
+                                    <input type="number" id="invoice_TotalDiscountKhr" name="invoice.TotalDiscountKhr"
+                                           aria-label="Discount (KHR)" class="form-control form-control-sm" value="0" readonly />
+                                    <span>Owe</span>
+                                    <input type="number" id="invoice_OweUsd" name="invoice.OweUsd"
+                                           aria-label="Owe (USD)" class="form-control form-control-sm" value="0.00" readonly />
+                                    <input type="number" id="invoice_OweKhr" name="invoice.OweKhr"
+                                           aria-label="Owe (KHR)" class="form-control form-control-sm" value="0" readonly />
+                                    <span>Other</span>
+                                    <input type="number" id="invoice_TotalOtherUsd" name="invoice.TotalOtherUsd"
+                                           aria-label="Other (USD)" class="form-control form-control-sm" value="0.00" readonly />
+                                    <input type="number" id="invoice_TotalOtherKhr" name="invoice.TotalOtherKhr"
+                                           aria-label="Other (KHR)" class="form-control form-control-sm" value="0" readonly />
+                                    <span>Paid</span>
+                                    <input type="number" id="invoice_TotalPayUsd" name="invoice.TotalPayUsd"
+                                           aria-label="Paid (USD)" class="form-control form-control-sm" value="0.00" min="0" step="0.01" />
+                                    <input type="number" id="invoice_TotalPayKhr" name="invoice.TotalPayKhr"
+                                           aria-label="Paid (KHR)" class="form-control form-control-sm" value="0" min="0" step="1" />
+                                    <strong>Net Total</strong>
+                                    <input type="number" id="invoice_TotalDollar" name="invoice.TotalDollar"
+                                           aria-label="Net Total (USD)" class="form-control form-control-sm" value="0.00" readonly />
+                                    <input type="number" id="invoice_TotalRiel" name="invoice.TotalRiel"
+                                           aria-label="Net Total (KHR)" class="form-control form-control-sm" value="0" readonly />
+                                </div>
+                            </details>
+
+                            <section id="paymentInvoiceHistory" role="tabpanel"
+                                     aria-labelledby="btnPaymentHistoryTab" hidden>
+                                <div class="invoice-history-header">
+                                    <h4 id="paymentInvoiceHistoryTitle" tabindex="-1">
+                                        <i class="fas fa-history" aria-hidden="true"></i>
+                                        Invoice History
+                                    </h4>
+                                </div>
+                                <p id="paymentInvoiceHistoryPrompt" class="text-muted px-3 py-2 mb-0">
+                                    Select a student to see invoice history.
+                                </p>
+                                <div id="paymentInvoiceHistoryResults" class="invoice-table-wrap" hidden>
+                                    <div class="alert alert-warning mb-2" data-invoice-history-error hidden>
+                                        <span role="alert"></span>
+                                        <button type="button" class="btn btn-sm btn-outline-dark ml-2">Retry</button>
+                                    </div>
+                                    <table id="tblPaymentInvoiceHistory" class="table table-bordered table-striped invoice-history-table"
+                                           aria-labelledby="paymentInvoiceHistoryTitle">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Invoice No.</th>
+                                            <th scope="col">Invoice Date</th>
+                                            <th scope="col">Term</th>
+                                            <th scope="col">Grand Total</th>
+                                            <th scope="col">Discount</th>
+                                            <th scope="col">VAT</th>
+                                            <th scope="col">Owe</th>
+                                            <th scope="col">Total Paid</th>
+                                            <th scope="col">Paid KHR</th>
+                                            <th scope="col">Paid USD</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm" id="btnSavePayment" disabled>
+                    <i class="fas fa-save mr-1" aria-hidden="true"></i> Save
+                </button>
+                <button type="button" id="btnClosePayment" class="btn btn-danger btn-sm">
+                    <i id="paymentCloseIcon" class="fas fa-times mr-1" aria-hidden="true"></i>
+                    <span id="paymentCloseLabel">Close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
